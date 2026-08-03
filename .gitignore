@@ -1,0 +1,15 @@
+# Local / secrets
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# Do not publish DB dumps or zip archives
+*.sql
+*.zip
+lpaezsis_web_files/
+
+# Editor
+.idea/
+.vscode/

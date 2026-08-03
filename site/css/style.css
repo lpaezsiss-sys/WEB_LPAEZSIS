@@ -561,9 +561,9 @@ body.nav-open {
 
 .hero-logo {
   display: block;
-  height: clamp(2.2rem, 4.5vw, 2.8rem);
+  height: clamp(2.6rem, 5.2vw, 3.4rem);
   width: auto;
-  margin: 0 0 1.25rem;
+  margin: 0 0 1.35rem;
   filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.35));
   animation: fadeUp 0.8s ease both;
 }
