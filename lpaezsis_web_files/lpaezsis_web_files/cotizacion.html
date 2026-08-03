@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cotización online | LPAEZsis</title>
+  <meta name="description" content="Solicita cotización de equipos industriales LPAEZsis: secadores, turbinas Sonic Air y fin de línea.">
+  <link rel="canonical" href="https://lpaezsis.cl/cotizacion.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cotización online | LPAEZsis">
+  <meta property="og:description" content="Arma tu lista y recibe una cotización de equipos y repuestos industriales.">
+  <meta property="og:url" content="https://lpaezsis.cl/cotizacion.html">
+  <meta property="og:image" content="https://lpaezsis.cl/img/hero/line.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css?v=52">
+</head>
+<body>
+  <div id="site-header-mount"></div>
+  <main id="main">
+    <div class="page-hero page-hero--compact">
+      <div class="page-hero-inner">
+        <h1>Cotización</h1>
+        <p>Agrega equipos (y opcionalmente repuestos) y envíanos tus datos. Te respondemos con una propuesta.</p>
+      </div>
+    </div>
+    <section class="section quote-layout">
+      <div>
+        <ul class="quote-list" id="quoteList"></ul>
+        <p class="empty-state" id="quoteEmpty" hidden>Tu lista está vacía. <a href="catalogo.html">Ver productos</a></p>
+      </div>
+      <div class="panel">
+        <h2>Datos de contacto</h2>
+        <form id="quoteForm">
+          <div class="honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" id="quoteWebsite" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <div class="form-field"><label for="quoteName">Nombre *</label><input id="quoteName" required maxlength="200" autocomplete="name"></div>
+          <div class="form-field"><label for="quoteEmail">Email *</label><input id="quoteEmail" type="email" required autocomplete="email"></div>
+          <div class="form-field"><label for="quotePhone">Teléfono *</label><input id="quotePhone" required autocomplete="tel"></div>
+          <div class="form-field"><label for="quoteCompany">Empresa</label><input id="quoteCompany" autocomplete="organization"></div>
+          <div class="form-field"><label for="quoteMessage">Mensaje / requerimientos</label><textarea id="quoteMessage" rows="4" maxlength="2000"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block" id="quoteSubmit">Solicitar cotización</button>
+          <p class="form-msg" id="quoteMsg" hidden></p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer-mount"></div>
+  <script src="js/layout.js?v=31"></script>
+  <script src="js/site.js?v=22"></script>
+  <script>
+    function renderQuote() {
+      var items = Lpaez.getQuote();
+      var list = document.getElementById("quoteList");
+      var empty = document.getElementById("quoteEmpty");
+      if (!items.length) {
+        list.innerHTML = "";
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      list.innerHTML = items.map(function (item) {
+        return '<li class="quote-item"><div class="quote-item-top"><strong>' + Lpaez.escapeHtml(item.name) +
+          '</strong><span>x' + item.qty + '</span></div>' +
+          '<div class="qty-row"><button type="button" data-dec="' + item.id + '">−</button><span>' + item.qty +
+          '</span><button type="button" data-inc="' + item.id + '">+</button></div>' +
+          '<button type="button" class="btn btn-outline" data-rm="' + item.id + '">Quitar</button></li>';
+      }).join("");
+      list.querySelectorAll("[data-dec]").forEach(function (btn) {
+        btn.onclick = function () {
+          var id = Number(btn.getAttribute("data-dec"));
+          var it = Lpaez.getQuote().find(function (i) { return i.id === id; });
+          Lpaez.setQuoteQty(id, (it ? it.qty : 1) - 1);
+          renderQuote();
+        };
+      });
+      list.querySelectorAll("[data-inc]").forEach(function (btn) {
+        btn.onclick = function () {
+          var id = Number(btn.getAttribute("data-inc"));
+          var it = Lpaez.getQuote().find(function (i) { return i.id === id; });
+          Lpaez.setQuoteQty(id, (it ? it.qty : 0) + 1);
+          renderQuote();
+        };
+      });
+      list.querySelectorAll("[data-rm]").forEach(function (btn) {
+        btn.onclick = function () {
+          Lpaez.setQuoteQty(Number(btn.getAttribute("data-rm")), 0);
+          renderQuote();
+        };
+      });
+    }
+    renderQuote();
+    (function prefillAsunto() {
+      var asunto = Lpaez.queryParam("asunto");
+      var ta = document.getElementById("quoteMessage");
+      if (asunto && ta && !ta.value.trim()) ta.value = asunto;
+    })();
+    document.getElementById("quoteForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = document.getElementById("quoteMsg");
+      var btn = document.getElementById("quoteSubmit");
+      var items = Lpaez.getQuote();
+      if (!items.length) {
+        msg.hidden = false; msg.className = "form-msg is-error"; msg.textContent = "Agrega productos a la cotización.";
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+      msg.hidden = true;
+      Lpaez.api("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          website: document.getElementById("quoteWebsite").value,
+          customer_name: document.getElementById("quoteName").value.trim(),
+          customer_email: document.getElementById("quoteEmail").value.trim(),
+          customer_phone: document.getElementById("quotePhone").value.trim(),
+          company_name: document.getElementById("quoteCompany").value.trim(),
+          message: document.getElementById("quoteMessage").value.trim(),
+          items: items.map(function (i) { return { product_id: i.id, qty: i.qty }; })
+        })
+      }).then(function (res) {
+        msg.hidden = false;
+        if (!res.ok) {
+          msg.className = "form-msg is-error";
+          msg.textContent = (res.data && res.data.error) || "No se pudo enviar.";
+          return;
+        }
+        msg.className = "form-msg is-ok";
+        msg.textContent = "Cotización recibida: " + res.data.public_code + ". Te contactaremos pronto.";
+        Lpaez.clearQuote();
+        renderQuote();
+        document.getElementById("quoteForm").reset();
+      }).catch(function () {
+        msg.hidden = false;
+        msg.className = "form-msg is-error";
+        msg.textContent = "Error de conexión.";
+      }).then(function () {
+        btn.disabled = false;
+        btn.textContent = "Solicitar cotización";
+      });
+    });
+  </script>
+</body>
+</html>

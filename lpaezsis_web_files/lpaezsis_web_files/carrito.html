@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carrito | LPAEZsis</title>
+  <meta name="description" content="Revisa tu carrito de repuestos y consumibles LPAEZsis. Pago por transferencia tras confirmación.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="stylesheet" href="css/style.css?v=52">
+</head>
+<body>
+  <div id="site-header-mount"></div>
+  <main id="main">
+    <div class="page-hero page-hero--compact">
+      <div class="page-hero-inner">
+        <h1>Carrito</h1>
+        <p>Solo productos comprables (repuestos y consumibles). Los equipos van en cotización.</p>
+      </div>
+    </div>
+    <section class="section cart-layout">
+      <div>
+        <ul class="cart-list" id="cartList"></ul>
+        <p class="empty-state" id="cartEmpty" hidden>Tu carrito está vacío. <a href="catalogo.html?sale_mode=buy">Ver productos para comprar</a></p>
+      </div>
+      <div class="panel">
+        <h2>Confirmar pedido</h2>
+        <form id="orderForm">
+          <div class="honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" id="orderWebsite" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <div class="form-field"><label for="orderName">Nombre *</label><input id="orderName" required maxlength="200" autocomplete="name"></div>
+          <div class="form-field"><label for="orderEmail">Email *</label><input id="orderEmail" type="email" required maxlength="200" autocomplete="email"></div>
+          <div class="form-field"><label for="orderPhone">Teléfono *</label><input id="orderPhone" required maxlength="40" autocomplete="tel"></div>
+          <div class="form-field"><label for="orderCompany">Empresa</label><input id="orderCompany" maxlength="200" autocomplete="organization"></div>
+          <div class="form-field"><label for="orderAddress">Dirección de despacho</label><input id="orderAddress" maxlength="500" autocomplete="street-address"></div>
+          <div class="form-field"><label for="orderNotes">Notas</label><textarea id="orderNotes" rows="3" maxlength="1000"></textarea></div>
+          <p><strong>Total: <span id="cartTotal">$0</span></strong></p>
+          <p class="form-note">Confirmaremos el pedido y te indicaremos los datos de transferencia.</p>
+          <button type="submit" class="btn btn-primary btn-block" id="orderSubmit">Enviar pedido</button>
+          <p class="form-msg" id="orderMsg" hidden></p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer-mount"></div>
+  <script src="js/layout.js?v=31"></script>
+  <script src="js/site.js?v=22"></script>
+  <script>
+    function renderCart() {
+      var items = Lpaez.getCart();
+      var list = document.getElementById("cartList");
+      var empty = document.getElementById("cartEmpty");
+      var total = 0;
+      if (!items.length) {
+        list.innerHTML = "";
+        empty.hidden = false;
+        document.getElementById("cartTotal").textContent = "$0";
+        return;
+      }
+      empty.hidden = true;
+      list.innerHTML = items.map(function (item) {
+        var line = (item.price_clp || 0) * item.qty;
+        total += line;
+        return '<li class="cart-item"><div class="cart-item-top"><strong>' + Lpaez.escapeHtml(item.name) +
+          '</strong><span>' + Lpaez.formatPrice(line) + '</span></div>' +
+          '<div class="qty-row"><button type="button" data-dec="' + item.id + '">−</button><span>' + item.qty +
+          '</span><button type="button" data-inc="' + item.id + '">+</button></div>' +
+          '<button type="button" class="btn btn-outline" data-rm="' + item.id + '">Quitar</button></li>';
+      }).join("");
+      document.getElementById("cartTotal").textContent = Lpaez.formatPrice(total);
+      list.querySelectorAll("[data-dec]").forEach(function (btn) {
+        btn.onclick = function () {
+          var id = Number(btn.getAttribute("data-dec"));
+          var it = Lpaez.getCart().find(function (i) { return i.id === id; });
+          Lpaez.setCartQty(id, (it ? it.qty : 1) - 1);
+          renderCart();
+        };
+      });
+      list.querySelectorAll("[data-inc]").forEach(function (btn) {
+        btn.onclick = function () {
+          var id = Number(btn.getAttribute("data-inc"));
+          var it = Lpaez.getCart().find(function (i) { return i.id === id; });
+          Lpaez.setCartQty(id, (it ? it.qty : 0) + 1);
+          renderCart();
+        };
+      });
+      list.querySelectorAll("[data-rm]").forEach(function (btn) {
+        btn.onclick = function () {
+          Lpaez.setCartQty(Number(btn.getAttribute("data-rm")), 0);
+          renderCart();
+        };
+      });
+    }
+    renderCart();
+    document.getElementById("orderForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = document.getElementById("orderMsg");
+      var btn = document.getElementById("orderSubmit");
+      var items = Lpaez.getCart();
+      if (!items.length) {
+        msg.hidden = false; msg.className = "form-msg is-error"; msg.textContent = "El carrito está vacío.";
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+      msg.hidden = true;
+      Lpaez.api("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          website: document.getElementById("orderWebsite").value,
+          customer_name: document.getElementById("orderName").value.trim(),
+          customer_email: document.getElementById("orderEmail").value.trim(),
+          customer_phone: document.getElementById("orderPhone").value.trim(),
+          company_name: document.getElementById("orderCompany").value.trim(),
+          address: document.getElementById("orderAddress").value.trim(),
+          notes: document.getElementById("orderNotes").value.trim(),
+          items: items.map(function (i) { return { product_id: i.id, qty: i.qty }; })
+        })
+      }).then(function (res) {
+        msg.hidden = false;
+        if (!res.ok) {
+          msg.className = "form-msg is-error";
+          msg.textContent = (res.data && res.data.error) || "No se pudo enviar el pedido.";
+          return;
+        }
+        msg.className = "form-msg is-ok";
+        msg.textContent = "Pedido recibido: " + res.data.public_code + ". Te contactaremos para confirmar pago.";
+        Lpaez.clearCart();
+        renderCart();
+        document.getElementById("orderForm").reset();
+      }).catch(function () {
+        msg.hidden = false; msg.className = "form-msg is-error"; msg.textContent = "Error de red.";
+      }).then(function () {
+        btn.disabled = false;
+        btn.textContent = "Enviar pedido";
+      });
+    });
+  </script>
+</body>
+</html>

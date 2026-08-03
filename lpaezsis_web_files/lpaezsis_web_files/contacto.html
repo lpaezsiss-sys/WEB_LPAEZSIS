@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contacto | LPAEZsis</title>
+  <meta name="description" content="Contacta a LPAEZsis: ventas@lpaezsis.cl, +56 9 6823 2745. Cotizaciones y soporte técnico en Chile.">
+  <link rel="canonical" href="https://lpaezsis.cl/contacto.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contacto | LPAEZsis">
+  <meta property="og:description" content="Escríbenos o contáctanos por WhatsApp para cotizar equipos industriales.">
+  <meta property="og:url" content="https://lpaezsis.cl/contacto.html">
+  <meta property="og:image" content="https://lpaezsis.cl/img/hero/line.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css?v=52">
+</head>
+<body>
+  <div id="site-header-mount"></div>
+  <main id="main">
+    <div class="page-hero page-hero--compact">
+      <div class="page-hero-inner">
+        <h1>Contacto</h1>
+        <p>Respuesta en horario laboral. WhatsApp es el camino más rápido.</p>
+      </div>
+    </div>
+    <section class="section quote-layout">
+      <div class="panel contact-fast">
+        <h2>Habla con ventas</h2>
+        <p class="contact-sla">Respondemos en horario laboral Chile · Lun–Vie</p>
+        <a class="btn btn-primary btn-lg btn-block" data-wa href="https://wa.me/56968232745">Escribir por WhatsApp</a>
+        <ul class="contact-direct">
+          <li><a data-email href="mailto:ventas@lpaezsis.cl">ventas@lpaezsis.cl</a></li>
+          <li><a data-phone href="tel:+56968232745">+56 9 6823 2745</a></li>
+          <li><a data-phone2 href="tel:+56941857051">+56 9 4185 7051</a></li>
+        </ul>
+        <p><a href="cotizacion.html">O arma una cotización con productos →</a></p>
+      </div>
+      <div class="panel">
+        <h2>Mensaje corto</h2>
+        <form id="contactForm">
+          <div class="honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" id="contactWebsite" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <div class="form-field"><label for="contactName">Nombre *</label><input id="contactName" required maxlength="200" autocomplete="name"></div>
+          <div class="form-field"><label for="contactEmail">Email *</label><input id="contactEmail" type="email" required autocomplete="email"></div>
+          <div class="form-field"><label for="contactCompany">Empresa</label><input id="contactCompany" maxlength="200" autocomplete="organization"></div>
+          <div class="form-field"><label for="contactMessage">Necesidad *</label><textarea id="contactMessage" rows="4" required maxlength="2000" placeholder="Ej: secado de botellas 600 ml, 18.000 bph…"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Enviar</button>
+          <p class="form-msg" id="contactMsg" hidden></p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer-mount"></div>
+  <script src="js/layout.js?v=31"></script>
+  <script src="js/site.js?v=22"></script>
+  <script>
+    Lpaez.injectJsonLd({
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      name: "LPAEZsis",
+      email: "ventas@lpaezsis.cl",
+      telephone: "+56 9 6823 2745",
+      url: "https://lpaezsis.cl/",
+      areaServed: "CL"
+    });
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = document.getElementById("contactMsg");
+      var btn = document.getElementById("contactSubmit");
+      var company = document.getElementById("contactCompany").value.trim();
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+      msg.hidden = true;
+      Lpaez.api("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          website: document.getElementById("contactWebsite").value,
+          name: document.getElementById("contactName").value.trim(),
+          email: document.getElementById("contactEmail").value.trim(),
+          phone: "",
+          subject: company ? "Empresa: " + company : "Contacto web",
+          message: document.getElementById("contactMessage").value.trim()
+        })
+      }).then(function (res) {
+        msg.hidden = false;
+        msg.textContent = (res.data && res.data.message) || (res.ok ? "Mensaje enviado." : "No se pudo enviar.");
+        msg.className = "form-msg " + (res.ok ? "is-ok" : "is-error");
+        if (res.ok) e.target.reset();
+      }).catch(function () {
+        msg.hidden = false;
+        msg.textContent = "Error de conexión.";
+        msg.className = "form-msg is-error";
+      }).then(function () {
+        btn.disabled = false;
+        btn.textContent = "Enviar";
+      });
+    });
+  </script>
+</body>
+</html>
