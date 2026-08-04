@@ -178,6 +178,7 @@ class PreviewHandler(BaseHTTPRequestHandler):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="LPAEZsis local preview server")
+    parser.add_argument("--host", default=os.environ.get("LPAEZ_PREVIEW_HOST", "0.0.0.0"))
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--api", default=os.environ.get("LPAEZ_API", DEFAULT_API))
     parser.add_argument("--site", default=str(SITE))
@@ -191,10 +192,11 @@ def main() -> int:
     PreviewHandler.api_origin = args.api.rstrip("/")
     PreviewHandler.site_root = site
 
-    server = ThreadingHTTPServer(("127.0.0.1", args.port), PreviewHandler)
+    server = ThreadingHTTPServer((args.host, args.port), PreviewHandler)
     print("LPAEZsis preview")
     print("  Site :", site)
     print("  API  :", PreviewHandler.api_origin, "(proxied at /api)")
+    print("  Bind :", "%s:%d" % (args.host, args.port))
     print("  URL  : http://127.0.0.1:%d/" % args.port)
     print("Ctrl+C to stop")
     try:
