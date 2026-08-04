@@ -90,7 +90,7 @@
       '<header class="site-header">' +
       '<div class="header-inner">' +
       '<a class="logo" href="index.html" aria-label="LPAEZsis inicio">' +
-      '<img src="img/brand/logo.svg" alt="LPAEZsis" width="160" height="37">' +
+      '<img src="img/brand/logo.png" alt="LPAEZsis" width="160" height="37">' +
       "</a>" +
       '<button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav">☰</button>' +
       '<nav class="nav" id="mainNav" aria-label="Principal">' +
@@ -129,7 +129,7 @@
     return (
       '<footer class="site-footer">' +
       '<div class="footer-inner">' +
-      '<div><a href="index.html"><img class="footer-logo" src="img/brand/logo-white.svg" alt="LPAEZsis" width="180" height="42"></a>' +
+      '<div><a href="index.html"><img class="footer-logo" src="img/brand/logo-white.png" alt="LPAEZsis" width="180" height="42"></a>' +
       "<p>LPAEZsis-Soluciones Industriales SpA — ingeniería, ahorro energético y optimización de packaging y fin de línea en Chile. Distribuidores Sonic Air Systems.</p></div>" +
       "<div><h3>Contacto</h3><ul>" +
       '<li><a data-email href="mailto:ventas@lpaezsis.cl">ventas@lpaezsis.cl</a></li>' +
