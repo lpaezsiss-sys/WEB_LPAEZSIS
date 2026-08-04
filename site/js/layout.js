@@ -23,6 +23,11 @@
 
   function ensureHeadAssets() {
     if (!document.querySelector('link[rel="icon"]')) {
+      var ico = document.createElement("link");
+      ico.rel = "icon";
+      ico.href = "img/icons/favicon.ico";
+      ico.sizes = "any";
+      document.head.appendChild(ico);
       var icon32 = document.createElement("link");
       icon32.rel = "icon";
       icon32.type = "image/png";
@@ -37,7 +42,7 @@
       document.head.appendChild(icon192);
       var apple = document.createElement("link");
       apple.rel = "apple-touch-icon";
-      apple.href = "img/icons/favicon-192.png";
+      apple.href = "img/icons/apple-touch-icon.png";
       document.head.appendChild(apple);
     }
 
