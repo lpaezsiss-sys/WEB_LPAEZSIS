@@ -123,6 +123,12 @@ select {
   display: block;
 }
 
+.logo img[src$=".svg"],
+.footer-logo[src$=".svg"] {
+  /* Keep vector logos crisp; avoid accidental bitmap scaling artifacts */
+  image-rendering: auto;
+}
+
 .nav {
   display: flex;
   align-items: center;
