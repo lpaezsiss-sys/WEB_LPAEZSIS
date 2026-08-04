@@ -47,34 +47,13 @@ class PreviewHandler(BaseHTTPRequestHandler):
         if self.path.startswith("/api"):
             self._proxy()
             return
-        # Lightweight static HEAD for health checks
-        parsed = urlparse(self.path)
-        rel = parsed.path.split("?", 1)[0]
-        if rel in ("", "/"):
-            rel = "/index.html"
-        candidate = (self.site_root / rel.lstrip("/")).resolve()
-        try:
-            candidate.relative_to(self.site_root.resolve())
-        except ValueError:
-            self.send_error(403, "Forbidden")
-            return
-        if candidate.is_dir():
-            candidate = candidate / "index.html"
-        if not candidate.is_file():
-            self.send_error(404, "Not found")
-            return
-        ctype = mimetypes.guess_type(str(candidate))[0] or "application/octet-stream"
-        self.send_response(200)
-        self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(candidate.stat().st_size))
-        self.send_header("Cache-Control", "no-cache")
-        self.end_headers()
+        self._serve_static(body=False)
 
     def do_GET(self) -> None:
         if self.path.startswith("/api"):
             self._proxy()
             return
-        self._serve_static()
+        self._serve_static(body=True)
 
     def do_POST(self) -> None:
         self._proxy()
@@ -157,7 +136,7 @@ class PreviewHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(payload)
 
-    def _serve_static(self) -> None:
+    def _serve_static(self, body: bool = True) -> None:
         parsed = urlparse(self.path)
         rel = parsed.path.split("?", 1)[0]
         if rel in ("", "/"):
@@ -168,6 +147,16 @@ class PreviewHandler(BaseHTTPRequestHandler):
             candidate.relative_to(self.site_root.resolve())
         except ValueError:
             self.send_error(403, "Forbidden")
+            return
+
+        # Directories need a trailing slash so relative CSS/JS resolve under /admin/...
+        if candidate.is_dir() and not rel.endswith("/"):
+            target = rel + "/"
+            if parsed.query:
+                target += "?" + parsed.query
+            self.send_response(301)
+            self.send_header("Location", target)
+            self.end_headers()
             return
 
         if candidate.is_dir():
@@ -183,7 +172,8 @@ class PreviewHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-cache")
         self.end_headers()
-        self.wfile.write(data)
+        if body:
+            self.wfile.write(data)
 
 
 def main() -> int:
