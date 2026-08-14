@@ -167,6 +167,55 @@ class PreviewHandler(BaseHTTPRequestHandler):
                     ).fetchall()
                 self._json(200, {"brands": [_row_to_dict(r) for r in rows]})
                 return
+            if path.startswith("/api/brands/") and self.command == "GET":
+                slug = path.split("/api/brands/", 1)[1].strip("/")
+                with self._db() as conn:
+                    row = conn.execute(
+                        """
+                        SELECT *
+                        FROM brands
+                        WHERE slug = ? AND COALESCE(is_active, 1) = 1
+                        LIMIT 1
+                        """,
+                        (slug,),
+                    ).fetchone()
+                    if not row:
+                        self._json(404, {"error": "Marca no encontrada"})
+                        return
+                    brand = _row_to_dict(row)
+                    gallery = []
+                    raw_gallery = brand.pop("gallery_json", None)
+                    if raw_gallery:
+                        try:
+                            parsed = json.loads(raw_gallery)
+                            if isinstance(parsed, list):
+                                gallery = [str(u) for u in parsed if u]
+                        except Exception:
+                            gallery = []
+                    brand["gallery"] = gallery
+                    products = conn.execute(
+                        """
+                        SELECT p.*,
+                               c.slug AS category_slug,
+                               c.name AS category_name,
+                               b.slug AS brand_slug,
+                               b.name AS brand_name
+                        FROM products p
+                        LEFT JOIN categories c ON c.id = p.category_id
+                        LEFT JOIN brands b ON b.id = p.brand_id
+                        WHERE p.brand_id = ? AND COALESCE(p.is_active, 1) = 1
+                        ORDER BY COALESCE(p.sort_order, 0), p.name
+                        """,
+                        (brand["id"],),
+                    ).fetchall()
+                self._json(
+                    200,
+                    {
+                        "brand": brand,
+                        "products": [_row_to_dict(p) for p in products],
+                    },
+                )
+                return
             if path == "/api/products" and self.command == "GET":
                 with self._db() as conn:
                     rows = conn.execute(
