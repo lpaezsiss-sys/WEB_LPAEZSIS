@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://lpaezsis.cl/cotizacion.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/hero/line.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=84">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -47,7 +47,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=22"></script>
+  <script src="js/site.js?v=23"></script>
   <script>
     function renderQuote() {
       var items = Lpaez.getQuote();
@@ -90,10 +90,38 @@
       });
     }
     renderQuote();
-    (function prefillAsunto() {
+    (function prefillFromUrl() {
       var asunto = Lpaez.queryParam("asunto");
+      var sku = Lpaez.queryParam("sku");
       var ta = document.getElementById("quoteMessage");
       if (asunto && ta && !ta.value.trim()) ta.value = asunto;
+      if (!sku) return;
+      Lpaez.api("/api/products/" + encodeURIComponent(sku)).then(function (res) {
+        if (!res.ok || !res.data) return;
+        var p = res.data;
+        if (!p.id && res.data.product) p = res.data.product;
+        if (!p || !p.id) return;
+        Lpaez.addToQuote(
+          {
+            id: p.id,
+            slug: p.slug,
+            name: p.name,
+            price_clp: p.price_clp,
+            sale_mode: p.sale_mode,
+          },
+          1
+        );
+        if (ta && (!ta.value.trim() || ta.value === asunto)) {
+          ta.value =
+            (asunto ? asunto + "\n" : "") +
+            "SKU/parte: " +
+            (p.slug || sku) +
+            " — " +
+            (p.name || "");
+        }
+        renderQuote();
+        Lpaez.updateBadges();
+      });
     })();
     document.getElementById("quoteForm").addEventListener("submit", function (e) {
       e.preventDefault();
