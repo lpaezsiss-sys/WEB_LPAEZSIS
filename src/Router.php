@@ -15,12 +15,12 @@ final class Router
         if ($path === '/') {
             $path = '/api';
         }
-        if (!\str_starts_with($path, '/api')) {
+        if (strncmp($path, '/api', 4) !== 0) {
             $path = '/api' . ($path === '/' ? '' : $path);
         }
 
         try {
-            if (\str_starts_with($path, '/api/admin')) {
+            if (strncmp($path, '/api/admin', 10) === 0) {
                 AdminApi::handle($method, $path);
                 return;
             }

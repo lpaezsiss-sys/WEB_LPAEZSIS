@@ -24,6 +24,8 @@ if ($bootstrap === null) {
     exit;
 }
 
+// Polyfills before bootstrap (PHP 7.4 hosts without str_starts_with / str_contains).
+require_once dirname($bootstrap) . '/polyfills.php';
 require $bootstrap;
 
 use Lpaezsis\Router;
@@ -48,10 +50,7 @@ if ($path === '' || $path === null) {
     }
 }
 
-if (!function_exists('str_starts_with')) {
-    require_once dirname($bootstrap) . '/polyfills.php';
-}
-if (!str_starts_with($path, '/api')) {
+if (strncmp((string) $path, '/api', 4) !== 0) {
     $path = '/api' . ($path === '/' ? '' : $path);
 }
 
