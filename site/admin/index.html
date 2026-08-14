@@ -6,7 +6,8 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Admin | LPAEZsis</title>
   <base href="/admin/">
-  <link rel="stylesheet" href="css/admin.css?v=6">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+  <link rel="stylesheet" href="css/admin.css?v=7">
 </head>
 <body>
   <div id="loginView" class="login-view">
@@ -164,8 +165,16 @@
         <input type="hidden" name="logo_url" id="brandLogoUrl">
       </div>
       <div id="simpleContentField" hidden>
-        <label>Contenido de la ficha (HTML o texto)</label>
-        <textarea name="content_html" id="brandContentHtml" rows="8" placeholder="Texto e imágenes que se muestran en marcas.html"></textarea>
+        <div class="sections-head">
+          <div>
+            <label class="sections-head__label">Contenido de la ficha</label>
+            <p class="sections-head__hint">Secciones con título y texto enriquecido (imágenes, video, formato).</p>
+          </div>
+          <button type="button" class="ghost" id="addSectionBtn">+ Agregar Sección</button>
+        </div>
+        <div id="brandSections" class="brand-sections" aria-live="polite"></div>
+        <!-- Serializado al guardar: &lt;section class="brand-section"&gt;&lt;h3&gt;…&lt;/h3&gt;…&lt;/section&gt; -->
+        <textarea name="content_html" id="brandContentHtml" hidden aria-hidden="true"></textarea>
       </div>
       <div id="simpleSeoFields">
         <label>SEO title</label><input name="seo_title">
@@ -202,6 +211,7 @@
   </dialog>
 
   <div class="toast" id="toast" hidden></div>
-  <script src="js/admin.js?v=13"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+  <script src="js/admin.js?v=14"></script>
 </body>
 </html>

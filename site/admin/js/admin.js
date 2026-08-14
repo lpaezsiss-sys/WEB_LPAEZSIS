@@ -716,6 +716,266 @@
     }
   }
 
+  /* ——— Brand ficha: dynamic sections + Quill ——— */
+  var brandSectionsState = [];
+  var brandQuills = {};
+  var brandSectionSeq = 0;
+
+  function newSectionId() {
+    brandSectionSeq += 1;
+    return "sec-" + Date.now().toString(36) + "-" + brandSectionSeq;
+  }
+
+  function isEmptyQuillHtml(html) {
+    if (!html) return true;
+    var t = String(html)
+      .replace(/<p><br\s*\/?><\/p>/gi, "")
+      .replace(/<p>\s*<\/p>/gi, "")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/<br\s*\/?>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .trim();
+    return !t;
+  }
+
+  function destroyBrandQuills() {
+    Object.keys(brandQuills).forEach(function (id) {
+      try {
+        var q = brandQuills[id];
+        if (q && q.root && q.root.parentNode) {
+          q.root.innerHTML = "";
+        }
+      } catch (err) {
+        /* ignore */
+      }
+    });
+    brandQuills = {};
+  }
+
+  function syncBrandSectionsFromDom() {
+    brandSectionsState.forEach(function (sec) {
+      var card = document.querySelector('[data-section-id="' + sec.id + '"]');
+      if (!card) return;
+      var titleInput = card.querySelector(".section-card__title");
+      if (titleInput) sec.title = titleInput.value;
+      var q = brandQuills[sec.id];
+      if (q) {
+        sec.html = q.root.innerHTML;
+      } else {
+        var fallback = card.querySelector("[data-section-fallback]");
+        if (fallback) sec.html = fallback.value;
+      }
+    });
+  }
+
+  function serializeBrandSections() {
+    syncBrandSectionsFromDom();
+    return brandSectionsState
+      .filter(function (sec) {
+        return (sec.title && sec.title.trim()) || !isEmptyQuillHtml(sec.html);
+      })
+      .map(function (sec) {
+        var title = (sec.title || "").trim() || "Sección";
+        return (
+          '<section class="brand-section">' +
+          "<h3>" +
+          escapeHtml(title) +
+          "</h3>\n" +
+          (sec.html || "") +
+          "\n</section>"
+        );
+      })
+      .join("\n");
+  }
+
+  function parseBrandContentHtml(html) {
+    if (!html || !String(html).trim()) {
+      return [{ id: newSectionId(), title: "", html: "", collapsed: false }];
+    }
+    var wrap = document.createElement("div");
+    wrap.innerHTML = String(html);
+    var nodes = wrap.querySelectorAll("section.brand-section");
+    if (nodes.length) {
+      return Array.prototype.map.call(nodes, function (sec) {
+        var h3 = sec.querySelector("h3");
+        var title = h3 ? h3.textContent.trim() : "";
+        if (h3) h3.parentNode.removeChild(h3);
+        return {
+          id: newSectionId(),
+          title: title,
+          html: sec.innerHTML.trim(),
+          collapsed: false,
+        };
+      });
+    }
+    // Compat: contenido legado sin secciones → una sola sección
+    var firstH3 = wrap.querySelector("h3");
+    if (firstH3 && wrap.children.length > 1) {
+      var parts = [];
+      var cur = { title: "", htmlParts: [] };
+      Array.prototype.forEach.call(wrap.childNodes, function (node) {
+        if (node.nodeType === 1 && node.tagName === "H3") {
+          if (cur.title || cur.htmlParts.length) {
+            parts.push({
+              id: newSectionId(),
+              title: cur.title,
+              html: cur.htmlParts.join(""),
+              collapsed: false,
+            });
+          }
+          cur = { title: (node.textContent || "").trim(), htmlParts: [] };
+        } else if (node.nodeType === 1 || (node.nodeType === 3 && String(node.textContent).trim())) {
+          if (node.nodeType === 1) cur.htmlParts.push(node.outerHTML);
+          else cur.htmlParts.push("<p>" + escapeHtml(node.textContent) + "</p>");
+        }
+      });
+      if (cur.title || cur.htmlParts.length) {
+        parts.push({
+          id: newSectionId(),
+          title: cur.title,
+          html: cur.htmlParts.join(""),
+          collapsed: false,
+        });
+      }
+      if (parts.length) return parts;
+    }
+    return [
+      {
+        id: newSectionId(),
+        title: "Contenido",
+        html: String(html).trim(),
+        collapsed: false,
+      },
+    ];
+  }
+
+  function createSectionQuill(editorEl, sectionId, initialHtml) {
+    if (typeof Quill === "undefined") {
+      editorEl.innerHTML =
+        '<textarea class="section-fallback" rows="6" data-section-fallback="' +
+        sectionId +
+        '">' +
+        escapeHtml(initialHtml || "") +
+        "</textarea>";
+      return null;
+    }
+    var quill = new Quill(editorEl, {
+      theme: "snow",
+      placeholder: "Escribe el contenido de esta sección…",
+      modules: {
+        toolbar: {
+          container: [
+            [{ header: [2, 3, false] }],
+            ["bold", "italic", "underline"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image", "video"],
+            ["clean"],
+          ],
+          handlers: {
+            image: function () {
+              var q = this.quill;
+              openImagePicker({
+                currentUrl: "",
+                onApply: function (url) {
+                  var range = q.getSelection(true) || { index: q.getLength() };
+                  q.insertEmbed(range.index, "image", url, "user");
+                  q.setSelection(range.index + 1);
+                  return Promise.resolve();
+                },
+              });
+            },
+          },
+        },
+      },
+    });
+    if (initialHtml) {
+      quill.root.innerHTML = initialHtml;
+    }
+    brandQuills[sectionId] = quill;
+    return quill;
+  }
+
+  function renderBrandSections() {
+    var container = document.getElementById("brandSections");
+    if (!container) return;
+    syncBrandSectionsFromDom();
+    destroyBrandQuills();
+    if (!brandSectionsState.length) {
+      container.innerHTML =
+        '<p class="brand-sections__empty">Sin secciones. Pulsa “+ Agregar Sección” para crear la primera.</p>';
+      return;
+    }
+    container.innerHTML = brandSectionsState
+      .map(function (sec, idx) {
+        return (
+          '<div class="section-card' +
+          (sec.collapsed ? " is-collapsed" : "") +
+          '" data-section-id="' +
+          escapeAttr(sec.id) +
+          '">' +
+          '<div class="section-card__head">' +
+          '<button type="button" class="section-card__toggle" data-toggle-section="' +
+          escapeAttr(sec.id) +
+          '" aria-expanded="' +
+          (sec.collapsed ? "false" : "true") +
+          '" title="Expandir / contraer">' +
+          '<span class="section-card__chevron" aria-hidden="true">▼</span>' +
+          "</button>" +
+          '<input type="text" class="section-card__title" value="' +
+          escapeAttr(sec.title || "") +
+          '" placeholder="Título de la sección (ej: Especificaciones Técnicas)" aria-label="Título de la sección">' +
+          '<div class="section-card__actions">' +
+          '<button type="button" data-move-section="up" data-section-id="' +
+          escapeAttr(sec.id) +
+          '" title="Subir" ' +
+          (idx === 0 ? "disabled" : "") +
+          ">↑</button>" +
+          '<button type="button" data-move-section="down" data-section-id="' +
+          escapeAttr(sec.id) +
+          '" title="Bajar" ' +
+          (idx === brandSectionsState.length - 1 ? "disabled" : "") +
+          ">↓</button>" +
+          '<button type="button" class="section-remove" data-remove-section="' +
+          escapeAttr(sec.id) +
+          '" title="Eliminar sección">Eliminar</button>' +
+          "</div></div>" +
+          '<div class="section-card__body">' +
+          "<label>Contenido</label>" +
+          '<div class="section-quill"><div class="quill-mount" data-quill-for="' +
+          escapeAttr(sec.id) +
+          '"></div></div>' +
+          "</div></div>"
+        );
+      })
+      .join("");
+
+    brandSectionsState.forEach(function (sec) {
+      var mount = container.querySelector('[data-quill-for="' + sec.id + '"]');
+      if (mount) createSectionQuill(mount, sec.id, sec.html || "");
+    });
+  }
+
+  function addBrandSection(prefill) {
+    syncBrandSectionsFromDom();
+    brandSectionsState.forEach(function (s) {
+      s.collapsed = true;
+    });
+    brandSectionsState.push({
+      id: newSectionId(),
+      title: (prefill && prefill.title) || "",
+      html: (prefill && prefill.html) || "",
+      collapsed: false,
+    });
+    renderBrandSections();
+  }
+
+  function resetBrandSections(html) {
+    destroyBrandQuills();
+    brandSectionsState = parseBrandContentHtml(html || "");
+    renderBrandSections();
+    document.getElementById("brandContentHtml").value = html || "";
+  }
+
   function openSimpleDialog(kind, item) {
     var form = document.getElementById("simpleForm");
     form.reset();
@@ -731,11 +991,13 @@
     var logoField = document.getElementById("simpleLogoField");
     var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
+    var dialog = document.getElementById("simpleDialog");
     if (kind === "brands") {
       logoField.hidden = false;
       contentField.hidden = false;
       seoFields.hidden = true;
-      document.getElementById("brandContentHtml").value = (item && item.content_html) || "";
+      dialog.classList.add("dialog--wide");
+      resetBrandSections((item && item.content_html) || "");
       if (item && item.logo_url) {
         setBrandLogoPreview(item.logo_url);
       } else if (item) {
@@ -743,18 +1005,22 @@
         document.getElementById("brandLogoUrl").value = item.logo_url || "";
       } else {
         setBrandLogoPreview("");
-        document.getElementById("brandContentHtml").value = "";
       }
     } else {
       logoField.hidden = true;
       contentField.hidden = true;
       seoFields.hidden = false;
+      dialog.classList.remove("dialog--wide");
+      destroyBrandQuills();
+      brandSectionsState = [];
       setBrandLogoPreview("");
       document.getElementById("brandContentHtml").value = "";
+      var sectionsEl = document.getElementById("brandSections");
+      if (sectionsEl) sectionsEl.innerHTML = "";
     }
     document.getElementById("simpleDialogTitle").textContent =
       (item ? "Editar " : "Nueva ") + (kind === "categories" ? "categoría" : "marca");
-    document.getElementById("simpleDialog").showModal();
+    dialog.showModal();
   }
 
   document.getElementById("brandLogoPick").addEventListener("click", function () {
@@ -767,6 +1033,54 @@
     });
   });
 
+  document.getElementById("addSectionBtn").addEventListener("click", function () {
+    addBrandSection();
+  });
+
+  document.getElementById("brandSections").addEventListener("click", function (e) {
+    var toggleId = e.target.closest && e.target.closest("[data-toggle-section]");
+    if (toggleId) {
+      var tid = toggleId.getAttribute("data-toggle-section");
+      syncBrandSectionsFromDom();
+      brandSectionsState.forEach(function (s) {
+        if (s.id === tid) s.collapsed = !s.collapsed;
+      });
+      renderBrandSections();
+      return;
+    }
+    var removeBtn = e.target.closest && e.target.closest("[data-remove-section]");
+    if (removeBtn) {
+      var rid = removeBtn.getAttribute("data-remove-section");
+      if (!confirm("¿Eliminar esta sección?")) return;
+      syncBrandSectionsFromDom();
+      brandSectionsState = brandSectionsState.filter(function (s) {
+        return s.id !== rid;
+      });
+      renderBrandSections();
+      return;
+    }
+    var moveBtn = e.target.closest && e.target.closest("[data-move-section]");
+    if (moveBtn) {
+      var mid = moveBtn.getAttribute("data-section-id");
+      var dir = moveBtn.getAttribute("data-move-section");
+      syncBrandSectionsFromDom();
+      var idx = -1;
+      for (var i = 0; i < brandSectionsState.length; i++) {
+        if (brandSectionsState[i].id === mid) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) return;
+      var swap = dir === "up" ? idx - 1 : idx + 1;
+      if (swap < 0 || swap >= brandSectionsState.length) return;
+      var tmp = brandSectionsState[idx];
+      brandSectionsState[idx] = brandSectionsState[swap];
+      brandSectionsState[swap] = tmp;
+      renderBrandSections();
+    }
+  });
+
   document.getElementById("addCategoryBtn").addEventListener("click", function () {
     openSimpleDialog("categories", null);
   });
@@ -774,7 +1088,14 @@
     openSimpleDialog("brands", null);
   });
   document.getElementById("simpleCancel").addEventListener("click", function () {
+    destroyBrandQuills();
+    document.getElementById("simpleDialog").classList.remove("dialog--wide");
     document.getElementById("simpleDialog").close();
+  });
+
+  document.getElementById("simpleDialog").addEventListener("close", function () {
+    destroyBrandQuills();
+    document.getElementById("simpleDialog").classList.remove("dialog--wide");
   });
 
   document.getElementById("brandsList").addEventListener("click", function (e) {
@@ -829,7 +1150,9 @@
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
-      body.content_html = document.getElementById("brandContentHtml").value;
+      var serialized = serializeBrandSections();
+      document.getElementById("brandContentHtml").value = serialized;
+      body.content_html = serialized;
     }
     var id = form.id.value;
     var req = id

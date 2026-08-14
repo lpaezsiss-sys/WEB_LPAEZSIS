@@ -1180,6 +1180,32 @@ body.nav-open {
   font-style: italic;
 }
 
+.brand-catalog-body .brand-section {
+  margin: 0 0 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-catalog-body .brand-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.brand-catalog-body .brand-section > h3:first-child {
+  margin-top: 0;
+}
+
+.brand-catalog-body iframe {
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+  min-height: 220px;
+  border: 0;
+  margin: 0.75rem 0 1.25rem;
+}
+
 .brand-catalog-body p {
   margin: 0 0 0.85rem;
 }
