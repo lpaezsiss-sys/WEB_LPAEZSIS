@@ -15,18 +15,22 @@ tools/
 
 ## Preview local (sin subir al hosting)
 
-Usa el front de `site/` y reenvía `/api` al staging actual `https://lpaezsis.soptec.cl`, así puedes probar catálogo, marcas y formularios sin desplegar.
+Usa el front de `site/` y, si existe `data/lpaezsis.sqlite`, responde `/api` desde esa base local (catálogo, marcas, settings). Si no hay SQLite, hace proxy al API remoto.
 
 ```bash
+# (opcional) regenerar SQLite desde el dump
+python3 tools/import_sql_to_sqlite.py
+
 python3 tools/preview_server.py
 ```
 
-Abre [http://127.0.0.1:8765/](http://127.0.0.1:8765/).
+Abre [http://127.0.0.1:8765/](http://127.0.0.1:8765/) y revisa [Productos](http://127.0.0.1:8765/catalogo.html).
 
 Opciones:
 
 ```bash
 python3 tools/preview_server.py --port 9000
+python3 tools/preview_server.py --remote-api   # forzar proxy remoto
 python3 tools/preview_server.py --api https://lpaezsis.soptec.cl
 ```
 
