@@ -41,9 +41,10 @@ También actualiza `prueba1.lpaezsis.cl/api/index.php` (viene en `site/api/`).
 **PHP 7.4 es suficiente.** No hace falta MultiPHP ni cambiar versión por subdominio: el backend está escrito para 7.4 (polyfills + sin APIs de PHP 8).
 
 ### 3. Base de datos
-1. Crea una BD MySQL en cPanel.
-2. Importa `data/lpaezsis_backup_final.sql` con phpMyAdmin.
-3. Copia `src/.env.example` → `src/.env` y completa:
+1. Crea una BD MySQL en cPanel (te dará un nombre tipo `sistem29_xxx`).
+2. En phpMyAdmin **selecciona esa BD** e importa **`data/lpaezsis_bluehosting.sql`**  
+   (no uses el dump original: trae un cotejo `utf8mb4_uca1400_ai_ci` que BlueHosting no soporta).
+3. Copia `src/.env.example` → `src/.env` y completa con el **usuario/clave reales** (no dejes `tu_usuario_mysql`):
 
 ```env
 DB_HOST=localhost

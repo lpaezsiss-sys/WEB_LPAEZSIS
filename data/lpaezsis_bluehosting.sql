@@ -1,4 +1,9 @@
-/*M!999999\- enable the sandbox mode */ 
+-- LPAEZsis import for BlueHosting / older MySQL-MariaDB
+-- 1) In cPanel create the MySQL database + user
+-- 2) In phpMyAdmin SELECT that database
+-- 3) Import THIS file (do not use CREATE DATABASE from the dump)
+-- Collation normalized to utf8mb4_unicode_ci
+
 -- MariaDB dump 10.19-11.4.12-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: 
@@ -20,8 +25,6 @@
 -- Current Database: `lpaezsis`
 --
 
--- On BlueHosting: create the DB in cPanel first, select it in phpMyAdmin, then import.
--- Prefer data/lpaezsis_bluehosting.sql (no CREATE DATABASE; collation compatible).
 -- CREATE DATABASE /*!32312 IF NOT EXISTS*/ `lpaezsis` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 
 -- USE `lpaezsis`;

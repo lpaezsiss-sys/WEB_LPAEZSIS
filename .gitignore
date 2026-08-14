@@ -9,6 +9,7 @@ Thumbs.db
 # Allow the seed dump + sqlite used by local preview
 !data/
 !data/lpaezsis_backup_final.sql
+!data/lpaezsis_bluehosting.sql
 !data/lpaezsis.sqlite
 
 # Local / secrets
