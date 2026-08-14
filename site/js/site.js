@@ -245,7 +245,8 @@
     );
   }
 
-  function productCardHtml(p) {
+  function productCardHtml(p, options) {
+    var opts = options || {};
     var modeClass = p.sale_mode === "buy" ? "badge-buy" : "badge-quote";
     var modeLabel = p.sale_mode === "buy" ? "Comprar" : "Cotizar";
     var price =
@@ -258,7 +259,9 @@
         img +
         '" alt="' +
         escapeAttr(p.name) +
-        '" loading="lazy" width="480" height="300">'
+        '" title="' +
+        escapeAttr(p.name) +
+        '" loading="lazy" decoding="async" width="480" height="480">'
       : "LPAEZ";
     var payload = productPayload(p);
     var primaryCta =
@@ -269,10 +272,20 @@
         : '<button type="button" class="btn btn-primary btn-sm" data-card-quote="' +
           payload +
           '">Pedir cotización</button>';
+    var datasheetBadge =
+      opts.showDatasheetBadge
+        ? '<a class="badge-datasheet" href="producto.html?slug=' +
+          encodeURIComponent(p.slug) +
+          '" title="Ficha técnica PDF disponible">' +
+          '<span class="badge-datasheet__icon" aria-hidden="true">PDF</span>' +
+          "<span>Ficha técnica PDF disponible</span></a>"
+        : "";
     return (
       '<article class="product-card reveal">' +
       '<a class="product-card-visual" href="producto.html?slug=' +
       encodeURIComponent(p.slug) +
+      '" title="' +
+      escapeAttr(p.name) +
       '">' +
       visual +
       "</a>" +
@@ -287,6 +300,7 @@
       stockLabel(p.stock_status) +
       "</span>" +
       "</div>" +
+      datasheetBadge +
       "<h3><a href=\"producto.html?slug=" +
       encodeURIComponent(p.slug) +
       '">' +
