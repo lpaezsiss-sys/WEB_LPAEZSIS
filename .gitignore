@@ -1,0 +1,24 @@
+# Do not publish random DB dumps or zip archives
+*.sql
+*.zip
+lpaezsis_web_files/
+tmp/
+.DS_Store
+Thumbs.db
+
+# Allow the seed dump + sqlite used by local preview
+!data/
+!data/lpaezsis_backup_final.sql
+!data/lpaezsis_bluehosting.sql
+!data/lpaezsis.sqlite
+
+# Local / secrets
+.env
+.env.*
+!.env.example
+!src/.env.example
+*.log
+
+# Editor
+.idea/
+.vscode/

@@ -1,1 +1,69 @@
 # WEB_LPAEZSIS
+
+Sitio web comercial de **LPAEZsis** (catálogo, cotización, carrito y admin).
+
+## Estructura
+
+```text
+site/                 ← front (HTML/CSS/JS) + api/index.php
+src/                  ← backend PHP (API + admin)
+data/                 ← dump SQL + SQLite para preview en Cursor
+tools/
+  preview_server.py   ← preview local con SQLite
+  import_sql_to_sqlite.py
+```
+
+## Preview local en Cursor (sin MySQL)
+
+```bash
+python3 tools/import_sql_to_sqlite.py   # si hace falta regenerar
+python3 tools/preview_server.py
+```
+
+Abre http://127.0.0.1:8765/ — el preview usa SQLite y no necesita `src/` PHP.
+
+## Subir a BlueHosting (`prueba1.lpaezsis.cl`)
+
+### 1. Front
+Sube el **contenido** de `site/` a:
+
+`public_html/prueba1.lpaezsis.cl/`
+
+### 2. Backend PHP
+Sube (o **vuelve a subir**) la carpeta **`src/`** completa a:
+
+`public_html/src/`
+
+Debe existir: `public_html/src/bootstrap.php` y `public_html/src/polyfills.php`
+
+También actualiza `prueba1.lpaezsis.cl/api/index.php` (viene en `site/api/`).
+
+**PHP 7.4 es suficiente.** No hace falta MultiPHP ni cambiar versión por subdominio: el backend está escrito para 7.4 (polyfills + sin APIs de PHP 8).
+
+### 3. Base de datos
+1. Crea una BD MySQL en cPanel (te dará un nombre tipo `sistem29_xxx`).
+2. En phpMyAdmin **selecciona esa BD** e importa **`data/lpaezsis_bluehosting.sql`**  
+   (no uses el dump original: trae un cotejo `utf8mb4_uca1400_ai_ci` que BlueHosting no soporta).
+3. Copia `src/.env.example` → `src/.env` y completa con el **usuario/clave reales** (no dejes `tu_usuario_mysql`):
+
+```env
+DB_HOST=localhost
+DB_NAME=nombre_bd
+DB_USER=usuario_bd
+DB_PASS=clave_bd
+UPLOAD_DIR=/home/TU_USUARIO/public_html/prueba1.lpaezsis.cl/img/uploads
+UPLOAD_URL_PREFIX=/img/uploads
+```
+
+### 4. Probar
+- https://prueba1.lpaezsis.cl/api/health
+- https://prueba1.lpaezsis.cl/catalogo.html
+- https://prueba1.lpaezsis.cl/marcas.html
+- https://prueba1.lpaezsis.cl/admin/
+
+La contraseña admin es la del hash guardado en la tabla `admin_credentials` (la misma del backup).
+
+## Notas
+
+- No subas `.env` con claves al repositorio público.
+- El preview de Cursor sigue usando SQLite; BlueHosting usa MySQL + `src/`.
