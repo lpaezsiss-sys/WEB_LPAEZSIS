@@ -28,9 +28,46 @@ def extract_create(raw: str, name: str) -> list[tuple[str, str]]:
         if not cm:
             continue
         col, typ = cm.group(1), cm.group(2).upper()
-        st = "INTEGER" if typ in {"INT", "TINYINT", "SMALLINT", "BIGINT", "INTEGER"} else "TEXT"
+        st = (
+            "INTEGER"
+            if typ in {"INT", "TINYINT", "SMALLINT", "BIGINT", "INTEGER"}
+            else "TEXT"
+        )
         cols.append((col, st))
     return cols
+
+
+def extract_insert_blob(raw: str, table: str) -> str:
+    """Return VALUES blob; stop at ';' only outside quoted strings."""
+    key = f"INSERT INTO `{table}` VALUES"
+    start = raw.find(key)
+    if start < 0:
+        return ""
+    i = start + len(key)
+    while i < len(raw) and raw[i] in " \n\r\t":
+        i += 1
+    in_str = False
+    esc = False
+    j = i
+    while j < len(raw):
+        ch = raw[j]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == "'":
+                if j + 1 < len(raw) and raw[j + 1] == "'":
+                    j += 2
+                    continue
+                in_str = False
+        else:
+            if ch == "'":
+                in_str = True
+            elif ch == ";":
+                break
+        j += 1
+    return raw[i:j].strip()
 
 
 def parse_values(blob: str) -> list[list[object]]:
@@ -39,33 +76,51 @@ def parse_values(blob: str) -> list[list[object]]:
     while i < n:
         while i < n and blob[i] in " \n\r\t,":
             i += 1
-        if i >= n or blob[i] != "(":
+        if i >= n:
             break
+        if blob[i] != "(":
+            raise SystemExit(f"expected '(' in INSERT parse near: {blob[i : i + 40]!r}")
         i += 1
         fields: list[object] = []
-        while i < n and blob[i] != ")":
+        while True:
             while i < n and blob[i] in " \n\r\t":
                 i += 1
+            if i >= n:
+                raise SystemExit("unterminated row")
+            if blob[i] == ")":
+                i += 1
+                break
             if blob[i] == "'":
                 i += 1
                 buf: list[str] = []
                 while i < n:
                     ch = blob[i]
                     if ch == "\\" and i + 1 < n:
-                        buf.append(blob[i + 1])
+                        nxt = blob[i + 1]
+                        mapping = {
+                            "n": "\n",
+                            "r": "\r",
+                            "t": "\t",
+                            '"': '"',
+                            "'": "'",
+                            "\\": "\\",
+                        }
+                        buf.append(mapping.get(nxt, nxt))
+                        i += 2
+                        continue
+                    if ch == "'" and i + 1 < n and blob[i + 1] == "'":
+                        buf.append("'")
                         i += 2
                         continue
                     if ch == "'":
-                        if i + 1 < n and blob[i + 1] == "'":
-                            buf.append("'")
-                            i += 2
-                            continue
                         i += 1
                         break
                     buf.append(ch)
                     i += 1
                 fields.append("".join(buf))
-            elif blob[i : i + 4].upper() == "NULL":
+            elif blob[i : i + 4].upper() == "NULL" and (
+                i + 4 >= n or blob[i + 4] in ",) \n\r\t"
+            ):
                 fields.append(None)
                 i += 4
             else:
@@ -85,17 +140,12 @@ def parse_values(blob: str) -> list[list[object]]:
                 i += 1
             if i < n and blob[i] == ",":
                 i += 1
-        if i < n and blob[i] == ")":
-            i += 1
+                continue
+            if i < n and blob[i] == ")":
+                i += 1
+                break
         rows.append(fields)
     return rows
-
-
-def extract_inserts(raw: str, name: str) -> list[list[object]]:
-    m = re.search(rf"INSERT INTO `{name}` VALUES\s*(.*?);", raw, re.S)
-    if not m:
-        return []
-    return parse_values(m.group(1).strip())
 
 
 def main() -> int:
@@ -112,7 +162,8 @@ def main() -> int:
         cols = extract_create(raw, table)
         coldefs = ", ".join(f'"{c}" {t}' for c, t in cols)
         cur.execute(f'CREATE TABLE "{table}" ({coldefs})')
-        rows = extract_inserts(raw, table)
+        blob = extract_insert_blob(raw, table)
+        rows = parse_values(blob) if blob else []
         if not rows:
             print(table, "0 rows")
             continue
@@ -121,6 +172,7 @@ def main() -> int:
         colnames = ",".join(f'"{c}"' for c in names)
         fixed = []
         for r in rows:
+            r = list(r)
             if len(r) < len(names):
                 r = r + [None] * (len(names) - len(r))
             fixed.append(r[: len(names)])
@@ -128,12 +180,13 @@ def main() -> int:
             f'INSERT INTO "{table}" ({colnames}) VALUES ({placeholders})', fixed
         )
         print(table, len(fixed), "rows")
-    # Repair truncated brand flags if HTML commas broke the parser mid-row.
+
+    # Keep classic nav order: Sonic…HAIDA first; Columbia after.
     cur.execute(
-        'UPDATE brands SET is_active=1 WHERE is_active IS NULL OR is_active=""'
+        "UPDATE brands SET sort_order = 70 WHERE slug = 'columbia-okura' AND COALESCE(sort_order, 0) = 0"
     )
     cur.execute(
-        'UPDATE brands SET sort_order=10 WHERE sort_order IS NULL OR sort_order=""'
+        'UPDATE brands SET is_active = 1 WHERE is_active IS NULL OR is_active = ""'
     )
     conn.commit()
     conn.close()
