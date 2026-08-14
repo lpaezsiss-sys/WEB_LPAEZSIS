@@ -111,9 +111,10 @@
         document.getElementById("brandName").textContent = brand.name;
         document.getElementById("brandDesc").textContent =
           brand.description || "Productos e información de la representación.";
-        // Avoid repeating the WP page H1/title already shown above
-        document.getElementById("brandName").hidden = true;
-        document.getElementById("brandDesc").hidden = true;
+        // Show name/desc in the catalog head when there is no rich HTML body.
+        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
+        document.getElementById("brandName").hidden = hasHtml;
+        document.getElementById("brandDesc").hidden = hasHtml && !brand.description;
 
         var logo = document.getElementById("brandLogo");
         if (brand.logo_url) {
@@ -125,7 +126,7 @@
         }
 
         var content = document.getElementById("brandContent");
-        if (brand.content_html) {
+        if (hasHtml) {
           content.innerHTML = brand.content_html;
           content.querySelectorAll("img").forEach(function (img) {
             var real =
@@ -141,6 +142,9 @@
               img.remove();
             }
           });
+          content.hidden = false;
+        } else if (brand.description) {
+          content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.description) + "</p>";
           content.hidden = false;
         } else {
           content.innerHTML = "";

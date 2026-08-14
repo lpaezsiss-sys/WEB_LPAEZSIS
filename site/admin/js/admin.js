@@ -557,7 +557,14 @@
       var url = res.data && res.data.url;
       document.getElementById("imageUrlField").value = url || "";
       setDialogImagePreview(url || "");
-      showToast("Imagen subida");
+      showToast("Imagen subida — pulsa «Usar imagen»");
+      // If picker was opened to save logo directly, apply immediately.
+      if (url && imagePickerContext && imagePickerContext.autoApply) {
+        var apply = imagePickerContext.onApply;
+        Promise.resolve(apply ? apply(url) : null).then(function () {
+          document.getElementById("imageDialog").close();
+        }).catch(function () {});
+      }
     });
   });
 
@@ -684,19 +691,12 @@
 
   function resolveBrandLogo(b) {
     if (!b) return "/img/brand/logo.png";
-    if (BRAND_LOGOS[b.slug]) return BRAND_LOGOS[b.slug];
+    // DB logo always wins (including /img/uploads/... from admin).
     if (b.logo_url) {
-      var u = String(b.logo_url);
-      if (/logo-sonic-air|sonic-air/i.test(u) && /\.png$/i.test(u)) {
-        return "/img/brand/sonic-air.png";
-      }
-      if (/\/LC\.png/i.test(u)) return "/img/brand/lyc.png";
-      if (/Movex\.png/i.test(u)) return "/img/brand/movex.png";
-      if (/Isodur\.png/i.test(u)) return "/img/brand/isodur.png";
-      if (/Combi\.png/i.test(u)) return "/img/brand/combi.png";
-      if (/15\.43\.30/i.test(u) || /haida/i.test(u)) return "/img/brand/haida.png";
-      return toSitePath(u) || u;
+      var u = String(b.logo_url).trim();
+      if (u) return toSitePath(u) || u;
     }
+    if (BRAND_LOGOS[b.slug]) return BRAND_LOGOS[b.slug];
     return "/img/brand/logo.png";
   }
 
@@ -729,10 +729,13 @@
     form.sort_order.value = (item && item.sort_order) || 0;
     form.is_active.checked = !item || item.is_active !== false;
     var logoField = document.getElementById("simpleLogoField");
+    var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
     if (kind === "brands") {
       logoField.hidden = false;
+      contentField.hidden = false;
       seoFields.hidden = true;
+      document.getElementById("brandContentHtml").value = (item && item.content_html) || "";
       if (item && item.logo_url) {
         setBrandLogoPreview(item.logo_url);
       } else if (item) {
@@ -740,11 +743,14 @@
         document.getElementById("brandLogoUrl").value = item.logo_url || "";
       } else {
         setBrandLogoPreview("");
+        document.getElementById("brandContentHtml").value = "";
       }
     } else {
       logoField.hidden = true;
+      contentField.hidden = true;
       seoFields.hidden = false;
       setBrandLogoPreview("");
+      document.getElementById("brandContentHtml").value = "";
     }
     document.getElementById("simpleDialogTitle").textContent =
       (item ? "Editar " : "Nueva ") + (kind === "categories" ? "categoría" : "marca");
@@ -780,7 +786,8 @@
         return String(b.id) === String(pickLogo);
       });
       openImagePicker({
-        currentUrl: brand ? resolveBrandLogo(brand) : "",
+        currentUrl: brand && brand.logo_url ? brand.logo_url : "",
+        autoApply: true,
         onApply: function (url) {
           return api("/brands/" + pickLogo, { method: "PUT", body: { logo_url: url } }).then(function (res) {
             if (!res.ok) {
@@ -822,6 +829,7 @@
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
+      body.content_html = document.getElementById("brandContentHtml").value;
     }
     var id = form.id.value;
     var req = id
