@@ -7,11 +7,13 @@ declare(strict_types=1);
  * or on BlueHosting at public_html/src/bootstrap.php).
  */
 
+require_once __DIR__ . '/polyfills.php';
+
 namespace Lpaezsis;
 
-spl_autoload_register(static function (string $class): void {
+spl_autoload_register(static function ($class) {
     $prefix = __NAMESPACE__ . '\\';
-    if (!str_starts_with($class, $prefix)) {
+    if (!\str_starts_with($class, $prefix)) {
         return;
     }
     $relative = str_replace('\\', '/', substr($class, strlen($prefix)));

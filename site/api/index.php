@@ -48,6 +48,9 @@ if ($path === '' || $path === null) {
     }
 }
 
+if (!function_exists('str_starts_with')) {
+    require_once dirname($bootstrap) . '/polyfills.php';
+}
 if (!str_starts_with($path, '/api')) {
     $path = '/api' . ($path === '/' ? '' : $path);
 }
