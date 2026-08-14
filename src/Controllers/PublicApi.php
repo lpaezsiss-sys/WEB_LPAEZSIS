@@ -12,7 +12,26 @@ final class PublicApi
     public static function handle(string $method, string $path): void
     {
         if ($method === 'GET' && ($path === '/api' || $path === '/api/health')) {
-            Response::json(['ok' => true, 'service' => 'lpaezsis-api']);
+            // Controllers live in src/Controllers → parent is src/
+            $envPath = dirname(__DIR__) . '/.env';
+            $hasEnv = is_file($envPath);
+            $dbOk = false;
+            $dbError = null;
+            try {
+                self::pdo()->query('SELECT 1')->fetchColumn();
+                $dbOk = true;
+            } catch (\Throwable $e) {
+                $dbError = $e->getMessage();
+            }
+            Response::json([
+                'ok' => true,
+                'service' => 'lpaezsis-api',
+                'php' => PHP_VERSION,
+                'compat' => '7.4+',
+                'env_file' => $hasEnv ? 'found' : 'missing',
+                'db' => $dbOk ? 'ok' : 'error',
+                'db_error' => $dbOk ? null : $dbError,
+            ]);
             return;
         }
         if ($method === 'GET' && $path === '/api/settings') {

@@ -38,7 +38,7 @@ Debe existir: `public_html/src/bootstrap.php` y `public_html/src/polyfills.php`
 
 También actualiza `prueba1.lpaezsis.cl/api/index.php` (viene en `site/api/`).
 
-Compatible con PHP **7.4+**. Ideal: MultiPHP **8.1/8.2**.
+**PHP 7.4 es suficiente.** No hace falta MultiPHP ni cambiar versión por subdominio: el backend está escrito para 7.4 (polyfills + sin APIs de PHP 8).
 
 ### 3. Base de datos
 1. Crea una BD MySQL en cPanel.
