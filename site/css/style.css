@@ -1636,6 +1636,24 @@ body.nav-open {
   color: var(--muted);
 }
 
+.catalog-skeleton-grid {
+  display: contents;
+}
+
+.catalog-outage {
+  max-width: 36rem;
+  margin: 1.5rem auto;
+  padding: 1.5rem 1.25rem;
+  border: 1px dashed var(--line-strong);
+  background: var(--off-white);
+  text-align: center;
+}
+
+.catalog-outage .empty-actions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 @keyframes skeleton-shine {
   0% {
     background-position: 100% 0;
