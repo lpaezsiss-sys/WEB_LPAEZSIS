@@ -62,7 +62,7 @@
     "salas-limpias": "Salas limpias",
   };
 
-  var FETCH_TIMEOUT_MS = 5000;
+  var FETCH_TIMEOUT_MS = 3000;
   var WA_FALLBACK = "https://wa.me/56968232745?text=" +
     encodeURIComponent("Hola LPAEZsis, no pude cargar el catálogo y necesito ayuda.");
 
@@ -257,6 +257,12 @@
   }
 
   function showSkeleton() {
+    var loader = document.getElementById("catalogLoader");
+    if (loader) {
+      loader.style.display = "";
+      loader.hidden = false;
+      loader.setAttribute("aria-hidden", "false");
+    }
     grid.innerHTML = skeletonHtml();
     grid.classList.add("catalog-loading");
     grid.setAttribute("aria-busy", "true");
@@ -267,9 +273,23 @@
     if (catalogCount) catalogCount.hidden = true;
   }
 
-  function hideSkeleton() {
+  function forceHideLoader() {
+    var loader = document.getElementById("catalogLoader");
+    if (loader) {
+      loader.style.display = "none";
+      loader.hidden = true;
+      loader.setAttribute("aria-hidden", "true");
+    }
     grid.classList.remove("catalog-loading");
     grid.setAttribute("aria-busy", "false");
+    var stuck = grid.querySelector(".catalog-loading-label");
+    if (stuck && stuck.parentNode === grid) {
+      /* label will be replaced on render; remove if still present alone */
+    }
+  }
+
+  function hideSkeleton() {
+    forceHideLoader();
   }
 
   function whatsappCatalogUrl() {
@@ -298,15 +318,20 @@
     var retry = document.getElementById("catalogRetryBtn");
     if (retry) {
       retry.addEventListener("click", function () {
-        bootCatalog(true);
+        initCatalog(true);
       });
     }
   }
 
+  /** Alias pedido: MOCK_PRODUCTS */
+  var MOCK_PRODUCTS = MOCK_CATALOG.products;
+
   function applyMockData() {
-    allCategories = MOCK_CATALOG.categories.slice();
-    allBrands = MOCK_CATALOG.brands.slice();
-    allProducts = MOCK_CATALOG.products.slice();
+    allCategories = Array.isArray(MOCK_CATALOG.categories)
+      ? MOCK_CATALOG.categories.slice()
+      : [];
+    allBrands = Array.isArray(MOCK_CATALOG.brands) ? MOCK_CATALOG.brands.slice() : [];
+    allProducts = Array.isArray(MOCK_PRODUCTS) ? MOCK_PRODUCTS.slice() : [];
     return allProducts.length > 0;
   }
 
@@ -316,9 +341,9 @@
     var opts = { credentials: "same-origin" };
     if (controller) opts.signal = controller.signal;
     var fetchPromise = fetch(url, opts).then(function (res) {
-      if (!res.ok) {
-        var err = new Error("HTTP " + res.status);
-        err.status = res.status;
+      if (!res || res.status !== 200) {
+        var err = new Error("HTTP " + (res && res.status));
+        err.status = res && res.status;
         throw err;
       }
       return res.json();
@@ -347,49 +372,47 @@
     );
   }
 
-  function loadCatalogPayload() {
-    return Promise.all([
+  async function loadCatalogPayload() {
+    var results = await Promise.all([
       fetchJsonWithTimeout("/api/categories", FETCH_TIMEOUT_MS),
       fetchJsonWithTimeout("/api/products", FETCH_TIMEOUT_MS),
       fetchJsonWithTimeout("/api/brands", FETCH_TIMEOUT_MS),
-    ]).then(function (results) {
-      var cats = (results[0] && results[0].categories) || [];
-      var products = (results[1] && results[1].products) || [];
-      var brands = (results[2] && results[2].brands) || [];
-      if (!products.length) {
-        var emptyErr = new Error("API returned empty products");
-        emptyErr.code = "EMPTY";
-        throw emptyErr;
-      }
-      return { categories: cats, products: products, brands: brands, source: "api" };
-    });
+    ]);
+    var cats = (results[0] && results[0].categories) || [];
+    var products = results[1] && results[1].products;
+    var brands = (results[2] && results[2].brands) || [];
+    products = Array.isArray(products) ? products : null;
+    if (!products || !products.length) {
+      var emptyErr = new Error("API returned empty/invalid products");
+      emptyErr.code = "EMPTY";
+      throw emptyErr;
+    }
+    return {
+      categories: Array.isArray(cats) ? cats : [],
+      products: products,
+      brands: Array.isArray(brands) ? brands : [],
+      source: "api",
+    };
   }
 
-  function bootCatalog(isRetry) {
+  async function initCatalog(isRetry) {
     showSkeleton();
     readUrlState();
-    loadCatalogPayload()
-      .then(function (payload) {
-        allCategories = payload.categories;
-        allProducts = payload.products;
-        allBrands = payload.brands;
-        hideSkeleton();
+    try {
+      var payload = await loadCatalogPayload();
+      allCategories = Array.isArray(payload.categories) ? payload.categories : [];
+      allBrands = Array.isArray(payload.brands) ? payload.brands : [];
+      allProducts = Array.isArray(payload.products) ? payload.products : MOCK_PRODUCTS.slice();
+      renderCatalog();
+    } catch (err) {
+      logDevError(isRetry ? "retry failed" : "api failed — injecting MOCK_PRODUCTS", err);
+      try {
+        if (!applyMockData()) {
+          throw new Error("mock unavailable");
+        }
         renderCatalog();
-      })
-      .catch(function (err) {
-        logDevError(isRetry ? "retry failed" : "api failed — using mock", err);
-        var ok = false;
-        try {
-          ok = applyMockData();
-        } catch (mockErr) {
-          logDevError("mock failed", mockErr);
-          ok = false;
-        }
-        hideSkeleton();
-        if (ok) {
-          renderCatalog();
-          return;
-        }
+      } catch (mockErr) {
+        logDevError("mock/render failed", mockErr);
         grid.innerHTML = outageEmptyHtml();
         if (catalogCount) catalogCount.hidden = true;
         if (pager) {
@@ -397,7 +420,10 @@
           pager.innerHTML = "";
         }
         bindOutageActions();
-      });
+      }
+    } finally {
+      forceHideLoader();
+    }
   }
 
   function readUrlState() {
@@ -445,24 +471,25 @@
         "</div></article>"
       );
     }).join("");
-    return (
-      '<p class="catalog-loading-label">Cargando catálogo…</p>' +
-      '<div class="product-grid catalog-skeleton-grid" role="status" aria-live="polite">' +
-      cards +
-      "</div>"
-    );
+    return cards;
   }
 
   function productSku(p) {
+    p = p || {};
     var desc = String(p.description || "");
     var m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i) || desc.match(/\b([A-Z]?\d{4,})\b/);
     if (m) return m[1];
-    return String(p.slug || p.id || "").toUpperCase();
+    return String(p.slug || p.id || "N/A").toUpperCase();
   }
 
   function localImageSrc(p) {
-    var src = Lpaez.resolveProductImage(p) || "";
-    // Prefer local mirror of legacy WP uploads
+    p = p || {};
+    var src = "";
+    try {
+      src = Lpaez.resolveProductImage(p) || "";
+    } catch (e) {
+      src = p.image_url || "img/products/A07-10015.jpg";
+    }
     var wp = String(src).match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
     if (/wp-content\/uploads/i.test(src) && wp) {
       return "img/products/" + wp[1];
@@ -475,7 +502,7 @@
         return src;
       }
     }
-    return src;
+    return src || "img/products/A07-10015.jpg";
   }
 
   function pictureHtml(src, alt) {
@@ -516,8 +543,10 @@
   }
 
   function filteredProducts() {
+    var list = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
     var industrySet = industryCategorySet();
-    return allProducts.filter(function (p) {
+    return list.filter(function (p) {
+      if (!p) return false;
       if (state.category && p.category_slug !== state.category) return false;
       if (industrySet && !industrySet[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
@@ -527,16 +556,19 @@
   }
 
   function categoriesWithProducts() {
+    var list = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
+    var cats = Array.isArray(allCategories) ? allCategories : [];
     var industrySet = industryCategorySet();
     var slugs = {};
-    allProducts.forEach(function (p) {
+    list.forEach(function (p) {
+      if (!p) return;
       if (state.mode && p.sale_mode !== state.mode) return;
       if (state.brand && p.brand_slug !== state.brand) return;
       if (industrySet && !industrySet[p.category_slug]) return;
       if (p.category_slug) slugs[p.category_slug] = true;
     });
-    return allCategories.filter(function (c) {
-      return !!slugs[c.slug];
+    return cats.filter(function (c) {
+      return c && !!slugs[c.slug];
     });
   }
 
@@ -630,24 +662,31 @@
   }
 
   function b2bCardHtml(p) {
+    p = p || {};
+    var name = (p && p.name) || "Producto";
+    var slug = (p && p.slug) || "";
     var sku = productSku(p);
     var img = localImageSrc(p);
-    var catLabel = p.category_name || CHIP_SHORT[p.category_slug] || "Producto";
+    var catLabel =
+      (p && p.category_name) ||
+      CHIP_SHORT[(p && p.category_slug) || ""] ||
+      "Producto";
+    var saleMode = (p && p.sale_mode) || "quote";
     var quoteUrl =
       "cotizacion.html?sku=" +
-      encodeURIComponent(p.slug) +
+      encodeURIComponent(slug || sku) +
       "&asunto=" +
-      encodeURIComponent("Cotización: " + p.name + " (" + sku + ")");
+      encodeURIComponent("Cotización: " + name + " (" + sku + ")");
     return (
       '<article class="product-card catalog-card reveal" data-product-id="' +
-      escapeAttr(String(p.id)) +
+      escapeAttr(String((p && p.id) || sku)) +
       '">' +
       '<a class="product-card-visual" href="producto.html?slug=' +
-      encodeURIComponent(p.slug) +
+      encodeURIComponent(slug) +
       '" title="' +
-      escapeAttr(p.name) +
+      escapeAttr(name) +
       '">' +
-      pictureHtml(img, p.name) +
+      pictureHtml(img, name) +
       "</a>" +
       '<div class="product-card-body">' +
       '<div class="product-meta">' +
@@ -655,14 +694,14 @@
       escapeHtml(catLabel) +
       "</span>" +
       '<span class="badge-mode ' +
-      (p.sale_mode === "buy" ? "badge-buy" : "badge-quote") +
+      (saleMode === "buy" ? "badge-buy" : "badge-quote") +
       '">' +
-      (p.sale_mode === "buy" ? "Comprar" : "Cotizar") +
+      (saleMode === "buy" ? "Comprar" : "Cotizar") +
       "</span></div>" +
       "<h3><a href=\"producto.html?slug=" +
-      encodeURIComponent(p.slug) +
+      encodeURIComponent(slug) +
       '">' +
-      escapeHtml(p.name) +
+      escapeHtml(name) +
       "</a></h3>" +
       '<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ' +
       escapeHtml(sku) +
@@ -672,9 +711,9 @@
       quoteUrl +
       '">Pedir cotización</a>' +
       '<button type="button" class="btn btn-outline btn-sm" data-datasheet="' +
-      escapeAttr(p.slug) +
+      escapeAttr(slug) +
       '" data-datasheet-name="' +
-      escapeAttr(p.name) +
+      escapeAttr(name) +
       '" data-datasheet-sku="' +
       escapeAttr(sku) +
       '">Descargar ficha técnica</button>' +
@@ -831,45 +870,63 @@
   }
 
   function renderCatalog() {
-    renderIndustryTabs();
-    renderCategoryChips();
-    renderBrandSelect();
-    syncModeChips();
-    writeUrlState();
+    try {
+      forceHideLoader();
+      renderIndustryTabs();
+      renderCategoryChips();
+      renderBrandSelect();
+      syncModeChips();
+      writeUrlState();
 
-    var products = filteredProducts();
-    var pages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
-    if (state.page > pages) state.page = pages;
-    var start = (state.page - 1) * PAGE_SIZE;
-    var pageItems = products.slice(start, start + PAGE_SIZE);
+      var products = filteredProducts();
+      products = Array.isArray(products) ? products : MOCK_PRODUCTS.slice();
+      var pages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+      if (state.page > pages) state.page = pages;
+      var start = (state.page - 1) * PAGE_SIZE;
+      var pageItems = products.slice(start, start + PAGE_SIZE);
 
-    catalogCount.hidden = false;
-    catalogCount.textContent =
-      products.length === 1 ? "1 producto" : products.length + " productos";
-
-    if (!products.length) {
-      grid.innerHTML = emptyStateHtml();
-      renderPager(0, 1, 1);
-      injectItemListJsonLd([]);
-      var clearBtn = document.getElementById("clearCatalogFilters");
-      if (clearBtn) {
-        clearBtn.addEventListener("click", function () {
-          state.category = "";
-          state.brand = "";
-          state.industry = "";
-          state.mode = "";
-          state.page = 1;
-          renderCatalog();
-        });
+      if (catalogCount) {
+        catalogCount.hidden = false;
+        catalogCount.textContent =
+          products.length === 1 ? "1 producto" : products.length + " productos";
       }
-      Lpaez.observeReveals();
-      return;
-    }
 
-    grid.innerHTML = pageItems.map(b2bCardHtml).join("");
-    renderPager(products.length, state.page, pages);
-    injectItemListJsonLd(pageItems);
-    Lpaez.observeReveals();
+      if (!products.length) {
+        grid.innerHTML = emptyStateHtml();
+        renderPager(0, 1, 1);
+        injectItemListJsonLd([]);
+        var clearBtn = document.getElementById("clearCatalogFilters");
+        if (clearBtn) {
+          clearBtn.addEventListener("click", function () {
+            state.category = "";
+            state.brand = "";
+            state.industry = "";
+            state.mode = "";
+            state.page = 1;
+            renderCatalog();
+          });
+        }
+        if (Lpaez.observeReveals) Lpaez.observeReveals();
+        return;
+      }
+
+      grid.innerHTML = pageItems.map(b2bCardHtml).join("");
+      renderPager(products.length, state.page, pages);
+      injectItemListJsonLd(pageItems);
+      if (Lpaez.observeReveals) Lpaez.observeReveals();
+    } catch (err) {
+      logDevError("renderCatalog", err);
+      try {
+        var fallback = Array.isArray(MOCK_PRODUCTS) ? MOCK_PRODUCTS : [];
+        grid.innerHTML = fallback.map(b2bCardHtml).join("") || outageEmptyHtml();
+        if (!fallback.length) bindOutageActions();
+      } catch (e2) {
+        grid.innerHTML = outageEmptyHtml();
+        bindOutageActions();
+      }
+    } finally {
+      forceHideLoader();
+    }
   }
 
   function bindKeyboardGroup(container, itemSelector, onActivate) {
@@ -981,6 +1038,6 @@
     });
   }
 
-  // Boot
-  bootCatalog(false);
+  // Boot — async safe init with finally that always hides loader
+  initCatalog(false);
 })();

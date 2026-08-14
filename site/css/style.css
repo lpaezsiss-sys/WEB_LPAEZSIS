@@ -1636,8 +1636,15 @@ body.nav-open {
   color: var(--muted);
 }
 
-.catalog-skeleton-grid {
-  display: contents;
+.catalog-loader {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0.35rem 1.25rem 0.75rem;
+}
+
+.catalog-loader[hidden],
+.catalog-loader[aria-hidden="true"] {
+  display: none !important;
 }
 
 .catalog-outage {
