@@ -62,11 +62,342 @@
     "salas-limpias": "Salas limpias",
   };
 
+  var FETCH_TIMEOUT_MS = 5000;
+  var WA_FALLBACK = "https://wa.me/56968232745?text=" +
+    encodeURIComponent("Hola LPAEZsis, no pude cargar el catálogo y necesito ayuda.");
+
+  /** Mock local (~8 ítems) para disponibilidad UX si la API falla. */
+  var MOCK_CATALOG = {
+    categories: [
+      { id: 1, slug: "secadores", name: "Secadores de Envases", is_active: 1, sort_order: 10 },
+      { id: 2, slug: "turbinas-soplado", name: "Turbinas de Soplado", is_active: 1, sort_order: 20 },
+      { id: 4, slug: "repuestos", name: "Repuestos y Consumibles", is_active: 1, sort_order: 40 },
+      { id: 5, slug: "fin-de-linea", name: "Máquinas Fin de Línea", is_active: 1, sort_order: 50 },
+      { id: 6, slug: "salas-limpias", name: "Salas Limpias y HEPA", is_active: 1, sort_order: 60 },
+    ],
+    brands: [
+      { id: 1, slug: "sonic-air-systems", name: "Sonic Air Systems", is_active: 1 },
+      { id: 7, slug: "columbia-okura", name: "COLUMBIA/OKURA", is_active: 1 },
+    ],
+    products: [
+      {
+        id: 101,
+        slug: "secador-botellas-sonic",
+        name: "Sistema Secador de Botellas Sonic Air",
+        description: "Sistema de secado de botellas con turbinas y air knives. Cotización según línea.",
+        sale_mode: "quote",
+        stock_status: "on_request",
+        price_clp: null,
+        image_url: "img/hero/cans.jpg",
+        category_id: 1,
+        category_slug: "secadores",
+        category_name: "Secadores de Envases",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 5,
+      },
+      {
+        id: 102,
+        slug: "turbina-soplado-sonic-100",
+        name: "Turbina de Soplado Sonic 100",
+        description: "Turbina de alto caudal para secado y limpieza industrial.",
+        sale_mode: "quote",
+        stock_status: "on_request",
+        price_clp: null,
+        image_url: "img/products/vt-sonic.jpg",
+        category_id: 2,
+        category_slug: "turbinas-soplado",
+        category_name: "Turbinas de Soplado",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 15,
+      },
+      {
+        id: 103,
+        slug: "correa-sonic-70-85",
+        name: "Correa Sonic 70/85",
+        description: "Correa 16 GRV SONIC 70/85 (Cod 13514)",
+        sale_mode: "buy",
+        stock_status: "in_stock",
+        price_clp: null,
+        image_url: "img/products/A07-13474.jpg",
+        category_id: 4,
+        category_slug: "repuestos",
+        category_name: "Repuestos y Consumibles",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 10,
+      },
+      {
+        id: 104,
+        slug: "filtro-poliester-s-75-85-100",
+        name: "Filtro Poliéster S 75-85-100",
+        description: "Elemento filtro polyester lavable Sonic 75-85-100",
+        sale_mode: "buy",
+        stock_status: "in_stock",
+        price_clp: null,
+        image_url: "img/products/A07-10317.jpg",
+        category_id: 4,
+        category_slug: "repuestos",
+        category_name: "Repuestos y Consumibles",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 20,
+      },
+      {
+        id: 105,
+        slug: "filtro-completo-poliester-s-70-85-100-con-indicador",
+        name: "Filtro Completo Poliéster con indicador",
+        description: "Filtro completo polyester lavable Sonic (Cod 10976)",
+        sale_mode: "buy",
+        stock_status: "in_stock",
+        price_clp: 195000,
+        image_url: "img/products/A07-10976.jpg",
+        category_id: 4,
+        category_slug: "repuestos",
+        category_name: "Repuestos y Consumibles",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 30,
+      },
+      {
+        id: 106,
+        slug: "impeller-sonic-70-100",
+        name: "Impeller Sonic 70/100",
+        description: "Impulsor soplador Sonic Air Models S70/S100 (Cod 10015)",
+        sale_mode: "buy",
+        stock_status: "in_stock",
+        price_clp: null,
+        image_url: "img/products/A07-10015.jpg",
+        category_id: 4,
+        category_slug: "repuestos",
+        category_name: "Repuestos y Consumibles",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 40,
+      },
+      {
+        id: 107,
+        slug: "cartucho-rodamientos-s-100-150",
+        name: "Cartucho Rodamientos S 100-150",
+        description: "Conjunto rodamientos sellado Sonic 100-150",
+        sale_mode: "buy",
+        stock_status: "in_stock",
+        price_clp: null,
+        image_url: "img/products/A07-14452.jpg",
+        category_id: 4,
+        category_slug: "repuestos",
+        category_name: "Repuestos y Consumibles",
+        brand_id: 1,
+        brand_slug: "sonic-air-systems",
+        brand_name: "Sonic Air Systems",
+        is_active: 1,
+        sort_order: 50,
+      },
+      {
+        id: 108,
+        slug: "paletizado-columbia-okura",
+        name: "Paletizado robotizado Columbia/Okura",
+        description: "Solución de fin de línea / paletizado. Cotización por proyecto.",
+        sale_mode: "quote",
+        stock_status: "on_request",
+        price_clp: null,
+        image_url: "img/hero/line.jpg",
+        category_id: 5,
+        category_slug: "fin-de-linea",
+        category_name: "Máquinas Fin de Línea",
+        brand_id: 7,
+        brand_slug: "columbia-okura",
+        brand_name: "COLUMBIA/OKURA",
+        is_active: 1,
+        sort_order: 8,
+      },
+    ],
+  };
+
+  function isDevEnv() {
+    try {
+      var host = String(window.location.hostname || "");
+      return (
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host.indexOf(".cvm.dev") !== -1 ||
+        host.indexOf("prueba1.") === 0 ||
+        /(?:^|\.)local$/i.test(host)
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function logDevError(label, err) {
+    if (!isDevEnv()) return;
+    try {
+      console.error("[catalogo]", label, err);
+    } catch (e) { /* ignore */ }
+  }
+
   function escapeHtml(s) {
     return Lpaez.escapeHtml(s);
   }
   function escapeAttr(s) {
     return Lpaez.escapeAttr(s);
+  }
+
+  function showSkeleton() {
+    grid.innerHTML = skeletonHtml();
+    grid.classList.add("catalog-loading");
+    grid.setAttribute("aria-busy", "true");
+    if (pager) {
+      pager.hidden = true;
+      pager.innerHTML = "";
+    }
+    if (catalogCount) catalogCount.hidden = true;
+  }
+
+  function hideSkeleton() {
+    grid.classList.remove("catalog-loading");
+    grid.setAttribute("aria-busy", "false");
+  }
+
+  function whatsappCatalogUrl() {
+    var el = document.querySelector("[data-wa]");
+    if (el && el.getAttribute("href") && el.getAttribute("href").indexOf("wa.me") !== -1) {
+      return el.getAttribute("href");
+    }
+    return WA_FALLBACK;
+  }
+
+  function outageEmptyHtml() {
+    return (
+      '<div class="empty-state catalog-outage">' +
+      "<p><strong>No pudimos cargar el catálogo en este momento.</strong></p>" +
+      "<p>Puedes reintentar o escribirnos por WhatsApp para cotizar sin demora.</p>" +
+      '<p class="empty-actions">' +
+      '<button type="button" class="btn btn-primary btn-sm" id="catalogRetryBtn">Reintentar</button>' +
+      '<a class="btn btn-outline btn-sm" id="catalogWaBtn" href="' +
+      escapeAttr(whatsappCatalogUrl()) +
+      '" target="_blank" rel="noopener noreferrer">Contactar por WhatsApp</a>' +
+      "</p></div>"
+    );
+  }
+
+  function bindOutageActions() {
+    var retry = document.getElementById("catalogRetryBtn");
+    if (retry) {
+      retry.addEventListener("click", function () {
+        bootCatalog(true);
+      });
+    }
+  }
+
+  function applyMockData() {
+    allCategories = MOCK_CATALOG.categories.slice();
+    allBrands = MOCK_CATALOG.brands.slice();
+    allProducts = MOCK_CATALOG.products.slice();
+    return allProducts.length > 0;
+  }
+
+  function fetchJsonWithTimeout(url, timeoutMs) {
+    var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = null;
+    var opts = { credentials: "same-origin" };
+    if (controller) opts.signal = controller.signal;
+    var fetchPromise = fetch(url, opts).then(function (res) {
+      if (!res.ok) {
+        var err = new Error("HTTP " + res.status);
+        err.status = res.status;
+        throw err;
+      }
+      return res.json();
+    });
+    var timeoutPromise = new Promise(function (_, reject) {
+      timer = setTimeout(function () {
+        if (controller) {
+          try {
+            controller.abort();
+          } catch (e) { /* ignore */ }
+        }
+        var err = new Error("Timeout after " + timeoutMs + "ms");
+        err.code = "TIMEOUT";
+        reject(err);
+      }, timeoutMs);
+    });
+    return Promise.race([fetchPromise, timeoutPromise]).then(
+      function (data) {
+        if (timer) clearTimeout(timer);
+        return data;
+      },
+      function (err) {
+        if (timer) clearTimeout(timer);
+        throw err;
+      }
+    );
+  }
+
+  function loadCatalogPayload() {
+    return Promise.all([
+      fetchJsonWithTimeout("/api/categories", FETCH_TIMEOUT_MS),
+      fetchJsonWithTimeout("/api/products", FETCH_TIMEOUT_MS),
+      fetchJsonWithTimeout("/api/brands", FETCH_TIMEOUT_MS),
+    ]).then(function (results) {
+      var cats = (results[0] && results[0].categories) || [];
+      var products = (results[1] && results[1].products) || [];
+      var brands = (results[2] && results[2].brands) || [];
+      if (!products.length) {
+        var emptyErr = new Error("API returned empty products");
+        emptyErr.code = "EMPTY";
+        throw emptyErr;
+      }
+      return { categories: cats, products: products, brands: brands, source: "api" };
+    });
+  }
+
+  function bootCatalog(isRetry) {
+    showSkeleton();
+    readUrlState();
+    loadCatalogPayload()
+      .then(function (payload) {
+        allCategories = payload.categories;
+        allProducts = payload.products;
+        allBrands = payload.brands;
+        hideSkeleton();
+        renderCatalog();
+      })
+      .catch(function (err) {
+        logDevError(isRetry ? "retry failed" : "api failed — using mock", err);
+        var ok = false;
+        try {
+          ok = applyMockData();
+        } catch (mockErr) {
+          logDevError("mock failed", mockErr);
+          ok = false;
+        }
+        hideSkeleton();
+        if (ok) {
+          renderCatalog();
+          return;
+        }
+        grid.innerHTML = outageEmptyHtml();
+        if (catalogCount) catalogCount.hidden = true;
+        if (pager) {
+          pager.hidden = true;
+          pager.innerHTML = "";
+        }
+        bindOutageActions();
+      });
   }
 
   function readUrlState() {
@@ -105,10 +436,21 @@
       return (
         '<article class="product-card catalog-card skeleton-card" aria-hidden="true">' +
         '<div class="product-card-visual skeleton-block"></div>' +
-        '<div class="product-card-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line btn"></div></div></article>'
+        '<div class="product-card-body">' +
+        '<div class="skeleton-line short"></div>' +
+        '<div class="skeleton-line"></div>' +
+        '<div class="skeleton-line short"></div>' +
+        '<div class="skeleton-line btn"></div>' +
+        '<div class="skeleton-line btn"></div>' +
+        "</div></article>"
       );
     }).join("");
-    return '<p class="catalog-loading-label">Cargando productos…</p>' + cards;
+    return (
+      '<p class="catalog-loading-label">Cargando catálogo…</p>' +
+      '<div class="product-grid catalog-skeleton-grid" role="status" aria-live="polite">' +
+      cards +
+      "</div>"
+    );
   }
 
   function productSku(p) {
@@ -640,28 +982,5 @@
   }
 
   // Boot
-  grid.innerHTML = skeletonHtml();
-  grid.classList.add("catalog-loading");
-  grid.setAttribute("aria-busy", "true");
-  readUrlState();
-
-  Promise.all([
-    Lpaez.api("/api/categories"),
-    Lpaez.api("/api/products"),
-    Lpaez.api("/api/brands"),
-  ])
-    .then(function (results) {
-      allCategories = (results[0].data && results[0].data.categories) || [];
-      allProducts = (results[1].data && results[1].data.products) || [];
-      allBrands = (results[2].data && results[2].data.brands) || [];
-      grid.classList.remove("catalog-loading");
-      grid.setAttribute("aria-busy", "false");
-      renderCatalog();
-    })
-    .catch(function () {
-      grid.classList.remove("catalog-loading");
-      grid.setAttribute("aria-busy", "false");
-      grid.innerHTML =
-        "<p class='empty-state'>No se pudo conectar con la API. Revisa el servidor.</p>";
-    });
+  bootCatalog(false);
 })();
