@@ -177,7 +177,7 @@
   </dialog>
 
   <dialog id="imageDialog">
-    <form method="dialog" class="dialog-body" id="imageForm">
+    <form method="dialog" class="dialog-body" id="imageForm" novalidate>
       <h3>Elegir imagen</h3>
       <input type="hidden" id="imageTargetProductId" value="">
       <div class="image-dialog-preview">
@@ -187,7 +187,8 @@
       <label for="imageFileInput">Archivo local (JPG, PNG, WEBP, GIF · máx. 5 MB)</label>
       <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp,image/gif">
       <label for="imageUrlField">O URL</label>
-      <input type="url" id="imageUrlField" placeholder="https://… o /img/products/…">
+      <!-- type=text: permite rutas relativas /img/uploads/... (type=url las rechaza) -->
+      <input type="text" id="imageUrlField" inputmode="url" autocomplete="off" placeholder="https://… o /img/uploads/…">
       <p class="error" id="imageError" hidden></p>
       <div class="dialog-actions">
         <button type="button" class="ghost" id="imageCancel">Cancelar</button>
@@ -197,6 +198,6 @@
   </dialog>
 
   <div class="toast" id="toast" hidden></div>
-  <script src="js/admin.js?v=11"></script>
+  <script src="js/admin.js?v=12"></script>
 </body>
 </html>
