@@ -1,794 +1,490 @@
 /**
- * Catálogo B2B — filtrado por URL, industria, brand, cards, JSON-LD, paginación.
+ * Catálogo B2B LPAEZsis — carga a prueba de fallos (mock + timeout).
+ * Sin dependencias externas salvo helpers opcionales de window.Lpaez.
  */
-(function () {
-  "use strict";
 
-  var PAGE_SIZE = 12;
-  var grid = document.getElementById("catalogGrid");
-  var filterChips = document.getElementById("filterChips");
-  var modeChips = document.getElementById("modeChips");
-  var industryTabs = document.getElementById("industryTabs");
-  var brandSelect = document.getElementById("brandFilter");
-  var catalogCount = document.getElementById("catalogCount");
-  var pager = document.getElementById("catalogPager");
-  var datasheetDialog = document.getElementById("datasheetDialog");
-  var datasheetBody = document.getElementById("datasheetBody");
-  var ldScript = document.getElementById("catalogItemListLd");
+/* 1) MOCK DATA HARDCODED — cima del archivo, cero dependencias externas */
+const MOCK_PRODUCTS = [
+  {
+    id: 1,
+    slug: "secador-botellas-sonic",
+    name: "Sistema Secador de Botellas Sonic Air",
+    sku: "SAS-DRY-BOT",
+    description: "Secado de botellas con turbinas y air knives Sonic. Cotización por línea.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/hero/cans.jpg",
+    image_webp: "img/hero/cans.webp",
+    category_slug: "secadores",
+    category_name: "Secadores de Envases",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=secador-botellas-sonic",
+  },
+  {
+    id: 2,
+    slug: "turbina-soplado-sonic-100",
+    name: "Turbina de Soplado Sonic 100",
+    sku: "SAS-VT-100",
+    description: "Turbina de alto caudal para secado y limpieza industrial.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/products/vt-sonic.jpg",
+    image_webp: "img/products/vt-sonic.webp",
+    category_slug: "turbinas-soplado",
+    category_name: "Turbinas de Soplado",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=turbina-soplado-sonic-100",
+  },
+  {
+    id: 3,
+    slug: "correa-sonic-70-85",
+    name: "Correa Sonic 70/85",
+    sku: "13514",
+    description: "Correa 16 GRV SONIC 70/85 (Cod 13514)",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: null,
+    image_url: "img/products/A07-13474.jpg",
+    image_webp: "img/products/A07-13474.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=correa-sonic-70-85",
+  },
+  {
+    id: 4,
+    slug: "filtro-poliester-s-75-85-100",
+    name: "Filtro Poliéster S 75-85-100",
+    sku: "A07-10317",
+    description: "Elemento filtro polyester lavable Sonic 75-85-100",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: null,
+    image_url: "img/products/A07-10317.jpg",
+    image_webp: "img/products/A07-10317.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=filtro-poliester-s-75-85-100",
+  },
+  {
+    id: 5,
+    slug: "filtro-completo-poliester-indicador",
+    name: "Filtro Completo Poliéster con indicador",
+    sku: "10976",
+    description: "Filtro completo polyester lavable Sonic con indicador",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: 195000,
+    image_url: "img/products/A07-10976.jpg",
+    image_webp: "img/products/A07-10976.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=filtro-completo-poliester-s-70-85-100-con-indicador",
+  },
+  {
+    id: 6,
+    slug: "impeller-sonic-70-100",
+    name: "Impeller Sonic 70/100",
+    sku: "10015",
+    description: "Impulsor soplador Sonic Air Models S70/S100",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: null,
+    image_url: "img/products/A07-10015.jpg",
+    image_webp: "img/products/A07-10015.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=impeller-sonic-70-100",
+  },
+  {
+    id: 7,
+    slug: "cartucho-rodamientos-s-100-150",
+    name: "Cartucho Rodamientos S 100-150",
+    sku: "A07-14452",
+    description: "Conjunto rodamientos sellado Sonic 100-150",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: null,
+    image_url: "img/products/A07-14452.jpg",
+    image_webp: "img/products/A07-14452.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=cartucho-rodamientos-s-100-150",
+  },
+  {
+    id: 8,
+    slug: "tensor-correa-sonic",
+    name: "Tensor Correa Sonic (todos los modelos)",
+    sku: "A07-13455",
+    description: "Kit tensor correa Sonic todos los modelos",
+    sale_mode: "buy",
+    stock_status: "in_stock",
+    price_clp: null,
+    image_url: "img/products/A07-13455.png",
+    image_webp: "img/products/A07-13455.webp",
+    category_slug: "repuestos",
+    category_name: "Repuestos y Consumibles",
+    brand_slug: "sonic-air-systems",
+    brand_name: "Sonic Air Systems",
+    quote_url: "cotizacion.html?sku=tensor-correa-sonic-todos-los-modelos",
+  },
+];
 
-  if (!grid || !window.Lpaez) return;
+const MOCK_CATEGORIES = [
+  { slug: "secadores", name: "Secadores de Envases" },
+  { slug: "turbinas-soplado", name: "Turbinas de Soplado" },
+  { slug: "repuestos", name: "Repuestos y Consumibles" },
+  { slug: "fin-de-linea", name: "Máquinas Fin de Línea" },
+  { slug: "salas-limpias", name: "Salas Limpias y HEPA" },
+  { slug: "cuchillos-aire", name: "Cuchillos de Aire" },
+];
 
-  var state = {
-    category: "",
-    brand: "",
-    industry: "",
-    mode: "",
-    page: 1,
+const MOCK_BRANDS = [
+  { slug: "sonic-air-systems", name: "Sonic Air Systems" },
+  { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+];
+
+const FETCH_TIMEOUT_MS = 2500;
+const PAGE_SIZE = 12;
+
+const INDUSTRIES = [
+  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
+  { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
+  { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
+];
+
+document.addEventListener("DOMContentLoaded", async () => {
+  /* 3) NULL-CHECK del contenedor */
+  const container = document.getElementById("grid-productos");
+  if (!container) {
+    console.error("[CATALOGO JS] No existe #grid-productos — abortando.");
+    return;
+  }
+
+  const loader = document.getElementById("catalogLoader");
+  const industryTabs = document.getElementById("industryTabs");
+  const filterChips = document.getElementById("filterChips");
+  const modeChips = document.getElementById("modeChips");
+  const brandSelect = document.getElementById("brandFilter");
+  const catalogCount = document.getElementById("catalogCount");
+  const pager = document.getElementById("catalogPager");
+  const ldScript = document.getElementById("catalogItemListLd");
+  const datasheetDialog = document.getElementById("datasheetDialog");
+  const datasheetBody = document.getElementById("datasheetBody");
+
+  const escapeHtml =
+    window.Lpaez?.escapeHtml ||
+    ((str) =>
+      String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;"));
+  const escapeAttr =
+    window.Lpaez?.escapeAttr ||
+    ((str) => escapeHtml(str).replace(/'/g, "&#39;"));
+  const queryParam =
+    window.Lpaez?.queryParam ||
+    ((name) => {
+      try {
+        return new URLSearchParams(window.location.search).get(name) || "";
+      } catch (_) {
+        return "";
+      }
+    });
+
+  const state = {
+    category: queryParam("category") || "",
+    brand: queryParam("brand") || "",
+    industry: queryParam("industry") || "",
+    mode: queryParam("sale_mode") || queryParam("mode") || "",
+    page: Math.max(1, parseInt(queryParam("page") || "1", 10) || 1),
   };
 
-  var allProducts = [];
-  var allCategories = [];
-  var allBrands = [];
+  let allProducts = MOCK_PRODUCTS.slice();
+  let allCategories = MOCK_CATEGORIES.slice();
+  let allBrands = MOCK_BRANDS.slice();
 
-  var INDUSTRIES = [
-    {
-      id: "alimentos",
-      label: "Alimentos",
-      categories: ["secadores", "cuchillos-aire", "turbinas-soplado"],
-    },
-    {
-      id: "packaging",
-      label: "Packaging",
-      categories: ["fin-de-linea"],
-    },
-    {
-      id: "farmaceutica",
-      label: "Farmacéutica",
-      categories: ["salas-limpias"],
-    },
-    {
-      id: "repuestos",
-      label: "Repuestos",
-      categories: ["repuestos"],
-    },
-  ];
-
-  var CHIP_SHORT = {
-    secadores: "Secadores",
-    "turbinas-soplado": "Turbinas",
-    "cuchillos-aire": "Air knives",
-    repuestos: "Repuestos",
-    "fin-de-linea": "Fin de línea",
-    "salas-limpias": "Salas limpias",
-  };
-
-  var FETCH_TIMEOUT_MS = 3000;
-  var WA_FALLBACK = "https://wa.me/56968232745?text=" +
-    encodeURIComponent("Hola LPAEZsis, no pude cargar el catálogo y necesito ayuda.");
-
-  /** Mock local (~8 ítems) para disponibilidad UX si la API falla. */
-  var MOCK_CATALOG = {
-    categories: [
-      { id: 1, slug: "secadores", name: "Secadores de Envases", is_active: 1, sort_order: 10 },
-      { id: 2, slug: "turbinas-soplado", name: "Turbinas de Soplado", is_active: 1, sort_order: 20 },
-      { id: 4, slug: "repuestos", name: "Repuestos y Consumibles", is_active: 1, sort_order: 40 },
-      { id: 5, slug: "fin-de-linea", name: "Máquinas Fin de Línea", is_active: 1, sort_order: 50 },
-      { id: 6, slug: "salas-limpias", name: "Salas Limpias y HEPA", is_active: 1, sort_order: 60 },
-    ],
-    brands: [
-      { id: 1, slug: "sonic-air-systems", name: "Sonic Air Systems", is_active: 1 },
-      { id: 7, slug: "columbia-okura", name: "COLUMBIA/OKURA", is_active: 1 },
-    ],
-    products: [
-      {
-        id: 101,
-        slug: "secador-botellas-sonic",
-        name: "Sistema Secador de Botellas Sonic Air",
-        description: "Sistema de secado de botellas con turbinas y air knives. Cotización según línea.",
-        sale_mode: "quote",
-        stock_status: "on_request",
-        price_clp: null,
-        image_url: "img/hero/cans.jpg",
-        category_id: 1,
-        category_slug: "secadores",
-        category_name: "Secadores de Envases",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 5,
-      },
-      {
-        id: 102,
-        slug: "turbina-soplado-sonic-100",
-        name: "Turbina de Soplado Sonic 100",
-        description: "Turbina de alto caudal para secado y limpieza industrial.",
-        sale_mode: "quote",
-        stock_status: "on_request",
-        price_clp: null,
-        image_url: "img/products/vt-sonic.jpg",
-        category_id: 2,
-        category_slug: "turbinas-soplado",
-        category_name: "Turbinas de Soplado",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 15,
-      },
-      {
-        id: 103,
-        slug: "correa-sonic-70-85",
-        name: "Correa Sonic 70/85",
-        description: "Correa 16 GRV SONIC 70/85 (Cod 13514)",
-        sale_mode: "buy",
-        stock_status: "in_stock",
-        price_clp: null,
-        image_url: "img/products/A07-13474.jpg",
-        category_id: 4,
-        category_slug: "repuestos",
-        category_name: "Repuestos y Consumibles",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 10,
-      },
-      {
-        id: 104,
-        slug: "filtro-poliester-s-75-85-100",
-        name: "Filtro Poliéster S 75-85-100",
-        description: "Elemento filtro polyester lavable Sonic 75-85-100",
-        sale_mode: "buy",
-        stock_status: "in_stock",
-        price_clp: null,
-        image_url: "img/products/A07-10317.jpg",
-        category_id: 4,
-        category_slug: "repuestos",
-        category_name: "Repuestos y Consumibles",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 20,
-      },
-      {
-        id: 105,
-        slug: "filtro-completo-poliester-s-70-85-100-con-indicador",
-        name: "Filtro Completo Poliéster con indicador",
-        description: "Filtro completo polyester lavable Sonic (Cod 10976)",
-        sale_mode: "buy",
-        stock_status: "in_stock",
-        price_clp: 195000,
-        image_url: "img/products/A07-10976.jpg",
-        category_id: 4,
-        category_slug: "repuestos",
-        category_name: "Repuestos y Consumibles",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 30,
-      },
-      {
-        id: 106,
-        slug: "impeller-sonic-70-100",
-        name: "Impeller Sonic 70/100",
-        description: "Impulsor soplador Sonic Air Models S70/S100 (Cod 10015)",
-        sale_mode: "buy",
-        stock_status: "in_stock",
-        price_clp: null,
-        image_url: "img/products/A07-10015.jpg",
-        category_id: 4,
-        category_slug: "repuestos",
-        category_name: "Repuestos y Consumibles",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 40,
-      },
-      {
-        id: 107,
-        slug: "cartucho-rodamientos-s-100-150",
-        name: "Cartucho Rodamientos S 100-150",
-        description: "Conjunto rodamientos sellado Sonic 100-150",
-        sale_mode: "buy",
-        stock_status: "in_stock",
-        price_clp: null,
-        image_url: "img/products/A07-14452.jpg",
-        category_id: 4,
-        category_slug: "repuestos",
-        category_name: "Repuestos y Consumibles",
-        brand_id: 1,
-        brand_slug: "sonic-air-systems",
-        brand_name: "Sonic Air Systems",
-        is_active: 1,
-        sort_order: 50,
-      },
-      {
-        id: 108,
-        slug: "paletizado-columbia-okura",
-        name: "Paletizado robotizado Columbia/Okura",
-        description: "Solución de fin de línea / paletizado. Cotización por proyecto.",
-        sale_mode: "quote",
-        stock_status: "on_request",
-        price_clp: null,
-        image_url: "img/hero/line.jpg",
-        category_id: 5,
-        category_slug: "fin-de-linea",
-        category_name: "Máquinas Fin de Línea",
-        brand_id: 7,
-        brand_slug: "columbia-okura",
-        brand_name: "COLUMBIA/OKURA",
-        is_active: 1,
-        sort_order: 8,
-      },
-    ],
-  };
-
-  function isDevEnv() {
-    try {
-      var host = String(window.location.hostname || "");
-      return (
-        host === "localhost" ||
-        host === "127.0.0.1" ||
-        host.indexOf(".cvm.dev") !== -1 ||
-        host.indexOf("prueba1.") === 0 ||
-        /(?:^|\.)local$/i.test(host)
-      );
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function logDevError(label, err) {
-    if (!isDevEnv()) return;
-    try {
-      console.error("[catalogo]", label, err);
-    } catch (e) { /* ignore */ }
-  }
-
-  function escapeHtml(s) {
-    return Lpaez.escapeHtml(s);
-  }
-  function escapeAttr(s) {
-    return Lpaez.escapeAttr(s);
-  }
-
-  function showSkeleton() {
-    var loader = document.getElementById("catalogLoader");
-    if (loader) {
-      loader.style.display = "";
-      loader.hidden = false;
-      loader.setAttribute("aria-hidden", "false");
-    }
-    grid.innerHTML = skeletonHtml();
-    grid.classList.add("catalog-loading");
-    grid.setAttribute("aria-busy", "true");
-    if (pager) {
-      pager.hidden = true;
-      pager.innerHTML = "";
-    }
-    if (catalogCount) catalogCount.hidden = true;
-  }
-
-  function forceHideLoader() {
-    var loader = document.getElementById("catalogLoader");
+  function hideLoader() {
     if (loader) {
       loader.style.display = "none";
       loader.hidden = true;
       loader.setAttribute("aria-hidden", "true");
     }
-    grid.classList.remove("catalog-loading");
-    grid.setAttribute("aria-busy", "false");
-    var stuck = grid.querySelector(".catalog-loading-label");
-    if (stuck && stuck.parentNode === grid) {
-      /* label will be replaced on render; remove if still present alone */
+    container.classList.remove("catalog-loading");
+    container.setAttribute("aria-busy", "false");
+  }
+
+  function showLoader() {
+    if (loader) {
+      loader.style.display = "";
+      loader.hidden = false;
+      loader.setAttribute("aria-hidden", "false");
     }
-  }
-
-  function hideSkeleton() {
-    forceHideLoader();
-  }
-
-  function whatsappCatalogUrl() {
-    var el = document.querySelector("[data-wa]");
-    if (el && el.getAttribute("href") && el.getAttribute("href").indexOf("wa.me") !== -1) {
-      return el.getAttribute("href");
-    }
-    return WA_FALLBACK;
-  }
-
-  function outageEmptyHtml() {
-    return (
-      '<div class="empty-state catalog-outage">' +
-      "<p><strong>No pudimos cargar el catálogo en este momento.</strong></p>" +
-      "<p>Puedes reintentar o escribirnos por WhatsApp para cotizar sin demora.</p>" +
-      '<p class="empty-actions">' +
-      '<button type="button" class="btn btn-primary btn-sm" id="catalogRetryBtn">Reintentar</button>' +
-      '<a class="btn btn-outline btn-sm" id="catalogWaBtn" href="' +
-      escapeAttr(whatsappCatalogUrl()) +
-      '" target="_blank" rel="noopener noreferrer">Contactar por WhatsApp</a>' +
-      "</p></div>"
-    );
-  }
-
-  function bindOutageActions() {
-    var retry = document.getElementById("catalogRetryBtn");
-    if (retry) {
-      retry.addEventListener("click", function () {
-        initCatalog(true);
-      });
-    }
-  }
-
-  /** Alias pedido: MOCK_PRODUCTS */
-  var MOCK_PRODUCTS = MOCK_CATALOG.products;
-
-  function applyMockData() {
-    allCategories = Array.isArray(MOCK_CATALOG.categories)
-      ? MOCK_CATALOG.categories.slice()
-      : [];
-    allBrands = Array.isArray(MOCK_CATALOG.brands) ? MOCK_CATALOG.brands.slice() : [];
-    allProducts = Array.isArray(MOCK_PRODUCTS) ? MOCK_PRODUCTS.slice() : [];
-    return allProducts.length > 0;
-  }
-
-  function fetchJsonWithTimeout(url, timeoutMs) {
-    var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-    var timer = null;
-    var opts = { credentials: "same-origin" };
-    if (controller) opts.signal = controller.signal;
-    var fetchPromise = fetch(url, opts).then(function (res) {
-      if (!res || res.status !== 200) {
-        var err = new Error("HTTP " + (res && res.status));
-        err.status = res && res.status;
-        throw err;
-      }
-      return res.json();
-    });
-    var timeoutPromise = new Promise(function (_, reject) {
-      timer = setTimeout(function () {
-        if (controller) {
-          try {
-            controller.abort();
-          } catch (e) { /* ignore */ }
-        }
-        var err = new Error("Timeout after " + timeoutMs + "ms");
-        err.code = "TIMEOUT";
-        reject(err);
-      }, timeoutMs);
-    });
-    return Promise.race([fetchPromise, timeoutPromise]).then(
-      function (data) {
-        if (timer) clearTimeout(timer);
-        return data;
-      },
-      function (err) {
-        if (timer) clearTimeout(timer);
-        throw err;
-      }
-    );
-  }
-
-  async function loadCatalogPayload() {
-    var results = await Promise.all([
-      fetchJsonWithTimeout("/api/categories", FETCH_TIMEOUT_MS),
-      fetchJsonWithTimeout("/api/products", FETCH_TIMEOUT_MS),
-      fetchJsonWithTimeout("/api/brands", FETCH_TIMEOUT_MS),
-    ]);
-    var cats = (results[0] && results[0].categories) || [];
-    var products = results[1] && results[1].products;
-    var brands = (results[2] && results[2].brands) || [];
-    products = Array.isArray(products) ? products : null;
-    if (!products || !products.length) {
-      var emptyErr = new Error("API returned empty/invalid products");
-      emptyErr.code = "EMPTY";
-      throw emptyErr;
-    }
-    return {
-      categories: Array.isArray(cats) ? cats : [],
-      products: products,
-      brands: Array.isArray(brands) ? brands : [],
-      source: "api",
-    };
-  }
-
-  async function initCatalog(isRetry) {
-    showSkeleton();
-    readUrlState();
-    try {
-      var payload = await loadCatalogPayload();
-      allCategories = Array.isArray(payload.categories) ? payload.categories : [];
-      allBrands = Array.isArray(payload.brands) ? payload.brands : [];
-      allProducts = Array.isArray(payload.products) ? payload.products : MOCK_PRODUCTS.slice();
-      renderCatalog();
-    } catch (err) {
-      logDevError(isRetry ? "retry failed" : "api failed — injecting MOCK_PRODUCTS", err);
-      try {
-        if (!applyMockData()) {
-          throw new Error("mock unavailable");
-        }
-        renderCatalog();
-      } catch (mockErr) {
-        logDevError("mock/render failed", mockErr);
-        grid.innerHTML = outageEmptyHtml();
-        if (catalogCount) catalogCount.hidden = true;
-        if (pager) {
-          pager.hidden = true;
-          pager.innerHTML = "";
-        }
-        bindOutageActions();
-      }
-    } finally {
-      forceHideLoader();
-    }
-  }
-
-  function readUrlState() {
-    state.category = Lpaez.queryParam("category") || "";
-    state.brand = Lpaez.queryParam("brand") || "";
-    state.industry = Lpaez.queryParam("industry") || "";
-    state.mode = Lpaez.queryParam("sale_mode") || Lpaez.queryParam("mode") || "";
-    var page = parseInt(Lpaez.queryParam("page") || "1", 10);
-    state.page = page > 0 ? page : 1;
-
-    // Map legacy category landing from home sectors into industry when useful
-    if (!state.industry && state.category) {
-      INDUSTRIES.forEach(function (ind) {
-        if (ind.categories.indexOf(state.category) !== -1) {
-          /* keep category; industry optional */
-        }
-      });
-    }
-  }
-
-  function writeUrlState() {
-    if (!window.history || !window.history.replaceState) return;
-    var params = new URLSearchParams();
-    if (state.industry) params.set("industry", state.industry);
-    if (state.category) params.set("category", state.category);
-    if (state.brand) params.set("brand", state.brand);
-    if (state.mode) params.set("sale_mode", state.mode);
-    if (state.page > 1) params.set("page", String(state.page));
-    var q = params.toString();
-    var url = "catalogo.html" + (q ? "?" + q : "");
-    window.history.replaceState({}, "", url);
-  }
-
-  function skeletonHtml() {
-    var cards = [0, 1, 2, 3, 4, 5].map(function () {
+    container.classList.add("catalog-loading");
+    container.setAttribute("aria-busy", "true");
+    container.innerHTML = Array.from({ length: 6 }, () => {
       return (
         '<article class="product-card catalog-card skeleton-card" aria-hidden="true">' +
         '<div class="product-card-visual skeleton-block"></div>' +
         '<div class="product-card-body">' +
         '<div class="skeleton-line short"></div>' +
         '<div class="skeleton-line"></div>' +
-        '<div class="skeleton-line short"></div>' +
-        '<div class="skeleton-line btn"></div>' +
         '<div class="skeleton-line btn"></div>' +
         "</div></article>"
       );
     }).join("");
-    return cards;
   }
 
-  function productSku(p) {
-    p = p || {};
-    var desc = String(p.description || "");
-    var m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i) || desc.match(/\b([A-Z]?\d{4,})\b/);
-    if (m) return m[1];
-    return String(p.slug || p.id || "N/A").toUpperCase();
-  }
-
-  function localImageSrc(p) {
-    p = p || {};
-    var src = "";
+  async function fetchJson(url) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-      src = Lpaez.resolveProductImage(p) || "";
-    } catch (e) {
-      src = p.image_url || "img/products/A07-10015.jpg";
+      const res = await fetch(url, {
+        credentials: "same-origin",
+        signal: controller.signal,
+      });
+      if (!res || res.status !== 200) {
+        throw new Error("HTTP " + (res?.status ?? "fail"));
+      }
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
     }
-    var wp = String(src).match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
-    if (/wp-content\/uploads/i.test(src) && wp) {
-      return "img/products/" + wp[1];
+  }
+
+  async function loadProducts() {
+    try {
+      const [catsRes, prodRes, brandRes] = await Promise.all([
+        fetchJson("/api/categories"),
+        fetchJson("/api/products"),
+        fetchJson("/api/brands"),
+      ]);
+      const products = Array.isArray(prodRes?.products) ? prodRes.products : null;
+      if (!products || !products.length) throw new Error("empty products");
+      allProducts = products.map(normalizeProduct);
+      allCategories = Array.isArray(catsRes?.categories)
+        ? catsRes.categories
+        : MOCK_CATEGORIES.slice();
+      allBrands = Array.isArray(brandRes?.brands)
+        ? brandRes.brands
+        : MOCK_BRANDS.slice();
+      return allProducts;
+    } catch (err) {
+      console.warn("[CATALOGO JS] API no disponible — usando MOCK_PRODUCTS", err);
+      allProducts = MOCK_PRODUCTS.slice();
+      allCategories = MOCK_CATEGORIES.slice();
+      allBrands = MOCK_BRANDS.slice();
+      return allProducts;
     }
-    if (/^https?:\/\/[^/]*lpaezsis\.cl\//i.test(src)) {
+  }
+
+  function normalizeProduct(p) {
+    const prod = p || {};
+    const slug = prod.slug || "";
+    const name = prod.name || "Producto";
+    let sku = slug ? String(slug).toUpperCase() : "N/A";
+    const desc = String(prod.description || "");
+    const m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i);
+    if (m) sku = m[1];
+    let image = prod.image_url || "";
+    if (/wp-content\/uploads/i.test(image)) {
+      const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+      if (file) image = "img/products/" + file[1];
+    }
+    if (!image && window.Lpaez?.resolveProductImage) {
       try {
-        var u = new URL(src);
-        return u.pathname.replace(/^\//, "");
-      } catch (e) {
-        return src;
+        image = Lpaez.resolveProductImage(prod);
+      } catch (_) {
+        image = "img/products/A07-10015.jpg";
       }
     }
-    return src || "img/products/A07-10015.jpg";
+    if (!image) image = "img/products/A07-10015.jpg";
+    const webp = /\.(jpe?g|png)$/i.test(image)
+      ? image.replace(/\.(jpe?g|png)$/i, ".webp")
+      : prod.image_webp || "";
+    return {
+      id: prod.id,
+      slug,
+      name,
+      sku,
+      description: desc,
+      sale_mode: prod.sale_mode || "quote",
+      stock_status: prod.stock_status || "on_request",
+      price_clp: prod.price_clp ?? null,
+      image_url: image,
+      image_webp: webp,
+      category_slug: prod.category_slug || "",
+      category_name: prod.category_name || "",
+      brand_slug: prod.brand_slug || "",
+      brand_name: prod.brand_name || "Sonic Air Systems",
+      quote_url:
+        "cotizacion.html?sku=" +
+        encodeURIComponent(slug) +
+        "&asunto=" +
+        encodeURIComponent("Cotización: " + name),
+    };
   }
 
-  function pictureHtml(src, alt) {
-    src = String(src || "");
-    var webp = "";
-    if (/\.(jpe?g|png)$/i.test(src) && src.indexOf("http") !== 0) {
-      webp = src.replace(/\.(jpe?g|png)$/i, ".webp");
+  function writeUrl() {
+    try {
+      const params = new URLSearchParams();
+      if (state.industry) params.set("industry", state.industry);
+      if (state.category) params.set("category", state.category);
+      if (state.brand) params.set("brand", state.brand);
+      if (state.mode) params.set("sale_mode", state.mode);
+      if (state.page > 1) params.set("page", String(state.page));
+      const q = params.toString();
+      history.replaceState({}, "", "catalogo.html" + (q ? "?" + q : ""));
+    } catch (_) {
+      /* ignore */
     }
-    var img =
-      '<img src="' +
-      escapeAttr(src) +
-      '" alt="' +
-      escapeAttr(alt) +
-      '" title="' +
-      escapeAttr(alt) +
-      '" loading="lazy" decoding="async" width="480" height="480">';
-    if (!webp) return img;
-    return (
-      '<picture><source type="image/webp" srcset="' +
-      escapeAttr(webp) +
-      '">' +
-      img +
-      "</picture>"
-    );
   }
 
-  function industryCategorySet() {
-    if (!state.industry) return null;
-    var ind = INDUSTRIES.filter(function (i) {
-      return i.id === state.industry;
-    })[0];
-    if (!ind) return null;
-    var set = {};
-    ind.categories.forEach(function (c) {
-      set[c] = true;
-    });
-    return set;
-  }
-
-  function filteredProducts() {
-    var list = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
-    var industrySet = industryCategorySet();
-    return list.filter(function (p) {
+  function filtered() {
+    const list = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
+    const ind = INDUSTRIES.find((i) => i.id === state.industry);
+    const set = ind
+      ? ind.categories.reduce((acc, c) => {
+          acc[c] = true;
+          return acc;
+        }, {})
+      : null;
+    return list.filter((p) => {
       if (!p) return false;
       if (state.category && p.category_slug !== state.category) return false;
-      if (industrySet && !industrySet[p.category_slug]) return false;
+      if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
       if (state.mode && p.sale_mode !== state.mode) return false;
       return true;
     });
   }
 
-  function categoriesWithProducts() {
-    var list = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
-    var cats = Array.isArray(allCategories) ? allCategories : [];
-    var industrySet = industryCategorySet();
-    var slugs = {};
-    list.forEach(function (p) {
-      if (!p) return;
-      if (state.mode && p.sale_mode !== state.mode) return;
-      if (state.brand && p.brand_slug !== state.brand) return;
-      if (industrySet && !industrySet[p.category_slug]) return;
-      if (p.category_slug) slugs[p.category_slug] = true;
-    });
-    return cats.filter(function (c) {
-      return c && !!slugs[c.slug];
-    });
-  }
-
-  function renderIndustryTabs() {
-    if (!industryTabs) return;
-    industryTabs.innerHTML =
-      '<button type="button" class="industry-tab' +
-      (!state.industry ? " is-active" : "") +
-      '" role="tab" data-industry="" aria-selected="' +
-      (!state.industry ? "true" : "false") +
-      '" tabindex="' +
-      (!state.industry ? "0" : "-1") +
-      '">Todas</button>' +
-      INDUSTRIES.map(function (ind) {
-        var on = state.industry === ind.id;
-        return (
-          '<button type="button" class="industry-tab' +
-          (on ? " is-active" : "") +
-          '" role="tab" data-industry="' +
-          escapeAttr(ind.id) +
-          '" aria-selected="' +
-          (on ? "true" : "false") +
-          '" tabindex="' +
-          (on ? "0" : "-1") +
-          '">' +
-          escapeHtml(ind.label) +
-          "</button>"
-        );
-      }).join("");
-  }
-
-  function renderCategoryChips() {
-    var cats = categoriesWithProducts();
-    if (state.category && !cats.some(function (c) {
-      return c.slug === state.category;
-    })) {
-      // Keep URL category even if empty — empty state will show
-    }
-    filterChips.innerHTML =
-      '<button type="button" class="filter-chip' +
-      (!state.category ? " is-active" : "") +
-      '" data-cat="" aria-pressed="' +
-      (!state.category ? "true" : "false") +
-      '" title="Todas las categorías">Todas</button>' +
-      cats.map(function (c) {
-        var active = state.category === c.slug;
-        var label = CHIP_SHORT[c.slug] || c.name;
-        return (
-          '<button type="button" class="filter-chip' +
-          (active ? " is-active" : "") +
-          '" data-cat="' +
-          escapeAttr(c.slug) +
-          '" aria-pressed="' +
-          (active ? "true" : "false") +
-          '" title="' +
-          escapeAttr(c.name) +
-          '">' +
-          escapeHtml(label) +
-          "</button>"
-        );
-      }).join("");
-  }
-
-  function renderBrandSelect() {
-    if (!brandSelect) return;
-    var options =
-      '<option value="">Todas las marcas</option>' +
-      allBrands
-        .map(function (b) {
-          return (
-            '<option value="' +
-            escapeAttr(b.slug) +
-            '"' +
-            (state.brand === b.slug ? " selected" : "") +
-            ">" +
-            escapeHtml(b.name) +
-            "</option>"
-          );
-        })
-        .join("");
-    brandSelect.innerHTML = options;
-  }
-
-  function syncModeChips() {
-    if (!modeChips) return;
-    modeChips.querySelectorAll(".filter-chip").forEach(function (chip) {
-      var on = chip.getAttribute("data-mode") === state.mode;
-      chip.classList.toggle("is-active", on);
-      chip.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-  }
-
-  function b2bCardHtml(p) {
-    p = p || {};
-    var name = (p && p.name) || "Producto";
-    var slug = (p && p.slug) || "";
-    var sku = productSku(p);
-    var img = localImageSrc(p);
-    var catLabel =
-      (p && p.category_name) ||
-      CHIP_SHORT[(p && p.category_slug) || ""] ||
-      "Producto";
-    var saleMode = (p && p.sale_mode) || "quote";
-    var quoteUrl =
-      "cotizacion.html?sku=" +
-      encodeURIComponent(slug || sku) +
-      "&asunto=" +
-      encodeURIComponent("Cotización: " + name + " (" + sku + ")");
+  function cardHtml(prod) {
+    const name = prod?.name || "Producto";
+    const slug = prod?.slug || "";
+    const sku = prod?.sku || "N/A";
+    const cat = prod?.category_name || prod?.category_slug || "Producto";
+    const img = prod?.image_url || "img/products/A07-10015.jpg";
+    const webp = prod?.image_webp || "";
+    const sale = prod?.sale_mode === "buy" ? "buy" : "quote";
+    const quote =
+      prod?.quote_url ||
+      "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
+    const picture = webp
+      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480"></picture>`
+      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
     return (
-      '<article class="product-card catalog-card reveal" data-product-id="' +
-      escapeAttr(String((p && p.id) || sku)) +
-      '">' +
-      '<a class="product-card-visual" href="producto.html?slug=' +
-      encodeURIComponent(slug) +
-      '" title="' +
-      escapeAttr(name) +
-      '">' +
-      pictureHtml(img, name) +
-      "</a>" +
-      '<div class="product-card-body">' +
-      '<div class="product-meta">' +
-      '<span class="badge-category">' +
-      escapeHtml(catLabel) +
-      "</span>" +
-      '<span class="badge-mode ' +
-      (saleMode === "buy" ? "badge-buy" : "badge-quote") +
-      '">' +
-      (saleMode === "buy" ? "Comprar" : "Cotizar") +
-      "</span></div>" +
-      "<h3><a href=\"producto.html?slug=" +
-      encodeURIComponent(slug) +
-      '">' +
-      escapeHtml(name) +
-      "</a></h3>" +
-      '<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ' +
-      escapeHtml(sku) +
-      "</p>" +
-      '<div class="product-card-actions catalog-card-actions">' +
-      '<a class="btn btn-primary btn-sm" href="' +
-      quoteUrl +
-      '">Pedir cotización</a>' +
-      '<button type="button" class="btn btn-outline btn-sm" data-datasheet="' +
-      escapeAttr(slug) +
-      '" data-datasheet-name="' +
-      escapeAttr(name) +
-      '" data-datasheet-sku="' +
-      escapeAttr(sku) +
-      '">Descargar ficha técnica</button>' +
-      "</div></div></article>"
+      `<article class="product-card catalog-card reveal">` +
+      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${picture}</a>` +
+      `<div class="product-card-body">` +
+      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>` +
+      `<span class="badge-mode ${sale === "buy" ? "badge-buy" : "badge-quote"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span></div>` +
+      `<h3><a href="producto.html?slug=${encodeURIComponent(slug)}">${escapeHtml(name)}</a></h3>` +
+      `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
+      `<div class="product-card-actions catalog-card-actions">` +
+      `<a class="btn btn-primary btn-sm" href="${escapeAttr(quote)}">Pedir cotización</a>` +
+      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">Descargar ficha técnica</button>` +
+      `</div></div></article>`
     );
   }
 
-  function emptyStateHtml() {
-    var hasFilters = !!(state.category || state.brand || state.industry || state.mode);
-    var parts = ["<div class='empty-state'>"];
-    if (hasFilters) {
-      parts.push("<p>No hay productos con esos filtros B2B.</p>");
-      parts.push(
-        "<p class='empty-actions'>" +
-          "<button type='button' class='btn btn-primary btn-sm' id='clearCatalogFilters'>Ver todos los productos</button>" +
-          "<a class='btn btn-outline btn-sm' href='cotizacion.html'>Pedir cotización</a>" +
-          "</p>"
-      );
-    } else {
-      parts.push("<p>Pronto publicaremos más ítems.</p>");
-      parts.push(
-        "<p class='empty-actions'><a class='btn btn-primary btn-sm' href='cotizacion.html'>Pedir cotización</a></p>"
-      );
+  function renderFilters() {
+    if (industryTabs) {
+      industryTabs.innerHTML =
+        `<button type="button" class="industry-tab${!state.industry ? " is-active" : ""}" data-industry="" aria-selected="${!state.industry}">Todas</button>` +
+        INDUSTRIES.map((ind) => {
+          const on = state.industry === ind.id;
+          return `<button type="button" class="industry-tab${on ? " is-active" : ""}" data-industry="${escapeAttr(ind.id)}" aria-selected="${on}">${escapeHtml(ind.label)}</button>`;
+        }).join("");
     }
-    parts.push("</div>");
-    return parts.join("");
+    if (filterChips) {
+      const used = {};
+      filtered().forEach((p) => {
+        if (p?.category_slug) used[p.category_slug] = true;
+      });
+      // show categories from all data for current industry/mode/brand context base list
+      const base = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
+      const catsPresent = {};
+      base.forEach((p) => {
+        if (!p) return;
+        if (state.mode && p.sale_mode !== state.mode) return;
+        if (state.brand && p.brand_slug !== state.brand) return;
+        const ind = INDUSTRIES.find((i) => i.id === state.industry);
+        if (ind && !ind.categories.includes(p.category_slug)) return;
+        if (p.category_slug) catsPresent[p.category_slug] = p.category_name || p.category_slug;
+      });
+      const catList = Object.keys(catsPresent).map((slug) => ({
+        slug,
+        name: catsPresent[slug],
+      }));
+      filterChips.innerHTML =
+        `<button type="button" class="filter-chip${!state.category ? " is-active" : ""}" data-cat="" aria-pressed="${!state.category}">Todas</button>` +
+        catList
+          .map((c) => {
+            const on = state.category === c.slug;
+            return `<button type="button" class="filter-chip${on ? " is-active" : ""}" data-cat="${escapeAttr(c.slug)}" aria-pressed="${on}">${escapeHtml(c.name)}</button>`;
+          })
+          .join("");
+    }
+    if (brandSelect) {
+      brandSelect.innerHTML =
+        `<option value="">Todas las marcas</option>` +
+        (Array.isArray(allBrands) ? allBrands : MOCK_BRANDS)
+          .map((b) => {
+            const slug = b?.slug || "";
+            const name = b?.name || slug;
+            return `<option value="${escapeAttr(slug)}"${state.brand === slug ? " selected" : ""}>${escapeHtml(name)}</option>`;
+          })
+          .join("");
+    }
+    if (modeChips) {
+      modeChips.querySelectorAll(".filter-chip").forEach((chip) => {
+        const on = chip.getAttribute("data-mode") === state.mode;
+        chip.classList.toggle("is-active", on);
+        chip.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
   }
 
-  function injectItemListJsonLd(products) {
-    var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
-    var graph = {
+  function injectJsonLd(products) {
+    const origin = window.location.origin || "https://prueba1.lpaezsis.cl";
+    const list = Array.isArray(products) ? products : [];
+    const graph = {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: "Catálogo de productos LPAEZsis",
-      url: origin + "/catalogo.html" + window.location.search,
-      numberOfItems: products.length,
-      itemListElement: products.map(function (p, i) {
-        var sku = productSku(p);
-        var img = localImageSrc(p);
-        var absImg = /^https?:/i.test(img) ? img : origin + "/" + String(img).replace(/^\//, "");
-        return {
-          "@type": "ListItem",
-          position: i + 1,
-          item: {
-            "@type": "Product",
-            name: p.name,
-            sku: sku,
-            productID: String(p.id),
-            description: (p.description || "").slice(0, 300),
-            image: absImg,
-            url: origin + "/producto.html?slug=" + encodeURIComponent(p.slug),
-            category: p.category_name || p.category_slug || undefined,
-            brand: p.brand_name
-              ? { "@type": "Brand", name: p.brand_name }
-              : { "@type": "Brand", name: "Sonic Air Systems" },
-            offers: {
-              "@type": "Offer",
-              url: origin + "/cotizacion.html?sku=" + encodeURIComponent(p.slug),
-              priceCurrency: "CLP",
-              availability:
-                p.stock_status === "in_stock"
-                  ? "https://schema.org/InStock"
-                  : "https://schema.org/PreOrder",
-              price: p.price_clp != null ? String(p.price_clp) : undefined,
-            },
-          },
-        };
-      }),
+      numberOfItems: list.length,
+      itemListElement: list.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Product",
+          name: p?.name || "Producto",
+          sku: p?.sku || p?.slug || "",
+          image: (p?.image_url || "").indexOf("http") === 0
+            ? p.image_url
+            : origin + "/" + String(p?.image_url || "").replace(/^\//, ""),
+          url: origin + "/producto.html?slug=" + encodeURIComponent(p?.slug || ""),
+          brand: { "@type": "Brand", name: p?.brand_name || "Sonic Air Systems" },
+        },
+      })),
     };
-    var json = JSON.stringify(graph);
-    if (ldScript) {
-      ldScript.textContent = json;
-    } else {
-      Lpaez.injectJsonLd(graph);
-    }
+    if (ldScript) ldScript.textContent = JSON.stringify(graph);
   }
 
   function renderPager(total, page, pages) {
@@ -799,245 +495,126 @@
       return;
     }
     pager.hidden = false;
-    var buttons = [];
-    buttons.push(
-      '<button type="button" class="btn btn-outline btn-sm" data-page="' +
-        (page - 1) +
-        '"' +
-        (page <= 1 ? " disabled" : "") +
-        ">Anterior</button>"
-    );
-    buttons.push(
-      '<span class="catalog-pager__status" aria-live="polite">Página ' +
-        page +
-        " de " +
-        pages +
-        "</span>"
-    );
-    buttons.push(
-      '<button type="button" class="btn btn-outline btn-sm" data-page="' +
-        (page + 1) +
-        '"' +
-        (page >= pages ? " disabled" : "") +
-        ">Siguiente</button>"
-    );
-    pager.innerHTML = buttons.join("");
+    pager.innerHTML =
+      `<button type="button" class="btn btn-outline btn-sm" data-page="${page - 1}"${page <= 1 ? " disabled" : ""}>Anterior</button>` +
+      `<span class="catalog-pager__status">Página ${page} de ${pages}</span>` +
+      `<button type="button" class="btn btn-outline btn-sm" data-page="${page + 1}"${page >= pages ? " disabled" : ""}>Siguiente</button>`;
   }
 
-  function openDatasheetModal(slug, name, sku) {
-    if (!datasheetDialog || !datasheetBody) {
-      window.location.href = "producto.html?slug=" + encodeURIComponent(slug);
+  /** Inyección síncrona de cards tras ocultar loader */
+  function renderGrid() {
+    hideLoader();
+    writeUrl();
+    renderFilters();
+
+    let products = filtered();
+    products = Array.isArray(products) ? products : MOCK_PRODUCTS.slice();
+
+    const pages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+    if (state.page > pages) state.page = pages;
+    const start = (state.page - 1) * PAGE_SIZE;
+    const pageItems = products.slice(start, start + PAGE_SIZE);
+
+    if (catalogCount) {
+      catalogCount.hidden = false;
+      catalogCount.textContent =
+        products.length === 1 ? "1 producto" : products.length + " productos";
+    }
+
+    if (!pageItems.length) {
+      container.innerHTML =
+        `<div class="empty-state"><p>No hay productos con esos filtros.</p>` +
+        `<p class="empty-actions"><button type="button" class="btn btn-primary btn-sm" id="clearCatalogFilters">Ver todos</button>` +
+        `<a class="btn btn-outline btn-sm" href="cotizacion.html">Pedir cotización</a></p></div>`;
+      document.getElementById("clearCatalogFilters")?.addEventListener("click", () => {
+        state.category = "";
+        state.brand = "";
+        state.industry = "";
+        state.mode = "";
+        state.page = 1;
+        renderGrid();
+      });
+      renderPager(0, 1, 1);
+      injectJsonLd([]);
+      console.log("[CATALOGO JS] Productos renderizados exitosamente:", 0);
       return;
     }
-    var pdfPath = "img/fichas/" + encodeURIComponent(slug) + ".pdf";
-    datasheetBody.innerHTML =
-      "<h3>Ficha técnica</h3>" +
-      "<p><strong>" +
-      escapeHtml(name) +
-      "</strong></p>" +
-      '<p class="product-sku">SKU / Parte: ' +
-      escapeHtml(sku) +
-      "</p>" +
-      "<p>Descarga la ficha técnica en PDF o solicita el envío con tu cotización.</p>" +
-      '<div class="empty-actions">' +
-      '<a class="btn btn-primary" id="datasheetPdfLink" href="' +
-      pdfPath +
-      '" download target="_blank" rel="noopener">Descargar PDF</a>' +
-      '<a class="btn btn-outline" href="cotizacion.html?sku=' +
-      encodeURIComponent(slug) +
-      '">Pedir cotización con ficha</a>' +
-      "</div>" +
-      '<p class="catalog-hint" id="datasheetHint">Si el PDF aún no está publicado, te lo enviamos al cotizar.</p>';
-    if (typeof datasheetDialog.showModal === "function") {
-      datasheetDialog.showModal();
-    } else {
-      datasheetDialog.setAttribute("open", "");
-    }
-    var link = document.getElementById("datasheetPdfLink");
-    if (link) {
-      link.addEventListener(
-        "click",
-        function () {
-          var hint = document.getElementById("datasheetHint");
-          if (hint) {
-            hint.innerHTML =
-              "Si el archivo no abre, el PDF aún no está publicado: usa <strong>Pedir cotización con ficha</strong>.";
-          }
-        },
-        { once: true }
-      );
-    }
+
+    container.innerHTML = pageItems.map(cardHtml).join("");
+    renderPager(products.length, state.page, pages);
+    injectJsonLd(pageItems);
+    window.Lpaez?.observeReveals?.();
+    console.log("[CATALOGO JS] Productos renderizados exitosamente:", pageItems.length);
   }
 
-  function renderCatalog() {
-    try {
-      forceHideLoader();
-      renderIndustryTabs();
-      renderCategoryChips();
-      renderBrandSelect();
-      syncModeChips();
-      writeUrlState();
-
-      var products = filteredProducts();
-      products = Array.isArray(products) ? products : MOCK_PRODUCTS.slice();
-      var pages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
-      if (state.page > pages) state.page = pages;
-      var start = (state.page - 1) * PAGE_SIZE;
-      var pageItems = products.slice(start, start + PAGE_SIZE);
-
-      if (catalogCount) {
-        catalogCount.hidden = false;
-        catalogCount.textContent =
-          products.length === 1 ? "1 producto" : products.length + " productos";
-      }
-
-      if (!products.length) {
-        grid.innerHTML = emptyStateHtml();
-        renderPager(0, 1, 1);
-        injectItemListJsonLd([]);
-        var clearBtn = document.getElementById("clearCatalogFilters");
-        if (clearBtn) {
-          clearBtn.addEventListener("click", function () {
-            state.category = "";
-            state.brand = "";
-            state.industry = "";
-            state.mode = "";
-            state.page = 1;
-            renderCatalog();
-          });
-        }
-        if (Lpaez.observeReveals) Lpaez.observeReveals();
-        return;
-      }
-
-      grid.innerHTML = pageItems.map(b2bCardHtml).join("");
-      renderPager(products.length, state.page, pages);
-      injectItemListJsonLd(pageItems);
-      if (Lpaez.observeReveals) Lpaez.observeReveals();
-    } catch (err) {
-      logDevError("renderCatalog", err);
-      try {
-        var fallback = Array.isArray(MOCK_PRODUCTS) ? MOCK_PRODUCTS : [];
-        grid.innerHTML = fallback.map(b2bCardHtml).join("") || outageEmptyHtml();
-        if (!fallback.length) bindOutageActions();
-      } catch (e2) {
-        grid.innerHTML = outageEmptyHtml();
-        bindOutageActions();
-      }
-    } finally {
-      forceHideLoader();
-    }
-  }
-
-  function bindKeyboardGroup(container, itemSelector, onActivate) {
-    if (!container) return;
-    container.addEventListener("keydown", function (e) {
-      var items = Array.prototype.slice.call(container.querySelectorAll(itemSelector));
-      var current = document.activeElement;
-      var idx = items.indexOf(current);
-      if (idx < 0) return;
-      var next = -1;
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (idx + 1) % items.length;
-      if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (idx - 1 + items.length) % items.length;
-      if (e.key === "Home") next = 0;
-      if (e.key === "End") next = items.length - 1;
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onActivate(current);
-        return;
-      }
-      if (next < 0) return;
-      e.preventDefault();
-      items[next].focus();
-    });
-  }
-
-  // Events
-  if (industryTabs) {
-    industryTabs.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-industry]");
+  function bindUi() {
+    industryTabs?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-industry]");
       if (!btn) return;
       state.industry = btn.getAttribute("data-industry") || "";
       state.category = "";
       state.page = 1;
-      renderCatalog();
+      renderGrid();
     });
-    bindKeyboardGroup(industryTabs, ".industry-tab", function (btn) {
-      state.industry = btn.getAttribute("data-industry") || "";
-      state.category = "";
+    filterChips?.addEventListener("click", (e) => {
+      const chip = e.target.closest(".filter-chip");
+      if (!chip) return;
+      state.category = chip.getAttribute("data-cat") || "";
       state.page = 1;
-      renderCatalog();
+      renderGrid();
     });
-  }
-
-  filterChips.addEventListener("click", function (e) {
-    var chip = e.target.closest(".filter-chip");
-    if (!chip) return;
-    state.category = chip.getAttribute("data-cat") || "";
-    state.page = 1;
-    renderCatalog();
-  });
-  bindKeyboardGroup(filterChips, ".filter-chip", function (chip) {
-    state.category = chip.getAttribute("data-cat") || "";
-    state.page = 1;
-    renderCatalog();
-  });
-
-  if (modeChips) {
-    modeChips.addEventListener("click", function (e) {
-      var chip = e.target.closest(".filter-chip");
+    modeChips?.addEventListener("click", (e) => {
+      const chip = e.target.closest(".filter-chip");
       if (!chip) return;
       state.mode = chip.getAttribute("data-mode") || "";
       state.page = 1;
-      renderCatalog();
+      renderGrid();
     });
-    bindKeyboardGroup(modeChips, ".filter-chip", function (chip) {
-      state.mode = chip.getAttribute("data-mode") || "";
-      state.page = 1;
-      renderCatalog();
-    });
-  }
-
-  if (brandSelect) {
-    brandSelect.addEventListener("change", function () {
+    brandSelect?.addEventListener("change", () => {
       state.brand = brandSelect.value || "";
       state.page = 1;
-      renderCatalog();
+      renderGrid();
     });
-  }
-
-  if (pager) {
-    pager.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-page]");
+    pager?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-page]");
       if (!btn || btn.disabled) return;
-      var page = parseInt(btn.getAttribute("data-page"), 10);
+      const page = parseInt(btn.getAttribute("data-page"), 10);
       if (!page || page < 1) return;
       state.page = page;
-      writeUrlState();
-      renderCatalog();
-      grid.focus({ preventScroll: false });
-      window.scrollTo({ top: grid.offsetTop - 80, behavior: "smooth" });
+      renderGrid();
+      container.focus({ preventScroll: true });
+    });
+    container.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-datasheet]");
+      if (!btn || !datasheetDialog || !datasheetBody) return;
+      const slug = btn.getAttribute("data-datasheet") || "";
+      const name = btn.getAttribute("data-datasheet-name") || "Producto";
+      const sku = btn.getAttribute("data-datasheet-sku") || "";
+      datasheetBody.innerHTML =
+        `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
+        `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
+        `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
+        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
+        `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
+      if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
+      else datasheetDialog.setAttribute("open", "");
+    });
+    document.getElementById("datasheetClose")?.addEventListener("click", () => {
+      if (typeof datasheetDialog?.close === "function") datasheetDialog.close();
+      else datasheetDialog?.removeAttribute("open");
     });
   }
 
-  grid.addEventListener("click", function (e) {
-    var btn = e.target.closest("[data-datasheet]");
-    if (!btn) return;
-    openDatasheetModal(
-      btn.getAttribute("data-datasheet"),
-      btn.getAttribute("data-datasheet-name") || "",
-      btn.getAttribute("data-datasheet-sku") || ""
-    );
-  });
-
-  var datasheetClose = document.getElementById("datasheetClose");
-  if (datasheetClose && datasheetDialog) {
-    datasheetClose.addEventListener("click", function () {
-      if (typeof datasheetDialog.close === "function") datasheetDialog.close();
-      else datasheetDialog.removeAttribute("open");
-    });
+  /* Boot a prueba de fallos */
+  showLoader();
+  bindUi();
+  try {
+    await loadProducts();
+  } catch (err) {
+    console.warn("[CATALOGO JS] fallback forzado a MOCK_PRODUCTS", err);
+    allProducts = MOCK_PRODUCTS.slice();
+  } finally {
+    hideLoader();
+    renderGrid();
   }
-
-  // Boot — async safe init with finally that always hides loader
-  initCatalog(false);
-})();
+});
