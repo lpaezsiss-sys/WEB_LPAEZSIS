@@ -511,17 +511,27 @@ dialog::backdrop { background: rgba(11,31,58,0.45); }
   max-height: 280px;
   overflow-y: auto;
 }
-.section-quill .ql-editor img,
-.section-quill .ql-editor video {
+.section-quill .ql-editor img {
   max-width: 100%;
   height: auto;
 }
-.section-quill .ql-editor iframe,
 .section-quill .ql-editor video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+}
+.section-quill .ql-editor iframe {
   max-width: 100%;
   width: 100%;
   display: block;
   margin: 0.5rem 0;
+}
+.ql-editor video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
 }
 .section-quill .ql-tooltip {
   position: absolute;

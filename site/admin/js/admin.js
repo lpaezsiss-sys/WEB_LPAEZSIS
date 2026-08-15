@@ -584,65 +584,57 @@
     if (!parsed || !parsed.src) {
       throw new Error("URL de video vacía");
     }
+    registerQuillMediaBlots();
     var range = quill.getSelection(true) || { index: quill.getLength() };
     var index = typeof range.index === "number" ? range.index : quill.getLength();
     var src = String(parsed.src);
 
     if (parsed.type === "embed") {
+      // YouTube / Vimeo → blot iframe nativo de Quill
       quill.insertEmbed(index, "video", src, "user");
-      quill.setSelection(index + 1, 0, "user");
-      return;
-    }
-
-    // Archivo local /uploads / mp4|webm: HTML5 video directo (evita blot frágil)
-    var mime = /\.webm(\?|#|$)/i.test(src) ? "video/webm" : "video/mp4";
-    var html =
-      '<video controls width="100%"><source src="' +
-      escapeAttr(src) +
-      '" type="' +
-      mime +
-      '"></video><p><br></p>';
-    if (typeof quill.clipboard.dangerouslyPasteHTML === "function") {
-      quill.clipboard.dangerouslyPasteHTML(index, html, "user");
     } else {
+      // MP4 / WEBM /uploads → blot HTML5 nativo
       quill.insertEmbed(index, "html5video", src, "user");
+    }
+    try {
       quill.setSelection(index + 1, 0, "user");
+    } catch (selErr) {
+      /* ignore selection errors after embed */
     }
   }
 
   function registerQuillMediaBlots() {
     if (typeof Quill === "undefined" || Quill.__lpaezMediaRegistered) return;
     var BlockEmbed = Quill.import("blots/block/embed");
-    var Html5VideoBlot = (function (_BlockEmbed) {
-      function Html5VideoBlot() {
-        return _BlockEmbed.apply(this, arguments) || this;
-      }
-      Html5VideoBlot.prototype = Object.create(_BlockEmbed.prototype);
-      Html5VideoBlot.prototype.constructor = Html5VideoBlot;
-      Html5VideoBlot.create = function (value) {
-        var node = document.createElement("video");
-        var src = typeof value === "string" ? value : (value && value.src) || "";
-        node.setAttribute("controls", "controls");
-        node.setAttribute("width", "100%");
-        node.setAttribute("preload", "metadata");
-        node.setAttribute("src", src);
-        var source = document.createElement("source");
-        source.setAttribute("src", src);
-        if (/\.webm(\?|#|$)/i.test(src)) source.setAttribute("type", "video/webm");
-        else source.setAttribute("type", "video/mp4");
-        node.appendChild(source);
-        return node;
-      };
-      Html5VideoBlot.value = function (node) {
-        var source = node.querySelector("source");
-        return node.getAttribute("src") || (source && source.getAttribute("src")) || "";
-      };
-      return Html5VideoBlot;
-    })(BlockEmbed);
-    Html5VideoBlot.blotName = "html5video";
-    Html5VideoBlot.tagName = "VIDEO";
-    Quill.register(Html5VideoBlot, true);
+
+    function HTML5VideoBlot() {
+      BlockEmbed.apply(this, arguments);
+    }
+    HTML5VideoBlot.prototype = Object.create(BlockEmbed.prototype);
+    HTML5VideoBlot.prototype.constructor = HTML5VideoBlot;
+
+    HTML5VideoBlot.create = function (value) {
+      var node = BlockEmbed.create.call(HTML5VideoBlot);
+      var src = typeof value === "string" ? value : (value && value.src) || "";
+      node.setAttribute("controls", "true");
+      node.setAttribute("width", "100%");
+      node.setAttribute("src", src);
+      return node;
+    };
+
+    HTML5VideoBlot.value = function (node) {
+      return node.getAttribute("src") || "";
+    };
+
+    HTML5VideoBlot.blotName = "html5video";
+    HTML5VideoBlot.tagName = "video";
+    Quill.register(HTML5VideoBlot);
     Quill.__lpaezMediaRegistered = true;
+  }
+
+  // Registrar el blot en cuanto Quill esté disponible (antes de abrir editores).
+  if (typeof Quill !== "undefined") {
+    registerQuillMediaBlots();
   }
 
   function openProductDialog(product) {
@@ -791,7 +783,7 @@
     errEl.textContent = "";
     setVideoApplyLoading(true);
     try {
-      // Si hay URL en el input, usarla directamente (no re-subir el archivo).
+      // URL del input (subida previa o enlace externo) — nunca re-subir aquí.
       var raw = document.getElementById("videoUrlField").value.trim();
       if (!raw) {
         throw new Error("Sube un archivo o indica una URL de YouTube/Vimeo");
@@ -805,15 +797,15 @@
         throw new Error("Editor Quill activo no disponible");
       }
       insertVideoIntoQuill(quill, parsed);
+      // Éxito: cerrar de inmediato y restaurar botón.
+      closeVideoModal();
       showToast("Video insertado");
     } catch (err) {
       console.error("[VIDEO ERROR]", err);
+      setVideoApplyLoading(false);
       errEl.hidden = false;
       errEl.textContent = (err && err.message) || "No se pudo insertar el video";
       showToast((err && err.message) || "Error al insertar video");
-    } finally {
-      setVideoApplyLoading(false);
-      closeVideoModal();
     }
   });
 
