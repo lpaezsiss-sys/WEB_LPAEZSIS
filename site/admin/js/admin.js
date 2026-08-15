@@ -577,64 +577,62 @@
     document.getElementById("videoDialog").showModal();
   }
 
-  function insertVideoIntoQuill(quill, parsed) {
-    if (!quill) {
+  function insertVideoIntoQuill(activeQuillInstance, parsed) {
+    if (!activeQuillInstance) {
       throw new Error("Editor Quill activo no disponible");
     }
     if (!parsed || !parsed.src) {
       throw new Error("URL de video vacía");
     }
-    registerQuillMediaBlots();
-    var range = quill.getSelection(true) || { index: quill.getLength() };
-    var index = typeof range.index === "number" ? range.index : quill.getLength();
-    var src = String(parsed.src);
+    var range = activeQuillInstance.getSelection(true) || {
+      index: activeQuillInstance.getLength(),
+    };
+    var index = typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
+    var url = String(parsed.src);
 
     if (parsed.type === "embed") {
-      // YouTube / Vimeo → blot iframe nativo de Quill
-      quill.insertEmbed(index, "video", src, "user");
+      activeQuillInstance.insertEmbed(index, "video", url, "user");
     } else {
-      // MP4 / WEBM /uploads → blot HTML5 nativo
-      quill.insertEmbed(index, "html5video", src, "user");
+      var mime = /\.webm(\?|#|$)/i.test(url) ? "video/webm" : "video/mp4";
+      var videoHtml =
+        '<p><video controls width="100%" style="max-width:100%; height:auto;"><source src="' +
+        escapeAttr(url) +
+        '" type="' +
+        mime +
+        '"></video></p>';
+      activeQuillInstance.focus();
+      activeQuillInstance.clipboard.dangerouslyPasteHTML(index, videoHtml, "user");
+
+      // Quill 1.3 puede descartar <video> (sin blot). Si no quedó, inyectar en el DOM del editor
+      // (syncBrandSectionsFromDom lee root.innerHTML → se guarda igual).
+      var kept = false;
+      Array.prototype.forEach.call(activeQuillInstance.root.querySelectorAll("video"), function (v) {
+        var s =
+          v.getAttribute("src") ||
+          (v.querySelector("source") && v.querySelector("source").getAttribute("src")) ||
+          "";
+        if (s && (s === url || decodeURI(s) === url || s.indexOf(url.split("/").pop()) !== -1)) {
+          kept = true;
+        }
+      });
+      if (!kept) {
+        var cur = (activeQuillInstance.root.innerHTML || "").trim();
+        if (!cur || cur === "<p><br></p>" || cur === "<p></p>") {
+          activeQuillInstance.root.innerHTML = videoHtml;
+        } else {
+          activeQuillInstance.root.insertAdjacentHTML("beforeend", videoHtml);
+        }
+      }
     }
     try {
-      quill.setSelection(index + 1, 0, "user");
+      activeQuillInstance.setSelection(
+        Math.min(index + 1, activeQuillInstance.getLength()),
+        0,
+        "user"
+      );
     } catch (selErr) {
-      /* ignore selection errors after embed */
+      /* ignore */
     }
-  }
-
-  function registerQuillMediaBlots() {
-    if (typeof Quill === "undefined" || Quill.__lpaezMediaRegistered) return;
-    var BlockEmbed = Quill.import("blots/block/embed");
-
-    function HTML5VideoBlot() {
-      BlockEmbed.apply(this, arguments);
-    }
-    HTML5VideoBlot.prototype = Object.create(BlockEmbed.prototype);
-    HTML5VideoBlot.prototype.constructor = HTML5VideoBlot;
-
-    HTML5VideoBlot.create = function (value) {
-      var node = BlockEmbed.create.call(HTML5VideoBlot);
-      var src = typeof value === "string" ? value : (value && value.src) || "";
-      node.setAttribute("controls", "true");
-      node.setAttribute("width", "100%");
-      node.setAttribute("src", src);
-      return node;
-    };
-
-    HTML5VideoBlot.value = function (node) {
-      return node.getAttribute("src") || "";
-    };
-
-    HTML5VideoBlot.blotName = "html5video";
-    HTML5VideoBlot.tagName = "video";
-    Quill.register(HTML5VideoBlot);
-    Quill.__lpaezMediaRegistered = true;
-  }
-
-  // Registrar el blot en cuanto Quill esté disponible (antes de abrir editores).
-  if (typeof Quill !== "undefined") {
-    registerQuillMediaBlots();
   }
 
   function openProductDialog(product) {
@@ -1082,7 +1080,6 @@
         "</textarea>";
       return null;
     }
-    registerQuillMediaBlots();
     var quill = new Quill(editorEl, {
       theme: "snow",
       placeholder: "Escribe el contenido de esta sección…",
@@ -1118,15 +1115,17 @@
         },
       },
     });
-    var Delta = Quill.import("delta");
-    quill.clipboard.addMatcher("VIDEO", function (node) {
+    // Preservar <video> al pegar/cargar HTML (Quill no tiene blot nativo HTML5).
+    quill.clipboard.addMatcher("VIDEO", function (node, delta) {
       var source = node.querySelector("source");
       var src = node.getAttribute("src") || (source && source.getAttribute("src")) || "";
-      if (!src) return new Delta();
-      return new Delta().insert({ html5video: src });
+      if (!src) return delta;
+      // Dejar que el HTML del editor conserve el nodo: no mapear a blot custom.
+      return delta;
     });
     if (initialHtml) {
-      quill.clipboard.dangerouslyPasteHTML(0, initialHtml, "silent");
+      // Carga directa en el DOM del editor para conservar <video> existentes.
+      quill.root.innerHTML = initialHtml;
     }
     brandQuills[sectionId] = quill;
     return quill;
