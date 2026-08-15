@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=84">
+  <link rel="stylesheet" href="css/style.css?v=85">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -290,6 +290,16 @@
       <div class="brand-strip" id="homeBrands"></div>
     </section>
 
+    <section class="section reveal clients-compact" aria-labelledby="clientes-title">
+      <div class="section-head center">
+        <h2 id="clientes-title">Empresas que confían en nosotros</h2>
+        <p>Soluciones instaladas en las principales plantas del país</p>
+      </div>
+      <div class="client-grid" id="homeClients" aria-label="Clientes y referencias industriales">
+        <!-- Logos o nombres: se rellenan en el script; reemplazar HOME_CLIENTS con logos reales -->
+      </div>
+    </section>
+
     <section class="cta-band reveal" aria-labelledby="cta-title">
       <h2 id="cta-title">¿Listo para optimizar tu línea?</h2>
       <p>Cuéntanos tu proceso: te armamos una cotización o te guiamos a los repuestos correctos.</p>
@@ -448,6 +458,43 @@
         return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
       }
 
+      // Referencias / clientes (texto o { name, logo }). Reemplazar con logos reales en img/clients/.
+      var HOME_CLIENTS = [
+        { name: "Alimentos y bebidas" },
+        { name: "Packaging industrial" },
+        { name: "Farmacéutica" },
+        { name: "Fin de línea" },
+        { name: "Mantención de planta" },
+        { name: "Salas limpias" }
+      ];
+
+      function clientTileHtml(c) {
+        if (c.logo) {
+          return (
+            '<div class="client-tile">' +
+            '<img src="' + Lpaez.escapeHtml(c.logo) + '" alt="' + Lpaez.escapeHtml(c.name) +
+            '" title="' + Lpaez.escapeHtml(c.name) +
+            '" width="160" height="64" loading="lazy" decoding="async">' +
+            "</div>"
+          );
+        }
+        return (
+          '<div class="client-tile client-tile--name">' +
+          "<span>" + Lpaez.escapeHtml(c.name) + "</span>" +
+          "</div>"
+        );
+      }
+
+      function renderHomeClients() {
+        var el = document.getElementById("homeClients");
+        if (!el) return;
+        if (!HOME_CLIENTS.length) {
+          el.innerHTML = '<p class="empty-state">Pronto publicaremos referencias de planta.</p>';
+          return;
+        }
+        el.innerHTML = HOME_CLIENTS.map(clientTileHtml).join("");
+      }
+
       // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
       var sectores = document.getElementById("sectores");
       if (sectores) {
@@ -471,6 +518,7 @@
         var products = (results[2].data && results[2].data.products) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
         renderSolutions(cats);
+        renderHomeClients();
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
