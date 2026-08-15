@@ -564,61 +564,61 @@ body.nav-open {
 /* ——— Hero ——— */
 .hero {
   position: relative;
-  /* Use svh (stable), never dvh — dynamic viewport fights mobile scroll gestures. */
-  min-height: calc(100vh - var(--header-h));
-  min-height: calc(100svh - var(--header-h));
+  min-height: 520px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  color: var(--white);
+  align-items: stretch;
+  justify-content: center;
   overflow: hidden;
-  background: var(--charcoal);
+  color: var(--white);
+  background-color: #0d0d0d; /* Color de respaldo rápido antes de cargar la imagen */
 }
 
 .hero-media {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
 }
 
-.hero-media img,
 .hero-media__slide,
-.hero-media picture.hero-media__slide,
-.hero-media picture.hero-media__slide img {
+.hero-media picture.hero-media__slide {
   position: absolute;
   inset: 0;
+  display: block;
+}
+
+.hero-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 40%;
   display: block;
-  opacity: 1;
-  transform: scale(1.04);
+  /* Aplica un tono tenue y un leve desenfoque sin afectar el rendimiento */
+  filter: brightness(0.4) contrast(1.1) blur(1px);
+  transform: scale(1.02); /* Evita bordes blancos por el desenfoque */
 }
 
-/* Single hero still: subtle zoom (no crossfade) */
-.hero-media__slide {
-  animation: heroZoom 24s ease-in-out infinite alternate;
-}
-
+/* Oscurecimiento extra con degradado para garantizar legibilidad del texto */
 .hero-scrim {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(105deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.68) 40%, rgba(0, 0, 0, 0.42) 100%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 48%);
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
   pointer-events: none;
 }
 
 .hero-inner {
   position: relative;
-  z-index: 2;
-  max-width: var(--max);
+  z-index: 3;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: clamp(2.75rem, 6vw, 4.25rem) 1.25rem clamp(2rem, 4vw, 3rem);
-  flex: 1 1 auto;
+  padding: 4rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -816,7 +816,8 @@ body.nav-open {
   .hero-media img,
   .hero-media__slide {
     animation: none;
-    transform: none;
+    /* Conserva scale(1.02) para cubrir bordes del blur */
+    transform: scale(1.02);
     opacity: 1;
   }
 }
@@ -824,7 +825,7 @@ body.nav-open {
 /* ——— Trust / partner band (inside hero) ——— */
 .trust-band {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   color: rgba(255, 255, 255, 0.9);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   background: linear-gradient(
@@ -3120,10 +3121,7 @@ body.nav-open {
   }
 
   .hero {
-    /* Fill first screen so Soluciones only appears after scroll.
-       Keep svh only — dvh resizes with the browser chrome and fights upward scroll. */
-    min-height: calc(100vh - var(--header-h));
-    min-height: calc(100svh - var(--header-h));
+    min-height: 520px;
   }
 
   .trust-band--in-hero {
