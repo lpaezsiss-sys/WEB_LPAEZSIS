@@ -120,13 +120,16 @@ final class PublicApi
 
     private static function clientes(): void
     {
-        $rows = self::pdo()->query(
-            'SELECT id, nombre, logo_url, orden, activo, created_at
+        // Contrato público: lista plana de clientes activos (id, nombre, logo_url).
+        $stmt = self::pdo()->prepare(
+            'SELECT id, nombre, logo_url
              FROM clientes
              WHERE activo = 1
              ORDER BY orden ASC, nombre ASC'
-        )->fetchAll();
-        Response::json(['clientes' => $rows]);
+        );
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        Response::json($rows);
     }
 
     private static function brandDetail(string $slug): void
