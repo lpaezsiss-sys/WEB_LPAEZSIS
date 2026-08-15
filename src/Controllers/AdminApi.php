@@ -225,12 +225,21 @@ final class AdminApi
             Response::error('Archivo requerido');
             return;
         }
-        $result = Upload::storeImage($file);
+        $kind = strtolower((string) ($_POST['kind'] ?? 'auto'));
+        if ($kind !== 'image' && $kind !== 'video') {
+            $kind = 'auto';
+        }
+        $result = $kind === 'video'
+            ? Upload::storeVideo($file)
+            : ($kind === 'image' ? Upload::storeImage($file) : Upload::store($file, 'auto'));
         if (!$result['ok']) {
             Response::error((string) $result['error']);
             return;
         }
-        Response::json(['url' => $result['url']]);
+        Response::json([
+            'url' => $result['url'],
+            'type' => $result['type'] ?? ($kind === 'video' ? 'video' : 'image'),
+        ]);
     }
 
     private static function saveSettings(): void

@@ -1,19 +1,23 @@
 # Freeze — estado estable LPAEZsis (prueba1)
 
-**Fecha:** 2026-08-14  
-**Tag:** `freeze-prueba1-2026-08-14`  
-**Rama inmutable de respaldo:** `cursor/freeze-prueba1-5af8`  
-**Rama de trabajo (sigue):** `cursor/preview-mejoras-5af8`
+## Freeze actual (2026-08-15)
 
-Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **12** productos, **7** marcas.
+**Fecha:** 2026-08-15  
+**Tag:** `freeze-prueba1-2026-08-15`  
+**Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260815-5af8`  
+**Rama de trabajo al momento del freeze:** `cursor/admin-marcas-video-activo-5af8`  
+**PR relacionada:** https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/pull/3
 
-## Sitio de prueba
+Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **12** productos, **8** marcas.
+
+### Sitio de prueba
 
 - URL: https://prueba1.lpaezsis.cl/
-- Admin: https://prueba1.lpaezsis.cl/admin/ (clave del backup: ver `admin_credentials`)
-- API health: https://prueba1.lpaezsis.cl/api/health → `db: ok`, PHP `7.4.33`
+- Admin: https://prueba1.lpaezsis.cl/admin/
+- API health: https://prueba1.lpaezsis.cl/api/health
+- Ficha con video de prueba: https://prueba1.lpaezsis.cl/marcas.html?slug=master-blower
 
-## Hosting (BlueHosting)
+### Hosting (BlueHosting)
 
 ```text
 public_html/src/                         → backend PHP (7.4)
@@ -24,47 +28,55 @@ public_html/prueba1.lpaezsis.cl/         → front (contenido de site/)
 - BD: `sistem29_lpaezsis`
 - Usuario BD: `sistem29_lpaezsis`
 - Dump compatible: `data/lpaezsis_bluehosting.sql`
-- Uploads: `prueba1.lpaezsis.cl/img/uploads/`
+- Uploads: `prueba1.lpaezsis.cl/img/uploads/` (imágenes `p-*` y videos `v-*.mp4`)
 
-## Qué incluye este freeze
+### Qué incluye este freeze (además del freeze 2026-08-14)
 
-### Front (`site/`)
-- Catálogo, marcas, productos, cotización, carrito, admin
-- Logos / favicons (marca completa y mark)
-- `marcas.html` lee API (nombre, descripción, logo, `content_html`, productos)
-- Admin: edición de marcas con logo + contenido de ficha; picker de imagen acepta `/img/uploads/...`
+#### Admin — ficha de marca (secciones + video)
+- Repeater de secciones dinámicas (`+ Agregar Sección`) con título, Quill WYSIWYG, reordenar/eliminar
+- Serialización a `<section class="brand-section"><h3>…</h3>…</section>` en `content_html`
+- Blot Quill `HTML5Video` (`html5video`) para MP4/WEBM; YouTube/Vimeo con blot `video` nativo
+- Diálogo de video: subida local (`kind=video`, máx. 50 MB) o URL; cierre del modal antes de insertar (evita fallos de selección con `<dialog>` anidados)
+- Checkbox **Activo** alineado (flex) + sync correcto con `0`/`1` (`coerceBool`)
+- Assets admin: `admin.js?v=20`, `admin.css?v=9`
 
-### Backend (`src/`)
-- API pública + admin (Bearer)
-- Compatible PHP **7.4** (`polyfills.php`, sin APIs PHP 8)
-- `/api/health` reporta php, `.env`, estado MySQL
+#### Backend upload
+- `src/Support/Upload.php` acepta imagen (JPG/PNG/WEBP/GIF ≤5 MB) y video (MP4/WEBM ≤50 MB)
+- Prefijos de archivo: `p-…` (imagen), `v-…` (video)
 
-### Datos / tools
-- `data/lpaezsis_bluehosting.sql` (sin collation `uca1400`)
-- `data/lpaezsis.sqlite` + `tools/preview_server.py` (preview Cursor)
-- `tools/create_db_bluehosting.sh` (UAPI cPanel)
-- `tools/import_sql_to_sqlite.py`
+#### Front público
+- `marcas.html` + estilos para `.brand-section`, `<video>` e iframes de embed
+- Catálogo B2B (`catalogo.js`), SEO home, WebP, cotización con `?sku=`
 
-### Preview Cursor
-- SQLite local: 12 productos, 7 marcas
+#### Verificado en Master_Blower
+- Video `/img/uploads/v-eae8e092b5a9e129.mp4` visible en admin y en ficha pública
 
-## Cómo volver a este estado
+### Cómo volver a este estado
 
 ```bash
 git fetch origin
-git checkout freeze-prueba1-2026-08-14
+git checkout freeze-prueba1-2026-08-15
 # o
-git checkout cursor/freeze-prueba1-5af8
+git checkout cursor/freeze-prueba1-20260815-5af8
 ```
 
 ZIP del freeze:
 
-https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-14.zip
+https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-15.zip
 
-## Mejoras siguientes (fuera del freeze)
+### Notas de seguridad / ops
 
-- Contenido/galería por marca (editor más cómodo)
-- Productos ligados a marcas nuevas (ej. Master Blower)
-- Limpieza de `_import_once.php` si aún existe en el docroot
-- Rotar claves expuestas en chat (FTP / MySQL) cuando sea posible
-- Producción definitiva (dominio final, `APP_DEBUG=0`, HTTPS/SEO)
+- No commitear `src/.env` ni claves FTP/cPanel
+- Rotar claves expuestas en sesiones previas cuando sea posible
+- El freeze **no** sustituye un dump MySQL: respaldar BD por separado en cPanel si hace falta recuperar datos de marcas/uploads
+
+---
+
+## Freeze anterior (2026-08-14) — conservado
+
+**Tag:** `freeze-prueba1-2026-08-14`  
+**Rama:** `cursor/freeze-prueba1-5af8`  
+
+ZIP: https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-14.zip  
+
+Incluye el baseline post-migración a `site/` + API PHP 7.4 + admin básico de marcas (antes del editor de secciones/video).
