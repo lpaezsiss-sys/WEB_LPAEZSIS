@@ -310,7 +310,39 @@ input, select, textarea {
   border: 1px solid var(--line);
   margin-bottom: 0.55rem;
 }
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  flex-shrink: 0;
+}
 label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.2rem; }
+label.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.55rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+label.check-row span {
+  line-height: 1.2;
+}
+label.check-row input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  accent-color: var(--navy);
+}
+.hint-text {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #667;
+  line-height: 1.35;
+}
 .chip {
   display: inline-block;
   padding: 0.1rem 0.4rem;
@@ -375,6 +407,9 @@ dialog::backdrop { background: rgba(11,31,58,0.45); }
   border: 1px solid var(--line);
   border-radius: 0.45rem;
   box-shadow: 0 2px 8px rgba(11, 31, 58, 0.06);
+  overflow: visible;
+}
+.section-card.is-collapsed {
   overflow: hidden;
 }
 .section-card.is-collapsed .section-card__body { display: none; }
@@ -386,8 +421,12 @@ dialog::backdrop { background: rgba(11,31,58,0.45); }
   padding: 0.45rem 0.55rem;
   background: linear-gradient(180deg, #faf9f6 0%, #f3f0e8 100%);
   border-bottom: 1px solid var(--line);
+  border-radius: 0.45rem 0.45rem 0 0;
 }
-.section-card.is-collapsed .section-card__head { border-bottom: none; }
+.section-card.is-collapsed .section-card__head {
+  border-bottom: none;
+  border-radius: 0.45rem;
+}
 .section-card__toggle {
   flex-shrink: 0;
   width: 2rem;
@@ -444,33 +483,69 @@ dialog::backdrop { background: rgba(11,31,58,0.45); }
   margin-top: 0.15rem;
 }
 .section-quill {
+  position: relative;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 0.25rem;
   margin-bottom: 0.25rem;
+  overflow: visible;
+  z-index: 1;
 }
 .section-quill .ql-toolbar.ql-snow {
   border: none;
   border-bottom: 1px solid var(--line);
   padding: 0.35rem 0.45rem;
   background: #faf9f6;
+  position: relative;
+  z-index: 2;
 }
 .section-quill .ql-container.ql-snow {
   border: none;
   font-size: 0.92rem;
   min-height: 140px;
+  position: relative;
+  overflow: visible;
 }
 .section-quill .ql-editor {
   min-height: 140px;
   max-height: 280px;
   overflow-y: auto;
 }
-.section-quill .ql-editor img {
+.section-quill .ql-editor img,
+.section-quill .ql-editor video {
   max-width: 100%;
   height: auto;
 }
-.section-quill .ql-editor iframe {
+.section-quill .ql-editor iframe,
+.section-quill .ql-editor video {
   max-width: 100%;
+  width: 100%;
+  display: block;
+  margin: 0.5rem 0;
+}
+.section-quill .ql-tooltip {
+  position: absolute;
+  left: 0.5rem !important;
+  right: 0.5rem;
+  top: auto !important;
+  bottom: 0.5rem;
+  z-index: 30;
+  max-width: calc(100% - 1rem);
+  box-sizing: border-box;
+  white-space: normal;
+  transform: none !important;
+}
+.section-quill .ql-tooltip input[type="text"] {
+  width: calc(100% - 6.5rem);
+  max-width: 100%;
+  margin-bottom: 0;
+}
+.section-quill .ql-tooltip.ql-editing {
+  left: 0.5rem !important;
+}
+#videoDialog {
+  width: min(92vw, 480px);
+  z-index: 50;
 }
 .brand-sections__empty {
   margin: 0;

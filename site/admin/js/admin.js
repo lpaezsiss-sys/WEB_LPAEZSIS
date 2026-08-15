@@ -21,6 +21,32 @@
       .replace(/'/g, "&#39;");
   }
 
+  function isActiveFlag(value) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return true;
+    }
+    return Boolean(Number(value));
+  }
+
+  function coerceBool(value, defaultValue) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return !!defaultValue;
+    }
+    return Boolean(Number(value));
+  }
+
   function escapeAttr(str) {
     return escapeHtml(str);
   }
@@ -483,6 +509,7 @@
   }
 
   var imagePickerContext = null;
+  var videoPickerContext = null;
 
   function openImagePicker(ctx) {
     imagePickerContext = ctx || {};
@@ -494,6 +521,88 @@
     document.getElementById("imageUrlField").value = imagePickerContext.currentUrl || "";
     setDialogImagePreview(imagePickerContext.currentUrl || "");
     document.getElementById("imageDialog").showModal();
+  }
+
+  function toVideoEmbedUrl(raw) {
+    var url = String(raw || "").trim();
+    if (!url) return null;
+    var yt =
+      url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i) ||
+      url.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
+    if (yt) {
+      return "https://www.youtube.com/embed/" + yt[1];
+    }
+    var vim = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vim) {
+      return "https://player.vimeo.com/video/" + vim[1];
+    }
+    if (/\.(mp4|webm)(\?|#|$)/i.test(url) || /\/img\/uploads\//i.test(url)) {
+      return { type: "file", src: url };
+    }
+    if (/^https?:\/\//i.test(url) && /youtube|vimeo|youtu\.be/i.test(url)) {
+      return url;
+    }
+    if (/^https?:\/\//i.test(url) || url.charAt(0) === "/") {
+      return { type: "file", src: url };
+    }
+    return null;
+  }
+
+  function openVideoPicker(ctx) {
+    videoPickerContext = ctx || {};
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("videoFileInput").value = "";
+    document.getElementById("videoUrlField").value = videoPickerContext.currentUrl || "";
+    document.getElementById("videoDialog").showModal();
+  }
+
+  function insertVideoIntoQuill(quill, value) {
+    if (!quill || !value) return;
+    var range = quill.getSelection(true) || { index: quill.getLength() };
+    var index = range.index;
+    if (typeof value === "object" && value.type === "file") {
+      quill.insertEmbed(index, "html5video", value.src, "user");
+    } else if (typeof value === "string") {
+      quill.insertEmbed(index, "video", value, "user");
+    }
+    quill.setSelection(index + 1);
+  }
+
+  function registerQuillMediaBlots() {
+    if (typeof Quill === "undefined" || Quill.__lpaezMediaRegistered) return;
+    var BlockEmbed = Quill.import("blots/block/embed");
+    var Html5VideoBlot = (function (_BlockEmbed) {
+      function Html5VideoBlot() {
+        return _BlockEmbed.apply(this, arguments) || this;
+      }
+      Html5VideoBlot.prototype = Object.create(_BlockEmbed.prototype);
+      Html5VideoBlot.prototype.constructor = Html5VideoBlot;
+      Html5VideoBlot.create = function (value) {
+        var node = document.createElement("video");
+        var src = typeof value === "string" ? value : (value && value.src) || "";
+        node.setAttribute("controls", "controls");
+        node.setAttribute("width", "100%");
+        node.setAttribute("preload", "metadata");
+        node.setAttribute("src", src);
+        var source = document.createElement("source");
+        source.setAttribute("src", src);
+        if (/\.webm(\?|#|$)/i.test(src)) source.setAttribute("type", "video/webm");
+        else source.setAttribute("type", "video/mp4");
+        node.appendChild(source);
+        return node;
+      };
+      Html5VideoBlot.value = function (node) {
+        var source = node.querySelector("source");
+        return node.getAttribute("src") || (source && source.getAttribute("src")) || "";
+      };
+      return Html5VideoBlot;
+    })(BlockEmbed);
+    Html5VideoBlot.blotName = "html5video";
+    Html5VideoBlot.tagName = "VIDEO";
+    Quill.register(Html5VideoBlot, true);
+    Quill.__lpaezMediaRegistered = true;
   }
 
   function openProductDialog(product) {
@@ -517,8 +626,8 @@
       }
       form.seo_title.value = product.seo_title || "";
       form.seo_description.value = product.seo_description || "";
-      form.is_featured.checked = !!product.is_featured;
-      form.is_active.checked = product.is_active !== false;
+      form.is_featured.checked = coerceBool(product.is_featured, false);
+      form.is_active.checked = coerceBool(product.is_active, true);
     } else {
       form.is_active.checked = true;
       setFormImagePreview("");
@@ -588,6 +697,59 @@
     }).catch(function () {
       /* toast already shown */
     });
+  });
+
+  document.getElementById("videoCancel").addEventListener("click", function () {
+    document.getElementById("videoDialog").close();
+  });
+
+  document.getElementById("videoFileInput").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      err.hidden = false;
+      err.textContent = "El video supera 50 MB";
+      return;
+    }
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "video");
+    showToast("Subiendo video…");
+    api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        err.hidden = false;
+        err.textContent = (res.data && res.data.error) || "No se pudo subir el video";
+        return;
+      }
+      var url = res.data && res.data.url;
+      document.getElementById("videoUrlField").value = url || "";
+      showToast("Video subido — pulsa «Insertar video»");
+    });
+  });
+
+  document.getElementById("videoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    var raw = document.getElementById("videoUrlField").value.trim();
+    if (!raw) {
+      err.hidden = false;
+      err.textContent = "Sube un archivo o indica una URL de YouTube/Vimeo";
+      return;
+    }
+    var parsed = toVideoEmbedUrl(raw);
+    if (!parsed) {
+      err.hidden = false;
+      err.textContent = "URL no válida. Usa YouTube, Vimeo, MP4/WEBM o /img/uploads/…";
+      return;
+    }
+    var apply = videoPickerContext && videoPickerContext.onApply;
+    Promise.resolve(apply ? apply(parsed) : null).then(function () {
+      document.getElementById("videoDialog").close();
+      showToast("Video insertado");
+    }).catch(function () {});
   });
 
   document.getElementById("addProductBtn").addEventListener("click", function () {
@@ -661,9 +823,9 @@
             escapeHtml(b.slug) +
             "</span>" +
             '<span class="chip ' +
-            (b.is_active ? "chip-on" : "chip-off") +
+            (isActiveFlag(b.is_active) ? "chip-on" : "chip-off") +
             '">' +
-            (b.is_active ? "Activa" : "Off") +
+            (isActiveFlag(b.is_active) ? "Activa" : "Off") +
             "</span></div>" +
             (desc ? '<p class="product-row__desc">' + escapeHtml(desc) + "</p>" : "") +
             "</div>" +
@@ -859,6 +1021,7 @@
         "</textarea>";
       return null;
     }
+    registerQuillMediaBlots();
     var quill = new Quill(editorEl, {
       theme: "snow",
       placeholder: "Escribe el contenido de esta sección…",
@@ -884,12 +1047,28 @@
                 },
               });
             },
+            video: function () {
+              var q = this.quill;
+              openVideoPicker({
+                onApply: function (value) {
+                  insertVideoIntoQuill(q, value);
+                  return Promise.resolve();
+                },
+              });
+            },
           },
         },
       },
     });
+    var Delta = Quill.import("delta");
+    quill.clipboard.addMatcher("VIDEO", function (node) {
+      var source = node.querySelector("source");
+      var src = node.getAttribute("src") || (source && source.getAttribute("src")) || "";
+      if (!src) return new Delta();
+      return new Delta().insert({ html5video: src });
+    });
     if (initialHtml) {
-      quill.root.innerHTML = initialHtml;
+      quill.clipboard.dangerouslyPasteHTML(0, initialHtml, "silent");
     }
     brandQuills[sectionId] = quill;
     return quill;
@@ -987,7 +1166,7 @@
     form.seo_title.value = (item && item.seo_title) || "";
     form.seo_description.value = (item && item.seo_description) || "";
     form.sort_order.value = (item && item.sort_order) || 0;
-    form.is_active.checked = !item || item.is_active !== false;
+    form.is_active.checked = item ? coerceBool(item.is_active, true) : true;
     var logoField = document.getElementById("simpleLogoField");
     var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
@@ -1146,7 +1325,7 @@
       seo_title: form.seo_title.value.trim(),
       seo_description: form.seo_description.value.trim(),
       sort_order: Number(form.sort_order.value) || 0,
-      is_active: form.is_active.checked,
+      is_active: !!form.is_active.checked,
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
