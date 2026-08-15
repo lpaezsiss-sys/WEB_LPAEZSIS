@@ -33,12 +33,20 @@ final class Upload
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($tmp) ?: '';
+        $origName = strtolower((string) ($file['name'] ?? ''));
+
+        // Algunos hosts reportan SVG como text/html, text/xml, etc.
+        $isSvgName = (bool) preg_match('/\.svg$/i', $origName);
+        if ($isSvgName && in_array($mime, ['image/svg+xml', 'text/plain', 'text/html', 'text/xml', 'application/xml', 'image/svg'], true)) {
+            $mime = 'image/svg+xml';
+        }
 
         $imageMap = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/webp' => 'webp',
             'image/gif' => 'gif',
+            'image/svg+xml' => 'svg',
         ];
         $videoMap = [
             'video/mp4' => 'mp4',
@@ -49,7 +57,7 @@ final class Upload
         $isVideo = isset($videoMap[$mime]);
 
         if ($kind === 'image' && !$isImage) {
-            return ['ok' => false, 'error' => 'Solo se permiten JPG, PNG, WEBP o GIF'];
+            return ['ok' => false, 'error' => 'Solo se permiten JPG, PNG, WEBP, GIF o SVG'];
         }
         if ($kind === 'video' && !$isVideo) {
             return ['ok' => false, 'error' => 'Solo se permiten MP4 o WEBM'];

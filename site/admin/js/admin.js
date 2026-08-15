@@ -112,12 +112,13 @@
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["products", "brands", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["products", "brands", "clientes", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
     if (tab === "products") loadProducts();
     if (tab === "brands") loadBrands();
+    if (tab === "clientes") loadClientes();
     if (tab === "orders") loadOrders();
     if (tab === "quotes") loadQuotes();
     if (tab === "contacts") loadContacts();
@@ -992,6 +993,224 @@
         .join("") || '<p class="empty-hint">No hay marcas.</p>';
     });
   }
+
+  var clientesCache = [];
+
+  function setClienteLogoPreview(url) {
+    var wrap = document.getElementById("clienteLogoPreviewWrap");
+    var img = document.getElementById("clienteLogoPreview");
+    var field = document.getElementById("clienteLogoUrl");
+    if (field) field.value = url || "";
+    if (url) {
+      wrap.hidden = false;
+      img.src = url;
+    } else {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+    }
+  }
+
+  function resetClienteForm() {
+    var form = document.getElementById("formCliente");
+    if (!form) return;
+    form.reset();
+    document.getElementById("clienteId").value = "";
+    document.getElementById("clienteOrden").value = "0";
+    document.getElementById("clienteActivo").checked = true;
+    document.getElementById("clienteLogo").value = "";
+    setClienteLogoPreview("");
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("clienteSaveBtn").textContent = "Guardar Cliente";
+  }
+
+  function loadClientes() {
+    api("/clientes").then(function (res) {
+      var tbody = document.getElementById("adminClientesList");
+      if (!tbody) return;
+      var items = (res.data && res.data.clientes) || [];
+      clientesCache = items;
+      if (!items.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty-hint">No hay clientes registrados.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (c) {
+          var active = coerceBool(c.activo, true);
+          var logo = c.logo_url || "/img/brand/logo-mark.png";
+          return (
+            "<tr data-cliente-id=\"" +
+            escapeAttr(c.id) +
+            '">' +
+            '<td><img class="admin-table__logo" src="' +
+            escapeAttr(logo) +
+            '" alt="" width="72" height="36" loading="lazy"></td>' +
+            "<td>" +
+            escapeHtml(c.nombre) +
+            "</td>" +
+            "<td>" +
+            escapeHtml(c.orden != null ? c.orden : 0) +
+            "</td>" +
+            '<td><span class="chip ' +
+            (active ? "chip-on" : "chip-off") +
+            '">' +
+            (active ? "Activo" : "Off") +
+            "</span></td>" +
+            '<td class="admin-table__actions">' +
+            '<button type="button" data-edit-cliente="' +
+            escapeAttr(c.id) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-cliente="' +
+            escapeAttr(c.id) +
+            '">' +
+            (active ? "Ocultar" : "Mostrar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-cliente="' +
+            escapeAttr(c.id) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  function uploadClienteLogo(file) {
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "image");
+    return api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        return Promise.reject((res.data && res.data.error) || "No se pudo subir el logo");
+      }
+      return (res.data && res.data.url) || "";
+    });
+  }
+
+  document.getElementById("clienteResetBtn").addEventListener("click", function () {
+    resetClienteForm();
+  });
+
+  document.getElementById("clienteLogo").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    if (!file) return;
+    uploadClienteLogo(file)
+      .then(function (url) {
+        setClienteLogoPreview(url);
+        showToast("Logo subido");
+      })
+      .catch(function (msg) {
+        err.hidden = false;
+        err.textContent = msg;
+        showToast(msg);
+      });
+  });
+
+  document.getElementById("formCliente").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    var id = document.getElementById("clienteId").value.trim();
+    var nombre = document.getElementById("clienteNombre").value.trim();
+    var orden = Number(document.getElementById("clienteOrden").value) || 0;
+    var activo = document.getElementById("clienteActivo").checked;
+    var logoUrl = document.getElementById("clienteLogoUrl").value.trim();
+    var fileInput = document.getElementById("clienteLogo");
+    var file = fileInput.files && fileInput.files[0];
+
+    function save(logo) {
+      if (!logo) {
+        err.hidden = false;
+        err.textContent = "Sube un logo (PNG, WEBP, SVG o JPG)";
+        return Promise.reject();
+      }
+      var body = { nombre: nombre, logo_url: logo, orden: orden, activo: activo };
+      var req = id
+        ? api("/clientes/" + id, { method: "PUT", body: body })
+        : api("/clientes", { method: "POST", body: body });
+      return req.then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo guardar";
+          return Promise.reject();
+        }
+        showToast(id ? "Cliente actualizado" : "Cliente creado");
+        resetClienteForm();
+        loadClientes();
+      });
+    }
+
+    var chain = Promise.resolve(logoUrl);
+    if (file && !logoUrl) {
+      chain = uploadClienteLogo(file);
+    } else if (file && logoUrl) {
+      // Ya se subió en change; si el usuario cambió de nuevo sin esperar, re-subir
+      chain = uploadClienteLogo(file);
+    }
+
+    chain
+      .then(function (url) {
+        return save(url || logoUrl);
+      })
+      .catch(function (msg) {
+        if (typeof msg === "string") {
+          err.hidden = false;
+          err.textContent = msg;
+        }
+      });
+  });
+
+  document.getElementById("adminClientesList").addEventListener("click", function (e) {
+    var editId = e.target.getAttribute("data-edit-cliente");
+    var delId = e.target.getAttribute("data-del-cliente");
+    var toggleId = e.target.getAttribute("data-toggle-cliente");
+    if (editId) {
+      var item = clientesCache.find(function (c) {
+        return String(c.id) === String(editId);
+      });
+      if (!item) return;
+      document.getElementById("clienteId").value = item.id;
+      document.getElementById("clienteNombre").value = item.nombre || "";
+      document.getElementById("clienteOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("clienteActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("clienteLogo").value = "";
+      setClienteLogoPreview(item.logo_url || "");
+      document.getElementById("clienteSaveBtn").textContent = "Actualizar Cliente";
+      document.getElementById("formCliente").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (toggleId) {
+      var row = clientesCache.find(function (c) {
+        return String(c.id) === String(toggleId);
+      });
+      if (!row) return;
+      var next = !coerceBool(row.activo, true);
+      api("/clientes/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo actualizar");
+          return;
+        }
+        showToast(next ? "Cliente visible" : "Cliente oculto");
+        loadClientes();
+      });
+      return;
+    }
+    if (delId && confirm("¿Eliminar este cliente?")) {
+      api("/clientes/" + delId, { method: "DELETE" }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo eliminar");
+          return;
+        }
+        showToast("Cliente eliminado");
+        if (document.getElementById("clienteId").value === String(delId)) resetClienteForm();
+        loadClientes();
+      });
+    }
+  });
 
   var BRAND_LOGOS = {
     "sonic-air-systems": "/img/brand/sonic-air.png",

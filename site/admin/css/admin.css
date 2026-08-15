@@ -574,6 +574,72 @@ dialog::backdrop { background: rgba(11,31,58,0.45); }
 .toast[hidden] { display: none !important; }
 .error { color: var(--danger); font-size: 0.9rem; }
 
+.admin-hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 1.5rem 0 1rem;
+}
+.admin-form .form-group {
+  margin-bottom: 0.35rem;
+}
+.client-logo-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  margin: 0.35rem 0 0.55rem;
+  padding: 0.5rem;
+  border: 1px dashed var(--line);
+  background: #f7f5ef;
+}
+.client-logo-preview img {
+  max-height: 56px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.admin-table th,
+.admin-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+.admin-table th {
+  background: #f7f5ef;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.admin-table__logo {
+  max-height: 36px;
+  max-width: 88px;
+  object-fit: contain;
+  background: #fff;
+  padding: 0.15rem 0.3rem;
+  border: 1px solid var(--line);
+}
+.admin-table__actions button {
+  width: auto;
+  margin: 0 0.15rem 0.15rem 0;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.78rem;
+}
+.admin-table .empty-hint {
+  text-align: center;
+  color: #667;
+  padding: 1rem;
+}
+
 .image-pick {
   display: flex;
   align-items: center;
