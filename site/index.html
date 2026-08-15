@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=85">
+  <link rel="stylesheet" href="css/style.css?v=86">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -456,42 +456,6 @@
         return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
       }
 
-      // Fallback local si la API aún no tiene filas (logo_url obligatorio en BD).
-      var HOME_CLIENTS_FALLBACK = [
-        { nombre: "Alimentos y bebidas", logo_url: "/img/brand/logo-mark.png" },
-        { nombre: "Packaging industrial", logo_url: "/img/brand/logo-mark.png" },
-        { nombre: "Farmacéutica", logo_url: "/img/brand/logo-mark.png" },
-        { nombre: "Fin de línea", logo_url: "/img/brand/logo-mark.png" },
-        { nombre: "Mantención de planta", logo_url: "/img/brand/logo-mark.png" },
-        { nombre: "Salas limpias", logo_url: "/img/brand/logo-mark.png" }
-      ];
-
-      function clientTileHtml(c) {
-        var name = c.nombre || c.name || "";
-        var logo = c.logo_url || c.logo || "";
-        if (logo) {
-          return (
-            '<div class="client-tile">' +
-            '<img src="' + Lpaez.escapeHtml(logo) + '" alt="' + Lpaez.escapeHtml(name) +
-            '" title="' + Lpaez.escapeHtml(name) +
-            '" width="160" height="64" loading="lazy" decoding="async">' +
-            "</div>"
-          );
-        }
-        return (
-          '<div class="client-tile client-tile--name">' +
-          "<span>" + Lpaez.escapeHtml(name) + "</span>" +
-          "</div>"
-        );
-      }
-
-      function renderHomeClients(list) {
-        var el = document.getElementById("homeClients");
-        if (!el) return;
-        var rows = list && list.length ? list : HOME_CLIENTS_FALLBACK;
-        el.innerHTML = rows.map(clientTileHtml).join("");
-      }
-
       // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
       var sectores = document.getElementById("sectores");
       if (sectores) {
@@ -508,19 +472,13 @@
       Promise.all([
         Lpaez.api("/api/brands"),
         Lpaez.api("/api/categories"),
-        Lpaez.api("/api/products?featured=1"),
-        Lpaez.api("/api/clientes")
+        Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
         var cats = (results[1].data && results[1].data.categories) || [];
         var products = (results[2].data && results[2].data.products) || [];
-        var rawClientes = results[3].data;
-        var clientes = Array.isArray(rawClientes)
-          ? rawClientes
-          : (rawClientes && rawClientes.clientes) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
         renderSolutions(cats);
-        renderHomeClients(clientes);
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
@@ -528,12 +486,39 @@
           '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
         Lpaez.observeReveals();
       }).catch(function () {
-        renderHomeClients([]);
         document.getElementById("homeProducts").innerHTML =
           '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
         Lpaez.observeReveals();
       });
     })();
+
+    function loadHomeClients() {
+      var container = document.getElementById("homeClients");
+      if (!container) return;
+
+      fetch("api/clientes.php")
+        .then(function (res) { return res.json(); })
+        .then(function (clients) {
+          if (!clients || !clients.length) {
+            var sec = document.getElementById("clientes");
+            if (sec) sec.style.display = "none";
+            return;
+          }
+
+          container.innerHTML = clients.map(function (c) {
+            return (
+              '<div class="client-card" title="' + Lpaez.escapeHtml(c.nombre) + '">' +
+                '<img src="' + Lpaez.escapeHtml(c.logo_url) + '" alt="' + Lpaez.escapeHtml(c.nombre) + '" loading="lazy">' +
+              '</div>'
+            );
+          }).join("");
+        })
+        .catch(function (err) {
+          console.warn("No se pudieron cargar los clientes", err);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadHomeClients);
   </script>
 </body>
 </html>
