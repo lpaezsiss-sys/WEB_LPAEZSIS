@@ -530,22 +530,40 @@
       url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i) ||
       url.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
     if (yt) {
-      return "https://www.youtube.com/embed/" + yt[1];
+      return { type: "embed", src: "https://www.youtube.com/embed/" + yt[1] };
     }
     var vim = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
     if (vim) {
-      return "https://player.vimeo.com/video/" + vim[1];
+      return { type: "embed", src: "https://player.vimeo.com/video/" + vim[1] };
     }
     if (/\.(mp4|webm)(\?|#|$)/i.test(url) || /\/img\/uploads\//i.test(url)) {
       return { type: "file", src: url };
-    }
-    if (/^https?:\/\//i.test(url) && /youtube|vimeo|youtu\.be/i.test(url)) {
-      return url;
     }
     if (/^https?:\/\//i.test(url) || url.charAt(0) === "/") {
       return { type: "file", src: url };
     }
     return null;
+  }
+
+  function setVideoApplyLoading(loading) {
+    var btn = document.getElementById("videoApply");
+    if (!btn) return;
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent || "Insertar video";
+    btn.disabled = !!loading;
+    btn.setAttribute("aria-busy", loading ? "true" : "false");
+    btn.textContent = loading ? "Insertando…" : btn.dataset.label;
+  }
+
+  function closeVideoModal() {
+    setVideoApplyLoading(false);
+    var dlg = document.getElementById("videoDialog");
+    if (dlg && typeof dlg.close === "function") {
+      try {
+        if (dlg.open) dlg.close();
+      } catch (closeErr) {
+        console.error("[VIDEO ERROR]", closeErr);
+      }
+    }
   }
 
   function openVideoPicker(ctx) {
@@ -555,19 +573,41 @@
     err.textContent = "";
     document.getElementById("videoFileInput").value = "";
     document.getElementById("videoUrlField").value = videoPickerContext.currentUrl || "";
+    setVideoApplyLoading(false);
     document.getElementById("videoDialog").showModal();
   }
 
-  function insertVideoIntoQuill(quill, value) {
-    if (!quill || !value) return;
-    var range = quill.getSelection(true) || { index: quill.getLength() };
-    var index = range.index;
-    if (typeof value === "object" && value.type === "file") {
-      quill.insertEmbed(index, "html5video", value.src, "user");
-    } else if (typeof value === "string") {
-      quill.insertEmbed(index, "video", value, "user");
+  function insertVideoIntoQuill(quill, parsed) {
+    if (!quill) {
+      throw new Error("Editor Quill activo no disponible");
     }
-    quill.setSelection(index + 1);
+    if (!parsed || !parsed.src) {
+      throw new Error("URL de video vacía");
+    }
+    var range = quill.getSelection(true) || { index: quill.getLength() };
+    var index = typeof range.index === "number" ? range.index : quill.getLength();
+    var src = String(parsed.src);
+
+    if (parsed.type === "embed") {
+      quill.insertEmbed(index, "video", src, "user");
+      quill.setSelection(index + 1, 0, "user");
+      return;
+    }
+
+    // Archivo local /uploads / mp4|webm: HTML5 video directo (evita blot frágil)
+    var mime = /\.webm(\?|#|$)/i.test(src) ? "video/webm" : "video/mp4";
+    var html =
+      '<video controls width="100%"><source src="' +
+      escapeAttr(src) +
+      '" type="' +
+      mime +
+      '"></video><p><br></p>';
+    if (typeof quill.clipboard.dangerouslyPasteHTML === "function") {
+      quill.clipboard.dangerouslyPasteHTML(index, html, "user");
+    } else {
+      quill.insertEmbed(index, "html5video", src, "user");
+      quill.setSelection(index + 1, 0, "user");
+    }
   }
 
   function registerQuillMediaBlots() {
@@ -700,7 +740,7 @@
   });
 
   document.getElementById("videoCancel").addEventListener("click", function () {
-    document.getElementById("videoDialog").close();
+    closeVideoModal();
   });
 
   document.getElementById("videoFileInput").addEventListener("change", function () {
@@ -708,6 +748,8 @@
     var err = document.getElementById("videoError");
     err.hidden = true;
     if (!file) return;
+    // Si el campo URL ya tiene valor (p. ej. subida previa), no re-subir automáticamente
+    // solo cuando el usuario elige un archivo nuevo.
     if (file.size > 50 * 1024 * 1024) {
       err.hidden = false;
       err.textContent = "El video supera 50 MB";
@@ -716,40 +758,67 @@
     var fd = new FormData();
     fd.append("file", file);
     fd.append("kind", "video");
+    setVideoApplyLoading(true);
     showToast("Subiendo video…");
-    api("/upload", { method: "POST", formData: fd }).then(function (res) {
-      if (!res.ok) {
+    api("/upload", { method: "POST", formData: fd })
+      .then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo subir el video";
+          return;
+        }
+        var url = res.data && res.data.url;
+        // Deja la URL lista; "Insertar video" la usa sin volver a subir.
+        document.getElementById("videoUrlField").value = url || "";
+        document.getElementById("videoFileInput").value = "";
+        showToast("Video subido — pulsa «Insertar video»");
+      })
+      .catch(function (uploadErr) {
+        console.error("[VIDEO ERROR]", uploadErr);
         err.hidden = false;
-        err.textContent = (res.data && res.data.error) || "No se pudo subir el video";
-        return;
-      }
-      var url = res.data && res.data.url;
-      document.getElementById("videoUrlField").value = url || "";
-      showToast("Video subido — pulsa «Insertar video»");
-    });
+        err.textContent = "Error de red al subir el video";
+      })
+      .then(function () {
+        setVideoApplyLoading(false);
+      });
   });
 
   document.getElementById("videoForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    var err = document.getElementById("videoError");
-    err.hidden = true;
-    var raw = document.getElementById("videoUrlField").value.trim();
-    if (!raw) {
-      err.hidden = false;
-      err.textContent = "Sube un archivo o indica una URL de YouTube/Vimeo";
-      return;
-    }
-    var parsed = toVideoEmbedUrl(raw);
-    if (!parsed) {
-      err.hidden = false;
-      err.textContent = "URL no válida. Usa YouTube, Vimeo, MP4/WEBM o /img/uploads/…";
-      return;
-    }
-    var apply = videoPickerContext && videoPickerContext.onApply;
-    Promise.resolve(apply ? apply(parsed) : null).then(function () {
-      document.getElementById("videoDialog").close();
+    e.stopPropagation();
+    var errEl = document.getElementById("videoError");
+    errEl.hidden = true;
+    errEl.textContent = "";
+    setVideoApplyLoading(true);
+    try {
+      // Si hay URL en el input, usarla directamente (no re-subir el archivo).
+      var raw = document.getElementById("videoUrlField").value.trim();
+      if (!raw) {
+        throw new Error("Sube un archivo o indica una URL de YouTube/Vimeo");
+      }
+      var parsed = toVideoEmbedUrl(raw);
+      if (!parsed || !parsed.src) {
+        throw new Error("URL no válida. Usa YouTube, Vimeo, MP4/WEBM o /img/uploads/…");
+      }
+      var quill = videoPickerContext && videoPickerContext.quill;
+      if (!quill) {
+        throw new Error("Editor Quill activo no disponible");
+      }
+      insertVideoIntoQuill(quill, parsed);
       showToast("Video insertado");
-    }).catch(function () {});
+    } catch (err) {
+      console.error("[VIDEO ERROR]", err);
+      errEl.hidden = false;
+      errEl.textContent = (err && err.message) || "No se pudo insertar el video";
+      showToast((err && err.message) || "Error al insertar video");
+    } finally {
+      setVideoApplyLoading(false);
+      closeVideoModal();
+    }
+  });
+
+  document.getElementById("videoDialog").addEventListener("cancel", function () {
+    setVideoApplyLoading(false);
   });
 
   document.getElementById("addProductBtn").addEventListener("click", function () {
@@ -1050,10 +1119,7 @@
             video: function () {
               var q = this.quill;
               openVideoPicker({
-                onApply: function (value) {
-                  insertVideoIntoQuill(q, value);
-                  return Promise.resolve();
-                },
+                quill: q,
               });
             },
           },
