@@ -46,6 +46,10 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/clientes') {
+            self::clientes();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -112,6 +116,17 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    private static function clientes(): void
+    {
+        $rows = self::pdo()->query(
+            'SELECT id, nombre, logo_url, orden, activo, created_at
+             FROM clientes
+             WHERE activo = 1
+             ORDER BY orden ASC, nombre ASC'
+        )->fetchAll();
+        Response::json(['clientes' => $rows]);
     }
 
     private static function brandDetail(string $slug): void

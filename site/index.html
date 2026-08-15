@@ -458,41 +458,40 @@
         return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
       }
 
-      // Referencias / clientes (texto o { name, logo }). Reemplazar con logos reales en img/clients/.
-      var HOME_CLIENTS = [
-        { name: "Alimentos y bebidas" },
-        { name: "Packaging industrial" },
-        { name: "Farmacéutica" },
-        { name: "Fin de línea" },
-        { name: "Mantención de planta" },
-        { name: "Salas limpias" }
+      // Fallback local si la API aún no tiene filas (logo_url obligatorio en BD).
+      var HOME_CLIENTS_FALLBACK = [
+        { nombre: "Alimentos y bebidas", logo_url: "/img/brand/logo-mark.png" },
+        { nombre: "Packaging industrial", logo_url: "/img/brand/logo-mark.png" },
+        { nombre: "Farmacéutica", logo_url: "/img/brand/logo-mark.png" },
+        { nombre: "Fin de línea", logo_url: "/img/brand/logo-mark.png" },
+        { nombre: "Mantención de planta", logo_url: "/img/brand/logo-mark.png" },
+        { nombre: "Salas limpias", logo_url: "/img/brand/logo-mark.png" }
       ];
 
       function clientTileHtml(c) {
-        if (c.logo) {
+        var name = c.nombre || c.name || "";
+        var logo = c.logo_url || c.logo || "";
+        if (logo) {
           return (
             '<div class="client-tile">' +
-            '<img src="' + Lpaez.escapeHtml(c.logo) + '" alt="' + Lpaez.escapeHtml(c.name) +
-            '" title="' + Lpaez.escapeHtml(c.name) +
+            '<img src="' + Lpaez.escapeHtml(logo) + '" alt="' + Lpaez.escapeHtml(name) +
+            '" title="' + Lpaez.escapeHtml(name) +
             '" width="160" height="64" loading="lazy" decoding="async">' +
             "</div>"
           );
         }
         return (
           '<div class="client-tile client-tile--name">' +
-          "<span>" + Lpaez.escapeHtml(c.name) + "</span>" +
+          "<span>" + Lpaez.escapeHtml(name) + "</span>" +
           "</div>"
         );
       }
 
-      function renderHomeClients() {
+      function renderHomeClients(list) {
         var el = document.getElementById("homeClients");
         if (!el) return;
-        if (!HOME_CLIENTS.length) {
-          el.innerHTML = '<p class="empty-state">Pronto publicaremos referencias de planta.</p>';
-          return;
-        }
-        el.innerHTML = HOME_CLIENTS.map(clientTileHtml).join("");
+        var rows = list && list.length ? list : HOME_CLIENTS_FALLBACK;
+        el.innerHTML = rows.map(clientTileHtml).join("");
       }
 
       // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
@@ -511,14 +510,16 @@
       Promise.all([
         Lpaez.api("/api/brands"),
         Lpaez.api("/api/categories"),
-        Lpaez.api("/api/products?featured=1")
+        Lpaez.api("/api/products?featured=1"),
+        Lpaez.api("/api/clientes")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
         var cats = (results[1].data && results[1].data.categories) || [];
         var products = (results[2].data && results[2].data.products) || [];
+        var clientes = (results[3].data && results[3].data.clientes) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
         renderSolutions(cats);
-        renderHomeClients();
+        renderHomeClients(clientes);
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
@@ -526,6 +527,7 @@
           '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
         Lpaez.observeReveals();
       }).catch(function () {
+        renderHomeClients([]);
         document.getElementById("homeProducts").innerHTML =
           '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
         Lpaez.observeReveals();

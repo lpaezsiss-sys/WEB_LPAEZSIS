@@ -85,6 +85,26 @@ final class AdminApi
             return;
         }
 
+        if ($method === 'GET' && $sub === '/clientes') {
+            $rows = self::pdo()->query(
+                'SELECT * FROM clientes ORDER BY orden ASC, nombre ASC'
+            )->fetchAll();
+            Response::json(['clientes' => $rows]);
+            return;
+        }
+        if ($method === 'POST' && $sub === '/clientes') {
+            self::createCliente();
+            return;
+        }
+        if ($method === 'PUT' && preg_match('#^/clientes/(\d+)$#', $sub, $m)) {
+            self::updateCliente((int) $m[1]);
+            return;
+        }
+        if ($method === 'DELETE' && preg_match('#^/clientes/(\d+)$#', $sub, $m)) {
+            self::deleteCliente((int) $m[1]);
+            return;
+        }
+
         if ($method === 'GET' && $sub === '/products') {
             $rows = self::pdo()->query(
                 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -352,6 +372,69 @@ final class AdminApi
     private static function deleteBrand(int $id): void
     {
         self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
+        Response::json(['ok' => true]);
+    }
+
+    private static function createCliente(): void
+    {
+        $b = self::body();
+        $nombre = trim((string) ($b['nombre'] ?? $b['name'] ?? ''));
+        $logo = trim((string) ($b['logo_url'] ?? ''));
+        if ($nombre === '' || $logo === '') {
+            Response::error('nombre y logo_url son requeridos');
+            return;
+        }
+        self::pdo()->prepare(
+            'INSERT INTO clientes (nombre, logo_url, orden, activo) VALUES (?, ?, ?, ?)'
+        )->execute([
+            $nombre,
+            $logo,
+            (int) ($b['orden'] ?? $b['sort_order'] ?? 0),
+            array_key_exists('activo', $b)
+                ? (!empty($b['activo']) ? 1 : 0)
+                : (array_key_exists('is_active', $b) ? (!empty($b['is_active']) ? 1 : 0) : 1),
+        ]);
+        Response::json(['id' => (int) self::pdo()->lastInsertId()]);
+    }
+
+    private static function updateCliente(int $id): void
+    {
+        $b = self::body();
+        if (isset($b['name']) && !isset($b['nombre'])) {
+            $b['nombre'] = $b['name'];
+        }
+        if (isset($b['sort_order']) && !isset($b['orden'])) {
+            $b['orden'] = $b['sort_order'];
+        }
+        if (array_key_exists('is_active', $b) && !array_key_exists('activo', $b)) {
+            $b['activo'] = !empty($b['is_active']) ? 1 : 0;
+        }
+        if (array_key_exists('activo', $b)) {
+            $b['activo'] = !empty($b['activo']) ? 1 : 0;
+        }
+        $fields = ['nombre', 'logo_url', 'orden', 'activo'];
+        $sets = [];
+        $vals = [];
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $b)) {
+                $sets[] = "$f = ?";
+                $vals[] = $b[$f];
+            }
+        }
+        if (!$sets) {
+            Response::error('Sin cambios');
+            return;
+        }
+        $vals[] = $id;
+        self::pdo()->prepare('UPDATE clientes SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($vals);
+        $stmt = self::pdo()->prepare('SELECT * FROM clientes WHERE id = ?');
+        $stmt->execute([$id]);
+        Response::json($stmt->fetch() ?: ['ok' => true]);
+    }
+
+    private static function deleteCliente(int $id): void
+    {
+        self::pdo()->prepare('DELETE FROM clientes WHERE id = ?')->execute([$id]);
         Response::json(['ok' => true]);
     }
 
