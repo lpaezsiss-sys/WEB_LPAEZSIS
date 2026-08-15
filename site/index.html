@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=88">
+  <link rel="stylesheet" href="css/style.css?v=89">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -96,20 +96,31 @@
   <main id="main">
     <section class="hero" aria-label="Inicio">
       <div class="hero-media" aria-hidden="true">
-        <picture class="hero-media__slide">
+        <picture class="hero-media__slide is-active">
           <source type="image/webp" srcset="img/hero/line.webp">
           <img
             src="img/hero/line.jpg"
             alt=""
+            title="Línea industrial de packaging"
             width="1920"
-            height="1080"
+            height="1440"
             loading="eager"
             fetchpriority="high"
             decoding="async">
         </picture>
+        <picture class="hero-media__slide">
+          <source type="image/webp" srcset="img/hero/3piece_cans.webp">
+          <img
+            src="img/hero/3piece_cans.jpg"
+            alt=""
+            title="Envases industriales"
+            width="1920"
+            height="1440"
+            loading="lazy"
+            decoding="async">
+        </picture>
       </div>
 
-      <!-- Overlay oscuro para oscurecer la imagen de fondo -->
       <div class="hero-scrim" aria-hidden="true"></div>
 
       <div class="hero-inner">
@@ -121,36 +132,6 @@
         <div class="hero-actions">
           <a class="btn btn-primary btn-lg btn-cta-primary" href="cotizacion.html">Pedir cotización</a>
           <a class="btn btn-ghost btn-lg btn-cta-secondary" href="#soluciones">Soluciones</a>
-        </div>
-        <div class="trust-inline" aria-label="Distribuidor oficial Sonic Air Systems">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems — distribuidor oficial en Chile"
-              width="120"
-              height="48"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p><strong>Distribuidores oficiales Sonic Air Systems</strong></p>
-        </div>
-      </div>
-      <div class="trust-band trust-band--in-hero">
-        <div class="trust-band-inner">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems"
-              width="150"
-              height="60"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p>Distribuidores oficiales <strong>Sonic Air Systems</strong> en Chile.</p>
         </div>
       </div>
     </section>
@@ -308,6 +289,20 @@
           ld.textContent = raw.split("https://prueba1.lpaezsis.cl").join(origin);
         } catch (e) { /* keep static JSON-LD */ }
       }
+
+      (function initHeroSlides() {
+        var slides = document.querySelectorAll(".hero-media__slide");
+        if (slides.length < 2) return;
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          return;
+        }
+        var i = 0;
+        window.setInterval(function () {
+          slides[i].classList.remove("is-active");
+          i = (i + 1) % slides.length;
+          slides[i].classList.add("is-active");
+        }, 7000);
+      })();
 
       function solutionBlurb(slug) {
         var map = {

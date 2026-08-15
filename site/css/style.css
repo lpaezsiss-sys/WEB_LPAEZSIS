@@ -585,6 +585,14 @@ body.nav-open {
   position: absolute;
   inset: 0;
   display: block;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+  z-index: 0;
+}
+
+.hero-media__slide.is-active {
+  opacity: 1;
+  z-index: 1;
 }
 
 .hero-media img {
@@ -813,12 +821,12 @@ body.nav-open {
     transition: none;
   }
 
-  .hero-media img,
-  .hero-media__slide {
-    animation: none;
-    /* Conserva scale(1.02) para cubrir bordes del blur */
+  .hero-media img {
     transform: scale(1.02);
-    opacity: 1;
+  }
+
+  .hero-media__slide {
+    transition: none;
   }
 }
 
