@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=84">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -367,16 +367,21 @@
           var active = i === 0;
           return (
             '<div class="solutions-panel' + (active ? " is-active" : "") +
-            '" role="tabpanel" id="sol-panel-' + Lpaez.escapeHtml(c.slug) +
-            '" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(c.slug) +
+            '" id="sol-panel-' + Lpaez.escapeHtml(c.slug) +
+            '" role="tabpanel" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(c.slug) +
             '" data-panel="' + Lpaez.escapeHtml(c.slug) + '"' +
             (active ? "" : " hidden") + ">" +
-            '<div class="solutions-media">' + categoryPicture(bg, c.name) + "</div>" +
-            '<div class="solutions-body"><h3>' + Lpaez.escapeHtml(c.name) + "</h3>" +
-            "<p>" + Lpaez.escapeHtml((c.description || "Soluciones industriales para tu planta.").slice(0, 160)) + "</p>" +
+            '<div class="solutions-panel-content">' +
+            "<h3>" + Lpaez.escapeHtml(c.name) + "</h3>" +
             '<ul class="solutions-list">' + items + "</ul>" +
-            '<a class="btn btn-primary" href="catalogo.html?category=' + encodeURIComponent(c.slug) + '">Ver productos</a>' +
-            "</div></div>"
+            '<a class="btn btn-outline" href="catalogo.html?category=' +
+            encodeURIComponent(c.slug) +
+            '">Ver catálogo ' +
+            Lpaez.escapeHtml(c.name) +
+            "</a>" +
+            "</div>" +
+            '<div class="solutions-panel-media">' + categoryPicture(bg, c.name) + "</div>" +
+            "</div>"
           );
         }).join("");
 
