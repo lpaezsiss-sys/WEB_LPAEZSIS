@@ -523,8 +523,19 @@
     document.getElementById("imageDialog").showModal();
   }
 
+  function normalizeVideoUrl(url) {
+    var u = String(url || "").trim();
+    if (!u) return u;
+    if (/^https?:\/\//i.test(u) || u.indexOf("//") === 0) return u;
+    // Rutas relativas sin "/" se resolverían bajo <base href="/admin/"> → forzar raíz del sitio
+    if (u.charAt(0) !== "/") {
+      u = "/" + u.replace(/^\.\//, "");
+    }
+    return u;
+  }
+
   function toVideoEmbedUrl(raw) {
-    var url = String(raw || "").trim();
+    var url = normalizeVideoUrl(String(raw || "").trim());
     if (!url) return null;
     var yt =
       url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i) ||
@@ -577,6 +588,39 @@
     document.getElementById("videoDialog").showModal();
   }
 
+  /**
+   * Whitelist <video> en Quill vía BlockEmbed (evita que el sanitizer borre el HTML).
+   * Debe ejecutarse ANTES de `new Quill(...)`.
+   */
+  function registerHTML5VideoBlot() {
+    if (typeof Quill === "undefined" || Quill.__lpaezHtml5Video) return;
+    var BlockEmbed = Quill.import("blots/block/embed");
+
+    class HTML5Video extends BlockEmbed {
+      static create(value) {
+        var node = super.create();
+        var src = normalizeVideoUrl(typeof value === "string" ? value : (value && value.src) || "");
+        node.setAttribute("controls", "true");
+        node.setAttribute("width", "100%");
+        node.setAttribute("preload", "metadata");
+        node.setAttribute("src", src);
+        node.style.maxWidth = "100%";
+        node.style.height = "auto";
+        node.style.display = "block";
+        return node;
+      }
+
+      static value(node) {
+        return node.getAttribute("src") || "";
+      }
+    }
+
+    HTML5Video.blotName = "html5video";
+    HTML5Video.tagName = "video";
+    Quill.register(HTML5Video, true);
+    Quill.__lpaezHtml5Video = true;
+  }
+
   function insertVideoIntoQuill(activeQuillInstance, parsed) {
     if (!activeQuillInstance) {
       throw new Error("Editor Quill activo no disponible");
@@ -584,11 +628,14 @@
     if (!parsed || !parsed.src) {
       throw new Error("URL de video vacía");
     }
+    registerHTML5VideoBlot();
+
     var range = activeQuillInstance.getSelection(true) || {
       index: activeQuillInstance.getLength(),
     };
     var index = typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
-    var url = String(parsed.src);
+    var url = normalizeVideoUrl(String(parsed.src));
+    console.log("HTML inyectado / URL video:", url, "type:", parsed.type);
 
     if (parsed.type === "embed") {
       activeQuillInstance.insertEmbed(index, "video", url, "user");
@@ -600,29 +647,13 @@
         '" type="' +
         mime +
         '"></video></p>';
-      activeQuillInstance.focus();
-      activeQuillInstance.clipboard.dangerouslyPasteHTML(index, videoHtml, "user");
+      console.log("HTML inyectado:", videoHtml);
+      // Inserción segura con blot whitelisted (no paste HTML que Quill limpia)
+      activeQuillInstance.insertEmbed(index, "html5video", url, "user");
+    }
 
-      // Quill 1.3 puede descartar <video> (sin blot). Si no quedó, inyectar en el DOM del editor
-      // (syncBrandSectionsFromDom lee root.innerHTML → se guarda igual).
-      var kept = false;
-      Array.prototype.forEach.call(activeQuillInstance.root.querySelectorAll("video"), function (v) {
-        var s =
-          v.getAttribute("src") ||
-          (v.querySelector("source") && v.querySelector("source").getAttribute("src")) ||
-          "";
-        if (s && (s === url || decodeURI(s) === url || s.indexOf(url.split("/").pop()) !== -1)) {
-          kept = true;
-        }
-      });
-      if (!kept) {
-        var cur = (activeQuillInstance.root.innerHTML || "").trim();
-        if (!cur || cur === "<p><br></p>" || cur === "<p></p>") {
-          activeQuillInstance.root.innerHTML = videoHtml;
-        } else {
-          activeQuillInstance.root.insertAdjacentHTML("beforeend", videoHtml);
-        }
-      }
+    if (typeof activeQuillInstance.update === "function") {
+      activeQuillInstance.update();
     }
     try {
       activeQuillInstance.setSelection(
@@ -633,6 +664,11 @@
     } catch (selErr) {
       /* ignore */
     }
+  }
+
+  // Registrar blot lo antes posible (Quill ya está cargado en esta página).
+  if (typeof Quill !== "undefined") {
+    registerHTML5VideoBlot();
   }
 
   function openProductDialog(product) {
@@ -758,8 +794,8 @@
           return;
         }
         var url = res.data && res.data.url;
-        // Deja la URL lista; "Insertar video" la usa sin volver a subir.
-        document.getElementById("videoUrlField").value = url || "";
+        // Deja la URL lista (normalizada a ruta absoluta del sitio).
+        document.getElementById("videoUrlField").value = normalizeVideoUrl(url || "");
         document.getElementById("videoFileInput").value = "";
         showToast("Video subido — pulsa «Insertar video»");
       })
@@ -1080,6 +1116,7 @@
         "</textarea>";
       return null;
     }
+    registerHTML5VideoBlot();
     var quill = new Quill(editorEl, {
       theme: "snow",
       placeholder: "Escribe el contenido de esta sección…",
@@ -1115,17 +1152,17 @@
         },
       },
     });
-    // Preservar <video> al pegar/cargar HTML (Quill no tiene blot nativo HTML5).
-    quill.clipboard.addMatcher("VIDEO", function (node, delta) {
+    var Delta = Quill.import("delta");
+    quill.clipboard.addMatcher("VIDEO", function (node) {
       var source = node.querySelector("source");
-      var src = node.getAttribute("src") || (source && source.getAttribute("src")) || "";
-      if (!src) return delta;
-      // Dejar que el HTML del editor conserve el nodo: no mapear a blot custom.
-      return delta;
+      var src = normalizeVideoUrl(
+        node.getAttribute("src") || (source && source.getAttribute("src")) || ""
+      );
+      if (!src) return new Delta();
+      return new Delta().insert({ html5video: src });
     });
     if (initialHtml) {
-      // Carga directa en el DOM del editor para conservar <video> existentes.
-      quill.root.innerHTML = initialHtml;
+      quill.clipboard.dangerouslyPasteHTML(0, initialHtml, "silent");
     }
     brandQuills[sectionId] = quill;
     return quill;
