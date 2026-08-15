@@ -578,12 +578,25 @@
   }
 
   function openVideoPicker(ctx) {
-    videoPickerContext = ctx || {};
+    var quill = ctx && ctx.quill;
+    var savedIndex = 0;
+    if (quill) {
+      try {
+        var sel = quill.getSelection(true);
+        savedIndex = sel && typeof sel.index === "number" ? sel.index : quill.getLength();
+      } catch (e) {
+        savedIndex = quill.getLength();
+      }
+    }
+    videoPickerContext = {
+      quill: quill,
+      index: savedIndex,
+    };
     var err = document.getElementById("videoError");
     err.hidden = true;
     err.textContent = "";
     document.getElementById("videoFileInput").value = "";
-    document.getElementById("videoUrlField").value = videoPickerContext.currentUrl || "";
+    document.getElementById("videoUrlField").value = (ctx && ctx.currentUrl) || "";
     setVideoApplyLoading(false);
     document.getElementById("videoDialog").showModal();
   }
@@ -601,12 +614,15 @@
         var node = super.create();
         var src = normalizeVideoUrl(typeof value === "string" ? value : (value && value.src) || "");
         node.setAttribute("controls", "true");
+        node.setAttribute("controlslist", "nodownload");
         node.setAttribute("width", "100%");
         node.setAttribute("preload", "metadata");
         node.setAttribute("src", src);
+        node.setAttribute("playsinline", "true");
         node.style.maxWidth = "100%";
         node.style.height = "auto";
         node.style.display = "block";
+        node.style.margin = "10px 0";
         return node;
       }
 
@@ -617,8 +633,10 @@
 
     HTML5Video.blotName = "html5video";
     HTML5Video.tagName = "video";
+    HTML5Video.className = "ql-html5video";
     Quill.register(HTML5Video, true);
     Quill.__lpaezHtml5Video = true;
+    console.log("[VIDEO] HTML5Video blot registered");
   }
 
   function insertVideoIntoQuill(activeQuillInstance, parsed) {
@@ -630,39 +648,76 @@
     }
     registerHTML5VideoBlot();
 
-    var range = activeQuillInstance.getSelection(true) || {
-      index: activeQuillInstance.getLength(),
-    };
-    var index = typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
     var url = normalizeVideoUrl(String(parsed.src));
-    console.log("HTML inyectado / URL video:", url, "type:", parsed.type);
+    var index =
+      videoPickerContext && typeof videoPickerContext.index === "number"
+        ? videoPickerContext.index
+        : null;
+    if (index == null) {
+      try {
+        var range = activeQuillInstance.getSelection(true);
+        index = range && typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
+      } catch (e) {
+        index = activeQuillInstance.getLength();
+      }
+    }
+
+    var mime = /\.webm(\?|#|$)/i.test(url) ? "video/webm" : "video/mp4";
+    var videoHtml =
+      '<p><video class="ql-html5video" controls width="100%" style="max-width:100%; height:auto;" src="' +
+      escapeAttr(url) +
+      '"><source src="' +
+      escapeAttr(url) +
+      '" type="' +
+      mime +
+      '"></video></p>';
+    console.log("HTML inyectado:", videoHtml);
+
+    // Cerrar modal y devolver foco al editor ANTES de insertar (evita rangos inválidos
+    // con <dialog> anidados — síntoma: addRange() / video no visible).
+    closeVideoModal();
+    try {
+      activeQuillInstance.focus();
+    } catch (focusErr) {
+      console.error("[VIDEO ERROR]", focusErr);
+    }
 
     if (parsed.type === "embed") {
       activeQuillInstance.insertEmbed(index, "video", url, "user");
     } else {
-      var mime = /\.webm(\?|#|$)/i.test(url) ? "video/webm" : "video/mp4";
-      var videoHtml =
-        '<p><video controls width="100%" style="max-width:100%; height:auto;"><source src="' +
-        escapeAttr(url) +
-        '" type="' +
-        mime +
-        '"></video></p>';
-      console.log("HTML inyectado:", videoHtml);
-      // Inserción segura con blot whitelisted (no paste HTML que Quill limpia)
-      activeQuillInstance.insertEmbed(index, "html5video", url, "user");
+      try {
+        activeQuillInstance.insertEmbed(index, "html5video", url, "user");
+      } catch (embedErr) {
+        console.error("[VIDEO ERROR]", embedErr);
+        // Fallback: pegar HTML con matcher de VIDEO → html5video
+        activeQuillInstance.clipboard.dangerouslyPasteHTML(index, videoHtml, "user");
+      }
     }
 
     if (typeof activeQuillInstance.update === "function") {
-      activeQuillInstance.update();
+      activeQuillInstance.update("user");
     }
+
+    var videos = activeQuillInstance.root.querySelectorAll("video");
+    console.log("[VIDEO] videos en editor tras insert:", videos.length, activeQuillInstance.root.innerHTML.slice(0, 500));
+    if (parsed.type !== "embed" && !videos.length) {
+      // Último recurso: inyectar en el DOM del editor (se serializa vía root.innerHTML al guardar)
+      activeQuillInstance.root.insertAdjacentHTML("beforeend", videoHtml);
+      videos = activeQuillInstance.root.querySelectorAll("video");
+      console.log("[VIDEO] fallback DOM videos:", videos.length);
+    }
+    if (parsed.type !== "embed" && !videos.length) {
+      throw new Error("El video no se pudo mostrar en el editor");
+    }
+
     try {
       activeQuillInstance.setSelection(
         Math.min(index + 1, activeQuillInstance.getLength()),
         0,
-        "user"
+        "silent"
       );
     } catch (selErr) {
-      /* ignore */
+      /* ignore invalid selection after nested dialogs */
     }
   }
 
@@ -830,9 +885,8 @@
       if (!quill) {
         throw new Error("Editor Quill activo no disponible");
       }
+      // insertVideoIntoQuill cierra el modal antes de insertar (foco/selección).
       insertVideoIntoQuill(quill, parsed);
-      // Éxito: cerrar de inmediato y restaurar botón.
-      closeVideoModal();
       showToast("Video insertado");
     } catch (err) {
       console.error("[VIDEO ERROR]", err);
@@ -840,6 +894,8 @@
       errEl.hidden = false;
       errEl.textContent = (err && err.message) || "No se pudo insertar el video";
       showToast((err && err.message) || "Error al insertar video");
+      // Si el modal ya se cerró en el intento de insert, reabrir no es necesario;
+      // el toast informa el fallo.
     }
   });
 
