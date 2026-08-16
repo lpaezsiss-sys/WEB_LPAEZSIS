@@ -290,20 +290,6 @@
         } catch (e) { /* keep static JSON-LD */ }
       }
 
-      (function initHeroSlides() {
-        var slides = document.querySelectorAll(".hero-media__slide");
-        if (slides.length < 2) return;
-        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          return;
-        }
-        var i = 0;
-        window.setInterval(function () {
-          slides[i].classList.remove("is-active");
-          i = (i + 1) % slides.length;
-          slides[i].classList.add("is-active");
-        }, 7000);
-      })();
-
       function solutionBlurb(slug) {
         var map = {
           secadores: ["Secado de botellas y envases", "Túneles y cabinas de soplado", "Sistemas food & beverage"],
@@ -473,6 +459,20 @@
         Lpaez.observeReveals();
       });
     })();
+
+    function initHeroCarousel() {
+      var slides = document.querySelectorAll(".hero-media__slide");
+      if (slides.length <= 1) return;
+
+      var currentIndex = 0;
+      setInterval(function () {
+        slides[currentIndex].classList.remove("is-active");
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add("is-active");
+      }, 5000); // Cambia cada 5 segundos
+    }
+
+    document.addEventListener("DOMContentLoaded", initHeroCarousel);
 
     function loadHomeClients() {
       var container = document.getElementById("homeClients");
