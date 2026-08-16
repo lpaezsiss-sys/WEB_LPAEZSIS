@@ -945,11 +945,11 @@ body.nav-open {
 }
 
 /* ——— Solutions tabs (Sonic product switcher) ——— */
-/* Pestañas de soluciones */
+/* Layout para 8 pestañas distribuidas */
 .solutions-tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
   margin-bottom: 1.5rem;
 }
 
@@ -959,12 +959,12 @@ body.nav-open {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 0.5rem;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  text-align: center;
   color: #475569;
   text-transform: uppercase;
-  text-align: left;
   line-height: 1.25;
   cursor: pointer;
   touch-action: manipulation;
@@ -977,10 +977,9 @@ body.nav-open {
   border-color: #cbd5e1;
 }
 
-/* Estado activo limpio */
 .solutions-tab.is-active {
   background-color: #ffffff;
-  color: #dc2626; /* Rojo de acento */
+  color: #dc2626;
   border-color: #dc2626;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -997,7 +996,6 @@ body.nav-open {
   overflow-anchor: none;
 }
 
-/* Panel de contenido */
 .solutions-panel {
   display: none;
   grid-template-columns: 1fr 1fr;
@@ -1025,7 +1023,6 @@ body.nav-open {
   overflow: hidden;
 }
 
-/* Imagen dentro del panel */
 .solutions-media img,
 .solutions-panel-media img {
   width: 100%;
@@ -1071,6 +1068,17 @@ body.nav-open {
   color: #dc2626;
   font-weight: bold;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .solutions-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .solutions-panel,
+  .solutions-panel.is-active {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ——— Brand strip ——— */
@@ -2878,10 +2886,6 @@ body.nav-open {
 }
 
 @media (max-width: 960px) {
-  .solutions-panel.is-active {
-    grid-template-columns: 1fr;
-  }
-
   .solutions-media img,
   .solutions-panel-media img {
     height: 220px;
@@ -3254,17 +3258,15 @@ body.nav-open {
   }
 
   .solutions-tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 1.25rem;
   }
 
   .solutions-tab {
     min-width: 0;
     width: 100%;
-    padding: 0.75rem 0.85rem;
-    text-align: left;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
     font-size: 0.78rem;
   }
 
@@ -3277,11 +3279,6 @@ body.nav-open {
   .solutions-panels {
     min-height: 0;
     overflow-anchor: none;
-  }
-
-  .solutions-panel.is-active {
-    display: grid;
-    grid-template-columns: 1fr;
   }
 
   .solutions-media img,
