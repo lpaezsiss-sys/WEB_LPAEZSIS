@@ -7,7 +7,7 @@
 **Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260816-5af8`  
 **Rama de trabajo al momento del freeze:** `cursor/admin-soluciones-dinamicas-5af8`  
 **PR relacionada:** https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/pull/5  
-**Commit:** `91ccd4a` (tip de la rama de respaldo / tag anotado)
+**Commit:** `2f842ec` (tip de la rama de respaldo / tag anotado)
 
 Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **12** productos, **8** marcas, **6** soluciones activas, **8** clientes activos.
 
