@@ -81,7 +81,10 @@
   }
 
   function addToCart(product, qty) {
-    if (product.sale_mode !== "buy") {
+    var isBuyable =
+      product &&
+      (product.sale_mode === "buy" || product.tipo === "repuesto");
+    if (!isBuyable) {
       showToast("Este producto solo se cotiza.");
       return;
     }
@@ -241,18 +244,28 @@
         name: p.name,
         price_clp: p.price_clp,
         sale_mode: p.sale_mode,
+        tipo: p.tipo || (p.sale_mode === "buy" ? "repuesto" : "equipo"),
       })
     );
   }
 
+  function productTipoOf(p) {
+    if (p && (p.tipo === "repuesto" || p.tipo === "equipo")) return p.tipo;
+    return p && p.sale_mode === "buy" ? "repuesto" : "equipo";
+  }
+
   function productCardHtml(p, options) {
     var opts = options || {};
-    var modeClass = p.sale_mode === "buy" ? "badge-buy" : "badge-quote";
-    var modeLabel = p.sale_mode === "buy" ? "Comprar" : "Cotizar";
+    var tipo = productTipoOf(p);
+    var isRepuesto = tipo === "repuesto";
+    var modeClass = isRepuesto ? "badge-buy" : "badge-quote";
+    var modeLabel = isRepuesto ? "Comprar" : "Cotizar";
     var price =
-      p.sale_mode === "buy" && p.price_clp != null
+      isRepuesto && p.price_clp != null
         ? formatPrice(p.price_clp)
-        : "Cotización";
+        : isRepuesto
+          ? "Consultar"
+          : "Cotización";
     var img = resolveProductImage(p);
     var visual = img
       ? '<img src="' +
@@ -264,14 +277,17 @@
         '" loading="lazy" decoding="async" width="480" height="480">'
       : "LPAEZ";
     var payload = productPayload(p);
-    var primaryCta =
-      p.sale_mode === "buy"
-        ? '<button type="button" class="btn btn-primary btn-sm" data-card-cart="' +
-          payload +
-          '">Agregar al carrito</button>'
-        : '<button type="button" class="btn btn-primary btn-sm" data-card-quote="' +
-          payload +
-          '">Pedir cotización</button>';
+    var primaryCta = isRepuesto
+      ? '<button type="button" class="btn btn-success btn-buy btn-sm" data-card-cart="' +
+        payload +
+        '">COMPRAR</button>'
+      : '<a class="btn btn-primary btn-quote btn-sm" href="contacto.html?quote=' +
+        encodeURIComponent(p.id || "") +
+        "&sku=" +
+        encodeURIComponent(p.slug || "") +
+        "&name=" +
+        encodeURIComponent(p.name || "") +
+        '">PEDIR COTIZACIÓN</a>';
     var datasheetBadge =
       opts.showDatasheetBadge
         ? '<a class="badge-datasheet" href="producto.html?slug=' +
@@ -281,7 +297,9 @@
           "<span>Ficha técnica PDF disponible</span></a>"
         : "";
     return (
-      '<article class="product-card reveal">' +
+      '<article class="product-card reveal" data-tipo="' +
+      escapeAttr(tipo) +
+      '">' +
       '<a class="product-card-visual" href="producto.html?slug=' +
       encodeURIComponent(p.slug) +
       '" title="' +
@@ -517,6 +535,7 @@
     clearQuote: clearQuote,
     showToast: showToast,
     productCardHtml: productCardHtml,
+    productTipoOf: productTipoOf,
     resolveProductImage: resolveProductImage,
     resolveCategoryImage: resolveCategoryImage,
     observeReveals: observeReveals,

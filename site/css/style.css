@@ -346,6 +346,30 @@ select {
   background: var(--sonic-red-dark);
 }
 
+.btn-success,
+.btn-buy {
+  background: #1f7a4d;
+  color: var(--white);
+  border-color: #1f7a4d;
+}
+
+.btn-success:hover,
+.btn-buy:hover {
+  background: #17633e;
+  border-color: #17633e;
+  color: var(--white);
+}
+
+.btn-quote {
+  letter-spacing: 0.03em;
+}
+
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--white);
@@ -1749,7 +1773,9 @@ body.nav-open {
 }
 
 /* Limpieza de botones CTA en tarjetas */
-.product-card .btn-outline {
+.product-card .btn-outline,
+.product-card .btn-buy,
+.product-card .btn-quote {
   display: flex;
   align-items: center;
   justify-content: center;

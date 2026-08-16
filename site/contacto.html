@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://lpaezsis.cl/contacto.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/hero/line.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=99">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -53,7 +53,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=36"></script>
-  <script src="js/site.js?v=22"></script>
+  <script src="js/site.js?v=24"></script>
   <script>
     Lpaez.injectJsonLd({
       "@context": "https://schema.org",
@@ -64,14 +64,39 @@
       url: "https://lpaezsis.cl/",
       areaServed: "CL"
     });
+
+    (function prefillQuoteRequest() {
+      var quoteId = Lpaez.queryParam("quote");
+      var sku = Lpaez.queryParam("sku");
+      var name = Lpaez.queryParam("name");
+      if (!quoteId && !sku && !name) return;
+      var ta = document.getElementById("contactMessage");
+      if (!ta || ta.value.trim()) return;
+      var lines = ["Solicito cotización de equipo:"];
+      if (name) lines.push("- Equipo: " + name);
+      if (sku) lines.push("- SKU / slug: " + sku);
+      if (quoteId) lines.push("- ID: " + quoteId);
+      lines.push("", "Cantidad / línea / requerimientos:");
+      ta.value = lines.join("\n");
+      var h1 = document.querySelector(".page-hero-inner h1");
+      var lead = document.querySelector(".page-hero-inner p");
+      if (h1) h1.textContent = "Pedir cotización";
+      if (lead) lead.textContent = "Cuéntanos tu línea y te respondemos con una propuesta.";
+    })();
+
     document.getElementById("contactForm").addEventListener("submit", function (e) {
       e.preventDefault();
       var msg = document.getElementById("contactMsg");
       var btn = document.getElementById("contactSubmit");
       var company = document.getElementById("contactCompany").value.trim();
+      var quoteId = Lpaez.queryParam("quote");
+      var sku = Lpaez.queryParam("sku");
       btn.disabled = true;
       btn.textContent = "Enviando…";
       msg.hidden = true;
+      var subjectParts = [];
+      if (company) subjectParts.push("Empresa: " + company);
+      if (quoteId || sku) subjectParts.push("Cotización equipo");
       Lpaez.api("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,7 +105,7 @@
           name: document.getElementById("contactName").value.trim(),
           email: document.getElementById("contactEmail").value.trim(),
           phone: "",
-          subject: company ? "Empresa: " + company : "Contacto web",
+          subject: subjectParts.length ? subjectParts.join(" · ") : "Contacto web",
           message: document.getElementById("contactMessage").value.trim()
         })
       }).then(function (res) {
