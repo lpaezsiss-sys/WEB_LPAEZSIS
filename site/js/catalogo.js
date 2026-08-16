@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       if (catalogHint) {
         catalogHint.innerHTML =
-          "Catálogo de <strong>repuestos</strong>. Usa filtros de marca o categoría. Enlace: <code>?tipo=repuesto</code>.";
+          "Catálogo de <strong>repuestos</strong>. Filtra por marca o tipo de venta. Enlace: <code>?tipo=repuesto</code>.";
       }
       if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de repuestos";
       document.title = "Repuestos industriales | Catálogo B2B LPAEZsis";
@@ -283,6 +283,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
   applyHeroCopy();
+
+  function applyRepuestoFilterVisibility() {
+    const isRepuesto = state.tipo === "repuesto";
+    const filterIndustria = document.getElementById("filterIndustriaGroup");
+    const filterCategoria = document.getElementById("filterCategoriaGroup");
+    if (filterIndustria) filterIndustria.style.display = isRepuesto ? "none" : "";
+    if (filterCategoria) filterCategoria.style.display = isRepuesto ? "none" : "";
+    if (isRepuesto) {
+      state.industry = "";
+      state.category = "";
+      if (industrySelect) industrySelect.value = "";
+      if (categorySelect) categorySelect.value = "";
+    }
+  }
+  applyRepuestoFilterVisibility();
 
   let allProducts = MOCK_PRODUCTS.slice();
   let allCategories = MOCK_CATEGORIES.slice();
