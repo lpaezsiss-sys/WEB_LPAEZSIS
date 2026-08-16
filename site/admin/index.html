@@ -26,7 +26,8 @@
     <header class="app-header">
       <strong>LPAEZsis</strong>
       <nav class="app-tabs" id="appTabs">
-        <button type="button" class="app-tab is-active" data-tab="products">Productos</button>
+        <button type="button" class="app-tab is-active" data-tab="equipos">Equipos</button>
+        <button type="button" class="app-tab" data-tab="repuestos">Repuestos</button>
         <button type="button" class="app-tab" data-tab="brands">Marcas</button>
         <button type="button" class="app-tab" data-tab="clientes">Clientes</button>
         <button type="button" class="app-tab" data-tab="soluciones">Soluciones</button>
@@ -38,7 +39,7 @@
       <button type="button" class="ghost" id="logoutBtn" style="color:#fff;border-color:rgba(255,255,255,.35)">Salir</button>
     </header>
     <main class="app-main">
-      <section class="view" id="productsView">
+      <section class="view" id="equiposView">
         <div class="catalog-layout">
           <aside class="cat-sidebar" aria-label="Categorías">
             <div class="cat-sidebar__head">
@@ -50,15 +51,38 @@
           <div class="catalog-main">
             <div class="catalog-main__head">
               <div>
-                <h2 id="catalogTitle">Productos</h2>
+                <h2 id="catalogTitle">Equipos</h2>
                 <p class="catalog-meta" id="catalogMeta"></p>
               </div>
               <div class="catalog-main__actions">
                 <button type="button" class="ghost" id="editCategoryBtn" hidden>Editar categoría</button>
-                <button type="button" id="addProductBtn">+ Producto</button>
+                <button type="button" id="addProductBtn">+ Equipo</button>
               </div>
             </div>
             <div class="product-rows" id="productsList"></div>
+          </div>
+        </div>
+      </section>
+      <section class="view" id="repuestosView" hidden>
+        <div class="catalog-layout">
+          <aside class="cat-sidebar" aria-label="Categorías de repuestos">
+            <div class="cat-sidebar__head">
+              <h2>Categorías</h2>
+              <p class="hint-text" style="margin:0.35rem 0 0">Misma taxonomía; listado filtrado por tipo Repuesto.</p>
+            </div>
+            <div class="cat-sidebar__list" id="catSidebarListRepuestos"></div>
+          </aside>
+          <div class="catalog-main">
+            <div class="catalog-main__head">
+              <div>
+                <h2 id="catalogTitleRepuestos">Repuestos</h2>
+                <p class="catalog-meta" id="catalogMetaRepuestos"></p>
+              </div>
+              <div class="catalog-main__actions">
+                <button type="button" id="addRepuestoBtn">+ Repuesto</button>
+              </div>
+            </div>
+            <div class="product-rows" id="repuestosList"></div>
           </div>
         </div>
       </section>
@@ -274,11 +298,7 @@
         <option value="buy">Comprar</option>
         <option value="quote">Cotizar</option>
       </select>
-      <label>Tipo</label>
-      <select name="tipo">
-        <option value="equipo">Equipo</option>
-        <option value="repuesto">Repuesto</option>
-      </select>
+      <input type="hidden" name="tipo" id="productTipo" value="equipo">
       <label>Stock</label>
       <select name="stock_status">
         <option value="in_stock">En stock</option>
@@ -394,6 +414,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=23"></script>
+  <script src="js/admin.js?v=25"></script>
 </body>
 </html>

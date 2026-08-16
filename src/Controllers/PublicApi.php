@@ -187,17 +187,29 @@ final class PublicApi
     private static function products(): void
     {
         $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
+        $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                        b.slug AS brand_slug, b.name AS brand_name
                 FROM products p
                 LEFT JOIN categories c ON c.id = p.category_id
                 LEFT JOIN brands b ON b.id = p.brand_id
                 WHERE p.is_active = 1';
+        $params = [];
         if ($featured) {
             $sql .= ' AND p.is_featured = 1';
         }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
         $sql .= ' ORDER BY p.sort_order, p.name';
-        $rows = self::pdo()->query($sql)->fetchAll();
+        if ($params) {
+            $stmt = self::pdo()->prepare($sql);
+            $stmt->execute($params);
+            $rows = $stmt->fetchAll();
+        } else {
+            $rows = self::pdo()->query($sql)->fetchAll();
+        }
         Response::json(['products' => $rows]);
     }
 

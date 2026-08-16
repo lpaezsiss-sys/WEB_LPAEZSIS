@@ -126,14 +126,20 @@ final class AdminApi
         }
 
         if ($method === 'GET' && $sub === '/products') {
-            $rows = self::pdo()->query(
-                'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
+            $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
+            $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                         b.slug AS brand_slug, b.name AS brand_name
                  FROM products p
                  LEFT JOIN categories c ON c.id = p.category_id
-                 LEFT JOIN brands b ON b.id = p.brand_id
-                 ORDER BY p.sort_order, p.name'
-            )->fetchAll();
+                 LEFT JOIN brands b ON b.id = p.brand_id';
+            if ($tipo === 'equipo' || $tipo === 'repuesto') {
+                $sql .= ' WHERE p.tipo = ?';
+                $stmt = self::pdo()->prepare($sql . ' ORDER BY p.sort_order, p.name');
+                $stmt->execute([$tipo]);
+                $rows = $stmt->fetchAll();
+            } else {
+                $rows = self::pdo()->query($sql . ' ORDER BY p.sort_order, p.name')->fetchAll();
+            }
             Response::json(['products' => $rows]);
             return;
         }

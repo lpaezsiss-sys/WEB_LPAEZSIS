@@ -12,6 +12,7 @@ const MOCK_PRODUCTS = [
     sku: "SAS-DRY-BOT",
     description: "Secado de botellas con turbinas y air knives Sonic. Cotización por línea.",
     sale_mode: "quote",
+    tipo: "equipo",
     stock_status: "on_request",
     price_clp: null,
     image_url: "img/hero/cans.jpg",
@@ -29,6 +30,7 @@ const MOCK_PRODUCTS = [
     sku: "SAS-VT-100",
     description: "Turbina de alto caudal para secado y limpieza industrial.",
     sale_mode: "quote",
+    tipo: "equipo",
     stock_status: "on_request",
     price_clp: null,
     image_url: "img/products/vt-sonic.jpg",
@@ -46,6 +48,7 @@ const MOCK_PRODUCTS = [
     sku: "13514",
     description: "Correa 16 GRV SONIC 70/85 (Cod 13514)",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-13474.jpg",
@@ -63,6 +66,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-10317",
     description: "Elemento filtro polyester lavable Sonic 75-85-100",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-10317.jpg",
@@ -80,6 +84,7 @@ const MOCK_PRODUCTS = [
     sku: "10976",
     description: "Filtro completo polyester lavable Sonic con indicador",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: 195000,
     image_url: "img/products/A07-10976.jpg",
@@ -97,6 +102,7 @@ const MOCK_PRODUCTS = [
     sku: "10015",
     description: "Impulsor soplador Sonic Air Models S70/S100",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-10015.jpg",
@@ -114,6 +120,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-14452",
     description: "Conjunto rodamientos sellado Sonic 100-150",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-14452.jpg",
@@ -131,6 +138,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-13455",
     description: "Kit tensor correa Sonic todos los modelos",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-13455.png",
@@ -164,7 +172,6 @@ const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
   { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
-  { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -185,6 +192,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ldScript = document.getElementById("catalogItemListLd");
   const datasheetDialog = document.getElementById("datasheetDialog");
   const datasheetBody = document.getElementById("datasheetBody");
+  const heroTitle = document.querySelector(".page-hero-inner h1");
+  const heroLead = document.querySelector(".page-hero-inner p");
+  const catalogHint = document.querySelector(".catalog-hint");
+  const catalogGridLabel = document.getElementById("catalogGridLabel");
 
   const escapeHtml =
     window.Lpaez?.escapeHtml ||
@@ -207,13 +218,67 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
+  function normalizeTipo(raw) {
+    const t = String(raw || "").toLowerCase().trim();
+    if (t === "equipo" || t === "repuesto") return t;
+    return "";
+  }
+
+  // Compat: ?category=repuestos → tipo=repuesto. Sin tipo → equipos.
+  let tipoFromQuery = normalizeTipo(queryParam("tipo"));
+  if (!tipoFromQuery && queryParam("category") === "repuestos") {
+    tipoFromQuery = "repuesto";
+  }
+  if (!tipoFromQuery) tipoFromQuery = "equipo";
+
   const state = {
-    category: queryParam("category") || "",
+    tipo: tipoFromQuery,
+    category: queryParam("category") === "repuestos" && tipoFromQuery === "repuesto" ? "" : queryParam("category") || "",
     brand: queryParam("brand") || "",
     industry: queryParam("industry") || "",
     mode: queryParam("sale_mode") || queryParam("mode") || "",
     page: Math.max(1, parseInt(queryParam("page") || "1", 10) || 1),
   };
+
+  function applyHeroCopy() {
+    if (state.tipo === "repuesto") {
+      if (heroTitle) heroTitle.textContent = "Repuestos";
+      if (heroLead) {
+        heroLead.textContent =
+          "Repuestos y consumibles para equipos Sonic: compra directa o cotiza según disponibilidad.";
+      }
+      if (catalogHint) {
+        catalogHint.innerHTML =
+          "Catálogo de <strong>repuestos</strong>. Usa filtros de marca o categoría. Enlace: <code>?tipo=repuesto</code>.";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de repuestos";
+      document.title = "Repuestos industriales | Catálogo B2B LPAEZsis";
+    } else if (state.tipo === "equipo") {
+      if (heroTitle) heroTitle.textContent = "Equipos";
+      if (heroLead) {
+        heroLead.textContent =
+          "Equipos industriales: filtra por industria o marca y solicita cotización con ficha técnica.";
+      }
+      if (catalogHint) {
+        catalogHint.innerHTML =
+          "Catálogo de <strong>equipos</strong>. Cotiza proyectos a medida. Enlace: <code>?tipo=equipo</code>.";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de equipos";
+      document.title = "Equipos industriales | Catálogo B2B LPAEZsis";
+    } else {
+      if (heroTitle) heroTitle.textContent = "Productos";
+      if (heroLead) {
+        heroLead.textContent =
+          "Catálogo B2B: equipos y repuestos. Filtra por tipo, industria o marca.";
+      }
+      if (catalogHint) {
+        catalogHint.innerHTML =
+          "Navega por <a href=\"catalogo.html?tipo=equipo\"><strong>Equipos</strong></a> o <a href=\"catalogo.html?tipo=repuesto\"><strong>Repuestos</strong></a>.";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de productos";
+    }
+  }
+  applyHeroCopy();
 
   let allProducts = MOCK_PRODUCTS.slice();
   let allCategories = MOCK_CATEGORIES.slice();
@@ -269,13 +334,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadProducts() {
     try {
+      const productsUrl =
+        state.tipo === "equipo" || state.tipo === "repuesto"
+          ? "/api/products?tipo=" + encodeURIComponent(state.tipo)
+          : "/api/products";
       const [catsRes, prodRes, brandRes] = await Promise.all([
         fetchJson("/api/categories"),
-        fetchJson("/api/products"),
+        fetchJson(productsUrl),
         fetchJson("/api/brands"),
       ]);
       const products = Array.isArray(prodRes?.products) ? prodRes.products : null;
-      if (!products || !products.length) throw new Error("empty products");
+      if (!products) throw new Error("empty products");
       allProducts = products.map(normalizeProduct);
       allCategories = Array.isArray(catsRes?.categories)
         ? catsRes.categories
@@ -286,11 +355,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       return allProducts;
     } catch (err) {
       console.warn("[CATALOGO JS] API no disponible — usando MOCK_PRODUCTS", err);
-      allProducts = MOCK_PRODUCTS.slice();
+      allProducts = MOCK_PRODUCTS.slice().filter((p) => {
+        if (!state.tipo) return true;
+        return (p.tipo || (p.sale_mode === "buy" ? "repuesto" : "equipo")) === state.tipo;
+      });
       allCategories = MOCK_CATEGORIES.slice();
       allBrands = MOCK_BRANDS.slice();
       return allProducts;
     }
+  }
+
+  function productTipoOf(prod) {
+    if (prod && (prod.tipo === "repuesto" || prod.tipo === "equipo")) return prod.tipo;
+    return prod && prod.sale_mode === "buy" ? "repuesto" : "equipo";
   }
 
   function normalizeProduct(p) {
@@ -317,13 +394,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const webp = /\.(jpe?g|png)$/i.test(image)
       ? image.replace(/\.(jpe?g|png)$/i, ".webp")
       : prod.image_webp || "";
+    const sale = prod.sale_mode || "quote";
     return {
       id: prod.id,
       slug,
       name,
       sku,
       description: desc,
-      sale_mode: prod.sale_mode || "quote",
+      sale_mode: sale,
+      tipo: productTipoOf({ tipo: prod.tipo, sale_mode: sale }),
       stock_status: prod.stock_status || "on_request",
       price_clp: prod.price_clp ?? null,
       image_url: image,
@@ -343,6 +422,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function writeUrl() {
     try {
       const params = new URLSearchParams();
+      if (state.tipo) params.set("tipo", state.tipo);
       if (state.industry) params.set("industry", state.industry);
       if (state.category) params.set("category", state.category);
       if (state.brand) params.set("brand", state.brand);
@@ -366,6 +446,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       : null;
     return list.filter((p) => {
       if (!p) return false;
+      if (state.tipo && productTipoOf(p) !== state.tipo) return false;
       if (state.category && p.category_slug !== state.category) return false;
       if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
@@ -417,6 +498,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const catsPresent = {};
       base.forEach((p) => {
         if (!p) return;
+        if (state.tipo && productTipoOf(p) !== state.tipo) return;
         if (state.mode && p.sale_mode !== state.mode) return;
         if (state.brand && p.brand_slug !== state.brand) return;
         const ind = INDUSTRIES.find((i) => i.id === state.industry);
@@ -507,8 +589,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (catalogCount) {
       catalogCount.hidden = false;
-      catalogCount.textContent =
-        products.length === 1 ? "1 producto" : products.length + " productos";
+      const noun =
+        state.tipo === "repuesto"
+          ? products.length === 1
+            ? "repuesto"
+            : "repuestos"
+          : state.tipo === "equipo"
+            ? products.length === 1
+              ? "equipo"
+              : "equipos"
+            : products.length === 1
+              ? "producto"
+              : "productos";
+      catalogCount.textContent = products.length + " " + noun;
     }
 
     if (!pageItems.length) {

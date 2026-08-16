@@ -7,6 +7,7 @@
   var brandsCache = [];
   var productsCache = [];
   var selectedCategoryId = null;
+  var productListTipo = "equipo"; // equipo | repuesto
 
   var loginView = document.getElementById("loginView");
   var appView = document.getElementById("appView");
@@ -105,18 +106,25 @@
   function showApp() {
     loginView.hidden = true;
     appView.hidden = false;
-    showTab("products");
+    showTab("equipos");
   }
 
   function showTab(tab) {
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["products", "brands", "clientes", "soluciones", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["equipos", "repuestos", "brands", "clientes", "soluciones", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
-    if (tab === "products") loadProducts();
+    if (tab === "equipos") {
+      productListTipo = "equipo";
+      loadProducts();
+    }
+    if (tab === "repuestos") {
+      productListTipo = "repuesto";
+      loadProducts();
+    }
     if (tab === "brands") loadBrands();
     if (tab === "clientes") loadClientes();
     if (tab === "soluciones") loadSoluciones();
@@ -157,8 +165,19 @@
     return "Bajo pedido";
   }
 
-  function countProductsInCategory(catId) {
+  function productTipoOf(p) {
+    if (p && (p.tipo === "repuesto" || p.tipo === "equipo")) return p.tipo;
+    return p && p.sale_mode === "buy" ? "repuesto" : "equipo";
+  }
+
+  function productsOfCurrentTipo() {
     return productsCache.filter(function (p) {
+      return productTipoOf(p) === productListTipo;
+    });
+  }
+
+  function countProductsInCategory(catId) {
+    return productsOfCurrentTipo().filter(function (p) {
       return String(p.category_id) === String(catId);
     }).length;
   }
@@ -173,9 +192,12 @@
   }
 
   function renderCatSidebar() {
-    var list = document.getElementById("catSidebarList");
+    var listId = productListTipo === "repuesto" ? "catSidebarListRepuestos" : "catSidebarList";
+    var list = document.getElementById(listId);
     if (!list) return;
-    var allCount = productsCache.length;
+    var scoped = productsOfCurrentTipo();
+    var allCount = scoped.length;
+    var label = productListTipo === "repuesto" ? "repuestos" : "equipos";
     var html =
       '<button type="button" class="cat-item' +
       (selectedCategoryId == null ? " is-active" : "") +
@@ -183,7 +205,9 @@
       '<span class="cat-item__name">Todas</span>' +
       '<span class="cat-item__count">' +
       allCount +
-      " productos</span></button>";
+      " " +
+      label +
+      "</span></button>";
     html += categoriesCache
       .map(function (c) {
         var n = countProductsInCategory(c.id);
@@ -198,8 +222,8 @@
           "</span>" +
           '<span class="cat-item__count">' +
           n +
-          " producto" +
-          (n === 1 ? "" : "s") +
+          " " +
+          (n === 1 ? label.replace(/s$/, "") : label) +
           "</span></button>"
         );
       })
@@ -208,36 +232,45 @@
   }
 
   function renderCatalogHead() {
-    var cat = selectedCategory();
-    var title = document.getElementById("catalogTitle");
-    var meta = document.getElementById("catalogMeta");
+    var isRep = productListTipo === "repuesto";
+    var title = document.getElementById(isRep ? "catalogTitleRepuestos" : "catalogTitle");
+    var meta = document.getElementById(isRep ? "catalogMetaRepuestos" : "catalogMeta");
     var editBtn = document.getElementById("editCategoryBtn");
+    if (!title || !meta) return;
+    var cat = selectedCategory();
+    var scoped = productsOfCurrentTipo();
+    var noun = isRep ? "repuestos" : "equipos";
     if (cat) {
       title.textContent = cat.name;
       meta.textContent =
         "Slug: " +
         (cat.slug || "—") +
-        " · Orden: " +
-        (cat.sort_order != null ? cat.sort_order : 0) +
         " · " +
         countProductsInCategory(cat.id) +
-        " productos";
-      editBtn.hidden = false;
+        " " +
+        noun;
+      if (editBtn) editBtn.hidden = isRep;
     } else {
-      title.textContent = "Todos los productos";
-      meta.textContent = productsCache.length + " productos en catálogo";
-      editBtn.hidden = true;
+      title.textContent = isRep ? "Todos los repuestos" : "Todos los equipos";
+      meta.textContent = scoped.length + " " + noun + " en catálogo";
+      if (editBtn) editBtn.hidden = true;
     }
   }
 
   function renderProductRows() {
-    var list = document.getElementById("productsList");
-    var rows = productsCache.filter(function (p) {
+    var list = document.getElementById(
+      productListTipo === "repuesto" ? "repuestosList" : "productsList"
+    );
+    if (!list) return;
+    var rows = productsOfCurrentTipo().filter(function (p) {
       if (selectedCategoryId == null) return true;
       return String(p.category_id) === String(selectedCategoryId);
     });
     if (!rows.length) {
-      list.innerHTML = '<p class="empty-hint">No hay productos en esta categoría.</p>';
+      list.innerHTML =
+        '<p class="empty-hint">No hay ' +
+        (productListTipo === "repuesto" ? "repuestos" : "equipos") +
+        " en esta categoría.</p>";
       return;
     }
     list.innerHTML = rows
@@ -272,9 +305,6 @@
           (p.sale_mode === "buy" ? "chip-buy" : "chip-quote") +
           '">' +
           escapeHtml(p.sale_mode === "buy" ? "Comprar" : "Cotizar") +
-          "</span>" +
-          '<span class="chip">' +
-          escapeHtml(p.tipo === "repuesto" ? "Repuesto" : "Equipo") +
           "</span>" +
           '<span class="chip ' +
           (p.is_active ? "chip-on" : "chip-off") +
@@ -390,7 +420,7 @@
     return PRODUCT_FALLBACKS[idx];
   }
 
-  document.getElementById("catSidebarList").addEventListener("click", function (e) {
+  function onCatSidebarClick(e) {
     var btn = e.target.closest("[data-cat-id]");
     if (!btn) return;
     var id = btn.getAttribute("data-cat-id");
@@ -398,14 +428,17 @@
     renderCatSidebar();
     renderCatalogHead();
     renderProductRows();
-  });
+  }
+  document.getElementById("catSidebarList").addEventListener("click", onCatSidebarClick);
+  var catSidebarRepuestos = document.getElementById("catSidebarListRepuestos");
+  if (catSidebarRepuestos) catSidebarRepuestos.addEventListener("click", onCatSidebarClick);
 
   document.getElementById("editCategoryBtn").addEventListener("click", function () {
     var cat = selectedCategory();
     if (cat) openSimpleDialog("categories", cat);
   });
 
-  document.getElementById("productsList").addEventListener("click", function (e) {
+  function onProductListClick(e) {
     var pick = e.target.getAttribute("data-pick-image");
     var edit = e.target.getAttribute("data-edit-product");
     var del = e.target.getAttribute("data-del-product");
@@ -438,9 +471,9 @@
       });
       return;
     }
-    if (del && confirm("¿Eliminar producto?")) {
+    if (del && confirm(productListTipo === "repuesto" ? "¿Eliminar repuesto?" : "¿Eliminar equipo?")) {
       api("/products/" + del, { method: "DELETE" }).then(function () {
-        showToast("Producto eliminado");
+        showToast(productListTipo === "repuesto" ? "Repuesto eliminado" : "Equipo eliminado");
         loadProducts();
       });
       return;
@@ -458,7 +491,7 @@
           showToast((res.data && res.data.error) || "Error");
           return;
         }
-        showToast(pActive.is_active ? "Producto oculto" : "Producto visible");
+        showToast(pActive.is_active ? "Ítem oculto" : "Ítem visible");
         loadProducts();
       });
       return;
@@ -481,7 +514,10 @@
         loadProducts();
       });
     }
-  });
+  }
+  document.getElementById("productsList").addEventListener("click", onProductListClick);
+  var repuestosListEl = document.getElementById("repuestosList");
+  if (repuestosListEl) repuestosListEl.addEventListener("click", onProductListClick);
 
   function setFormImagePreview(url) {
     var img = document.getElementById("productImagePreview");
@@ -740,8 +776,8 @@
       form.slug.value = product.slug || "";
       form.category_id.value = product.category_id || "";
       form.brand_id.value = product.brand_id || "";
-      form.sale_mode.value = product.sale_mode || "quote";
-      form.tipo.value = product.tipo || (product.sale_mode === "buy" ? "repuesto" : "equipo");
+      form.sale_mode.value = product.sale_mode || (productListTipo === "repuesto" ? "buy" : "quote");
+      form.tipo.value = product.tipo || productListTipo;
       form.stock_status.value = product.stock_status || "on_request";
       form.price_clp.value = product.price_clp != null ? product.price_clp : "";
       form.description.value = product.description || "";
@@ -757,10 +793,17 @@
       form.is_active.checked = coerceBool(product.is_active, true);
     } else {
       form.is_active.checked = true;
-      form.tipo.value = "equipo";
+      form.tipo.value = productListTipo;
+      form.sale_mode.value = productListTipo === "repuesto" ? "buy" : "quote";
       setFormImagePreview("");
     }
-    document.getElementById("productDialogTitle").textContent = product ? "Editar producto" : "Nuevo producto";
+    document.getElementById("productDialogTitle").textContent = product
+      ? productListTipo === "repuesto"
+        ? "Editar repuesto"
+        : "Editar equipo"
+      : productListTipo === "repuesto"
+        ? "Nuevo repuesto"
+        : "Nuevo equipo";
     document.getElementById("productDialog").showModal();
   }
 
@@ -912,12 +955,25 @@
 
   document.getElementById("addProductBtn").addEventListener("click", function () {
     fillSelects().then(function () {
+      productListTipo = "equipo";
       openProductDialog(null);
       if (selectedCategoryId != null) {
         document.getElementById("productForm").category_id.value = selectedCategoryId;
       }
     });
   });
+  var addRepuestoBtn = document.getElementById("addRepuestoBtn");
+  if (addRepuestoBtn) {
+    addRepuestoBtn.addEventListener("click", function () {
+      fillSelects().then(function () {
+        productListTipo = "repuesto";
+        openProductDialog(null);
+        if (selectedCategoryId != null) {
+          document.getElementById("productForm").category_id.value = selectedCategoryId;
+        }
+      });
+    });
+  }
   document.getElementById("productCancel").addEventListener("click", function () {
     document.getElementById("productDialog").close();
   });

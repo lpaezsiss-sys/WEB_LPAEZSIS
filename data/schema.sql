@@ -1,5 +1,12 @@
--- Schema: soluciones (home "Soluciones para tu planta")
--- Máximo 8 activos se aplica en la API de administración.
+-- Schema reference — LPAEZsis
+-- Tabla real de ítems: `products` (a veces referida como "productos").
+
+-- Diferenciación Equipo vs Repuesto:
+-- ALTER TABLE `products`
+--   ADD COLUMN `tipo` ENUM('equipo', 'repuesto') NOT NULL DEFAULT 'equipo' AFTER `id`;
+-- (Si la columna ya existe en otra posición:)
+-- ALTER TABLE `products`
+--   MODIFY COLUMN `tipo` ENUM('equipo', 'repuesto') NOT NULL DEFAULT 'equipo' AFTER `id`;
 
 CREATE TABLE IF NOT EXISTS `soluciones` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
