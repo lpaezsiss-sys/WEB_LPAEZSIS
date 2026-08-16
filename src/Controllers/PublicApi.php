@@ -50,6 +50,10 @@ final class PublicApi
             self::clientes();
             return;
         }
+        if ($method === 'GET' && $path === '/api/soluciones') {
+            self::soluciones();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -130,6 +134,21 @@ final class PublicApi
         $stmt->execute();
         $rows = $stmt->fetchAll();
         Response::json($rows);
+    }
+
+    private static function soluciones(): void
+    {
+        // Contrato público: hasta 8 soluciones activas ordenadas.
+        $stmt = self::pdo()->prepare(
+            'SELECT id, slug, titulo, bullet_1, bullet_2, bullet_3,
+                    cta_texto, cta_url, imagen_url, orden
+             FROM soluciones
+             WHERE activo = 1
+             ORDER BY orden ASC, titulo ASC
+             LIMIT 8'
+        );
+        $stmt->execute();
+        Response::json($stmt->fetchAll());
     }
 
     private static function brandDetail(string $slug): void

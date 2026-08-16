@@ -112,13 +112,14 @@
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["products", "brands", "clientes", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["products", "brands", "clientes", "soluciones", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
     if (tab === "products") loadProducts();
     if (tab === "brands") loadBrands();
     if (tab === "clientes") loadClientes();
+    if (tab === "soluciones") loadSoluciones();
     if (tab === "orders") loadOrders();
     if (tab === "quotes") loadQuotes();
     if (tab === "contacts") loadContacts();
@@ -1208,6 +1209,234 @@
         showToast("Cliente eliminado");
         if (document.getElementById("clienteId").value === String(delId)) resetClienteForm();
         loadClientes();
+      });
+    }
+  });
+
+  var solucionesCache = [];
+
+  function setSolucionImagenPreview(url) {
+    var wrap = document.getElementById("solucionImagenPreviewWrap");
+    var img = document.getElementById("solucionImagenPreview");
+    var field = document.getElementById("solucionImagenUrl");
+    if (field) field.value = url || "";
+    if (!wrap || !img) return;
+    if (url) {
+      wrap.hidden = false;
+      img.src = url;
+    } else {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+    }
+  }
+
+  function resetSolucionForm() {
+    var form = document.getElementById("formSolucion");
+    if (!form) return;
+    form.reset();
+    document.getElementById("solucionId").value = "";
+    document.getElementById("solucionOrden").value = "0";
+    document.getElementById("solucionActivo").checked = true;
+    document.getElementById("solucionImagen").value = "";
+    setSolucionImagenPreview("");
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("solucionSaveBtn").textContent = "Guardar Solución";
+  }
+
+  function loadSoluciones() {
+    api("/soluciones").then(function (res) {
+      var tbody = document.getElementById("adminSolucionesList");
+      if (!tbody) return;
+      var items = (res.data && res.data.soluciones) || [];
+      solucionesCache = items;
+      if (!items.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="empty-hint">No hay soluciones registradas.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (s) {
+          var active = coerceBool(s.activo, true);
+          var img = s.imagen_url || "/img/brand/logo-mark.png";
+          return (
+            '<tr data-solucion-id="' +
+            escapeAttr(s.id) +
+            '">' +
+            '<td><img class="admin-table__logo" src="' +
+            escapeAttr(img) +
+            '" alt="" width="72" height="36" loading="lazy"></td>' +
+            "<td>" +
+            escapeHtml(s.titulo) +
+            "</td>" +
+            "<td><code>" +
+            escapeHtml(s.slug) +
+            "</code></td>" +
+            "<td>" +
+            escapeHtml(s.orden != null ? s.orden : 0) +
+            "</td>" +
+            '<td><span class="chip ' +
+            (active ? "chip-on" : "chip-off") +
+            '">' +
+            (active ? "Activo" : "Off") +
+            "</span></td>" +
+            '<td class="admin-table__actions">' +
+            '<button type="button" data-edit-solucion="' +
+            escapeAttr(s.id) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-solucion="' +
+            escapeAttr(s.id) +
+            '">' +
+            (active ? "Ocultar" : "Mostrar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-solucion="' +
+            escapeAttr(s.id) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  function uploadSolucionImagen(file) {
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "image");
+    return api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        return Promise.reject((res.data && res.data.error) || "No se pudo subir la imagen");
+      }
+      return (res.data && res.data.url) || "";
+    });
+  }
+
+  document.getElementById("solucionResetBtn").addEventListener("click", function () {
+    resetSolucionForm();
+  });
+
+  document.getElementById("solucionImagen").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    if (!file) return;
+    uploadSolucionImagen(file)
+      .then(function (url) {
+        setSolucionImagenPreview(url);
+        showToast("Imagen subida");
+      })
+      .catch(function (msg) {
+        err.hidden = false;
+        err.textContent = msg;
+        showToast(msg);
+      });
+  });
+
+  document.getElementById("formSolucion").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    var id = document.getElementById("solucionId").value.trim();
+    var body = {
+      titulo: document.getElementById("solucionTitulo").value.trim(),
+      slug: document.getElementById("solucionSlug").value.trim(),
+      bullet_1: document.getElementById("solucionBullet1").value.trim(),
+      bullet_2: document.getElementById("solucionBullet2").value.trim(),
+      bullet_3: document.getElementById("solucionBullet3").value.trim(),
+      cta_texto: document.getElementById("solucionCtaTexto").value.trim(),
+      cta_url: document.getElementById("solucionCtaUrl").value.trim(),
+      orden: Number(document.getElementById("solucionOrden").value) || 0,
+      activo: document.getElementById("solucionActivo").checked,
+      imagen_url: document.getElementById("solucionImagenUrl").value.trim(),
+    };
+    var fileInput = document.getElementById("solucionImagen");
+    var file = fileInput.files && fileInput.files[0];
+
+    function save(imagen) {
+      body.imagen_url = imagen || body.imagen_url || null;
+      var req = id
+        ? api("/soluciones/" + id, { method: "PUT", body: body })
+        : api("/soluciones", { method: "POST", body: body });
+      return req.then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo guardar";
+          return Promise.reject();
+        }
+        showToast(id ? "Solución actualizada" : "Solución creada");
+        resetSolucionForm();
+        loadSoluciones();
+      });
+    }
+
+    var chain = Promise.resolve(body.imagen_url);
+    if (file) {
+      chain = uploadSolucionImagen(file);
+    }
+
+    chain
+      .then(function (url) {
+        return save(url || body.imagen_url);
+      })
+      .catch(function (msg) {
+        if (typeof msg === "string") {
+          err.hidden = false;
+          err.textContent = msg;
+        }
+      });
+  });
+
+  document.getElementById("adminSolucionesList").addEventListener("click", function (e) {
+    var editId = e.target.getAttribute("data-edit-solucion");
+    var delId = e.target.getAttribute("data-del-solucion");
+    var toggleId = e.target.getAttribute("data-toggle-solucion");
+    if (editId) {
+      var item = solucionesCache.find(function (s) {
+        return String(s.id) === String(editId);
+      });
+      if (!item) return;
+      document.getElementById("solucionId").value = item.id;
+      document.getElementById("solucionTitulo").value = item.titulo || "";
+      document.getElementById("solucionSlug").value = item.slug || "";
+      document.getElementById("solucionBullet1").value = item.bullet_1 || "";
+      document.getElementById("solucionBullet2").value = item.bullet_2 || "";
+      document.getElementById("solucionBullet3").value = item.bullet_3 || "";
+      document.getElementById("solucionCtaTexto").value = item.cta_texto || "";
+      document.getElementById("solucionCtaUrl").value = item.cta_url || "";
+      document.getElementById("solucionOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("solucionActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("solucionImagen").value = "";
+      setSolucionImagenPreview(item.imagen_url || "");
+      document.getElementById("solucionSaveBtn").textContent = "Actualizar Solución";
+      document.getElementById("formSolucion").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (toggleId) {
+      var row = solucionesCache.find(function (s) {
+        return String(s.id) === String(toggleId);
+      });
+      if (!row) return;
+      var next = !coerceBool(row.activo, true);
+      api("/soluciones/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo actualizar");
+          return;
+        }
+        showToast(next ? "Solución visible" : "Solución oculta");
+        loadSoluciones();
+      });
+      return;
+    }
+    if (delId && confirm("¿Eliminar esta solución?")) {
+      api("/soluciones/" + delId, { method: "DELETE" }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo eliminar");
+          return;
+        }
+        showToast("Solución eliminada");
+        if (document.getElementById("solucionId").value === String(delId)) resetSolucionForm();
+        loadSoluciones();
       });
     }
   });

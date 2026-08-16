@@ -105,6 +105,26 @@ final class AdminApi
             return;
         }
 
+        if ($method === 'GET' && $sub === '/soluciones') {
+            $rows = self::pdo()->query(
+                'SELECT * FROM soluciones ORDER BY orden ASC, titulo ASC'
+            )->fetchAll();
+            Response::json(['soluciones' => $rows]);
+            return;
+        }
+        if ($method === 'POST' && $sub === '/soluciones') {
+            self::createSolucion();
+            return;
+        }
+        if ($method === 'PUT' && preg_match('#^/soluciones/(\d+)$#', $sub, $m)) {
+            self::updateSolucion((int) $m[1]);
+            return;
+        }
+        if ($method === 'DELETE' && preg_match('#^/soluciones/(\d+)$#', $sub, $m)) {
+            self::deleteSolucion((int) $m[1]);
+            return;
+        }
+
         if ($method === 'GET' && $sub === '/products') {
             $rows = self::pdo()->query(
                 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -435,6 +455,190 @@ final class AdminApi
     private static function deleteCliente(int $id): void
     {
         self::pdo()->prepare('DELETE FROM clientes WHERE id = ?')->execute([$id]);
+        Response::json(['ok' => true]);
+    }
+
+    private const SOLUCIONES_MAX_ACTIVAS = 8;
+
+    private static function countSolucionesActivas(?int $excludeId = null): int
+    {
+        if ($excludeId) {
+            $stmt = self::pdo()->prepare(
+                'SELECT COUNT(*) FROM soluciones WHERE activo = 1 AND id <> ?'
+            );
+            $stmt->execute([$excludeId]);
+            return (int) $stmt->fetchColumn();
+        }
+        return (int) self::pdo()->query(
+            'SELECT COUNT(*) FROM soluciones WHERE activo = 1'
+        )->fetchColumn();
+    }
+
+    private static function normalizeSolucionPayload(array $b, ?int $id = null): array
+    {
+        $titulo = trim((string) ($b['titulo'] ?? $b['title'] ?? $b['name'] ?? ''));
+        $slugIn = trim((string) ($b['slug'] ?? ''));
+        $slug = $slugIn !== ''
+            ? Slug::make($slugIn)
+            : ($titulo !== ''
+                ? Slug::unique($titulo, function (string $candidate) use ($id): bool {
+                    $sql = 'SELECT id FROM soluciones WHERE slug = ?';
+                    $params = [$candidate];
+                    if ($id) {
+                        $sql .= ' AND id <> ?';
+                        $params[] = $id;
+                    }
+                    $sql .= ' LIMIT 1';
+                    $stmt = self::pdo()->prepare($sql);
+                    $stmt->execute($params);
+                    return (bool) $stmt->fetch();
+                })
+                : '');
+
+        $activo = array_key_exists('activo', $b)
+            ? (!empty($b['activo']) ? 1 : 0)
+            : (array_key_exists('is_active', $b) ? (!empty($b['is_active']) ? 1 : 0) : null);
+
+        return [
+            'slug' => $slug,
+            'titulo' => $titulo,
+            'bullet_1' => self::nullableString($b['bullet_1'] ?? null),
+            'bullet_2' => self::nullableString($b['bullet_2'] ?? null),
+            'bullet_3' => self::nullableString($b['bullet_3'] ?? null),
+            'cta_texto' => self::nullableString($b['cta_texto'] ?? null),
+            'cta_url' => self::nullableString($b['cta_url'] ?? null),
+            'imagen_url' => self::nullableString($b['imagen_url'] ?? $b['image_url'] ?? null),
+            'orden' => (int) ($b['orden'] ?? $b['sort_order'] ?? 0),
+            'activo' => $activo,
+        ];
+    }
+
+    private static function nullableString($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $s = trim((string) $value);
+        return $s === '' ? null : $s;
+    }
+
+    private static function createSolucion(): void
+    {
+        $raw = self::body();
+        $b = self::normalizeSolucionPayload($raw);
+        if ($b['titulo'] === '' || $b['slug'] === '') {
+            Response::error('titulo (y slug) son requeridos');
+            return;
+        }
+        $activo = $b['activo'] === null ? 1 : $b['activo'];
+        if ($activo === 1 && self::countSolucionesActivas() >= self::SOLUCIONES_MAX_ACTIVAS) {
+            Response::error('Máximo ' . self::SOLUCIONES_MAX_ACTIVAS . ' soluciones activas');
+            return;
+        }
+        try {
+            self::pdo()->prepare(
+                'INSERT INTO soluciones
+                  (slug, titulo, bullet_1, bullet_2, bullet_3, cta_texto, cta_url, imagen_url, orden, activo)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            )->execute([
+                $b['slug'],
+                $b['titulo'],
+                $b['bullet_1'],
+                $b['bullet_2'],
+                $b['bullet_3'],
+                $b['cta_texto'],
+                $b['cta_url'],
+                $b['imagen_url'],
+                $b['orden'],
+                $activo,
+            ]);
+        } catch (\PDOException $e) {
+            if ((int) $e->getCode() === 23000 || strpos($e->getMessage(), 'Duplicate') !== false) {
+                Response::error('El slug ya existe', 409);
+                return;
+            }
+            throw $e;
+        }
+        Response::json(['id' => (int) self::pdo()->lastInsertId()]);
+    }
+
+    private static function updateSolucion(int $id): void
+    {
+        $raw = self::body();
+        $existing = self::pdo()->prepare('SELECT * FROM soluciones WHERE id = ? LIMIT 1');
+        $existing->execute([$id]);
+        $row = $existing->fetch();
+        if (!$row) {
+            Response::error('Solución no encontrada', 404);
+            return;
+        }
+
+        $merged = array_merge($row, $raw);
+        if (isset($raw['title']) && !isset($raw['titulo'])) {
+            $merged['titulo'] = $raw['title'];
+        }
+        if (isset($raw['name']) && !isset($raw['titulo'])) {
+            $merged['titulo'] = $raw['name'];
+        }
+        if (isset($raw['image_url']) && !isset($raw['imagen_url'])) {
+            $merged['imagen_url'] = $raw['image_url'];
+        }
+        if (isset($raw['sort_order']) && !isset($raw['orden'])) {
+            $merged['orden'] = $raw['sort_order'];
+        }
+        if (array_key_exists('is_active', $raw) && !array_key_exists('activo', $raw)) {
+            $merged['activo'] = !empty($raw['is_active']) ? 1 : 0;
+        }
+
+        $b = self::normalizeSolucionPayload($merged, $id);
+        if ($b['titulo'] === '' || $b['slug'] === '') {
+            Response::error('titulo (y slug) son requeridos');
+            return;
+        }
+
+        $activo = $b['activo'] === null ? (int) $row['activo'] : $b['activo'];
+        if ($activo === 1 && self::countSolucionesActivas($id) >= self::SOLUCIONES_MAX_ACTIVAS) {
+            Response::error('Máximo ' . self::SOLUCIONES_MAX_ACTIVAS . ' soluciones activas');
+            return;
+        }
+
+        try {
+            self::pdo()->prepare(
+                'UPDATE soluciones SET
+                  slug = ?, titulo = ?, bullet_1 = ?, bullet_2 = ?, bullet_3 = ?,
+                  cta_texto = ?, cta_url = ?, imagen_url = ?, orden = ?, activo = ?
+                 WHERE id = ?'
+            )->execute([
+                $b['slug'],
+                $b['titulo'],
+                $b['bullet_1'],
+                $b['bullet_2'],
+                $b['bullet_3'],
+                $b['cta_texto'],
+                $b['cta_url'],
+                $b['imagen_url'],
+                $b['orden'],
+                $activo,
+                $id,
+            ]);
+        } catch (\PDOException $e) {
+            if ((int) $e->getCode() === 23000 || strpos($e->getMessage(), 'Duplicate') !== false) {
+                Response::error('El slug ya existe', 409);
+                return;
+            }
+            throw $e;
+        }
+
+        // Partial toggle-only updates (activo alone) already covered by merge above.
+        // If only activo/orden sent without titulo, normalize still has titulo from row.
+        $stmt = self::pdo()->prepare('SELECT * FROM soluciones WHERE id = ?');
+        $stmt->execute([$id]);
+        Response::json($stmt->fetch() ?: ['ok' => true]);
+    }
+
+    private static function deleteSolucion(int $id): void
+    {
+        self::pdo()->prepare('DELETE FROM soluciones WHERE id = ?')->execute([$id]);
         Response::json(['ok' => true]);
     }
 

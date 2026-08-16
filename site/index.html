@@ -290,22 +290,12 @@
         } catch (e) { /* keep static JSON-LD */ }
       }
 
-      function solutionBlurb(slug) {
-        var map = {
-          secadores: ["Secado de botellas y envases", "Túneles y cabinas de soplado", "Sistemas food & beverage"],
-          "turbinas-soplado": ["Sopladores centrífugos Sonic", "Portátiles y fijos", "Repuestos de transmisión"],
-          "cuchillos-aire": ["Air knives industriales", "Manifolds y toberas", "Control de recubrimiento"],
-          repuestos: ["Correas y filtros", "Silenciadores y HEPA", "Piezas de mantención"],
-          "fin-de-linea": ["Integración en conveyor", "Soplado post-llenado", "Soluciones a medida"],
-          "salas-limpias": ["Aire filtrado", "Aplicaciones sanitarias", "Sistemas de bajo particulado"]
-        };
-        return map[slug] || ["Equipos industriales", "Accesorios y repuestos", "Soporte de aplicación"];
-      }
-
-      function categoryPicture(srcJpg, alt) {
+      function solutionPicture(src, alt) {
+        var srcJpg = src || "img/hero/plant.jpg";
+        if (srcJpg.charAt(0) === "/") srcJpg = srcJpg.slice(1);
         var webp = String(srcJpg || "").replace(/\.(jpe?g|png)$/i, ".webp");
         return (
-          '<picture>' +
+          "<picture>" +
           '<source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">' +
           '<img src="' + Lpaez.escapeHtml(srcJpg) + '" alt="' + Lpaez.escapeHtml(alt) +
           '" title="' + Lpaez.escapeHtml(alt) +
@@ -314,49 +304,51 @@
         );
       }
 
-      function renderSolutions(cats) {
+      function renderSolutions(items) {
         var tabs = document.getElementById("solutionsTabs");
         var panels = document.getElementById("solutionsPanels");
-        if (!cats.length) {
+        if (!items || !items.length) {
           tabs.innerHTML = "";
           panels.innerHTML = "<p class='empty-state'>Pronto publicaremos las soluciones.</p>";
           return;
         }
-        tabs.innerHTML = cats.map(function (c, i) {
-          var id = "sol-tab-" + c.slug;
-          var panelId = "sol-panel-" + c.slug;
+        tabs.innerHTML = items.map(function (s, i) {
+          var id = "sol-tab-" + s.slug;
+          var panelId = "sol-panel-" + s.slug;
           return (
             '<button type="button" class="solutions-tab' + (i === 0 ? " is-active" : "") +
             '" role="tab" id="' + id + '" aria-controls="' + panelId +
             '" aria-selected="' + (i === 0 ? "true" : "false") +
             '" tabindex="' + (i === 0 ? "0" : "-1") +
-            '" data-tab="' + Lpaez.escapeHtml(c.slug) + '">' +
-            Lpaez.escapeHtml(c.name) +
+            '" data-tab="' + Lpaez.escapeHtml(s.slug) + '">' +
+            Lpaez.escapeHtml(s.titulo) +
             "</button>"
           );
         }).join("");
-        panels.innerHTML = cats.map(function (c, i) {
-          var bg = Lpaez.resolveCategoryImage(c.slug);
-          var items = solutionBlurb(c.slug).map(function (t) {
+        panels.innerHTML = items.map(function (s, i) {
+          var bullets = [s.bullet_1, s.bullet_2, s.bullet_3].filter(Boolean);
+          var itemsHtml = bullets.map(function (t) {
             return "<li><span class='bullet' aria-hidden='true'>→</span><span>" + Lpaez.escapeHtml(t) + "</span></li>";
           }).join("");
+          var ctaText = s.cta_texto || ("Ver catálogo " + (s.titulo || ""));
+          var ctaUrl = s.cta_url || ("catalogo.html?category=" + encodeURIComponent(s.slug));
           var active = i === 0;
           return (
             '<div class="solutions-panel' + (active ? " is-active" : "") +
-            '" id="sol-panel-' + Lpaez.escapeHtml(c.slug) +
-            '" role="tabpanel" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(c.slug) +
-            '" data-panel="' + Lpaez.escapeHtml(c.slug) + '"' +
+            '" id="sol-panel-' + Lpaez.escapeHtml(s.slug) +
+            '" role="tabpanel" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(s.slug) +
+            '" data-panel="' + Lpaez.escapeHtml(s.slug) + '"' +
             (active ? "" : " hidden") + ">" +
             '<div class="solutions-panel-content">' +
-            "<h3>" + Lpaez.escapeHtml(c.name) + "</h3>" +
-            '<ul class="solutions-list">' + items + "</ul>" +
-            '<a class="btn btn-outline" href="catalogo.html?category=' +
-            encodeURIComponent(c.slug) +
-            '">Ver catálogo ' +
-            Lpaez.escapeHtml(c.name) +
+            "<h3>" + Lpaez.escapeHtml(s.titulo) + "</h3>" +
+            (itemsHtml ? '<ul class="solutions-list">' + itemsHtml + "</ul>" : "") +
+            '<a class="btn btn-outline" href="' + Lpaez.escapeHtml(ctaUrl) + '">' +
+            Lpaez.escapeHtml(ctaText) +
             "</a>" +
             "</div>" +
-            '<div class="solutions-panel-media">' + categoryPicture(bg, c.name) + "</div>" +
+            '<div class="solutions-panel-media">' +
+            solutionPicture(s.imagen_url, s.titulo) +
+            "</div>" +
             "</div>"
           );
         }).join("");
@@ -439,14 +431,15 @@
 
       Promise.all([
         Lpaez.api("/api/brands"),
-        Lpaez.api("/api/categories"),
+        Lpaez.api("/api/soluciones"),
         Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
-        var cats = (results[1].data && results[1].data.categories) || [];
+        var rawSol = results[1].data;
+        var soluciones = Array.isArray(rawSol) ? rawSol : (rawSol && rawSol.soluciones) || [];
         var products = (results[2].data && results[2].data.products) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
-        renderSolutions(cats);
+        renderSolutions(soluciones);
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
@@ -454,6 +447,7 @@
           '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
         Lpaez.observeReveals();
       }).catch(function () {
+        renderSolutions([]);
         document.getElementById("homeProducts").innerHTML =
           '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
         Lpaez.observeReveals();

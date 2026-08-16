@@ -12,6 +12,8 @@ Thumbs.db
 !data/lpaezsis_bluehosting.sql
 !data/lpaezsis.sqlite
 !data/2026-08-15_clientes.sql
+!data/2026-08-16_soluciones.sql
+!data/schema.sql
 
 # Local / secrets
 .env
