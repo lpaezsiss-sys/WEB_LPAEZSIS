@@ -1501,40 +1501,48 @@ body.nav-open {
 .product-card {
   display: flex;
   flex-direction: column;
-  background: var(--white);
-  border: 1px solid var(--line);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
   min-height: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .product-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-soft);
-  border-color: var(--line-strong);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
+.product-card__media,
 .product-card-visual {
-  aspect-ratio: 1 / 1;
-  background: var(--product-bg);
-  display: grid;
-  place-items: center;
+  position: relative;
+  height: 200px;
+  background: #ffffff;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--muted);
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   overflow: hidden;
-  border-bottom: 1px solid var(--line);
-  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
+.product-card__media img,
 .product-card-visual img {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   transition: transform 0.35s ease;
 }
 
+.product-card:hover .product-card__media img,
 .product-card:hover .product-card-visual img {
   transform: scale(1.03);
 }
@@ -1563,6 +1571,29 @@ body.nav-open {
   flex-wrap: wrap;
   gap: 0.4rem;
   align-items: center;
+}
+
+/* Badge flotante de tipo de venta */
+.badge-type {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-type--cotizar {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.badge-type--comprar {
+  background-color: #dcfce7;
+  color: #16a34a;
 }
 
 .badge-mode {
@@ -2194,10 +2225,63 @@ body.nav-open {
 }
 
 .catalog-toolbar {
-  background: var(--off-white);
-  border-bottom: 1px solid var(--line);
-  padding-top: 0.85rem;
-  padding-bottom: 0.35rem;
+  background: transparent;
+  border-bottom: none;
+  padding: 1.25rem 1.25rem 0.35rem;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+/* Barra de filtros limpia y unificada */
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  color: #1e293b;
+  outline: none;
+  width: 100%;
+  min-height: 2.5rem;
+  font: inherit;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  border-color: #dc2626;
+}
+
+.filter-select:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.35);
+  outline-offset: 2px;
 }
 
 .catalog-toolbar__row {

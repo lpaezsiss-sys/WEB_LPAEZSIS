@@ -176,10 +176,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const loader = document.getElementById("catalogLoader");
-  const industryTabs = document.getElementById("industryTabs");
-  const filterChips = document.getElementById("filterChips");
-  const modeChips = document.getElementById("modeChips");
+  const industrySelect = document.getElementById("industryFilter");
+  const categorySelect = document.getElementById("categoryFilter");
   const brandSelect = document.getElementById("brandFilter");
+  const modeSelect = document.getElementById("modeFilter");
   const catalogCount = document.getElementById("catalogCount");
   const pager = document.getElementById("catalogPager");
   const ldScript = document.getElementById("catalogItemListLd");
@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = Array.from({ length: 6 }, () => {
       return (
         '<article class="product-card catalog-card skeleton-card" aria-hidden="true">' +
-        '<div class="product-card-visual skeleton-block"></div>' +
+        '<div class="product-card__media skeleton-block"></div>' +
         '<div class="product-card-body">' +
         '<div class="skeleton-line short"></div>' +
         '<div class="skeleton-line"></div>' +
@@ -390,10 +390,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
     return (
       `<article class="product-card catalog-card reveal">` +
-      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${picture}</a>` +
+      `<a class="product-card__media product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">` +
+      `<span class="badge-type ${sale === "buy" ? "badge-type--comprar" : "badge-type--cotizar"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span>` +
+      `${picture}</a>` +
       `<div class="product-card-body">` +
-      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>` +
-      `<span class="badge-mode ${sale === "buy" ? "badge-buy" : "badge-quote"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span></div>` +
+      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span></div>` +
       `<h3><a href="producto.html?slug=${encodeURIComponent(slug)}">${escapeHtml(name)}</a></h3>` +
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
       `<div class="product-card-actions catalog-card-actions">` +
@@ -404,20 +405,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderFilters() {
-    if (industryTabs) {
-      industryTabs.innerHTML =
-        `<button type="button" class="industry-tab${!state.industry ? " is-active" : ""}" data-industry="" aria-selected="${!state.industry}">Todas</button>` +
+    if (industrySelect) {
+      industrySelect.innerHTML =
+        `<option value="">Todas</option>` +
         INDUSTRIES.map((ind) => {
-          const on = state.industry === ind.id;
-          return `<button type="button" class="industry-tab${on ? " is-active" : ""}" data-industry="${escapeAttr(ind.id)}" aria-selected="${on}">${escapeHtml(ind.label)}</button>`;
+          return `<option value="${escapeAttr(ind.id)}"${state.industry === ind.id ? " selected" : ""}>${escapeHtml(ind.label)}</option>`;
         }).join("");
     }
-    if (filterChips) {
-      const used = {};
-      filtered().forEach((p) => {
-        if (p?.category_slug) used[p.category_slug] = true;
-      });
-      // show categories from all data for current industry/mode/brand context base list
+    if (categorySelect) {
       const base = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
       const catsPresent = {};
       base.forEach((p) => {
@@ -432,12 +427,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
         name: catsPresent[slug],
       }));
-      filterChips.innerHTML =
-        `<button type="button" class="filter-chip${!state.category ? " is-active" : ""}" data-cat="" aria-pressed="${!state.category}">Todas</button>` +
+      categorySelect.innerHTML =
+        `<option value="">Todas</option>` +
         catList
           .map((c) => {
-            const on = state.category === c.slug;
-            return `<button type="button" class="filter-chip${on ? " is-active" : ""}" data-cat="${escapeAttr(c.slug)}" aria-pressed="${on}">${escapeHtml(c.name)}</button>`;
+            return `<option value="${escapeAttr(c.slug)}"${state.category === c.slug ? " selected" : ""}>${escapeHtml(c.name)}</option>`;
           })
           .join("");
     }
@@ -452,12 +446,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
           .join("");
     }
-    if (modeChips) {
-      modeChips.querySelectorAll(".filter-chip").forEach((chip) => {
-        const on = chip.getAttribute("data-mode") === state.mode;
-        chip.classList.toggle("is-active", on);
-        chip.setAttribute("aria-pressed", on ? "true" : "false");
-      });
+    if (modeSelect) {
+      modeSelect.value = state.mode || "";
     }
   }
 
@@ -548,25 +538,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function bindUi() {
-    industryTabs?.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-industry]");
-      if (!btn) return;
-      state.industry = btn.getAttribute("data-industry") || "";
+    industrySelect?.addEventListener("change", () => {
+      state.industry = industrySelect.value || "";
       state.category = "";
       state.page = 1;
       renderGrid();
     });
-    filterChips?.addEventListener("click", (e) => {
-      const chip = e.target.closest(".filter-chip");
-      if (!chip) return;
-      state.category = chip.getAttribute("data-cat") || "";
+    categorySelect?.addEventListener("change", () => {
+      state.category = categorySelect.value || "";
       state.page = 1;
       renderGrid();
     });
-    modeChips?.addEventListener("click", (e) => {
-      const chip = e.target.closest(".filter-chip");
-      if (!chip) return;
-      state.mode = chip.getAttribute("data-mode") || "";
+    modeSelect?.addEventListener("change", () => {
+      state.mode = modeSelect.value || "";
       state.page = 1;
       renderGrid();
     });
