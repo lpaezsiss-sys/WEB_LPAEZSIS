@@ -658,9 +658,9 @@ final class AdminApi
         });
         self::pdo()->prepare(
             'INSERT INTO products
-             (category_id, brand_id, slug, name, description, sale_mode, stock_status, price_clp, image_url,
+             (category_id, brand_id, slug, name, description, sale_mode, tipo, stock_status, price_clp, image_url,
               is_featured, is_active, seo_title, seo_description, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
             $categoryId,
             isset($b['brand_id']) && $b['brand_id'] !== '' && $b['brand_id'] !== null ? (int) $b['brand_id'] : null,
@@ -668,6 +668,7 @@ final class AdminApi
             $name,
             $b['description'] ?? null,
             $b['sale_mode'] ?? 'quote',
+            self::normalizeProductTipo($b),
             $b['stock_status'] ?? 'on_request',
             array_key_exists('price_clp', $b) && $b['price_clp'] !== null && $b['price_clp'] !== ''
                 ? (int) $b['price_clp'] : null,
@@ -679,6 +680,17 @@ final class AdminApi
             (int) ($b['sort_order'] ?? 100),
         ]);
         Response::json(['id' => (int) self::pdo()->lastInsertId(), 'slug' => $slug]);
+    }
+
+    private static function normalizeProductTipo(array $b): string
+    {
+        $tipo = strtolower(trim((string) ($b['tipo'] ?? '')));
+        if ($tipo === 'repuesto' || $tipo === 'equipo') {
+            return $tipo;
+        }
+        // Inferencia desde sale_mode si no viene tipo.
+        $mode = (string) ($b['sale_mode'] ?? 'quote');
+        return $mode === 'buy' ? 'repuesto' : 'equipo';
     }
 
     private static function updateProduct(int $id): void
@@ -697,8 +709,11 @@ final class AdminApi
         if (array_key_exists('price_clp', $b) && $b['price_clp'] === '') {
             $b['price_clp'] = null;
         }
+        if (array_key_exists('tipo', $b) || array_key_exists('sale_mode', $b)) {
+            $b['tipo'] = self::normalizeProductTipo($b);
+        }
         $fields = [
-            'category_id', 'brand_id', 'slug', 'name', 'description', 'sale_mode', 'stock_status',
+            'category_id', 'brand_id', 'slug', 'name', 'description', 'sale_mode', 'tipo', 'stock_status',
             'price_clp', 'image_url', 'is_featured', 'is_active', 'seo_title', 'seo_description', 'sort_order',
         ];
         $sets = ['updated_at = NOW()'];

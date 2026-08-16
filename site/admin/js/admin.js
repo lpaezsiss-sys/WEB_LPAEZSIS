@@ -273,6 +273,9 @@
           '">' +
           escapeHtml(p.sale_mode === "buy" ? "Comprar" : "Cotizar") +
           "</span>" +
+          '<span class="chip">' +
+          escapeHtml(p.tipo === "repuesto" ? "Repuesto" : "Equipo") +
+          "</span>" +
           '<span class="chip ' +
           (p.is_active ? "chip-on" : "chip-off") +
           '">' +
@@ -738,6 +741,7 @@
       form.category_id.value = product.category_id || "";
       form.brand_id.value = product.brand_id || "";
       form.sale_mode.value = product.sale_mode || "quote";
+      form.tipo.value = product.tipo || (product.sale_mode === "buy" ? "repuesto" : "equipo");
       form.stock_status.value = product.stock_status || "on_request";
       form.price_clp.value = product.price_clp != null ? product.price_clp : "";
       form.description.value = product.description || "";
@@ -753,6 +757,7 @@
       form.is_active.checked = coerceBool(product.is_active, true);
     } else {
       form.is_active.checked = true;
+      form.tipo.value = "equipo";
       setFormImagePreview("");
     }
     document.getElementById("productDialogTitle").textContent = product ? "Editar producto" : "Nuevo producto";
@@ -926,6 +931,7 @@
       category_id: Number(form.category_id.value),
       brand_id: form.brand_id.value ? Number(form.brand_id.value) : null,
       sale_mode: form.sale_mode.value,
+      tipo: form.tipo.value,
       stock_status: form.stock_status.value,
       price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
       description: form.description.value,

@@ -271,6 +271,7 @@ CREATE TABLE `products` (
   `name` varchar(300) NOT NULL,
   `description` text DEFAULT NULL,
   `sale_mode` enum('buy','quote') NOT NULL DEFAULT 'quote',
+  `tipo` enum('equipo','repuesto') NOT NULL DEFAULT 'equipo',
   `stock_status` enum('in_stock','on_request','out_of_stock','discontinued') NOT NULL DEFAULT 'on_request',
   `price_clp` int(11) DEFAULT NULL,
   `image_url` varchar(500) DEFAULT NULL,
