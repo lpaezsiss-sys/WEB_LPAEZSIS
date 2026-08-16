@@ -12,40 +12,37 @@
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=95">
+  <link rel="stylesheet" href="css/style.css?v=96">
 </head>
 <body>
   <div id="site-header-mount"></div>
   <main id="main">
-    <div class="page-hero page-hero--compact">
-      <div class="page-hero-inner">
-        <h1 id="brandsTitle">Representaciones y Distribución</h1>
-        <p id="brandsLead">Socios tecnológicos para soplado, packaging, movimiento y control de calidad.</p>
+    <header class="brand-hero" aria-labelledby="brandsTitle">
+      <div class="brand-hero__inner">
+        <h1 class="brand-hero__title" id="brandsTitle">Representaciones y Distribución</h1>
+        <p class="brand-hero__description" id="brandsLead">Socios tecnológicos para soplado, packaging, movimiento y control de calidad.</p>
       </div>
-    </div>
-    <section class="section">
-      <div class="brand-selector-grid mb-lg" id="brandsList"></div>
+    </header>
+
+    <div class="brand-content-wrapper">
+      <div class="brand-selector-grid" id="brandsList"></div>
+
       <div id="brandDetail" hidden>
-        <div class="brand-catalog-head">
-          <img id="brandLogo" class="brand-catalog-logo" alt="" hidden>
-          <div>
-            <h2 id="brandName"></h2>
-            <p id="brandDesc"></p>
-          </div>
-        </div>
+        <img id="brandLogo" class="brand-catalog-logo" alt="" hidden>
         <div class="brand-catalog-body" id="brandContent"></div>
         <div class="brand-gallery" id="brandGallery" hidden></div>
-        <div class="section-head is-left stack-xl">
+
+        <section class="brand-products-section" aria-labelledby="brandProductsTitle">
           <h2 id="brandProductsTitle">Productos y equipos</h2>
           <p id="brandProductsLead">Disponibles para cotizar o comprar según el ítem.</p>
-        </div>
-        <div class="product-grid" id="brandProducts"></div>
-        <div class="section-actions is-start">
-          <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
-          <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
-        </div>
+          <div class="product-grid" id="brandProducts"></div>
+          <div class="section-actions is-start">
+            <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
+            <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
+          </div>
+        </section>
       </div>
-    </section>
+    </div>
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
@@ -113,15 +110,9 @@
         var products = r.data.products || [];
         document.title = brand.name + " | LPAEZsis";
         document.getElementById("brandsTitle").textContent = brand.name;
-        document.getElementById("brandsLead").textContent = brand.description || "";
-        document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandName").textContent = brand.name;
-        document.getElementById("brandDesc").textContent =
+        document.getElementById("brandsLead").textContent =
           brand.description || "Productos e información de la representación.";
-        // Show name/desc in the catalog head when there is no rich HTML body.
-        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
-        document.getElementById("brandName").hidden = hasHtml;
-        document.getElementById("brandDesc").hidden = hasHtml && !brand.description;
+        document.getElementById("brandDetail").hidden = false;
 
         var logo = document.getElementById("brandLogo");
         if (brand.logo_url) {
@@ -133,6 +124,7 @@
         }
 
         var content = document.getElementById("brandContent");
+        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
         if (hasHtml) {
           content.innerHTML = brand.content_html;
           content.querySelectorAll("img").forEach(function (img) {
@@ -149,9 +141,6 @@
               img.remove();
             }
           });
-          content.hidden = false;
-        } else if (brand.description) {
-          content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.description) + "</p>";
           content.hidden = false;
         } else {
           content.innerHTML = "";

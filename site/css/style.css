@@ -1091,17 +1091,17 @@ body.nav-open {
 /* Selector de marcas limpio */
 .brand-selector-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* Columnas más estrechas */
+  gap: 8px; /* Menor separación entre logos */
+  margin-bottom: 1.5rem; /* Menor separación con el contenido inferior */
 }
 
 .brand-card-item {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.75rem;
-  height: 70px;
+  border-radius: 6px;
+  padding: 0.4rem;
+  height: 52px; /* Reducción de la altura del contenedor del logo */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1110,17 +1110,17 @@ body.nav-open {
   text-decoration: none;
   color: inherit;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-align: center;
 }
 
 .brand-card-item img {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 85%;
+  max-height: 36px; /* Forzar tamaño de logo más discreto */
   object-fit: contain;
   filter: grayscale(100%);
-  opacity: 0.7;
-  transition: filter 0.2s, opacity 0.2s;
+  opacity: 0.65;
+  transition: all 0.2s ease;
 }
 
 .brand-card-item:hover img,
@@ -1135,7 +1135,62 @@ body.nav-open {
 
 .brand-card-item.is-active {
   border-color: #dc2626;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
+}
+
+/* --- HERO Y TEXTO SOBRE FONDO NEGRO --- */
+.brand-hero {
+  background-color: #0d0d0d;
+  color: #ffffff;
+  padding: 2.5rem 1.5rem;
+  width: 100%;
+}
+
+.brand-hero__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.brand-hero__title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  margin: 0 0 0.75rem;
+  color: #ffffff;
+}
+
+.brand-hero__description {
+  max-width: 900px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  text-align: justify; /* Alineación y cuadratura del texto */
+  margin: 0;
+}
+
+/* --- CONTENEDOR PRINCIPAL Y REDUCCIÓN DE ESPACIOS --- */
+.brand-content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2rem 1.5rem; /* Espaciado interno reducido */
+}
+
+/* --- SECCIÓN DE PRODUCTOS / EQUIPOS --- */
+.brand-products-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.brand-products-section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 1rem;
+}
+
+.brand-products-section #brandProductsLead {
+  margin: 0 0 1.25rem;
+  color: var(--ink-soft);
 }
 
 .brand-pill {
