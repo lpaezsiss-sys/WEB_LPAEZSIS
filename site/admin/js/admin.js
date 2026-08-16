@@ -21,6 +21,32 @@
       .replace(/'/g, "&#39;");
   }
 
+  function isActiveFlag(value) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return true;
+    }
+    return Boolean(Number(value));
+  }
+
+  function coerceBool(value, defaultValue) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return !!defaultValue;
+    }
+    return Boolean(Number(value));
+  }
+
   function escapeAttr(str) {
     return escapeHtml(str);
   }
@@ -86,12 +112,13 @@
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["products", "brands", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["products", "brands", "clientes", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
     if (tab === "products") loadProducts();
     if (tab === "brands") loadBrands();
+    if (tab === "clientes") loadClientes();
     if (tab === "orders") loadOrders();
     if (tab === "quotes") loadQuotes();
     if (tab === "contacts") loadContacts();
@@ -483,6 +510,7 @@
   }
 
   var imagePickerContext = null;
+  var videoPickerContext = null;
 
   function openImagePicker(ctx) {
     imagePickerContext = ctx || {};
@@ -494,6 +522,209 @@
     document.getElementById("imageUrlField").value = imagePickerContext.currentUrl || "";
     setDialogImagePreview(imagePickerContext.currentUrl || "");
     document.getElementById("imageDialog").showModal();
+  }
+
+  function normalizeVideoUrl(url) {
+    var u = String(url || "").trim();
+    if (!u) return u;
+    if (/^https?:\/\//i.test(u) || u.indexOf("//") === 0) return u;
+    // Rutas relativas sin "/" se resolverían bajo <base href="/admin/"> → forzar raíz del sitio
+    if (u.charAt(0) !== "/") {
+      u = "/" + u.replace(/^\.\//, "");
+    }
+    return u;
+  }
+
+  function toVideoEmbedUrl(raw) {
+    var url = normalizeVideoUrl(String(raw || "").trim());
+    if (!url) return null;
+    var yt =
+      url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i) ||
+      url.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
+    if (yt) {
+      return { type: "embed", src: "https://www.youtube.com/embed/" + yt[1] };
+    }
+    var vim = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vim) {
+      return { type: "embed", src: "https://player.vimeo.com/video/" + vim[1] };
+    }
+    if (/\.(mp4|webm)(\?|#|$)/i.test(url) || /\/img\/uploads\//i.test(url)) {
+      return { type: "file", src: url };
+    }
+    if (/^https?:\/\//i.test(url) || url.charAt(0) === "/") {
+      return { type: "file", src: url };
+    }
+    return null;
+  }
+
+  function setVideoApplyLoading(loading) {
+    var btn = document.getElementById("videoApply");
+    if (!btn) return;
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent || "Insertar video";
+    btn.disabled = !!loading;
+    btn.setAttribute("aria-busy", loading ? "true" : "false");
+    btn.textContent = loading ? "Insertando…" : btn.dataset.label;
+  }
+
+  function closeVideoModal() {
+    setVideoApplyLoading(false);
+    var dlg = document.getElementById("videoDialog");
+    if (dlg && typeof dlg.close === "function") {
+      try {
+        if (dlg.open) dlg.close();
+      } catch (closeErr) {
+        console.error("[VIDEO ERROR]", closeErr);
+      }
+    }
+  }
+
+  function openVideoPicker(ctx) {
+    var quill = ctx && ctx.quill;
+    var savedIndex = 0;
+    if (quill) {
+      try {
+        var sel = quill.getSelection(true);
+        savedIndex = sel && typeof sel.index === "number" ? sel.index : quill.getLength();
+      } catch (e) {
+        savedIndex = quill.getLength();
+      }
+    }
+    videoPickerContext = {
+      quill: quill,
+      index: savedIndex,
+    };
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("videoFileInput").value = "";
+    document.getElementById("videoUrlField").value = (ctx && ctx.currentUrl) || "";
+    setVideoApplyLoading(false);
+    document.getElementById("videoDialog").showModal();
+  }
+
+  /**
+   * Whitelist <video> en Quill vía BlockEmbed (evita que el sanitizer borre el HTML).
+   * Debe ejecutarse ANTES de `new Quill(...)`.
+   */
+  function registerHTML5VideoBlot() {
+    if (typeof Quill === "undefined" || Quill.__lpaezHtml5Video) return;
+    var BlockEmbed = Quill.import("blots/block/embed");
+
+    class HTML5Video extends BlockEmbed {
+      static create(value) {
+        var node = super.create();
+        var src = normalizeVideoUrl(typeof value === "string" ? value : (value && value.src) || "");
+        node.setAttribute("controls", "true");
+        node.setAttribute("controlslist", "nodownload");
+        node.setAttribute("width", "100%");
+        node.setAttribute("preload", "metadata");
+        node.setAttribute("src", src);
+        node.setAttribute("playsinline", "true");
+        node.style.maxWidth = "100%";
+        node.style.height = "auto";
+        node.style.display = "block";
+        node.style.margin = "10px 0";
+        return node;
+      }
+
+      static value(node) {
+        return node.getAttribute("src") || "";
+      }
+    }
+
+    HTML5Video.blotName = "html5video";
+    HTML5Video.tagName = "video";
+    HTML5Video.className = "ql-html5video";
+    Quill.register(HTML5Video, true);
+    Quill.__lpaezHtml5Video = true;
+    console.log("[VIDEO] HTML5Video blot registered");
+  }
+
+  function insertVideoIntoQuill(activeQuillInstance, parsed) {
+    if (!activeQuillInstance) {
+      throw new Error("Editor Quill activo no disponible");
+    }
+    if (!parsed || !parsed.src) {
+      throw new Error("URL de video vacía");
+    }
+    registerHTML5VideoBlot();
+
+    var url = normalizeVideoUrl(String(parsed.src));
+    var index =
+      videoPickerContext && typeof videoPickerContext.index === "number"
+        ? videoPickerContext.index
+        : null;
+    if (index == null) {
+      try {
+        var range = activeQuillInstance.getSelection(true);
+        index = range && typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
+      } catch (e) {
+        index = activeQuillInstance.getLength();
+      }
+    }
+
+    var mime = /\.webm(\?|#|$)/i.test(url) ? "video/webm" : "video/mp4";
+    var videoHtml =
+      '<p><video class="ql-html5video" controls width="100%" style="max-width:100%; height:auto;" src="' +
+      escapeAttr(url) +
+      '"><source src="' +
+      escapeAttr(url) +
+      '" type="' +
+      mime +
+      '"></video></p>';
+    console.log("HTML inyectado:", videoHtml);
+
+    // Cerrar modal y devolver foco al editor ANTES de insertar (evita rangos inválidos
+    // con <dialog> anidados — síntoma: addRange() / video no visible).
+    closeVideoModal();
+    try {
+      activeQuillInstance.focus();
+    } catch (focusErr) {
+      console.error("[VIDEO ERROR]", focusErr);
+    }
+
+    if (parsed.type === "embed") {
+      activeQuillInstance.insertEmbed(index, "video", url, "user");
+    } else {
+      try {
+        activeQuillInstance.insertEmbed(index, "html5video", url, "user");
+      } catch (embedErr) {
+        console.error("[VIDEO ERROR]", embedErr);
+        // Fallback: pegar HTML con matcher de VIDEO → html5video
+        activeQuillInstance.clipboard.dangerouslyPasteHTML(index, videoHtml, "user");
+      }
+    }
+
+    if (typeof activeQuillInstance.update === "function") {
+      activeQuillInstance.update("user");
+    }
+
+    var videos = activeQuillInstance.root.querySelectorAll("video");
+    console.log("[VIDEO] videos en editor tras insert:", videos.length, activeQuillInstance.root.innerHTML.slice(0, 500));
+    if (parsed.type !== "embed" && !videos.length) {
+      // Último recurso: inyectar en el DOM del editor (se serializa vía root.innerHTML al guardar)
+      activeQuillInstance.root.insertAdjacentHTML("beforeend", videoHtml);
+      videos = activeQuillInstance.root.querySelectorAll("video");
+      console.log("[VIDEO] fallback DOM videos:", videos.length);
+    }
+    if (parsed.type !== "embed" && !videos.length) {
+      throw new Error("El video no se pudo mostrar en el editor");
+    }
+
+    try {
+      activeQuillInstance.setSelection(
+        Math.min(index + 1, activeQuillInstance.getLength()),
+        0,
+        "silent"
+      );
+    } catch (selErr) {
+      /* ignore invalid selection after nested dialogs */
+    }
+  }
+
+  // Registrar blot lo antes posible (Quill ya está cargado en esta página).
+  if (typeof Quill !== "undefined") {
+    registerHTML5VideoBlot();
   }
 
   function openProductDialog(product) {
@@ -517,8 +748,8 @@
       }
       form.seo_title.value = product.seo_title || "";
       form.seo_description.value = product.seo_description || "";
-      form.is_featured.checked = !!product.is_featured;
-      form.is_active.checked = product.is_active !== false;
+      form.is_featured.checked = coerceBool(product.is_featured, false);
+      form.is_active.checked = coerceBool(product.is_active, true);
     } else {
       form.is_active.checked = true;
       setFormImagePreview("");
@@ -588,6 +819,89 @@
     }).catch(function () {
       /* toast already shown */
     });
+  });
+
+  document.getElementById("videoCancel").addEventListener("click", function () {
+    closeVideoModal();
+  });
+
+  document.getElementById("videoFileInput").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    if (!file) return;
+    // Si el campo URL ya tiene valor (p. ej. subida previa), no re-subir automáticamente
+    // solo cuando el usuario elige un archivo nuevo.
+    if (file.size > 50 * 1024 * 1024) {
+      err.hidden = false;
+      err.textContent = "El video supera 50 MB";
+      return;
+    }
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "video");
+    setVideoApplyLoading(true);
+    showToast("Subiendo video…");
+    api("/upload", { method: "POST", formData: fd })
+      .then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo subir el video";
+          return;
+        }
+        var url = res.data && res.data.url;
+        // Deja la URL lista (normalizada a ruta absoluta del sitio).
+        document.getElementById("videoUrlField").value = normalizeVideoUrl(url || "");
+        document.getElementById("videoFileInput").value = "";
+        showToast("Video subido — pulsa «Insertar video»");
+      })
+      .catch(function (uploadErr) {
+        console.error("[VIDEO ERROR]", uploadErr);
+        err.hidden = false;
+        err.textContent = "Error de red al subir el video";
+      })
+      .then(function () {
+        setVideoApplyLoading(false);
+      });
+  });
+
+  document.getElementById("videoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var errEl = document.getElementById("videoError");
+    errEl.hidden = true;
+    errEl.textContent = "";
+    setVideoApplyLoading(true);
+    try {
+      // URL del input (subida previa o enlace externo) — nunca re-subir aquí.
+      var raw = document.getElementById("videoUrlField").value.trim();
+      if (!raw) {
+        throw new Error("Sube un archivo o indica una URL de YouTube/Vimeo");
+      }
+      var parsed = toVideoEmbedUrl(raw);
+      if (!parsed || !parsed.src) {
+        throw new Error("URL no válida. Usa YouTube, Vimeo, MP4/WEBM o /img/uploads/…");
+      }
+      var quill = videoPickerContext && videoPickerContext.quill;
+      if (!quill) {
+        throw new Error("Editor Quill activo no disponible");
+      }
+      // insertVideoIntoQuill cierra el modal antes de insertar (foco/selección).
+      insertVideoIntoQuill(quill, parsed);
+      showToast("Video insertado");
+    } catch (err) {
+      console.error("[VIDEO ERROR]", err);
+      setVideoApplyLoading(false);
+      errEl.hidden = false;
+      errEl.textContent = (err && err.message) || "No se pudo insertar el video";
+      showToast((err && err.message) || "Error al insertar video");
+      // Si el modal ya se cerró en el intento de insert, reabrir no es necesario;
+      // el toast informa el fallo.
+    }
+  });
+
+  document.getElementById("videoDialog").addEventListener("cancel", function () {
+    setVideoApplyLoading(false);
   });
 
   document.getElementById("addProductBtn").addEventListener("click", function () {
@@ -661,9 +975,9 @@
             escapeHtml(b.slug) +
             "</span>" +
             '<span class="chip ' +
-            (b.is_active ? "chip-on" : "chip-off") +
+            (isActiveFlag(b.is_active) ? "chip-on" : "chip-off") +
             '">' +
-            (b.is_active ? "Activa" : "Off") +
+            (isActiveFlag(b.is_active) ? "Activa" : "Off") +
             "</span></div>" +
             (desc ? '<p class="product-row__desc">' + escapeHtml(desc) + "</p>" : "") +
             "</div>" +
@@ -679,6 +993,224 @@
         .join("") || '<p class="empty-hint">No hay marcas.</p>';
     });
   }
+
+  var clientesCache = [];
+
+  function setClienteLogoPreview(url) {
+    var wrap = document.getElementById("clienteLogoPreviewWrap");
+    var img = document.getElementById("clienteLogoPreview");
+    var field = document.getElementById("clienteLogoUrl");
+    if (field) field.value = url || "";
+    if (url) {
+      wrap.hidden = false;
+      img.src = url;
+    } else {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+    }
+  }
+
+  function resetClienteForm() {
+    var form = document.getElementById("formCliente");
+    if (!form) return;
+    form.reset();
+    document.getElementById("clienteId").value = "";
+    document.getElementById("clienteOrden").value = "0";
+    document.getElementById("clienteActivo").checked = true;
+    document.getElementById("clienteLogo").value = "";
+    setClienteLogoPreview("");
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("clienteSaveBtn").textContent = "Guardar Cliente";
+  }
+
+  function loadClientes() {
+    api("/clientes").then(function (res) {
+      var tbody = document.getElementById("adminClientesList");
+      if (!tbody) return;
+      var items = (res.data && res.data.clientes) || [];
+      clientesCache = items;
+      if (!items.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty-hint">No hay clientes registrados.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (c) {
+          var active = coerceBool(c.activo, true);
+          var logo = c.logo_url || "/img/brand/logo-mark.png";
+          return (
+            "<tr data-cliente-id=\"" +
+            escapeAttr(c.id) +
+            '">' +
+            '<td><img class="admin-table__logo" src="' +
+            escapeAttr(logo) +
+            '" alt="" width="72" height="36" loading="lazy"></td>' +
+            "<td>" +
+            escapeHtml(c.nombre) +
+            "</td>" +
+            "<td>" +
+            escapeHtml(c.orden != null ? c.orden : 0) +
+            "</td>" +
+            '<td><span class="chip ' +
+            (active ? "chip-on" : "chip-off") +
+            '">' +
+            (active ? "Activo" : "Off") +
+            "</span></td>" +
+            '<td class="admin-table__actions">' +
+            '<button type="button" data-edit-cliente="' +
+            escapeAttr(c.id) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-cliente="' +
+            escapeAttr(c.id) +
+            '">' +
+            (active ? "Ocultar" : "Mostrar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-cliente="' +
+            escapeAttr(c.id) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  function uploadClienteLogo(file) {
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "image");
+    return api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        return Promise.reject((res.data && res.data.error) || "No se pudo subir el logo");
+      }
+      return (res.data && res.data.url) || "";
+    });
+  }
+
+  document.getElementById("clienteResetBtn").addEventListener("click", function () {
+    resetClienteForm();
+  });
+
+  document.getElementById("clienteLogo").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    if (!file) return;
+    uploadClienteLogo(file)
+      .then(function (url) {
+        setClienteLogoPreview(url);
+        showToast("Logo subido");
+      })
+      .catch(function (msg) {
+        err.hidden = false;
+        err.textContent = msg;
+        showToast(msg);
+      });
+  });
+
+  document.getElementById("formCliente").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    var id = document.getElementById("clienteId").value.trim();
+    var nombre = document.getElementById("clienteNombre").value.trim();
+    var orden = Number(document.getElementById("clienteOrden").value) || 0;
+    var activo = document.getElementById("clienteActivo").checked;
+    var logoUrl = document.getElementById("clienteLogoUrl").value.trim();
+    var fileInput = document.getElementById("clienteLogo");
+    var file = fileInput.files && fileInput.files[0];
+
+    function save(logo) {
+      if (!logo) {
+        err.hidden = false;
+        err.textContent = "Sube un logo (PNG, WEBP, SVG o JPG)";
+        return Promise.reject();
+      }
+      var body = { nombre: nombre, logo_url: logo, orden: orden, activo: activo };
+      var req = id
+        ? api("/clientes/" + id, { method: "PUT", body: body })
+        : api("/clientes", { method: "POST", body: body });
+      return req.then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo guardar";
+          return Promise.reject();
+        }
+        showToast(id ? "Cliente actualizado" : "Cliente creado");
+        resetClienteForm();
+        loadClientes();
+      });
+    }
+
+    var chain = Promise.resolve(logoUrl);
+    if (file && !logoUrl) {
+      chain = uploadClienteLogo(file);
+    } else if (file && logoUrl) {
+      // Ya se subió en change; si el usuario cambió de nuevo sin esperar, re-subir
+      chain = uploadClienteLogo(file);
+    }
+
+    chain
+      .then(function (url) {
+        return save(url || logoUrl);
+      })
+      .catch(function (msg) {
+        if (typeof msg === "string") {
+          err.hidden = false;
+          err.textContent = msg;
+        }
+      });
+  });
+
+  document.getElementById("adminClientesList").addEventListener("click", function (e) {
+    var editId = e.target.getAttribute("data-edit-cliente");
+    var delId = e.target.getAttribute("data-del-cliente");
+    var toggleId = e.target.getAttribute("data-toggle-cliente");
+    if (editId) {
+      var item = clientesCache.find(function (c) {
+        return String(c.id) === String(editId);
+      });
+      if (!item) return;
+      document.getElementById("clienteId").value = item.id;
+      document.getElementById("clienteNombre").value = item.nombre || "";
+      document.getElementById("clienteOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("clienteActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("clienteLogo").value = "";
+      setClienteLogoPreview(item.logo_url || "");
+      document.getElementById("clienteSaveBtn").textContent = "Actualizar Cliente";
+      document.getElementById("formCliente").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (toggleId) {
+      var row = clientesCache.find(function (c) {
+        return String(c.id) === String(toggleId);
+      });
+      if (!row) return;
+      var next = !coerceBool(row.activo, true);
+      api("/clientes/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo actualizar");
+          return;
+        }
+        showToast(next ? "Cliente visible" : "Cliente oculto");
+        loadClientes();
+      });
+      return;
+    }
+    if (delId && confirm("¿Eliminar este cliente?")) {
+      api("/clientes/" + delId, { method: "DELETE" }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo eliminar");
+          return;
+        }
+        showToast("Cliente eliminado");
+        if (document.getElementById("clienteId").value === String(delId)) resetClienteForm();
+        loadClientes();
+      });
+    }
+  });
 
   var BRAND_LOGOS = {
     "sonic-air-systems": "/img/brand/sonic-air.png",
@@ -859,6 +1391,7 @@
         "</textarea>";
       return null;
     }
+    registerHTML5VideoBlot();
     var quill = new Quill(editorEl, {
       theme: "snow",
       placeholder: "Escribe el contenido de esta sección…",
@@ -884,12 +1417,27 @@
                 },
               });
             },
+            video: function () {
+              var q = this.quill;
+              openVideoPicker({
+                quill: q,
+              });
+            },
           },
         },
       },
     });
+    var Delta = Quill.import("delta");
+    quill.clipboard.addMatcher("VIDEO", function (node) {
+      var source = node.querySelector("source");
+      var src = normalizeVideoUrl(
+        node.getAttribute("src") || (source && source.getAttribute("src")) || ""
+      );
+      if (!src) return new Delta();
+      return new Delta().insert({ html5video: src });
+    });
     if (initialHtml) {
-      quill.root.innerHTML = initialHtml;
+      quill.clipboard.dangerouslyPasteHTML(0, initialHtml, "silent");
     }
     brandQuills[sectionId] = quill;
     return quill;
@@ -987,7 +1535,7 @@
     form.seo_title.value = (item && item.seo_title) || "";
     form.seo_description.value = (item && item.seo_description) || "";
     form.sort_order.value = (item && item.sort_order) || 0;
-    form.is_active.checked = !item || item.is_active !== false;
+    form.is_active.checked = item ? coerceBool(item.is_active, true) : true;
     var logoField = document.getElementById("simpleLogoField");
     var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
@@ -1146,7 +1694,7 @@
       seo_title: form.seo_title.value.trim(),
       seo_description: form.seo_description.value.trim(),
       sort_order: Number(form.sort_order.value) || 0,
-      is_active: form.is_active.checked,
+      is_active: !!form.is_active.checked,
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
