@@ -288,8 +288,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const isRepuesto = state.tipo === "repuesto";
     const filterIndustria = document.getElementById("filterIndustriaGroup");
     const filterCategoria = document.getElementById("filterCategoriaGroup");
+    const filtersBar = document.querySelector(".catalog-filters");
     if (filterIndustria) filterIndustria.style.display = isRepuesto ? "none" : "";
     if (filterCategoria) filterCategoria.style.display = isRepuesto ? "none" : "";
+    if (filtersBar) filtersBar.classList.toggle("filters-repuestos", isRepuesto);
     if (isRepuesto) {
       state.industry = "";
       state.category = "";

@@ -2469,6 +2469,13 @@ body.nav-open {
   margin-bottom: 1.5rem;
 }
 
+/* Cuando hay solo 2 filtros visibles */
+.catalog-filters.filters-repuestos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
 .filter-group {
   display: flex;
   flex-direction: column;
