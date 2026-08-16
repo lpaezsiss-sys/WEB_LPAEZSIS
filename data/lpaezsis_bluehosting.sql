@@ -421,3 +421,35 @@ UNLOCK TABLES;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
 -- Dump completed on 2026-07-31 23:13:24
+
+--
+-- Table structure for table `clientes`
+--
+
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(150) NOT NULL,
+  `logo_url` VARCHAR(255) NOT NULL,
+  `orden` INT DEFAULT 0,
+  `activo` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Table structure for table `soluciones`
+--
+
+CREATE TABLE IF NOT EXISTS `soluciones` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `slug` VARCHAR(50) NOT NULL UNIQUE,
+  `titulo` VARCHAR(150) NOT NULL,
+  `bullet_1` VARCHAR(255) DEFAULT NULL,
+  `bullet_2` VARCHAR(255) DEFAULT NULL,
+  `bullet_3` VARCHAR(255) DEFAULT NULL,
+  `cta_texto` VARCHAR(100) DEFAULT NULL,
+  `cta_url` VARCHAR(255) DEFAULT NULL,
+  `imagen_url` VARCHAR(255) DEFAULT NULL,
+  `orden` INT DEFAULT 0,
+  `activo` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

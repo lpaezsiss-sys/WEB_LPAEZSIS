@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=97">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -96,7 +96,7 @@
   <main id="main">
     <section class="hero" aria-label="Inicio">
       <div class="hero-media" aria-hidden="true">
-        <picture class="hero-media__slide">
+        <picture class="hero-media__slide is-active">
           <source type="image/webp" srcset="img/hero/line.webp">
           <img
             src="img/hero/line.jpg"
@@ -114,18 +114,16 @@
             src="img/hero/3piece_cans.jpg"
             alt=""
             title="Envases industriales"
-            width="467"
-            height="350"
+            width="1920"
+            height="1440"
             loading="lazy"
             decoding="async">
         </picture>
       </div>
+
       <div class="hero-scrim" aria-hidden="true"></div>
+
       <div class="hero-inner">
-        <p class="hero-brand">
-          <span class="hero-brand__name">LPAEZ</span>
-          <span class="hero-brand__tag">Soluciones Industriales</span>
-        </p>
         <h1 class="hero-title">
           <span class="hero-title__line">Ingeniería industrial para</span>
           <span class="hero-title__line hero-title__line--accent">packaging y fin de línea</span>
@@ -134,36 +132,6 @@
         <div class="hero-actions">
           <a class="btn btn-primary btn-lg btn-cta-primary" href="cotizacion.html">Pedir cotización</a>
           <a class="btn btn-ghost btn-lg btn-cta-secondary" href="#soluciones">Soluciones</a>
-        </div>
-        <div class="trust-inline" aria-label="Distribuidor oficial Sonic Air Systems">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems — distribuidor oficial en Chile"
-              width="120"
-              height="48"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p><strong>Distribuidores oficiales Sonic Air Systems</strong></p>
-        </div>
-      </div>
-      <div class="trust-band trust-band--in-hero">
-        <div class="trust-band-inner">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems"
-              width="150"
-              height="60"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p>Distribuidores oficiales <strong>Sonic Air Systems</strong> en Chile.</p>
         </div>
       </div>
     </section>
@@ -215,10 +183,10 @@
               <source type="image/webp" srcset="img/hero/line.webp">
               <img
                 src="img/hero/line.jpg"
-                alt=""
+                alt="Packaging y fin de línea"
                 title="Packaging y fin de línea"
-                width="1920"
-                height="1440"
+                width="600"
+                height="450"
                 loading="lazy"
                 decoding="async">
             </picture>
@@ -287,7 +255,15 @@
         <h2 id="marcas-title">Representaciones y Distribución</h2>
         <p><a href="marcas.html">Ver todas →</a></p>
       </div>
-      <div class="brand-strip" id="homeBrands"></div>
+      <div class="brand-selector-grid" id="homeBrands"></div>
+    </section>
+
+    <section class="section reveal clients-compact" id="clientes" aria-labelledby="clientes-title">
+      <div class="section-head center">
+        <h2 id="clientes-title">Empresas que confían en nosotros</h2>
+        <p>Soluciones de soplado y secado instaladas en las principales plantas del país</p>
+      </div>
+      <div class="client-grid" id="homeClients"></div>
     </section>
 
     <section class="cta-band reveal" aria-labelledby="cta-title">
@@ -295,7 +271,7 @@
       <p>Cuéntanos tu proceso: te armamos una cotización o te guiamos a los repuestos correctos.</p>
       <div class="actions-row">
         <a class="btn btn-primary btn-lg btn-cta-primary" href="cotizacion.html">Pedir cotización</a>
-        <a class="btn btn-ghost btn-cta-secondary" href="novedades.html">Ver artículos y un video</a>
+        <a class="btn btn-ghost btn-cta-secondary" href="novedades.html">Ver novedades y contenido técnico</a>
       </div>
     </section>
   </main>
@@ -314,22 +290,12 @@
         } catch (e) { /* keep static JSON-LD */ }
       }
 
-      function solutionBlurb(slug) {
-        var map = {
-          secadores: ["Secado de botellas y envases", "Túneles y cabinas de soplado", "Sistemas food & beverage"],
-          "turbinas-soplado": ["Sopladores centrífugos Sonic", "Portátiles y fijos", "Repuestos de transmisión"],
-          "cuchillos-aire": ["Air knives industriales", "Manifolds y toberas", "Control de recubrimiento"],
-          repuestos: ["Correas y filtros", "Silenciadores y HEPA", "Piezas de mantención"],
-          "fin-de-linea": ["Integración en conveyor", "Soplado post-llenado", "Soluciones a medida"],
-          "salas-limpias": ["Aire filtrado", "Aplicaciones sanitarias", "Sistemas de bajo particulado"]
-        };
-        return map[slug] || ["Equipos industriales", "Accesorios y repuestos", "Soporte de aplicación"];
-      }
-
-      function categoryPicture(srcJpg, alt) {
+      function solutionPicture(src, alt) {
+        var srcJpg = src || "img/hero/plant.jpg";
+        if (srcJpg.charAt(0) === "/") srcJpg = srcJpg.slice(1);
         var webp = String(srcJpg || "").replace(/\.(jpe?g|png)$/i, ".webp");
         return (
-          '<picture>' +
+          "<picture>" +
           '<source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">' +
           '<img src="' + Lpaez.escapeHtml(srcJpg) + '" alt="' + Lpaez.escapeHtml(alt) +
           '" title="' + Lpaez.escapeHtml(alt) +
@@ -338,45 +304,52 @@
         );
       }
 
-      function renderSolutions(cats) {
+      function renderSolutions(items) {
         var tabs = document.getElementById("solutionsTabs");
         var panels = document.getElementById("solutionsPanels");
-        if (!cats.length) {
+        if (!items || !items.length) {
           tabs.innerHTML = "";
           panels.innerHTML = "<p class='empty-state'>Pronto publicaremos las soluciones.</p>";
           return;
         }
-        tabs.innerHTML = cats.map(function (c, i) {
-          var id = "sol-tab-" + c.slug;
-          var panelId = "sol-panel-" + c.slug;
+        tabs.innerHTML = items.map(function (s, i) {
+          var id = "sol-tab-" + s.slug;
+          var panelId = "sol-panel-" + s.slug;
           return (
             '<button type="button" class="solutions-tab' + (i === 0 ? " is-active" : "") +
             '" role="tab" id="' + id + '" aria-controls="' + panelId +
             '" aria-selected="' + (i === 0 ? "true" : "false") +
             '" tabindex="' + (i === 0 ? "0" : "-1") +
-            '" data-tab="' + Lpaez.escapeHtml(c.slug) + '">' +
-            Lpaez.escapeHtml(c.name) +
+            '" data-tab="' + Lpaez.escapeHtml(s.slug) + '">' +
+            Lpaez.escapeHtml(s.titulo) +
             "</button>"
           );
         }).join("");
-        panels.innerHTML = cats.map(function (c, i) {
-          var bg = Lpaez.resolveCategoryImage(c.slug);
-          var items = solutionBlurb(c.slug).map(function (t) {
+        panels.innerHTML = items.map(function (s, i) {
+          var bullets = [s.bullet_1, s.bullet_2, s.bullet_3].filter(Boolean);
+          var itemsHtml = bullets.map(function (t) {
             return "<li><span class='bullet' aria-hidden='true'>→</span><span>" + Lpaez.escapeHtml(t) + "</span></li>";
           }).join("");
+          var ctaText = s.cta_texto || ("Ver catálogo " + (s.titulo || ""));
+          var ctaUrl = s.cta_url || ("catalogo.html?category=" + encodeURIComponent(s.slug));
           var active = i === 0;
           return (
             '<div class="solutions-panel' + (active ? " is-active" : "") +
-            '" role="tabpanel" id="sol-panel-' + Lpaez.escapeHtml(c.slug) +
-            '" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(c.slug) +
-            '" data-panel="' + Lpaez.escapeHtml(c.slug) + '"' +
+            '" id="sol-panel-' + Lpaez.escapeHtml(s.slug) +
+            '" role="tabpanel" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(s.slug) +
+            '" data-panel="' + Lpaez.escapeHtml(s.slug) + '"' +
             (active ? "" : " hidden") + ">" +
-            '<div class="solutions-media">' + categoryPicture(bg, c.name) + "</div>" +
-            '<div class="solutions-body"><h3>' + Lpaez.escapeHtml(c.name) + "</h3>" +
-            "<p>" + Lpaez.escapeHtml((c.description || "Soluciones industriales para tu planta.").slice(0, 160)) + "</p>" +
-            '<ul class="solutions-list">' + items + "</ul>" +
-            '<a class="btn btn-primary" href="catalogo.html?category=' + encodeURIComponent(c.slug) + '">Ver productos</a>' +
-            "</div></div>"
+            '<div class="solutions-panel-content">' +
+            "<h3>" + Lpaez.escapeHtml(s.titulo) + "</h3>" +
+            (itemsHtml ? '<ul class="solutions-list">' + itemsHtml + "</ul>" : "") +
+            '<a class="btn btn-outline" href="' + Lpaez.escapeHtml(ctaUrl) + '">' +
+            Lpaez.escapeHtml(ctaText) +
+            "</a>" +
+            "</div>" +
+            '<div class="solutions-panel-media">' +
+            solutionPicture(s.imagen_url, s.titulo) +
+            "</div>" +
+            "</div>"
           );
         }).join("");
 
@@ -424,23 +397,14 @@
         var label = Lpaez.escapeHtml(b.name);
         if (b.logo_url || b.slug === "sonic-air-systems") {
           var src = b.logo_url || "img/brand/sonic-air.png";
-          var webp =
-            b.slug === "sonic-air-systems" && !b.logo_url
-              ? "img/brand/sonic-air.webp"
-              : String(src).replace(/\.(jpe?g|png)$/i, ".webp");
-          var useWebp = /\.(jpe?g|png)$/i.test(src) || b.slug === "sonic-air-systems";
           return (
-            '<a class="brand-pill" href="' + href + '" title="' + label + '">' +
-            (useWebp
-              ? '<picture><source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">'
-              : "") +
+            '<a class="brand-card-item" href="' + href + '" title="' + label + '">' +
             '<img src="' + Lpaez.escapeHtml(src) + '" alt="' + label +
-            '" title="' + label + '" width="120" height="48" loading="lazy" decoding="async">' +
-            (useWebp ? "</picture>" : "") +
+            '" title="' + label + '" loading="lazy" decoding="async">' +
             "</a>"
           );
         }
-        return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
+        return '<a class="brand-card-item" href="' + href + '" title="' + label + '">' + label + "</a>";
       }
 
       // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
@@ -458,14 +422,15 @@
 
       Promise.all([
         Lpaez.api("/api/brands"),
-        Lpaez.api("/api/categories"),
+        Lpaez.api("/api/soluciones"),
         Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
-        var cats = (results[1].data && results[1].data.categories) || [];
+        var rawSol = results[1].data;
+        var soluciones = Array.isArray(rawSol) ? rawSol : (rawSol && rawSol.soluciones) || [];
         var products = (results[2].data && results[2].data.products) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
-        renderSolutions(cats);
+        renderSolutions(soluciones);
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
@@ -473,11 +438,54 @@
           '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
         Lpaez.observeReveals();
       }).catch(function () {
+        renderSolutions([]);
         document.getElementById("homeProducts").innerHTML =
           '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
         Lpaez.observeReveals();
       });
     })();
+
+    function initHeroCarousel() {
+      var slides = document.querySelectorAll(".hero-media__slide");
+      if (slides.length <= 1) return;
+
+      var currentIndex = 0;
+      setInterval(function () {
+        slides[currentIndex].classList.remove("is-active");
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add("is-active");
+      }, 5000); // Cambia cada 5 segundos
+    }
+
+    document.addEventListener("DOMContentLoaded", initHeroCarousel);
+
+    function loadHomeClients() {
+      var container = document.getElementById("homeClients");
+      if (!container) return;
+
+      fetch("api/clientes.php")
+        .then(function (res) { return res.json(); })
+        .then(function (clients) {
+          if (!clients || !clients.length) {
+            var sec = document.getElementById("clientes");
+            if (sec) sec.style.display = "none";
+            return;
+          }
+
+          container.innerHTML = clients.map(function (c) {
+            return (
+              '<div class="client-card" title="' + Lpaez.escapeHtml(c.nombre) + '">' +
+                '<img src="' + Lpaez.escapeHtml(c.logo_url) + '" alt="' + Lpaez.escapeHtml(c.nombre) + '" loading="lazy">' +
+              '</div>'
+            );
+          }).join("");
+        })
+        .catch(function (err) {
+          console.warn("No se pudieron cargar los clientes", err);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadHomeClients);
   </script>
 </body>
 </html>
