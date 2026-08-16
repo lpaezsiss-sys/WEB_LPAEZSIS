@@ -193,7 +193,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const datasheetDialog = document.getElementById("datasheetDialog");
   const datasheetBody = document.getElementById("datasheetBody");
   const heroTitle = document.querySelector(".page-hero-inner h1");
-  const heroLead = document.querySelector(".page-hero-inner p");
+  const heroLead =
+    document.querySelector(".page-hero-inner .hero-description") ||
+    document.querySelector(".page-hero-inner p");
   const catalogHint = document.querySelector(".catalog-hint");
   const catalogGridLabel = document.getElementById("catalogGridLabel");
 
@@ -241,11 +243,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   function applyHeroCopy() {
+    if (heroLead && !heroLead.classList.contains("hero-description")) {
+      heroLead.classList.add("hero-description");
+    }
     if (state.tipo === "repuesto") {
       if (heroTitle) heroTitle.textContent = "Repuestos";
       if (heroLead) {
-        heroLead.textContent =
-          "Repuestos y consumibles para equipos Sonic: compra directa o cotiza según disponibilidad.";
+        heroLead.textContent = "Repuestos y Consumibles";
       }
       if (catalogHint) {
         catalogHint.innerHTML =
