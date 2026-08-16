@@ -1188,9 +1188,14 @@ body.nav-open {
   margin: 0 0 1rem;
 }
 
-.brand-products-section #brandProductsLead {
-  margin: 0 0 1.25rem;
-  color: var(--ink-soft);
+.brand-products-section #brandProductsTitle {
+  font-weight: 800;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 1.15rem;
 }
 
 .brand-pill {

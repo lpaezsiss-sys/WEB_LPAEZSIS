@@ -12,45 +12,49 @@
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=96">
+  <link rel="stylesheet" href="css/style.css?v=97">
 </head>
 <body>
   <div id="site-header-mount"></div>
-  <main id="main">
-    <header class="brand-hero" aria-labelledby="brandsTitle">
-      <div class="brand-hero__inner">
-        <h1 class="brand-hero__title" id="brandsTitle">Representaciones y Distribución</h1>
-        <p class="brand-hero__description" id="brandsLead">Socios tecnológicos para soplado, packaging, movimiento y control de calidad.</p>
-      </div>
-    </header>
 
-    <div class="brand-content-wrapper">
-      <div class="brand-selector-grid" id="brandsList"></div>
-
-      <div id="brandDetail" hidden>
-        <img id="brandLogo" class="brand-catalog-logo" alt="" hidden>
-        <div class="brand-catalog-body" id="brandContent"></div>
-        <div class="brand-gallery" id="brandGallery" hidden></div>
-
-        <section class="brand-products-section" aria-labelledby="brandProductsTitle">
-          <h2 id="brandProductsTitle">Productos y equipos</h2>
-          <p id="brandProductsLead">Disponibles para cotizar o comprar según el ítem.</p>
-          <div class="product-grid" id="brandProducts"></div>
-          <div class="section-actions is-start">
-            <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
-            <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
-          </div>
-        </section>
-      </div>
+  <!-- Hero oscuro superior con texto cuadrado y extendido -->
+  <section class="brand-hero" aria-labelledby="brandTitle">
+    <div class="brand-hero__inner">
+      <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
+      <p class="brand-hero__description" id="brandDescription">
+        Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
+      </p>
     </div>
+  </section>
+
+  <!-- Cuerpo de la página sin textos ni logos repetidos -->
+  <main class="brand-content-wrapper" id="main">
+
+    <!-- Selector de marcas compacto con logos reducidos -->
+    <div class="brand-selector-grid" id="brandSelector"></div>
+
+    <!-- Contenido enriquecido de la ficha (solo si existe en admin; no repite título/desc) -->
+    <div class="brand-catalog-body" id="brandContent" hidden></div>
+    <div class="brand-gallery" id="brandGallery" hidden></div>
+
+    <!-- Catálogo de equipos directamente debajo del selector -->
+    <section class="brand-products-section" aria-labelledby="brandProductsHeading">
+      <h2 id="brandProductsHeading">Equipos <span id="brandProductsTitle"></span></h2>
+      <div class="catalog-grid product-grid" id="brandProductsGrid"></div>
+      <div class="section-actions is-start">
+        <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
+        <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
+      </div>
+    </section>
   </main>
+
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
   <script src="js/site.js?v=23"></script>
   <script>
     var slug = Lpaez.queryParam("slug");
 
-    function brandPillHtml(b) {
+    function brandCardHtml(b) {
       var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
       var active = slug && slug === b.slug ? " is-active" : "";
       if (b.logo_url) {
@@ -81,6 +85,32 @@
       }).join("");
     }
 
+    function hydrateContent(html) {
+      var content = document.getElementById("brandContent");
+      var hasHtml = !!(html && String(html).trim());
+      if (!hasHtml) {
+        content.innerHTML = "";
+        content.hidden = true;
+        return;
+      }
+      content.innerHTML = html;
+      content.querySelectorAll("img").forEach(function (img) {
+        var real =
+          img.getAttribute("data-src") ||
+          img.getAttribute("data-lazy-src") ||
+          img.getAttribute("data-original");
+        if (real) {
+          img.setAttribute("src", real);
+          img.removeAttribute("data-src");
+          img.removeAttribute("data-lazy-src");
+        }
+        if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
+          img.remove();
+        }
+      });
+      content.hidden = false;
+    }
+
     Lpaez.api("/api/brands").then(function (res) {
       var brands = (res.data && res.data.brands) || [];
       if (!slug && brands.length) {
@@ -92,77 +122,43 @@
           history.replaceState(null, "", "marcas.html?slug=" + encodeURIComponent(slug));
         }
       }
-      document.getElementById("brandsList").innerHTML = brands.map(brandPillHtml).join("");
+      document.getElementById("brandSelector").innerHTML = brands.map(brandCardHtml).join("");
+
       if (!slug) {
-        document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandProducts").innerHTML =
-          "<p class='empty-state'>Elige una marca para ver su ficha y productos.</p>";
+        document.getElementById("brandProductsGrid").innerHTML =
+          "<p class='empty-state'>Elige una marca para ver sus equipos.</p>";
         return;
       }
+
       return Lpaez.api("/api/brands/" + encodeURIComponent(slug)).then(function (r) {
+        var grid = document.getElementById("brandProductsGrid");
         if (!r.ok) {
-          document.getElementById("brandDetail").hidden = false;
-          document.getElementById("brandProducts").innerHTML =
-            "<p class='empty-state'>No se encontró esta marca.</p>";
+          grid.innerHTML = "<p class='empty-state'>No se encontró esta marca.</p>";
           return;
         }
         var brand = r.data.brand;
         var products = r.data.products || [];
         document.title = brand.name + " | LPAEZsis";
-        document.getElementById("brandsTitle").textContent = brand.name;
-        document.getElementById("brandsLead").textContent =
+        document.getElementById("brandTitle").textContent = brand.name;
+        document.getElementById("brandDescription").textContent =
           brand.description || "Productos e información de la representación.";
-        document.getElementById("brandDetail").hidden = false;
+        document.getElementById("brandProductsTitle").textContent = brand.name;
 
-        var logo = document.getElementById("brandLogo");
-        if (brand.logo_url) {
-          logo.src = brand.logo_url;
-          logo.alt = brand.name;
-          logo.hidden = false;
-        } else {
-          logo.hidden = true;
-        }
-
-        var content = document.getElementById("brandContent");
-        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
-        if (hasHtml) {
-          content.innerHTML = brand.content_html;
-          content.querySelectorAll("img").forEach(function (img) {
-            var real =
-              img.getAttribute("data-src") ||
-              img.getAttribute("data-lazy-src") ||
-              img.getAttribute("data-original");
-            if (real) {
-              img.setAttribute("src", real);
-              img.removeAttribute("data-src");
-              img.removeAttribute("data-lazy-src");
-            }
-            if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
-              img.remove();
-            }
-          });
-          content.hidden = false;
-        } else {
-          content.innerHTML = "";
-          content.hidden = true;
-        }
-
+        hydrateContent(brand.content_html);
         renderGallery(brand.gallery || []);
 
-        document.getElementById("brandProductsTitle").textContent =
-          products.length ? "Productos " + brand.name : "Equipos " + brand.name;
-        document.getElementById("brandProducts").innerHTML = products.length
+        grid.innerHTML = products.length
           ? products.map(Lpaez.productCardHtml).join("")
-          : "<p class='empty-state'>Esta marca se cotiza por proyecto. Revisa la galería fotográfica arriba o solicita una cotización.</p>";
+          : "<p class='empty-state'>Esta marca se cotiza por proyecto. Solicita una cotización para evaluar tu línea.</p>";
         Lpaez.observeReveals();
+
         var link = document.createElement("link");
         link.rel = "canonical";
         link.href = "https://lpaezsis.cl/marcas.html?slug=" + encodeURIComponent(brand.slug);
         document.head.appendChild(link);
       });
     }).catch(function () {
-      document.getElementById("brandDetail").hidden = false;
-      document.getElementById("brandProducts").innerHTML =
+      document.getElementById("brandProductsGrid").innerHTML =
         "<p class='empty-state'>No se pudo cargar la marca. Intenta recargar.</p>";
     });
   </script>
