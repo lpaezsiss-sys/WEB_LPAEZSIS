@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=94">
+  <link rel="stylesheet" href="css/style.css?v=95">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -255,7 +255,7 @@
         <h2 id="marcas-title">Representaciones y Distribución</h2>
         <p><a href="marcas.html">Ver todas →</a></p>
       </div>
-      <div class="brand-strip" id="homeBrands"></div>
+      <div class="brand-selector-grid" id="homeBrands"></div>
     </section>
 
     <section class="section reveal clients-compact" id="clientes" aria-labelledby="clientes-title">
@@ -397,23 +397,14 @@
         var label = Lpaez.escapeHtml(b.name);
         if (b.logo_url || b.slug === "sonic-air-systems") {
           var src = b.logo_url || "img/brand/sonic-air.png";
-          var webp =
-            b.slug === "sonic-air-systems" && !b.logo_url
-              ? "img/brand/sonic-air.webp"
-              : String(src).replace(/\.(jpe?g|png)$/i, ".webp");
-          var useWebp = /\.(jpe?g|png)$/i.test(src) || b.slug === "sonic-air-systems";
           return (
-            '<a class="brand-pill" href="' + href + '" title="' + label + '">' +
-            (useWebp
-              ? '<picture><source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">'
-              : "") +
+            '<a class="brand-card-item" href="' + href + '" title="' + label + '">' +
             '<img src="' + Lpaez.escapeHtml(src) + '" alt="' + label +
-            '" title="' + label + '" width="120" height="48" loading="lazy" decoding="async">' +
-            (useWebp ? "</picture>" : "") +
+            '" title="' + label + '" loading="lazy" decoding="async">' +
             "</a>"
           );
         }
-        return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
+        return '<a class="brand-card-item" href="' + href + '" title="' + label + '">' + label + "</a>";
       }
 
       // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
