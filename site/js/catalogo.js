@@ -416,6 +416,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         encodeURIComponent(slug) +
         "&asunto=" +
         encodeURIComponent("Cotización: " + name),
+      ficha_url: prod.ficha_url || prod.datasheet_url || "",
     };
   }
 
@@ -468,7 +469,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480"></picture>`
       : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
 
-    let ctaButtonHtml;
+    const quoteHref =
+      "contacto.html?quote=" +
+      encodeURIComponent(prod.id || "") +
+      "&sku=" +
+      encodeURIComponent(slug) +
+      "&name=" +
+      encodeURIComponent(name);
+
+    const fichaUrl = String(prod?.ficha_url || prod?.datasheet_url || "").trim();
+    const fichaHtml = fichaUrl
+      ? `<a href="${escapeAttr(fichaUrl)}" target="_blank" rel="noopener" class="btn btn-outline-spec">DESCARGAR FICHA TÉCNICA</a>`
+      : `<button type="button" class="btn btn-outline-spec" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">DESCARGAR FICHA TÉCNICA</button>`;
+
+    let actionsHtml;
     if (isRepuesto) {
       const cartPayload = encodeURIComponent(
         JSON.stringify({
@@ -480,20 +494,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           tipo: "repuesto",
         })
       );
-      ctaButtonHtml =
-        `<button type="button" class="btn btn-success btn-buy btn-sm" data-card-cart="${escapeAttr(cartPayload)}">` +
-        `<svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14h9.5c.8 0 1.5-.5 1.7-1.2L21 6H6.2L5.3 3H2v2h2l3.6 7.6L6.2 15c-.2.4-.2.8 0 1.2.2.4.6.6 1 .6h12v-2H7.4l.6-1.2z"/></svg>` +
-        ` COMPRAR</button>`;
+      actionsHtml =
+        `<div class="product-card-actions catalog-card-actions">` +
+        `<div class="action-buttons-group">` +
+        `<button type="button" class="btn btn-buy" data-card-cart="${escapeAttr(cartPayload)}">COMPRAR</button>` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-secondary">COTIZAR</a>` +
+        `</div>` +
+        fichaHtml +
+        `</div>`;
     } else {
-      const quoteHref =
-        "contacto.html?quote=" +
-        encodeURIComponent(prod.id || "") +
-        "&sku=" +
-        encodeURIComponent(slug) +
-        "&name=" +
-        encodeURIComponent(name);
-      ctaButtonHtml =
-        `<a href="${escapeAttr(quoteHref)}" class="btn btn-primary btn-quote btn-sm">PEDIR COTIZACIÓN</a>`;
+      actionsHtml =
+        `<div class="product-card-actions catalog-card-actions">` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-primary">PEDIR COTIZACIÓN</a>` +
+        fichaHtml +
+        `</div>`;
     }
 
     return (
@@ -505,10 +519,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span></div>` +
       `<h3><a href="producto.html?slug=${encodeURIComponent(slug)}">${escapeHtml(name)}</a></h3>` +
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
-      `<div class="product-card-actions catalog-card-actions">` +
-      `${ctaButtonHtml}` +
-      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">Descargar ficha técnica</button>` +
-      `</div></div></article>`
+      `${actionsHtml}` +
+      `</div></article>`
     );
   }
 

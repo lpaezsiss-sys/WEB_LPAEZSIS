@@ -277,25 +277,52 @@
         '" loading="lazy" decoding="async" width="480" height="480">'
       : "LPAEZ";
     var payload = productPayload(p);
-    var primaryCta = isRepuesto
-      ? '<button type="button" class="btn btn-success btn-buy btn-sm" data-card-cart="' +
-        payload +
-        '">COMPRAR</button>'
-      : '<a class="btn btn-primary btn-quote btn-sm" href="contacto.html?quote=' +
-        encodeURIComponent(p.id || "") +
-        "&sku=" +
-        encodeURIComponent(p.slug || "") +
-        "&name=" +
-        encodeURIComponent(p.name || "") +
-        '">PEDIR COTIZACIÓN</a>';
-    var datasheetBadge =
-      opts.showDatasheetBadge
-        ? '<a class="badge-datasheet" href="producto.html?slug=' +
+    var quoteHref =
+      "contacto.html?quote=" +
+      encodeURIComponent(p.id || "") +
+      "&sku=" +
+      encodeURIComponent(p.slug || "") +
+      "&name=" +
+      encodeURIComponent(p.name || "");
+    var fichaUrl = String(p.ficha_url || p.datasheet_url || "").trim();
+    var fichaHtml = fichaUrl
+      ? '<a href="' +
+        escapeAttr(fichaUrl) +
+        '" target="_blank" rel="noopener" class="btn btn-outline-spec">DESCARGAR FICHA TÉCNICA</a>'
+      : opts.showDatasheetBadge
+        ? '<a class="btn btn-outline-spec" href="producto.html?slug=' +
           encodeURIComponent(p.slug) +
-          '" title="Ficha técnica PDF disponible">' +
-          '<span class="badge-datasheet__icon" aria-hidden="true">PDF</span>' +
-          "<span>Ficha técnica PDF disponible</span></a>"
+          '">DESCARGAR FICHA TÉCNICA</a>'
         : "";
+    var actionsHtml;
+    if (isRepuesto) {
+      actionsHtml =
+        '<div class="product-card-actions">' +
+        '<div class="action-buttons-group">' +
+        '<button type="button" class="btn btn-buy" data-card-cart="' +
+        payload +
+        '">COMPRAR</button>' +
+        '<a href="' +
+        escapeAttr(quoteHref) +
+        '" class="btn btn-quote-secondary">COTIZAR</a>' +
+        "</div>" +
+        fichaHtml +
+        '<a class="product-card-link" href="producto.html?slug=' +
+        encodeURIComponent(p.slug) +
+        '">Ver detalle</a>' +
+        "</div>";
+    } else {
+      actionsHtml =
+        '<div class="product-card-actions">' +
+        '<a href="' +
+        escapeAttr(quoteHref) +
+        '" class="btn btn-quote-primary">PEDIR COTIZACIÓN</a>' +
+        fichaHtml +
+        '<a class="product-card-link" href="producto.html?slug=' +
+        encodeURIComponent(p.slug) +
+        '">Ver detalle</a>' +
+        "</div>";
+    }
     return (
       '<article class="product-card reveal" data-tipo="' +
       escapeAttr(tipo) +
@@ -318,7 +345,6 @@
       stockLabel(p.stock_status) +
       "</span>" +
       "</div>" +
-      datasheetBadge +
       "<h3><a href=\"producto.html?slug=" +
       encodeURIComponent(p.slug) +
       '">' +
@@ -327,12 +353,8 @@
       '<p class="product-price">' +
       price +
       "</p>" +
-      '<div class="product-card-actions">' +
-      primaryCta +
-      '<a class="product-card-link" href="producto.html?slug=' +
-      encodeURIComponent(p.slug) +
-      '">Ver detalle</a>' +
-      "</div></div></article>"
+      actionsHtml +
+      "</div></article>"
     );
   }
 

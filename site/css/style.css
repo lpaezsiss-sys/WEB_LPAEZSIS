@@ -360,8 +360,56 @@ select {
   color: var(--white);
 }
 
-.btn-quote {
+.btn-quote,
+.btn-quote-primary {
   letter-spacing: 0.03em;
+}
+
+.btn-quote-primary {
+  background: var(--sonic-red);
+  color: var(--white);
+  border-color: var(--sonic-red);
+}
+
+.btn-quote-primary:hover {
+  background: var(--sonic-red-dark);
+  border-color: var(--sonic-red-dark);
+  color: var(--white);
+}
+
+.btn-quote-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line, #d0d0d0);
+  letter-spacing: 0.03em;
+}
+
+.btn-quote-secondary:hover {
+  border-color: var(--sonic-red);
+  color: var(--sonic-red);
+}
+
+.btn-outline-spec {
+  background: transparent;
+  color: var(--ink-soft, #555);
+  border: 1px solid var(--line, #d0d0d0);
+  letter-spacing: 0.04em;
+}
+
+.btn-outline-spec:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.action-buttons-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.action-buttons-group .btn {
+  width: 100%;
+  min-width: 0;
 }
 
 .btn-icon {
@@ -1774,8 +1822,11 @@ body.nav-open {
 
 /* Limpieza de botones CTA en tarjetas */
 .product-card .btn-outline,
+.product-card .btn-outline-spec,
 .product-card .btn-buy,
-.product-card .btn-quote {
+.product-card .btn-quote,
+.product-card .btn-quote-primary,
+.product-card .btn-quote-secondary {
   display: flex;
   align-items: center;
   justify-content: center;

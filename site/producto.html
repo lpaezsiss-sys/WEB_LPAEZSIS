@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=99">
+  <link rel="stylesheet" href="css/style.css?v=100">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -39,7 +39,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=36"></script>
-  <script src="js/site.js?v=24"></script>
+  <script src="js/site.js?v=25"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -123,21 +123,23 @@
             '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
         }
         var actions = document.getElementById("productActions");
+        var quoteHref =
+          "contacto.html?quote=" +
+          encodeURIComponent(product.id || "") +
+          "&sku=" +
+          encodeURIComponent(product.slug || "") +
+          "&name=" +
+          encodeURIComponent(product.name || "");
         if (isRepuesto) {
           actions.innerHTML =
-            '<button type="button" class="btn btn-success btn-buy" id="btnBuy">COMPRAR</button>' +
-            '<button type="button" class="btn btn-outline" id="btnAlsoQuote">También a cotización</button>';
+            '<div class="action-buttons-group">' +
+            '<button type="button" class="btn btn-buy" id="btnBuy">COMPRAR</button>' +
+            '<a class="btn btn-quote-secondary" href="' + quoteHref + '">COTIZAR</a>' +
+            "</div>";
           document.getElementById("btnBuy").onclick = function () { Lpaez.addToCart(product, qty); };
-          document.getElementById("btnAlsoQuote").onclick = function () { Lpaez.addToQuote(product, qty); };
         } else {
           actions.innerHTML =
-            '<a class="btn btn-primary btn-quote" id="btnQuote" href="contacto.html?quote=' +
-            encodeURIComponent(product.id || "") +
-            "&sku=" +
-            encodeURIComponent(product.slug || "") +
-            "&name=" +
-            encodeURIComponent(product.name || "") +
-            '">PEDIR COTIZACIÓN</a>';
+            '<a class="btn btn-quote-primary" id="btnQuote" href="' + quoteHref + '">PEDIR COTIZACIÓN</a>';
         }
         Lpaez.injectJsonLd({
           "@context": "https://schema.org",
