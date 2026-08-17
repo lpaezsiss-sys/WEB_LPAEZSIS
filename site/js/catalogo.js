@@ -238,6 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     category: queryParam("category") === "repuestos" && tipoFromQuery === "repuesto" ? "" : queryParam("category") || "",
     brand: queryParam("brand") || "",
     industry: queryParam("industry") || "",
+    industria: queryParam("industria") || "",
     mode: queryParam("sale_mode") || queryParam("mode") || "",
     page: Math.max(1, parseInt(queryParam("page") || "1", 10) || 1),
   };
@@ -355,10 +356,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadProducts() {
     try {
-      const productsUrl =
-        state.tipo === "equipo" || state.tipo === "repuesto"
-          ? "/api/products?tipo=" + encodeURIComponent(state.tipo)
-          : "/api/products";
+      const params = new URLSearchParams();
+      if (state.tipo === "equipo" || state.tipo === "repuesto") params.set("tipo", state.tipo);
+      if (state.industria) params.set("industria", state.industria);
+      const qs = params.toString();
+      const productsUrl = "/api/products" + (qs ? "?" + qs : "");
       const [catsRes, prodRes, brandRes] = await Promise.all([
         fetchJson("/api/categories"),
         fetchJson(productsUrl),
@@ -432,6 +434,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       category_name: prod.category_name || "",
       brand_slug: prod.brand_slug || "",
       brand_name: prod.brand_name || "Sonic Air Systems",
+      industria_slug: prod.industria_slug || "",
+      industria_nombre: prod.industria_nombre || "",
       quote_url:
         "cotizacion.html?sku=" +
         encodeURIComponent(slug) +
@@ -445,6 +449,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const params = new URLSearchParams();
       if (state.tipo) params.set("tipo", state.tipo);
+      if (state.industria) params.set("industria", state.industria);
       if (state.industry) params.set("industry", state.industry);
       if (state.category) params.set("category", state.category);
       if (state.brand) params.set("brand", state.brand);
@@ -469,6 +474,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return list.filter((p) => {
       if (!p) return false;
       if (state.tipo && productTipoOf(p) !== state.tipo) return false;
+      if (state.industria && p.industria_slug !== state.industria) return false;
       if (state.category && p.category_slug !== state.category) return false;
       if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
