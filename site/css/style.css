@@ -1095,6 +1095,117 @@ body.nav-open {
   gap: 0.75rem;
 }
 
+
+/* Selector de marcas limpio */
+.brand-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.brand-card-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.4rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.brand-card-item img {
+  max-width: 85%;
+  max-height: 36px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.65;
+  transition: all 0.2s ease;
+}
+
+.brand-card-item:hover img,
+.brand-card-item.is-active img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.brand-card-item:hover {
+  border-color: #cbd5e1;
+}
+
+.brand-card-item.is-active {
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
+}
+
+/* --- HERO Y TEXTO SOBRE FONDO NEGRO --- */
+.brand-hero {
+  background-color: #0d0d0d;
+  color: #ffffff;
+  padding: 2.5rem 1.5rem;
+  width: 100%;
+}
+
+.brand-hero__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.brand-hero__title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  margin: 0 0 0.75rem;
+  color: #ffffff;
+}
+
+.brand-hero__description {
+  max-width: 900px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  text-align: justify;
+  margin: 0;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.brand-content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2rem 1.5rem;
+}
+
+/* --- SECCIÓN DE PRODUCTOS / EQUIPOS --- */
+.brand-products-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.brand-products-section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 1rem;
+}
+
+.brand-products-section #brandProductsTitle {
+  font-weight: 800;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 1.15rem;
+}
+
 .brand-pill {
   display: flex;
   align-items: center;
@@ -1232,6 +1343,17 @@ body.nav-open {
   float: none;
   display: block;
   margin: 0.75rem 0 1.25rem;
+}
+
+.brand-catalog-body video,
+.brand-catalog-body .ql-html5video,
+.brand-catalog-body .ql-video {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  margin: 0.75rem 0 1.25rem;
+  background: #000;
 }
 
 .brand-gallery {
