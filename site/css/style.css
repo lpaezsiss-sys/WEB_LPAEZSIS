@@ -1247,6 +1247,26 @@ body.nav-open {
 }
 
 /* --- HERO Y TEXTO SOBRE FONDO NEGRO --- */
+
+/* Contenedor estable en páginas de marcas (plantilla independiente de la API) */
+.brand-hero__inner.container,
+.brand-content-wrapper.container {
+  width: 100%;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.brand-selector-grid:empty::before {
+  content: "Cargando marcas…";
+  display: block;
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
 .brand-hero {
   background-color: #0d0d0d;
   color: #ffffff;

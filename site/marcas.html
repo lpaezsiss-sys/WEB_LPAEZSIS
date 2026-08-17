@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Representaciones y Distribución | LPAEZsis</title>
   <meta name="description" content="Representaciones y distribución LPAEZsis: Sonic Air Systems, LYC, MOVEX, ISODUR, COMBI, HAIDA.">
-  <link rel="canonical" href="https://lpaezsis.cl/marcas.html">
+  <link rel="canonical" id="brandCanonical" href="https://lpaezsis.cl/marcas.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Representaciones y Distribución | LPAEZsis">
   <meta property="og:description" content="Conoce las representaciones y distribución industrial de LPAEZsis en Chile.">
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=112">
+  <link rel="stylesheet" href="css/style.css?v=113">
 </head>
 <body>
   <div id="site-header-mount"></div>
 
-  <!-- Hero oscuro superior con texto cuadrado y extendido -->
+  <!-- Hero principal con contenedor oscuro permanente (maquetado independiente de la API) -->
   <section class="brand-hero" aria-labelledby="brandTitle">
-    <div class="brand-hero__inner">
+    <div class="brand-hero__inner container">
       <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
       <p class="brand-hero__description" id="brandDescription">
         Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
@@ -27,154 +27,32 @@
     </div>
   </section>
 
-  <!-- Cuerpo de la página sin textos ni logos repetidos -->
-  <main class="brand-content-wrapper" id="main">
+  <!-- Contenedor principal del cuerpo: estructura fija; JS solo rellena nodos -->
+  <main class="brand-content-wrapper container" id="main">
 
-    <!-- Selector de marcas compacto con logos reducidos -->
-    <div class="brand-selector-grid" id="brandSelector"></div>
+    <!-- Selector de marcas estable -->
+    <div class="brand-selector-grid" id="brandSelectorGrid" aria-label="Seleccionar marca"></div>
 
-    <!-- Contenido enriquecido de la ficha (solo si existe en admin; no repite título/desc) -->
+    <!-- Ficha enriquecida (nodo siempre presente; vacío/oculto si no hay HTML) -->
     <div class="brand-catalog-body" id="brandContent" hidden></div>
     <div class="brand-gallery" id="brandGallery" hidden></div>
 
-    <!-- Catálogo de equipos directamente debajo del selector -->
-    <section class="brand-products-section" aria-labelledby="brandProductsHeading">
-      <h2 id="brandProductsHeading">Equipos <span id="brandProductsTitle"></span></h2>
-      <div class="catalog-grid product-grid" id="brandProductsGrid"></div>
+    <!-- Sección de catálogo de la marca -->
+    <section class="brand-products-section" aria-labelledby="brandProductsTitle">
+      <h2 id="brandProductsTitle">Equipos de la marca</h2>
+      <div class="catalog-grid product-grid" id="brandProductsGrid">
+        <p class="empty-state" id="brandProductsPlaceholder">Cargando equipos…</p>
+      </div>
       <div class="section-actions is-start">
-        <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
+        <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
         <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
       </div>
     </section>
   </main>
 
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=23"></script>
-  <script>
-    var slug = Lpaez.queryParam("slug");
-
-    function brandCardHtml(b) {
-      var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
-      var active = slug && slug === b.slug ? " is-active" : "";
-      if (b.logo_url) {
-        return (
-          '<a class="brand-card-item' + active + '" href="' + href + '" title="' + Lpaez.escapeHtml(b.name) + '">' +
-          '<img src="' + Lpaez.escapeHtml(b.logo_url) + '" alt="' + Lpaez.escapeHtml(b.name) + '" loading="lazy">' +
-          "</a>"
-        );
-      }
-      return (
-        '<a class="brand-card-item' + active + '" href="' + href + '" title="' + Lpaez.escapeHtml(b.name) + '">' +
-        Lpaez.escapeHtml(b.name) +
-        "</a>"
-      );
-    }
-
-    function renderGallery(urls) {
-      var el = document.getElementById("brandGallery");
-      if (!urls || !urls.length) {
-        el.hidden = true;
-        el.innerHTML = "";
-        return;
-      }
-      el.hidden = false;
-      el.innerHTML = urls.map(function (u) {
-        return '<a class="brand-gallery-item" href="' + Lpaez.escapeHtml(u) + '" target="_blank" rel="noopener">' +
-          '<img src="' + Lpaez.escapeHtml(u) + '" alt="" loading="lazy"></a>';
-      }).join("");
-    }
-
-    function hydrateContent(html) {
-      var content = document.getElementById("brandContent");
-      var hasHtml = !!(html && String(html).trim());
-      if (!hasHtml) {
-        content.innerHTML = "";
-        content.hidden = true;
-        return;
-      }
-      content.innerHTML = html;
-      content.querySelectorAll("img").forEach(function (img) {
-        var real =
-          img.getAttribute("data-src") ||
-          img.getAttribute("data-lazy-src") ||
-          img.getAttribute("data-original");
-        if (real) {
-          img.setAttribute("src", real);
-          img.removeAttribute("data-src");
-          img.removeAttribute("data-lazy-src");
-        }
-        if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
-          img.remove();
-        }
-      });
-      content.hidden = false;
-    }
-
-    Lpaez.api("/api/brands").then(function (res) {
-      var brands = (res.data && res.data.brands) || [];
-      if (!slug && brands.length) {
-        var sonic = brands.find(function (b) {
-          return b.slug === "sonic-air-systems" || /sonic/i.test(b.name || "");
-        });
-        slug = (sonic && sonic.slug) || brands[0].slug;
-        if (slug && history.replaceState) {
-          history.replaceState(null, "", "marcas.html?slug=" + encodeURIComponent(slug));
-        }
-      }
-      document.getElementById("brandSelector").innerHTML = brands.map(brandCardHtml).join("");
-
-      if (!slug) {
-        document.getElementById("brandProductsGrid").innerHTML =
-          "<p class='empty-state'>Elige una marca para ver sus equipos.</p>";
-        return;
-      }
-
-      return Lpaez.api("/api/brands/" + encodeURIComponent(slug)).then(function (r) {
-        var grid = document.getElementById("brandProductsGrid");
-        if (!r.ok) {
-          // Inactive or missing slug: fall back to first active brand instead of a blank page.
-          if (brands.length && brands[0].slug !== slug) {
-            if (history.replaceState) {
-              history.replaceState(null, "", "marcas.html?slug=" + encodeURIComponent(brands[0].slug));
-            }
-            window.location.replace("marcas.html?slug=" + encodeURIComponent(brands[0].slug));
-            return;
-          }
-          grid.innerHTML = "<p class='empty-state'>No se encontró esta marca (puede estar inactiva).</p>";
-          return;
-        }
-        var brand = r.data.brand;
-        var products = r.data.products || [];
-        document.title = brand.name + " | LPAEZsis";
-        document.getElementById("brandTitle").textContent = brand.name;
-        document.getElementById("brandDescription").textContent =
-          brand.description || "Productos e información de la representación.";
-        document.getElementById("brandProductsTitle").textContent = brand.name;
-
-        if (brand.content_html && String(brand.content_html).trim()) {
-          hydrateContent(brand.content_html);
-        } else if (brand.description) {
-          hydrateContent("<p>" + Lpaez.escapeHtml(brand.description) + "</p>");
-        } else {
-          hydrateContent("");
-        }
-        renderGallery(brand.gallery || []);
-
-        grid.innerHTML = products.length
-          ? products.map(Lpaez.productCardHtml).join("")
-          : "<p class='empty-state'>Esta marca se cotiza por proyecto. Solicita una cotización para evaluar tu línea.</p>";
-        Lpaez.observeReveals();
-
-        var link = document.createElement("link");
-        link.rel = "canonical";
-        link.href = "https://lpaezsis.cl/marcas.html?slug=" + encodeURIComponent(brand.slug);
-        document.head.appendChild(link);
-      });
-    }).catch(function () {
-      document.getElementById("brandProductsGrid").innerHTML =
-        "<p class='empty-state'>No se pudo cargar la marca. Intenta recargar.</p>";
-    });
-  </script>
+  <script src="js/layout.js?v=36"></script>
+  <script src="js/site.js?v=25"></script>
+  <script src="js/marcas.js?v=113"></script>
 </body>
 </html>
