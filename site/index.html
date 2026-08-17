@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=103">
+  <link rel="stylesheet" href="css/style.css?v=104">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -152,7 +152,7 @@
         <h2 id="sectores-title">Sectores donde <span class="accent">trabajamos</span></h2>
         <p class="section-subtitle">Revisa tu sector industrial.</p>
       </div>
-      <div class="industry-grid" id="industriasContainer" role="list">
+      <div class="industries-grid" id="industriasContainer" role="list">
         <a
           class="industry-tile"
           role="listitem"
@@ -471,9 +471,9 @@
             }
             if (img.charAt(0) === "/") img = img.slice(1);
             return (
-              '<a href="' + Lpaez.escapeHtml(href) + '" class="industry-card industry-tile" role="listitem" aria-label="' +
+              '<a href="' + Lpaez.escapeHtml(href) + '" class="industry-card" role="listitem" aria-label="' +
               Lpaez.escapeHtml(nombre) + ' — ver productos">' +
-              '<div class="industry-card__media industry-tile-media">' +
+              '<div class="industry-card__media">' +
               '<img src="' + Lpaez.escapeHtml(img) + '" alt="' + Lpaez.escapeHtml(nombre) +
               '" title="' + Lpaez.escapeHtml(nombre) + '" loading="lazy" decoding="async" width="720" height="480">' +
               "</div>" +
