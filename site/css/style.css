@@ -1320,6 +1320,11 @@ body.nav-open {
   font-weight: 800;
 }
 
+.no-products {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+}
+
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
