@@ -85,6 +85,14 @@ final class AdminApi
             return;
         }
 
+        if ($method === 'GET' && $sub === '/industrias') {
+            $rows = self::pdo()->query(
+                'SELECT * FROM industrias ORDER BY orden ASC, nombre ASC'
+            )->fetchAll();
+            Response::json(['industrias' => $rows]);
+            return;
+        }
+
         if ($method === 'GET' && $sub === '/clientes') {
             $rows = self::pdo()->query(
                 'SELECT * FROM clientes ORDER BY orden ASC, nombre ASC'
@@ -128,10 +136,12 @@ final class AdminApi
         if ($method === 'GET' && $sub === '/products') {
             $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
             $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
-                        b.slug AS brand_slug, b.name AS brand_name
+                        b.slug AS brand_slug, b.name AS brand_name,
+                        i.slug AS industria_slug, i.nombre AS industria_nombre
                  FROM products p
                  LEFT JOIN categories c ON c.id = p.category_id
-                 LEFT JOIN brands b ON b.id = p.brand_id';
+                 LEFT JOIN brands b ON b.id = p.brand_id
+                 LEFT JOIN industrias i ON i.id = p.industria_id';
             if ($tipo === 'equipo' || $tipo === 'repuesto') {
                 $sql .= ' WHERE p.tipo = ?';
                 $stmt = self::pdo()->prepare($sql . ' ORDER BY p.sort_order, p.name');
@@ -662,12 +672,20 @@ final class AdminApi
             $st->execute([$s]);
             return (bool) $st->fetchColumn();
         });
+        $industriaId = null;
+        if (array_key_exists('industria_id', $b) && $b['industria_id'] !== '' && $b['industria_id'] !== null) {
+            $industriaId = (int) $b['industria_id'];
+            if ($industriaId <= 0) {
+                $industriaId = null;
+            }
+        }
         self::pdo()->prepare(
             'INSERT INTO products
-             (category_id, brand_id, slug, name, description, sale_mode, tipo, stock_status, price_clp, image_url,
+             (industria_id, category_id, brand_id, slug, name, description, sale_mode, tipo, stock_status, price_clp, image_url,
               is_featured, is_active, seo_title, seo_description, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
+            $industriaId,
             $categoryId,
             isset($b['brand_id']) && $b['brand_id'] !== '' && $b['brand_id'] !== null ? (int) $b['brand_id'] : null,
             $slug,
@@ -712,6 +730,14 @@ final class AdminApi
         if (array_key_exists('brand_id', $b) && ($b['brand_id'] === '' || $b['brand_id'] === null)) {
             $b['brand_id'] = null;
         }
+        if (array_key_exists('industria_id', $b) && ($b['industria_id'] === '' || $b['industria_id'] === null)) {
+            $b['industria_id'] = null;
+        } elseif (array_key_exists('industria_id', $b)) {
+            $b['industria_id'] = (int) $b['industria_id'];
+            if ($b['industria_id'] <= 0) {
+                $b['industria_id'] = null;
+            }
+        }
         if (array_key_exists('price_clp', $b) && $b['price_clp'] === '') {
             $b['price_clp'] = null;
         }
@@ -719,7 +745,7 @@ final class AdminApi
             $b['tipo'] = self::normalizeProductTipo($b);
         }
         $fields = [
-            'category_id', 'brand_id', 'slug', 'name', 'description', 'sale_mode', 'tipo', 'stock_status',
+            'industria_id', 'category_id', 'brand_id', 'slug', 'name', 'description', 'sale_mode', 'tipo', 'stock_status',
             'price_clp', 'image_url', 'is_featured', 'is_active', 'seo_title', 'seo_description', 'sort_order',
         ];
         $sets = ['updated_at = NOW()'];

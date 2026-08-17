@@ -5,6 +5,7 @@
   var TOKEN_KEY = "lpaezsis_admin_token";
   var categoriesCache = [];
   var brandsCache = [];
+  var industriasCache = [];
   var productsCache = [];
   var selectedCategoryId = null;
   var productListTipo = "equipo"; // equipo | repuesto
@@ -337,10 +338,11 @@
   }
 
   function loadProducts() {
-    return Promise.all([api("/categories"), api("/brands"), api("/products")]).then(function (results) {
+    return Promise.all([api("/categories"), api("/brands"), api("/industrias"), api("/products")]).then(function (results) {
       categoriesCache = (results[0].data && results[0].data.categories) || [];
       brandsCache = (results[1].data && results[1].data.brands) || [];
-      productsCache = (results[2].data && results[2].data.products) || [];
+      industriasCache = (results[2].data && results[2].data.industrias) || [];
+      productsCache = (results[3].data && results[3].data.products) || [];
       fillSelectsFromCache();
       if (
         selectedCategoryId != null &&
@@ -359,6 +361,7 @@
   function fillSelectsFromCache() {
     var catSel = document.getElementById("productCategory");
     var brandSel = document.getElementById("productBrand");
+    var indSel = document.getElementById("productoIndustria");
     if (!catSel || !brandSel) return;
     catSel.innerHTML = categoriesCache
       .map(function (c) {
@@ -372,12 +375,28 @@
           return '<option value="' + escapeAttr(b.id) + '">' + escapeHtml(b.name) + "</option>";
         })
         .join("");
+    if (indSel) {
+      indSel.innerHTML =
+        '<option value="">-- Seleccionar Industria --</option>' +
+        industriasCache
+          .map(function (i) {
+            return (
+              '<option value="' +
+              escapeAttr(i.id) +
+              '">' +
+              escapeHtml(i.nombre || i.name || i.slug) +
+              "</option>"
+            );
+          })
+          .join("");
+    }
   }
 
   function fillSelects() {
-    return Promise.all([api("/categories"), api("/brands")]).then(function (results) {
+    return Promise.all([api("/categories"), api("/brands"), api("/industrias")]).then(function (results) {
       categoriesCache = (results[0].data && results[0].data.categories) || [];
       brandsCache = (results[1].data && results[1].data.brands) || [];
+      industriasCache = (results[2].data && results[2].data.industrias) || [];
       fillSelectsFromCache();
     });
   }
@@ -776,6 +795,9 @@
       form.slug.value = product.slug || "";
       form.category_id.value = product.category_id || "";
       form.brand_id.value = product.brand_id || "";
+      if (form.industria_id) {
+        form.industria_id.value = product.industria_id || "";
+      }
       form.sale_mode.value = product.sale_mode || (productListTipo === "repuesto" ? "buy" : "quote");
       form.tipo.value = product.tipo || productListTipo;
       form.stock_status.value = product.stock_status || "on_request";
@@ -795,6 +817,7 @@
       form.is_active.checked = true;
       form.tipo.value = productListTipo;
       form.sale_mode.value = productListTipo === "repuesto" ? "buy" : "quote";
+      if (form.industria_id) form.industria_id.value = "";
       setFormImagePreview("");
     }
     document.getElementById("productDialogTitle").textContent = product
@@ -986,6 +1009,7 @@
       slug: form.slug.value.trim() || undefined,
       category_id: Number(form.category_id.value),
       brand_id: form.brand_id.value ? Number(form.brand_id.value) : null,
+      industria_id: form.industria_id && form.industria_id.value ? Number(form.industria_id.value) : null,
       sale_mode: form.sale_mode.value,
       tipo: form.tipo.value,
       stock_status: form.stock_status.value,
