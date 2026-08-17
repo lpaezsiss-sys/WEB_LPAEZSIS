@@ -15,7 +15,7 @@
   <meta property="og:image" id="ogImage" content="https://prueba1.lpaezsis.cl/img/hero/plant.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="img/icons/favicon.ico" sizes="any">
-  <link rel="stylesheet" href="css/style.css?v=85">
+  <link rel="stylesheet" href="css/style.css?v=110">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -52,40 +52,42 @@
         </picture>
       </div>
       <div class="page-hero-inner">
-        <h1>Productos</h1>
-        <p>Catálogo B2B: filtra por industria o marca, cotiza equipos y descarga fichas técnicas.</p>
+        <h1>Equipos</h1>
+        <p class="hero-description">Equipos industriales: filtra por industria o marca y solicita cotización con ficha técnica.</p>
       </div>
     </div>
 
     <div class="catalog-toolbar">
-      <p class="catalog-mode-label" id="industryLabel">Industria</p>
-      <div
-        class="industry-tabs"
-        id="industryTabs"
-        role="tablist"
-        aria-labelledby="industryLabel"></div>
-
-      <p class="catalog-mode-label" id="categoryLabel">Categoría</p>
-      <div class="filter-chips" id="filterChips" role="group" aria-labelledby="categoryLabel"></div>
-
-      <div class="catalog-toolbar__row">
-        <div class="catalog-brand-field">
-          <label class="catalog-mode-label" for="brandFilter">Marca</label>
-          <select id="brandFilter" class="catalog-select" aria-label="Filtrar por marca">
+      <div class="catalog-filters" role="search" aria-label="Filtros del catálogo">
+        <div class="filter-group" id="filterIndustriaGroup">
+          <label for="industryFilter">Industria</label>
+          <select id="industryFilter" class="filter-select" aria-label="Filtrar por industria">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group" id="filterCategoriaGroup">
+          <label for="categoryFilter">Categoría</label>
+          <select id="categoryFilter" class="filter-select" aria-label="Filtrar por categoría">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="brandFilter">Marca</label>
+          <select id="brandFilter" class="filter-select" aria-label="Filtrar por marca">
             <option value="">Todas las marcas</option>
           </select>
         </div>
-        <div>
-          <p class="catalog-mode-label" id="modeLabel">Tipo de venta</p>
-          <div class="filter-chips filter-chips--mode" aria-labelledby="modeLabel" id="modeChips" role="group">
-            <button type="button" class="filter-chip is-active" data-mode="" aria-pressed="true">Todas</button>
-            <button type="button" class="filter-chip" data-mode="buy" aria-pressed="false">Comprar</button>
-            <button type="button" class="filter-chip" data-mode="quote" aria-pressed="false">Cotizar</button>
-          </div>
+        <div class="filter-group">
+          <label for="modeFilter">Tipo de venta</label>
+          <select id="modeFilter" class="filter-select" aria-label="Filtrar por tipo de venta">
+            <option value="">Todas</option>
+            <option value="buy">Comprar</option>
+            <option value="quote">Cotizar</option>
+          </select>
         </div>
       </div>
 
-      <p class="catalog-hint">Repuestos y consumibles → <strong>Comprar</strong>. Equipos industriales → <strong>Cotizar</strong>. Usa <code>?category=</code> y <code>?brand=</code> en la URL.</p>
+      <p class="catalog-hint catalog-debug-info">Catálogo de <strong>equipos</strong>. Cotiza proyectos a medida. Enlace: <code>?tipo=equipo</code>.</p>
       <p class="catalog-count" id="catalogCount" hidden></p>
     </div>
 
@@ -111,8 +113,8 @@
   </dialog>
 
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=23"></script>
-  <script src="js/catalogo.js?v=4"></script>
+  <script src="js/layout.js?v=36"></script>
+  <script src="js/site.js?v=25"></script>
+  <script src="js/catalogo.js?v=13"></script>
 </body>
 </html>

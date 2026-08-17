@@ -346,6 +346,95 @@ select {
   background: var(--sonic-red-dark);
 }
 
+/* Grupo de botones principales para repuestos */
+.action-buttons-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.action-buttons-group .btn {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Botón Comprar (Verde) */
+.btn-success,
+.btn-buy {
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-success:hover,
+.btn-buy:hover {
+  background-color: #15803d;
+}
+
+/* Botón Cotizar primario (equipos) */
+.btn-quote,
+.btn-quote-primary {
+  letter-spacing: 0.03em;
+  background: var(--sonic-red);
+  color: var(--white);
+  border-color: var(--sonic-red);
+}
+
+.btn-quote-primary:hover,
+.btn-quote:hover {
+  background: var(--sonic-red-dark);
+  border-color: var(--sonic-red-dark);
+  color: var(--white);
+}
+
+/* Botón Cotizar secundario para repuestos */
+.btn-quote-secondary {
+  background-color: #ffffff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.55rem 0.25rem;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-quote-secondary:hover {
+  background-color: #fee2e2;
+}
+
+/* Botón Ficha Técnica unificado */
+.btn-outline-spec {
+  display: block;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.45rem;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.btn-outline-spec:hover {
+  background-color: #f1f5f9;
+}
+
+
 .btn-ghost {
   background: transparent;
   color: var(--white);
@@ -1683,6 +1772,7 @@ body.nav-open {
   border-color: var(--line-strong);
 }
 
+.product-card__media,
 .product-card-visual {
   aspect-ratio: 1 / 1;
   background: var(--product-bg);
@@ -1698,6 +1788,7 @@ body.nav-open {
   padding: 1rem;
 }
 
+.product-card__media img,
 .product-card-visual img {
   width: 100%;
   height: 100%;
@@ -1705,9 +1796,62 @@ body.nav-open {
   transition: transform 0.35s ease;
 }
 
+.product-card:hover .product-card__media img,
 .product-card:hover .product-card-visual img {
   transform: scale(1.03);
 }
+
+/* Badge flotante de tipo de venta */
+.badge-type {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-type--cotizar {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.badge-type--comprar {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.product-card-actions {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  justify-items: stretch;
+}
+
+.product-card-actions .btn {
+  width: 100%;
+}
+
+/* Limpieza de botones CTA en tarjetas (outline / cotizar primario) */
+.product-card .btn-outline,
+.product-card .btn-quote,
+.product-card .btn-quote-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap; /* Evita saltos de línea raros en el texto */
+}
+
+
+
 
 .product-card-body {
   padding: 1rem 1.05rem 1.15rem;
@@ -1766,15 +1910,9 @@ body.nav-open {
   margin-top: auto;
 }
 
-.product-card-actions {
-  display: grid;
-  gap: 0.55rem;
-  margin-top: 0.5rem;
-  justify-items: stretch;
-}
-
-.product-card-actions .btn {
-  width: 100%;
+/* Ocultar texto auxiliar técnico */
+.catalog-debug-info {
+  display: none !important;
 }
 
 .product-card-link {
@@ -2369,6 +2507,64 @@ body.nav-open {
 
 .prose .actions-row {
   margin: 1.75rem 0 1rem;
+}
+
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+/* Cuando hay solo 2 filtros visibles */
+.catalog-filters.filters-repuestos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  color: #1e293b;
+  outline: none;
+  width: 100%;
+  min-height: 2.5rem;
+  font: inherit;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  border-color: #dc2626;
+}
+
+.filter-select:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.35);
+  outline-offset: 2px;
 }
 
 .catalog-toolbar {
