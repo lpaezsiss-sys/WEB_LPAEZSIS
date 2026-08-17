@@ -40,12 +40,15 @@ async function initBrandPage() {
       return b && (b.activo == 1 || b.is_active == 1 || b.activo === true || b.is_active === true);
     });
 
-    // 2. Determinar marca actual (si la del slug no existe o está inactiva, tomar la primera activa)
+    // 2. Determinar marca actual (si la del slug no existe o está inactiva, preferir Sonic o la primera activa)
     var currentBrand = activeBrands.find(function (b) {
       return b.slug === currentSlug;
     });
     if (!currentBrand && activeBrands.length > 0) {
-      currentBrand = activeBrands[0];
+      currentBrand =
+        activeBrands.find(function (b) {
+          return b.slug === "sonic-air-systems" || /sonic/i.test(b.nombre || b.name || "");
+        }) || activeBrands[0];
       if (currentBrand.slug && history.replaceState) {
         history.replaceState(
           null,
