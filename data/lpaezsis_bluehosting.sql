@@ -265,6 +265,7 @@ DROP TABLE IF EXISTS `products`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tipo` enum('equipo','repuesto') NOT NULL DEFAULT 'equipo',
   `category_id` int(10) unsigned NOT NULL,
   `brand_id` int(10) unsigned DEFAULT NULL,
   `slug` varchar(200) NOT NULL,
@@ -298,19 +299,18 @@ CREATE TABLE `products` (
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
 INSERT INTO `products` VALUES
-(1,1,1,'secador-botellas-sonic','Sistema Secador de Botellas Sonic Air','Sistema de secado de botellas con turbinas y cuchillos de aire Sonic Air Systems. Configuración según línea y cadencia. Cotización personalizada.','quote','on_request',NULL,NULL,1,1,'Secador de botellas Sonic Air | Cotizar','Cotiza tu sistema de secado de botellas Sonic Air Systems. Distribuidores oficiales en Chile.',5,'2026-07-18 23:51:59','2026-07-19 07:51:30'),
-(2,1,1,'turbina-soplado-sonic-100','Turbina de Soplado Sonic 100','Turbina de soplado de alto caudal para aplicaciones de secado y limpieza industrial. Cotización según configuración.','quote','on_request',NULL,'',1,1,'Turbina Sonic 100 | Cotizar LPAEZsis','Turbina de soplado Sonic Air 100. Solicita cotización con LPAEZsis, distribuidores oficiales.',15,'2026-07-18 23:51:59','2026-07-19 08:06:14'),
-(3,4,1,'correa-sonic-70-85','Correa Sonic 70/85','Correa 16 GRV SONIC 70/85 (Cod 13514)','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13474.jpg',1,1,'Correa Sonic 70/ 85 | LPAEZsis','Correa 16 GRV SONIC 70/85 (Cod 13514)',10,'2026-07-18 23:51:59','2026-07-21 19:40:22'),
-(4,4,1,'filtro-poliester-s-75-85-100','Filtro Poliéster S 75-85-100','Elemento Filtro Polyester Lavable para Equipos SONIC 75-85-100','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10317.jpg',1,1,'Filtro Poliester S 75-85-100 | LPAEZsis','Elemento Filtro Polyester Lavable para Equipos SONIC 75-85-100',20,'2026-07-18 23:51:59','2026-07-21 19:40:04'),
-(9,4,1,'cartucho-rodamientos-s-100-150','Cartucho Rodamientos S 100-150','Conjunto Rodamientos Sellado Para Equipos SONIC 100-150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-14452.jpg',0,1,'Cartucho rodamientos Sonic 100-150 | LPAEZsis','Conjunto Rodamientos Sellado Para Equipos SONIC 100-150',100,'2026-07-19 00:11:41','2026-07-21 19:39:33'),
-(10,4,1,'cartucho-rodamientos-s-70-85','Cartucho Rodamientos S 70-85','Conjunto Rodamientos Sellado Para Equipos SONIC 70-85','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-14452.jpg',0,1,'Cartucho rodamientos Sonic 70-85 | LPAEZsis','Conjunto Rodamientos Sellado Para Equipos SONIC 70-85',100,'2026-07-19 00:11:41','2026-07-21 19:39:22'),
-(11,4,1,'correa-sonic-100-150','Correa Sonic 100/150','Correa 16 GRV SONIC 100/150 (Cod 13474)','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13474.jpg',0,1,'Correa Sonic 100/150 | Repuesto LPAEZsis','Correa 16 GRV SONIC 70/85 (Cod 13474)',100,'2026-07-19 00:11:41','2026-07-21 19:40:56'),
-(12,4,1,'filtro-completo-poliester-s-70-85-100-con-indicador','Filtro Completo Poliéster S 70/85/100 con indicador','Filtro Completo Polyester Lavable para Equipos SONIC 100- 150','buy','in_stock',195000,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10976.jpg',0,1,'Filtro completo Poliéster Sonic | LPAEZsis','Filtro Completo Polyester Lavable para Equipos SONIC 100- 150',100,'2026-07-19 00:11:41','2026-07-19 07:53:18'),
-(13,4,1,'filtro-poliester-s-100-150','Filtro Poliéster S 100-150','Elemento Filtro Polyester Lavable para Equipos SONIC 100- 150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10317.jpg',0,1,'Filtro Poliéster Sonic 100-150 | LPAEZsis','Elemento Filtro Polyester Lavable para Equipos SONIC 100- 150',100,'2026-07-19 00:11:41','2026-07-21 19:39:51'),
-(14,4,1,'impeller-sonic-70-100','Impeller Sonic 70/100','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 70/S100','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10015.jpg',0,1,'Impeller Sonic 70/100 | LPAEZsis','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 70/S100',100,'2026-07-19 00:11:41','2026-07-21 19:38:42'),
-(15,4,1,'impeller-sonic-85-150','Impeller Sonic 85/150','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 85/S150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10015.jpg',0,1,'Impeller Sonic 85/150 | LPAEZsis','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 85/S150',100,'2026-07-19 00:11:41','2026-07-21 19:38:57'),
-(16,4,1,'tensor-correa-sonic-todos-los-modelos','Tensor Correa Sonic (todos los modelos)','Kit Tensor Correa Sonic Todos los Modelos','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13455.png',0,1,'Tensor correa Sonic | Repuesto LPAEZsis','Kit Tensor Correa Sonic Todos los Modelos',100,'2026-07-19 00:11:41','2026-07-21 19:39:10');
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+(1,'equipo',1,1,'secador-botellas-sonic','Sistema Secador de Botellas Sonic Air','Sistema de secado de botellas con turbinas y cuchillos de aire Sonic Air Systems. Configuración según línea y cadencia. Cotización personalizada.','quote','on_request',NULL,NULL,1,1,'Secador de botellas Sonic Air | Cotizar','Cotiza tu sistema de secado de botellas Sonic Air Systems. Distribuidores oficiales en Chile.',5,'2026-07-18 23:51:59','2026-07-19 07:51:30'),
+(2,'equipo',1,1,'turbina-soplado-sonic-100','Turbina de Soplado Sonic 100','Turbina de soplado de alto caudal para aplicaciones de secado y limpieza industrial. Cotización según configuración.','quote','on_request',NULL,'',1,1,'Turbina Sonic 100 | Cotizar LPAEZsis','Turbina de soplado Sonic Air 100. Solicita cotización con LPAEZsis, distribuidores oficiales.',15,'2026-07-18 23:51:59','2026-07-19 08:06:14'),
+(3,'repuesto',4,1,'correa-sonic-70-85','Correa Sonic 70/85','Correa 16 GRV SONIC 70/85 (Cod 13514)','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13474.jpg',1,1,'Correa Sonic 70/ 85 | LPAEZsis','Correa 16 GRV SONIC 70/85 (Cod 13514)',10,'2026-07-18 23:51:59','2026-07-21 19:40:22'),
+(4,'repuesto',4,1,'filtro-poliester-s-75-85-100','Filtro Poliéster S 75-85-100','Elemento Filtro Polyester Lavable para Equipos SONIC 75-85-100','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10317.jpg',1,1,'Filtro Poliester S 75-85-100 | LPAEZsis','Elemento Filtro Polyester Lavable para Equipos SONIC 75-85-100',20,'2026-07-18 23:51:59','2026-07-21 19:40:04'),
+(9,'repuesto',4,1,'cartucho-rodamientos-s-100-150','Cartucho Rodamientos S 100-150','Conjunto Rodamientos Sellado Para Equipos SONIC 100-150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-14452.jpg',0,1,'Cartucho rodamientos Sonic 100-150 | LPAEZsis','Conjunto Rodamientos Sellado Para Equipos SONIC 100-150',100,'2026-07-19 00:11:41','2026-07-21 19:39:33'),
+(10,'repuesto',4,1,'cartucho-rodamientos-s-70-85','Cartucho Rodamientos S 70-85','Conjunto Rodamientos Sellado Para Equipos SONIC 70-85','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-14452.jpg',0,1,'Cartucho rodamientos Sonic 70-85 | LPAEZsis','Conjunto Rodamientos Sellado Para Equipos SONIC 70-85',100,'2026-07-19 00:11:41','2026-07-21 19:39:22'),
+(11,'repuesto',4,1,'correa-sonic-100-150','Correa Sonic 100/150','Correa 16 GRV SONIC 100/150 (Cod 13474)','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13474.jpg',0,1,'Correa Sonic 100/150 | Repuesto LPAEZsis','Correa 16 GRV SONIC 70/85 (Cod 13474)',100,'2026-07-19 00:11:41','2026-07-21 19:40:56'),
+(12,'repuesto',4,1,'filtro-completo-poliester-s-70-85-100-con-indicador','Filtro Completo Poliéster S 70/85/100 con indicador','Filtro Completo Polyester Lavable para Equipos SONIC 100- 150','buy','in_stock',195000,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10976.jpg',0,1,'Filtro completo Poliéster Sonic | LPAEZsis','Filtro Completo Polyester Lavable para Equipos SONIC 100- 150',100,'2026-07-19 00:11:41','2026-07-19 07:53:18'),
+(13,'repuesto',4,1,'filtro-poliester-s-100-150','Filtro Poliéster S 100-150','Elemento Filtro Polyester Lavable para Equipos SONIC 100- 150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10317.jpg',0,1,'Filtro Poliéster Sonic 100-150 | LPAEZsis','Elemento Filtro Polyester Lavable para Equipos SONIC 100- 150',100,'2026-07-19 00:11:41','2026-07-21 19:39:51'),
+(14,'repuesto',4,1,'impeller-sonic-70-100','Impeller Sonic 70/100','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 70/S100','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10015.jpg',0,1,'Impeller Sonic 70/100 | LPAEZsis','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 70/S100',100,'2026-07-19 00:11:41','2026-07-21 19:38:42'),
+(15,'repuesto',4,1,'impeller-sonic-85-150','Impeller Sonic 85/150','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 85/S150','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-10015.jpg',0,1,'Impeller Sonic 85/150 | LPAEZsis','Impulsor para Soplador SONIC AIR SYSTEMS Modelos S 85/S150',100,'2026-07-19 00:11:41','2026-07-21 19:38:57'),
+(16,'repuesto',4,1,'tensor-correa-sonic-todos-los-modelos','Tensor Correa Sonic (todos los modelos)','Kit Tensor Correa Sonic Todos los Modelos','buy','in_stock',NULL,'https://lpaezsis.cl/wp-content/uploads/2022/03/A07-13455.png',0,1,'Tensor correa Sonic | Repuesto LPAEZsis','Kit Tensor Correa Sonic Todos los Modelos',100,'2026-07-19 00:11:41','2026-07-21 19:39:10');/*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -421,3 +421,35 @@ UNLOCK TABLES;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
 -- Dump completed on 2026-07-31 23:13:24
+
+--
+-- Table structure for table `clientes`
+--
+
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(150) NOT NULL,
+  `logo_url` VARCHAR(255) NOT NULL,
+  `orden` INT DEFAULT 0,
+  `activo` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Table structure for table `soluciones`
+--
+
+CREATE TABLE IF NOT EXISTS `soluciones` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `slug` VARCHAR(50) NOT NULL UNIQUE,
+  `titulo` VARCHAR(150) NOT NULL,
+  `bullet_1` VARCHAR(255) DEFAULT NULL,
+  `bullet_2` VARCHAR(255) DEFAULT NULL,
+  `bullet_3` VARCHAR(255) DEFAULT NULL,
+  `cta_texto` VARCHAR(100) DEFAULT NULL,
+  `cta_url` VARCHAR(255) DEFAULT NULL,
+  `imagen_url` VARCHAR(255) DEFAULT NULL,
+  `orden` INT DEFAULT 0,
+  `activo` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=104">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -38,8 +38,8 @@
     </div>
   </main>
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=22"></script>
+  <script src="js/layout.js?v=36"></script>
+  <script src="js/site.js?v=25"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -86,9 +86,16 @@
           product.sale_mode === "buy" && product.price_clp != null
             ? Lpaez.formatPrice(product.price_clp)
             : "Precio a cotizar";
+        var tipo =
+          product.tipo === "repuesto" || product.tipo === "equipo"
+            ? product.tipo
+            : product.sale_mode === "buy"
+              ? "repuesto"
+              : "equipo";
+        var isRepuesto = tipo === "repuesto";
         document.getElementById("productMeta").innerHTML =
-          '<span class="badge-mode ' + (product.sale_mode === "buy" ? "badge-buy" : "badge-quote") + '">' +
-          (product.sale_mode === "buy" ? "Comprar" : "Cotizar") + "</span>" +
+          '<span class="badge-mode ' + (isRepuesto ? "badge-buy" : "badge-quote") + '">' +
+          (isRepuesto ? "Comprar" : "Cotizar") + "</span>" +
           '<span class="badge-stock">' + Lpaez.stockLabel(product.stock_status) + "</span>";
 
         var crumb = document.getElementById("productBreadcrumb");
@@ -99,7 +106,11 @@
           crumbCat.hidden = false;
           crumbCatSep.hidden = false;
           crumbCat.textContent = product.category_name;
-          crumbCat.href = "catalogo.html?category=" + encodeURIComponent(product.category_slug);
+          crumbCat.href =
+            "catalogo.html?tipo=" +
+            encodeURIComponent(tipo) +
+            "&category=" +
+            encodeURIComponent(product.category_slug);
         } else {
           crumbCat.hidden = true;
           crumbCatSep.hidden = true;
@@ -112,15 +123,23 @@
             '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
         }
         var actions = document.getElementById("productActions");
-        if (product.sale_mode === "buy") {
+        var quoteHref =
+          "contacto.html?quote=" +
+          encodeURIComponent(product.id || "") +
+          "&sku=" +
+          encodeURIComponent(product.slug || "") +
+          "&name=" +
+          encodeURIComponent(product.name || "");
+        if (isRepuesto) {
           actions.innerHTML =
-            '<button type="button" class="btn btn-primary" id="btnBuy">Agregar al carrito</button>' +
-            '<button type="button" class="btn btn-outline" id="btnAlsoQuote">También a cotización</button>';
+            '<div class="action-buttons-group">' +
+            '<button type="button" class="btn btn-buy" id="btnBuy">COMPRAR</button>' +
+            '<a class="btn btn-quote-secondary" href="' + quoteHref + '">COTIZAR</a>' +
+            "</div>";
           document.getElementById("btnBuy").onclick = function () { Lpaez.addToCart(product, qty); };
-          document.getElementById("btnAlsoQuote").onclick = function () { Lpaez.addToQuote(product, qty); };
         } else {
-          actions.innerHTML = '<button type="button" class="btn btn-primary" id="btnQuote">Agregar a cotización</button>';
-          document.getElementById("btnQuote").onclick = function () { Lpaez.addToQuote(product, qty); };
+          actions.innerHTML =
+            '<a class="btn btn-quote-primary" id="btnQuote" href="' + quoteHref + '">PEDIR COTIZACIÓN</a>';
         }
         Lpaez.injectJsonLd({
           "@context": "https://schema.org",

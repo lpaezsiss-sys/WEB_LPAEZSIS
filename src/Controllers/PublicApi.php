@@ -46,6 +46,18 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/clientes') {
+            self::clientes();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/soluciones') {
+            self::soluciones();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/industrias') {
+            self::industrias();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -114,6 +126,57 @@ final class PublicApi
         Response::json(['brands' => $rows]);
     }
 
+    private static function clientes(): void
+    {
+        // Contrato público: lista plana de clientes activos (id, nombre, logo_url).
+        $stmt = self::pdo()->prepare(
+            'SELECT id, nombre, logo_url
+             FROM clientes
+             WHERE activo = 1
+             ORDER BY orden ASC, nombre ASC'
+        );
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        Response::json($rows);
+    }
+
+    private static function soluciones(): void
+    {
+        // Contrato público: hasta 8 soluciones activas ordenadas.
+        $stmt = self::pdo()->prepare(
+            'SELECT id, slug, titulo, bullet_1, bullet_2, bullet_3,
+                    cta_texto, cta_url, imagen_url, orden
+             FROM soluciones
+             WHERE activo = 1
+             ORDER BY orden ASC, titulo ASC
+             LIMIT 8'
+        );
+        $stmt->execute();
+        Response::json($stmt->fetchAll());
+    }
+
+    private static function industrias(): void
+    {
+        // Sectores activos (máx. 8) + imagen aleatoria de un producto vinculado.
+        // Tabla real: products / image_url (no productos / imagen_url).
+        $stmt = self::pdo()->query(
+            "SELECT i.id, i.slug, i.nombre, i.orden,
+                    (SELECT p.image_url
+                     FROM products p
+                     WHERE p.industria_id = i.id
+                       AND p.is_active = 1
+                       AND p.image_url IS NOT NULL
+                       AND p.image_url <> ''
+                     ORDER BY RAND()
+                     LIMIT 1) AS imagen_random
+             FROM industrias i
+             WHERE i.activo = 1
+             ORDER BY i.orden ASC, i.nombre ASC
+             LIMIT 8"
+        );
+        Response::json($stmt->fetchAll());
+    }
+
     private static function brandDetail(string $slug): void
     {
         $stmt = self::pdo()->prepare(
@@ -150,17 +213,36 @@ final class PublicApi
     private static function products(): void
     {
         $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
+        $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
+        $industria = strtolower(trim((string) ($_GET['industria'] ?? $_GET['industry'] ?? '')));
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
-                       b.slug AS brand_slug, b.name AS brand_name
+                       b.slug AS brand_slug, b.name AS brand_name,
+                       i.slug AS industria_slug, i.nombre AS industria_nombre
                 FROM products p
                 LEFT JOIN categories c ON c.id = p.category_id
                 LEFT JOIN brands b ON b.id = p.brand_id
+                LEFT JOIN industrias i ON i.id = p.industria_id
                 WHERE p.is_active = 1';
+        $params = [];
         if ($featured) {
             $sql .= ' AND p.is_featured = 1';
         }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
+        if ($industria !== '') {
+            $sql .= ' AND i.slug = ?';
+            $params[] = $industria;
+        }
         $sql .= ' ORDER BY p.sort_order, p.name';
-        $rows = self::pdo()->query($sql)->fetchAll();
+        if ($params) {
+            $stmt = self::pdo()->prepare($sql);
+            $stmt->execute($params);
+            $rows = $stmt->fetchAll();
+        } else {
+            $rows = self::pdo()->query($sql)->fetchAll();
+        }
         Response::json(['products' => $rows]);
     }
 

@@ -11,6 +11,12 @@ Thumbs.db
 !data/lpaezsis_backup_final.sql
 !data/lpaezsis_bluehosting.sql
 !data/lpaezsis.sqlite
+!data/2026-08-15_clientes.sql
+!data/2026-08-16_soluciones.sql
+!data/2026-08-16_products_tipo.sql
+!data/2026-08-16_products_tipo_after_id.sql
+!data/2026-08-17_industrias.sql
+!data/schema.sql
 
 # Local / secrets
 .env
