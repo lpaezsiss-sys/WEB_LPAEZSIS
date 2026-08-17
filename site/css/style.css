@@ -1196,12 +1196,49 @@ body.nav-open {
 }
 
 
-/* Selector de marcas limpio */
+/* Estilos blindados para la vista de Marcas */
+.brand-hero {
+  background-color: #0d0d0d !important;
+  color: #ffffff;
+  padding: 2.5rem 1.5rem;
+  width: 100%;
+}
+
+.brand-hero__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.brand-hero__title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+  color: #ffffff;
+}
+
+.brand-hero__description {
+  max-width: 900px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  text-align: justify;
+  margin: 0;
+}
+
+.brand-content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
 .brand-selector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 8px;
-  margin-bottom: 1.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+  gap: 10px !important;
+  margin-bottom: 2rem !important;
+  width: 100%;
 }
 
 .brand-card-item {
@@ -1209,26 +1246,26 @@ body.nav-open {
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   padding: 0.4rem;
-  height: 52px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
   text-decoration: none;
   color: inherit;
   font-weight: 700;
   font-size: 0.75rem;
   text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .brand-card-item img {
   max-width: 85%;
-  max-height: 36px;
+  max-height: 38px;
   object-fit: contain;
   filter: grayscale(100%);
   opacity: 0.65;
-  transition: all 0.2s ease;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
 .brand-card-item:hover img,
@@ -1245,8 +1282,6 @@ body.nav-open {
   border-color: #dc2626;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
 }
-
-/* --- HERO Y TEXTO SOBRE FONDO NEGRO --- */
 
 /* Contenedor estable en páginas de marcas (plantilla independiente de la API) */
 .brand-hero__inner.container,
@@ -1265,43 +1300,6 @@ body.nav-open {
   color: var(--muted);
   font-size: 0.9rem;
   padding: 0.5rem 0;
-}
-
-.brand-hero {
-  background-color: #0d0d0d;
-  color: #ffffff;
-  padding: 2.5rem 1.5rem;
-  width: 100%;
-}
-
-.brand-hero__inner {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.brand-hero__title {
-  font-size: 2rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.5px;
-  margin: 0 0 0.75rem;
-  color: #ffffff;
-}
-
-.brand-hero__description {
-  max-width: 900px;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #cbd5e1;
-  text-align: justify;
-  margin: 0;
-}
-
-/* --- CONTENEDOR PRINCIPAL --- */
-.brand-content-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.5rem 1.5rem 2rem 1.5rem;
 }
 
 /* --- SECCIÓN DE PRODUCTOS / EQUIPOS --- */
