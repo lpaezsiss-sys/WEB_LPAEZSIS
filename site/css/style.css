@@ -1403,6 +1403,49 @@ body.nav-open {
   font-size: 0.95rem;
 }
 
+
+/* ——— About page CTA ——— */
+.about-cta-section {
+  background: var(--off-white);
+  border-top: 1px solid var(--line);
+  padding: clamp(2.75rem, 6vw, 4.25rem) 1.25rem;
+}
+
+.about-cta-section .container {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.about-cta-section .text-center {
+  text-align: center;
+}
+
+.about-cta-section h2 {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+  font-weight: 800;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.about-cta-section p {
+  margin: 0 auto 1.4rem;
+  max-width: 44ch;
+  color: var(--ink-soft);
+}
+
+.about-cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.about-cta-buttons .btn {
+  min-width: 10.5rem;
+  letter-spacing: 0.04em;
+}
+
 /* ——— CTA band ——— */
 .cta-band {
   background: var(--charcoal);
