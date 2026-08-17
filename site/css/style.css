@@ -1759,67 +1759,98 @@ body.nav-open {
   color: var(--sonic-red);
 }
 
+.company-card,
 .about-card {
   background: var(--off-white);
   border: 1px solid var(--line);
-  padding: 1.25rem 1.35rem;
+  padding: 1.35rem 1.4rem 1.45rem;
 }
 
+.company-card__title,
 .about-card h3 {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
+  margin: 0 0 0.85rem;
+  font-size: 1.15rem;
   font-weight: 800;
   font-style: italic;
+  color: var(--ink);
 }
 
-.about-facts {
+.company-card__list {
   list-style: none;
-  margin: 0 0 1.15rem;
+  margin: 0 0 1.2rem;
   padding: 0;
   display: grid;
   gap: 0;
-  font-size: 0.95rem;
-  color: var(--ink-soft);
 }
 
-.about-fact {
+.company-card__list li {
   display: grid;
-  grid-template-columns: minmax(6.5rem, 38%) 1fr;
-  gap: 0.65rem 1rem;
+  grid-template-columns: minmax(6.75rem, 36%) 1fr;
+  gap: 0.55rem 1rem;
   align-items: baseline;
-  padding: 0.7rem 0;
+  padding: 0.72rem 0;
   border-bottom: 1px solid var(--line);
 }
 
-.about-fact:last-child {
+.company-card__list li:last-child {
   border-bottom: 0;
-  padding-bottom: 0.15rem;
 }
 
-.about-fact dt {
+.company-card__list label {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
   color: var(--muted);
+  cursor: default;
 }
 
-.about-fact dd {
+.company-card__list span,
+.company-card__list a {
   margin: 0;
+  font-size: 0.95rem;
   font-weight: 650;
   color: var(--ink);
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-.about-fact a {
+.company-card__list a {
   color: var(--sonic-red);
   text-decoration: none;
 }
 
-.about-fact a:hover {
+.company-card__list a:hover {
   text-decoration: underline;
+}
+
+.btn-linkedin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: #0a66c2;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-linkedin:hover {
+  background: #004182;
+  color: #fff;
+}
+
+.btn-linkedin svg {
+  flex-shrink: 0;
 }
 
 .specialty-grid {
@@ -2066,7 +2097,7 @@ body.nav-open {
     grid-template-columns: 1fr;
   }
 
-  .about-fact {
+  .company-card__list li {
     grid-template-columns: 1fr;
     gap: 0.2rem;
   }
