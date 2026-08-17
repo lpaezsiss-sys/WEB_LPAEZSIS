@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=102">
+  <link rel="stylesheet" href="css/style.css?v=103">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -152,7 +152,7 @@
         <h2 id="sectores-title">Sectores donde <span class="accent">trabajamos</span></h2>
         <p class="section-subtitle">Revisa tu sector industrial.</p>
       </div>
-      <div class="industry-grid" role="list">
+      <div class="industry-grid" id="industriasContainer" role="list">
         <a
           class="industry-tile"
           role="listitem"
@@ -392,54 +392,6 @@
         });
       }
 
-      var SECTOR_FALLBACKS = {
-        "alimentos-bebidas": "img/hero/cans.jpg",
-        "packaging-fin-de-linea": "img/hero/line.jpg",
-        "farmaceutica-salas-limpias": "img/hero/plant.jpg",
-        "mantencion-repuestos": "img/products/A07-10015.jpg"
-      };
-
-      function sectorHref(slug) {
-        if (slug === "mantencion-repuestos") return "catalogo.html?tipo=repuesto";
-        return "catalogo.html?tipo=equipo&industria=" + encodeURIComponent(slug || "");
-      }
-
-      function sectorImage(src, slug) {
-        var img = (src || SECTOR_FALLBACKS[slug] || "img/hero/plant.jpg").trim();
-        if (img.indexOf("http") === 0) {
-          var m = img.match(/\/([^\/?#]+\.(?:jpe?g|png|webp|gif))$/i);
-          if (m) img = "img/products/" + m[1];
-        }
-        if (img.charAt(0) === "/") img = img.slice(1);
-        var webp = String(img).replace(/\.(jpe?g|png)$/i, ".webp");
-        return (
-          '<span class="industry-tile-media" aria-hidden="true">' +
-          "<picture>" +
-          '<source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">' +
-          '<img src="' + Lpaez.escapeHtml(img) + '" alt="" title="' + Lpaez.escapeHtml(slug || "") +
-          '" loading="lazy" decoding="async" width="720" height="480">' +
-          "</picture></span>"
-        );
-      }
-
-      function renderSectores(items) {
-        var grid = document.querySelector("#sectores .industry-grid");
-        if (!grid) return;
-        if (!items || !items.length) return; // keep static HTML fallback
-        grid.innerHTML = items.map(function (it) {
-          var slug = it.slug || "";
-          var name = it.nombre || slug;
-          var href = sectorHref(slug);
-          return (
-            '<a class="industry-tile" role="listitem" href="' + Lpaez.escapeHtml(href) +
-            '" aria-label="' + Lpaez.escapeHtml(name) + ' — ver productos">' +
-            sectorImage(it.imagen_random, slug) +
-            "<h3>" + Lpaez.escapeHtml(name) + "</h3>" +
-            "</a>"
-          );
-        }).join("");
-      }
-
       function brandPillHtml(b) {
         var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
         var label = Lpaez.escapeHtml(b.name);
@@ -459,7 +411,7 @@
       var sectores = document.getElementById("sectores");
       if (sectores) {
         sectores.addEventListener("keydown", function (e) {
-          var tile = e.target.closest(".industry-tile");
+          var tile = e.target.closest(".industry-tile, .industry-card");
           if (!tile) return;
           if (e.key === " " || e.key === "Enter") {
             e.preventDefault();
@@ -471,18 +423,14 @@
       Promise.all([
         Lpaez.api("/api/brands"),
         Lpaez.api("/api/soluciones"),
-        Lpaez.api("/api/products?featured=1"),
-        Lpaez.api("/api/industrias")
+        Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
         var rawSol = results[1].data;
         var soluciones = Array.isArray(rawSol) ? rawSol : (rawSol && rawSol.soluciones) || [];
         var products = (results[2].data && results[2].data.products) || [];
-        var rawInd = results[3].data;
-        var industrias = Array.isArray(rawInd) ? rawInd : (rawInd && rawInd.industrias) || [];
         document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
         renderSolutions(soluciones);
-        renderSectores(industrias);
         document.getElementById("homeProducts").innerHTML =
           products.map(function (p) {
             return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
@@ -496,6 +444,49 @@
         Lpaez.observeReveals();
       });
     })();
+
+    function loadIndustriesSection() {
+      var SECTOR_FALLBACKS = {
+        "alimentos-bebidas": "img/hero/cans.jpg",
+        "packaging-fin-de-linea": "img/hero/line.jpg",
+        "farmaceutica-salas-limpias": "img/hero/plant.jpg",
+        "mantencion-repuestos": "img/products/A07-10015.jpg"
+      };
+      fetch("api/industrias.php")
+        .then(function (res) { return res.json(); })
+        .then(function (industries) {
+          var container = document.getElementById("industriasContainer");
+          if (!container || !industries || !industries.length) return;
+          container.innerHTML = industries.map(function (ind) {
+            var slug = ind.slug || "";
+            var nombre = ind.nombre || slug;
+            var href =
+              slug === "mantencion-repuestos"
+                ? "catalogo.html?tipo=repuesto&industria=" + encodeURIComponent(slug)
+                : "catalogo.html?tipo=equipo&industria=" + encodeURIComponent(slug);
+            var img = (ind.imagen_random || SECTOR_FALLBACKS[slug] || "img/hero/plant.jpg").trim();
+            if (img.indexOf("http") === 0) {
+              var m = img.match(/\/([^\/?#]+\.(?:jpe?g|png|webp|gif))$/i);
+              if (m) img = "img/products/" + m[1];
+            }
+            if (img.charAt(0) === "/") img = img.slice(1);
+            return (
+              '<a href="' + Lpaez.escapeHtml(href) + '" class="industry-card industry-tile" role="listitem" aria-label="' +
+              Lpaez.escapeHtml(nombre) + ' — ver productos">' +
+              '<div class="industry-card__media industry-tile-media">' +
+              '<img src="' + Lpaez.escapeHtml(img) + '" alt="' + Lpaez.escapeHtml(nombre) +
+              '" title="' + Lpaez.escapeHtml(nombre) + '" loading="lazy" decoding="async" width="720" height="480">' +
+              "</div>" +
+              '<div class="industry-card__overlay"><h3>' + Lpaez.escapeHtml(nombre) + "</h3></div>" +
+              "</a>"
+            );
+          }).join("");
+          if (window.Lpaez && Lpaez.observeReveals) Lpaez.observeReveals();
+        })
+        .catch(function () { /* keep static fallback tiles */ });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadIndustriesSection);
 
     function initHeroCarousel() {
       var slides = document.querySelectorAll(".hero-media__slide");
