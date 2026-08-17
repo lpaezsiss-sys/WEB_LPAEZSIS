@@ -1848,6 +1848,7 @@ body.nav-open {
 
 .product-card__media,
 .product-card-visual {
+  position: relative;
   aspect-ratio: 1 / 1;
   background: var(--product-bg);
   display: grid;
@@ -2596,6 +2597,25 @@ body.nav-open {
 }
 
 /* Cuando hay solo 2 filtros visibles */
+
+.catalog-filters:not(.filters-repuestos) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .catalog-filters:not(.filters-repuestos) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .catalog-filters:not(.filters-repuestos) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .catalog-filters.filters-repuestos {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
