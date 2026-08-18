@@ -81,7 +81,10 @@
   }
 
   function addToCart(product, qty) {
-    if (product.sale_mode !== "buy") {
+    var isBuyable =
+      product &&
+      (product.sale_mode === "buy" || product.tipo === "repuesto");
+    if (!isBuyable) {
       showToast("Este producto solo se cotiza.");
       return;
     }
@@ -241,18 +244,28 @@
         name: p.name,
         price_clp: p.price_clp,
         sale_mode: p.sale_mode,
+        tipo: p.tipo || (p.sale_mode === "buy" ? "repuesto" : "equipo"),
       })
     );
   }
 
+  function productTipoOf(p) {
+    if (p && (p.tipo === "repuesto" || p.tipo === "equipo")) return p.tipo;
+    return p && p.sale_mode === "buy" ? "repuesto" : "equipo";
+  }
+
   function productCardHtml(p, options) {
     var opts = options || {};
-    var modeClass = p.sale_mode === "buy" ? "badge-buy" : "badge-quote";
-    var modeLabel = p.sale_mode === "buy" ? "Comprar" : "Cotizar";
+    var tipo = productTipoOf(p);
+    var isRepuesto = tipo === "repuesto";
+    var modeClass = isRepuesto ? "badge-buy" : "badge-quote";
+    var modeLabel = isRepuesto ? "Comprar" : "Cotizar";
     var price =
-      p.sale_mode === "buy" && p.price_clp != null
+      isRepuesto && p.price_clp != null
         ? formatPrice(p.price_clp)
-        : "Cotización";
+        : isRepuesto
+          ? "Consultar"
+          : "Cotización";
     var img = resolveProductImage(p);
     var visual = img
       ? '<img src="' +
@@ -264,24 +277,56 @@
         '" loading="lazy" decoding="async" width="480" height="480">'
       : "LPAEZ";
     var payload = productPayload(p);
-    var primaryCta =
-      p.sale_mode === "buy"
-        ? '<button type="button" class="btn btn-primary btn-sm" data-card-cart="' +
-          payload +
-          '">Agregar al carrito</button>'
-        : '<button type="button" class="btn btn-primary btn-sm" data-card-quote="' +
-          payload +
-          '">Pedir cotización</button>';
-    var datasheetBadge =
-      opts.showDatasheetBadge
-        ? '<a class="badge-datasheet" href="producto.html?slug=' +
+    var quoteHref =
+      "contacto.html?quote=" +
+      encodeURIComponent(p.id || "") +
+      "&sku=" +
+      encodeURIComponent(p.slug || "") +
+      "&name=" +
+      encodeURIComponent(p.name || "");
+    var fichaUrl = String(p.ficha_url || p.datasheet_url || "").trim();
+    var fichaHtml = fichaUrl
+      ? '<a href="' +
+        escapeAttr(fichaUrl) +
+        '" target="_blank" rel="noopener" class="btn btn-outline-spec">DESCARGAR FICHA TÉCNICA</a>'
+      : opts.showDatasheetBadge
+        ? '<a class="btn btn-outline-spec" href="producto.html?slug=' +
           encodeURIComponent(p.slug) +
-          '" title="Ficha técnica PDF disponible">' +
-          '<span class="badge-datasheet__icon" aria-hidden="true">PDF</span>' +
-          "<span>Ficha técnica PDF disponible</span></a>"
+          '">DESCARGAR FICHA TÉCNICA</a>'
         : "";
+    var actionsHtml;
+    if (isRepuesto) {
+      actionsHtml =
+        '<div class="product-card-actions">' +
+        '<div class="action-buttons-group">' +
+        '<button type="button" class="btn btn-buy" data-card-cart="' +
+        payload +
+        '">COMPRAR</button>' +
+        '<a href="' +
+        escapeAttr(quoteHref) +
+        '" class="btn btn-quote-secondary">COTIZAR</a>' +
+        "</div>" +
+        fichaHtml +
+        '<a class="product-card-link" href="producto.html?slug=' +
+        encodeURIComponent(p.slug) +
+        '">Ver detalle</a>' +
+        "</div>";
+    } else {
+      actionsHtml =
+        '<div class="product-card-actions">' +
+        '<a href="' +
+        escapeAttr(quoteHref) +
+        '" class="btn btn-quote-primary">PEDIR COTIZACIÓN</a>' +
+        fichaHtml +
+        '<a class="product-card-link" href="producto.html?slug=' +
+        encodeURIComponent(p.slug) +
+        '">Ver detalle</a>' +
+        "</div>";
+    }
     return (
-      '<article class="product-card reveal">' +
+      '<article class="product-card reveal" data-tipo="' +
+      escapeAttr(tipo) +
+      '">' +
       '<a class="product-card-visual" href="producto.html?slug=' +
       encodeURIComponent(p.slug) +
       '" title="' +
@@ -300,7 +345,6 @@
       stockLabel(p.stock_status) +
       "</span>" +
       "</div>" +
-      datasheetBadge +
       "<h3><a href=\"producto.html?slug=" +
       encodeURIComponent(p.slug) +
       '">' +
@@ -309,12 +353,8 @@
       '<p class="product-price">' +
       price +
       "</p>" +
-      '<div class="product-card-actions">' +
-      primaryCta +
-      '<a class="product-card-link" href="producto.html?slug=' +
-      encodeURIComponent(p.slug) +
-      '">Ver detalle</a>' +
-      "</div></div></article>"
+      actionsHtml +
+      "</div></article>"
     );
   }
 
@@ -517,6 +557,7 @@
     clearQuote: clearQuote,
     showToast: showToast,
     productCardHtml: productCardHtml,
+    productTipoOf: productTipoOf,
     resolveProductImage: resolveProductImage,
     resolveCategoryImage: resolveCategoryImage,
     observeReveals: observeReveals,
