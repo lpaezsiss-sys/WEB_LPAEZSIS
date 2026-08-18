@@ -46,6 +46,14 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/marcas') {
+            self::marcas();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/productos') {
+            self::productosList();
+            return;
+        }
         if ($method === 'GET' && $path === '/api/soluciones') {
             self::soluciones();
             return;
@@ -116,6 +124,123 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    /**
+     * GET /api/marcas[?slug=]
+     * - Sin slug: { marcas: [...], brands: [...] } (aliases ES para marcas.js)
+     * - Con slug: { marca: {...}, todas: [...] }
+     * Tabla real: brands (is_active).
+     */
+    private static function marcas(): void
+    {
+        try {
+            $slug = isset($_GET['slug']) ? trim((string) $_GET['slug']) : '';
+
+            $mapRow = static function (array $b): array {
+                $nombre = (string) ($b['name'] ?? '');
+                $desc = (string) ($b['description'] ?? '');
+                $logo = (string) ($b['logo_url'] ?? '');
+                return [
+                    'id' => isset($b['id']) ? (int) $b['id'] : null,
+                    'slug' => (string) ($b['slug'] ?? ''),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'descripcion' => $desc,
+                    'description' => $desc,
+                    'logo_url' => $logo,
+                    'imagen' => $logo,
+                    'website_url' => $b['website_url'] ?? null,
+                    'sort_order' => isset($b['sort_order']) ? (int) $b['sort_order'] : 0,
+                    'activo' => 1,
+                    'is_active' => 1,
+                ];
+            };
+
+            if ($slug !== '') {
+                $stmt = self::pdo()->prepare(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE slug = ? AND is_active = 1 LIMIT 1'
+                );
+                $stmt->execute([$slug]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$row) {
+                    Response::error('Marca no encontrada o inactiva', 404);
+                    return;
+                }
+
+                $todas = self::pdo()->query(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+                )->fetchAll(PDO::FETCH_ASSOC);
+
+                $todasMapped = array_map($mapRow, $todas);
+                Response::json([
+                    'marca' => $mapRow($row),
+                    'todas' => $todasMapped,
+                    'marcas' => $todasMapped,
+                    'brands' => $todasMapped,
+                ]);
+                return;
+            }
+
+            $rows = self::pdo()->query(
+                'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                 FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            )->fetchAll(PDO::FETCH_ASSOC);
+            $marcas = array_map($mapRow, $rows);
+            Response::json(['marcas' => $marcas, 'brands' => $marcas]);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar marcas: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Lista plana de productos para api/productos.php (filtra por ?brand= / ?marca= / ?tipo=). */
+    private static function productosList(): void
+    {
+        $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
+        $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
+        $brand = isset($_GET['brand']) ? trim((string) $_GET['brand']) : '';
+        if ($brand === '' && isset($_GET['marca'])) {
+            $brand = trim((string) $_GET['marca']);
+        }
+
+        $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
+                       b.slug AS brand_slug, b.name AS brand_name
+                FROM products p
+                LEFT JOIN categories c ON c.id = p.category_id
+                LEFT JOIN brands b ON b.id = p.brand_id
+                WHERE p.is_active = 1';
+        $params = [];
+        if ($featured) {
+            $sql .= ' AND p.is_featured = 1';
+        }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
+        if ($brand !== '') {
+            if (ctype_digit($brand)) {
+                $sql .= ' AND p.brand_id = ?';
+                $params[] = (int) $brand;
+            } else {
+                $sql .= ' AND b.slug = ?';
+                $params[] = $brand;
+            }
+        }
+        $sql .= ' ORDER BY p.sort_order, p.name';
+        try {
+            if ($params) {
+                $st = self::pdo()->prepare($sql);
+                $st->execute($params);
+                $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $rows = self::pdo()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            }
+            Response::json($rows);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar productos: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
