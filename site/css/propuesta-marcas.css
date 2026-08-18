@@ -1,0 +1,196 @@
+/**
+ * propuesta-marcas.css — borrador aislado (index-propuesta-marcas.html)
+ * No tocar style.css de producción hasta aprobación.
+ */
+
+:root {
+  --pm-ink: #0f172a;
+  --pm-muted: #64748b;
+  --pm-line: #e2e8f0;
+  --pm-surface: #f1f5f9;
+  --pm-white: #ffffff;
+  --pm-red: #d81f37;
+  --pm-max: 1100px;
+}
+
+.prop-preview-banner {
+  background: #0f172a;
+  color: #e2e8f0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  padding: 0.45rem 1rem;
+}
+
+.prop-preview-banner a {
+  color: #fda4af;
+  font-weight: 750;
+}
+
+/* ——— Marcas: tarjetas industriales ——— */
+.pm-brands-section {
+  background:
+    linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 48%);
+  padding: clamp(2.5rem, 5vw, 3.75rem) 1.25rem;
+}
+
+.pm-brands-section .container {
+  max-width: var(--pm-max);
+  margin: 0 auto;
+}
+
+.pm-brands-section .section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 0;
+  padding: 0;
+}
+
+.pm-brands-section .section-header h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+  font-weight: 800;
+  font-style: italic;
+  color: var(--pm-ink);
+}
+
+.pm-brands-section .section-header a {
+  font-size: 0.9rem;
+  font-weight: 750;
+  color: var(--pm-red);
+  text-decoration: none;
+}
+
+.pm-brands-section .section-header a:hover {
+  text-decoration: underline;
+}
+
+.industrial-brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.industrial-brand-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+  padding: 1.1rem 1rem;
+  background: var(--pm-white);
+  border: 1px solid var(--pm-line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.industrial-brand-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.industrial-brand-card img {
+  max-width: 100%;
+  max-height: 52px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.85;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.industrial-brand-card:hover img {
+  filter: none;
+  opacity: 1;
+}
+
+.industrial-brand-card__name {
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: var(--pm-ink);
+  text-align: center;
+}
+
+/* ——— Clientes ——— */
+.pm-clients-section {
+  background: var(--pm-white);
+  padding: clamp(2.25rem, 4.5vw, 3.25rem) 1.25rem 3rem;
+  border-top: 1px solid var(--pm-line);
+}
+
+.pm-clients-section .container {
+  max-width: var(--pm-max);
+  margin: 0 auto;
+}
+
+.pm-clients-section .section-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border: 0;
+  padding: 0;
+}
+
+.pm-clients-section .section-header h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  font-weight: 800;
+  font-style: italic;
+  color: var(--pm-ink);
+}
+
+.pm-clients-section .section-header p {
+  margin: 0 auto;
+  max-width: 46ch;
+  color: var(--pm-muted);
+  font-size: 0.98rem;
+}
+
+.pm-clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.85rem;
+}
+
+.pm-client-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  padding: 0.9rem;
+  background: #f8fafc;
+  border: 1px solid var(--pm-line);
+  border-radius: 8px;
+}
+
+.pm-client-card img {
+  max-width: 100%;
+  max-height: 44px;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.8;
+}
+
+.pm-empty-hint {
+  margin: 0;
+  text-align: center;
+  color: var(--pm-muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .industrial-brands-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pm-clients-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
