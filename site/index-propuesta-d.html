@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propuesta D | Diagnóstico interactivo — LPAEZsis</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="img/icons/favicon.ico" sizes="any">
+  <link rel="preload" as="image" href="img/hero/cans.jpg" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.css?v=120">
+  <link rel="stylesheet" href="css/propuesta-home-d.css?v=1">
+</head>
+<body class="prop-home-d">
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <div class="prop-preview-banner" role="status">
+    PROPUESTA D (borrador) —
+    <a href="index-propuestas.html">Comparar propuestas</a> ·
+    <a href="index.html">Volver a producción</a>
+  </div>
+  <div id="site-header-mount"></div>
+
+  <main id="main" class="prop-d-wrap">
+    <section class="prop-d-hero" aria-label="Inicio — propuesta D">
+      <div>
+        <p class="prop-d-hero__brand">LPAEZsis</p>
+        <h1 class="prop-d-hero__title">Soluciones industriales para optimizar tu línea de producción</h1>
+        <p class="prop-d-hero__lead">Tecnología especializada, ingeniería y soporte técnico local en Chile. Secado · Soplado · Limpieza · Packaging · Fin de línea.</p>
+        <div class="prop-d-hero__actions">
+          <a class="prop-d-btn prop-d-btn--primary" href="contacto.html?motivo=cotizacion">PEDIR COTIZACIÓN</a>
+          <a class="prop-d-btn prop-d-btn--ghost" href="#diagnostico">EVALUAR MI APLICACIÓN</a>
+        </div>
+        <p class="prop-d-hero__micro">Representantes e integradores de tecnologías industriales especializadas</p>
+      </div>
+      <div class="prop-d-hero__visual" aria-hidden="true">
+        <img src="img/hero/cans.jpg" alt="" width="960" height="720" loading="eager" fetchpriority="high">
+      </div>
+    </section>
+
+    <section class="prop-d-diag" id="diagnostico" aria-labelledby="prop-d-diag-title">
+      <div class="prop-d-diag__head">
+        <h2 id="prop-d-diag-title">¿Qué necesidad tiene tu línea de proceso?</h2>
+        <p>Selecciona el desafío de tu planta — te mostramos la ruta recomendada al instante.</p>
+      </div>
+
+      <div class="prop-d-options" role="listbox" aria-label="Necesidades de planta" id="propDOptions">
+        <button type="button" class="prop-d-option is-active" role="option" aria-selected="true"
+          data-title="Secado de Envases"
+          data-desc="Elimina agua residual antes de etiquetado, codificado o embalaje. Ideal previo a packaging."
+          data-href="catalogo.html?aplicacion=secado"
+          data-cta="Ver soluciones de secado">
+          <strong>Secado</strong>
+          <span>Agua residual en envases</span>
+        </button>
+        <button type="button" class="prop-d-option" role="option" aria-selected="false"
+          data-title="Soplado Industrial"
+          data-desc="Remoción de polvo, partículas y optimización de consumo de aire en la línea."
+          data-href="catalogo.html?aplicacion=soplado"
+          data-cta="Ver soluciones de soplado">
+          <strong>Soplado</strong>
+          <span>Polvo y aire comprimido</span>
+        </button>
+        <button type="button" class="prop-d-option" role="option" aria-selected="false"
+          data-title="Limpieza e Higiene"
+          data-desc="Sistemas para líneas donde la limpieza superficial es crítica para calidad."
+          data-href="catalogo.html?aplicacion=limpieza"
+          data-cta="Ver soluciones de limpieza">
+          <strong>Limpieza</strong>
+          <span>Higiene superficial</span>
+        </button>
+        <button type="button" class="prop-d-option" role="option" aria-selected="false"
+          data-title="Packaging & Fin de Línea"
+          data-desc="Automatización y optimización en el manejo de envases al final del proceso."
+          data-href="catalogo.html?aplicacion=fin-de-linea"
+          data-cta="Ver fin de línea">
+          <strong>Packaging</strong>
+          <span>Fin de línea</span>
+        </button>
+        <button type="button" class="prop-d-option" role="option" aria-selected="false"
+          data-title="Mantención y Repuestos"
+          data-desc="Consumibles, repuestos en stock y soporte técnico preventivo para continuidad operacional."
+          data-href="catalogo.html?tipo=repuesto"
+          data-cta="Ver repuestos">
+          <strong>Repuestos</strong>
+          <span>Mantención continua</span>
+        </button>
+      </div>
+
+      <div class="prop-d-result" id="propDResult">
+        <div>
+          <h3 id="propDResultTitle">Secado de Envases</h3>
+          <p id="propDResultDesc">Elimina agua residual antes de etiquetado, codificado o embalaje. Ideal previo a packaging.</p>
+        </div>
+        <div class="prop-d-result__actions">
+          <a class="prop-d-btn prop-d-btn--primary" id="propDResultLink" href="catalogo.html?aplicacion=secado">Ver soluciones de secado</a>
+          <a class="prop-d-btn prop-d-btn--ghost" href="contacto.html?motivo=asesoria">Hablar con un asesor</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer-mount"></div>
+  <script src="js/site.js?v=120" defer></script>
+  <script>
+    (function () {
+      var options = document.querySelectorAll("#propDOptions .prop-d-option");
+      var title = document.getElementById("propDResultTitle");
+      var desc = document.getElementById("propDResultDesc");
+      var link = document.getElementById("propDResultLink");
+      if (!options.length || !title || !desc || !link) return;
+
+      options.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          options.forEach(function (el) {
+            el.classList.remove("is-active");
+            el.setAttribute("aria-selected", "false");
+          });
+          btn.classList.add("is-active");
+          btn.setAttribute("aria-selected", "true");
+          title.textContent = btn.getAttribute("data-title") || "";
+          desc.textContent = btn.getAttribute("data-desc") || "";
+          link.href = btn.getAttribute("data-href") || "#";
+          link.textContent = btn.getAttribute("data-cta") || "Ver soluciones";
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

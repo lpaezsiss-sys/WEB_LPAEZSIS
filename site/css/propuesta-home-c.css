@@ -1,0 +1,262 @@
+/**
+ * propuesta-home-c.css — Propuesta C: línea de proceso como navegación
+ * Aislado. No tocar style.css de producción.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,600&family=Instrument+Serif:ital@0;1&display=swap");
+
+:root {
+  --c-ink: #14212b;
+  --c-muted: #5b6b78;
+  --c-line: #d7e0e7;
+  --c-bg: #f3f6f8;
+  --c-white: #ffffff;
+  --c-accent: #0e7490;
+  --c-accent-dark: #0a5a6e;
+  --c-red: #d81f37;
+  --c-max: 1140px;
+}
+
+.prop-preview-banner {
+  background: #102028;
+  color: #e2e8f0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  padding: 0.45rem 1rem;
+}
+
+.prop-preview-banner a { color: #7dd3fc; font-weight: 750; }
+
+.prop-c-hero {
+  position: relative;
+  min-height: min(86vh, 720px);
+  display: grid;
+  place-items: end stretch;
+  overflow: hidden;
+  color: #fff;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.prop-c-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.prop-c-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.prop-c-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10, 18, 24, 0.25) 0%, rgba(10, 18, 24, 0.55) 45%, rgba(10, 18, 24, 0.92) 100%);
+}
+
+.prop-c-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 2rem, var(--c-max));
+  margin: 0 auto;
+  padding: 0 0 clamp(2rem, 4vw, 2.75rem);
+}
+
+.prop-c-hero__brand {
+  margin: 0 0 0.35rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(2.8rem, 7vw, 4.4rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.prop-c-hero__title {
+  margin: 0 0 0.65rem;
+  max-width: 20ch;
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.prop-c-hero__lead {
+  margin: 0 0 1.1rem;
+  max-width: 40ch;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.prop-c-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+}
+
+.prop-c-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.25rem;
+  background: var(--c-red);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  font-size: 0.88rem;
+  border: 0;
+  transition: background 0.18s ease;
+}
+
+.prop-c-btn-primary:hover { background: #b8172c; }
+
+.prop-c-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.25rem;
+  background: transparent;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  font-size: 0.88rem;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  transition: background 0.18s ease;
+}
+
+.prop-c-btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
+
+.prop-c-hero__micro {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Process line */
+.prop-c-process {
+  background: var(--c-bg);
+  padding: clamp(2.4rem, 5vw, 3.5rem) 1.25rem;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.prop-c-process .container {
+  max-width: var(--c-max);
+  margin: 0 auto;
+}
+
+.prop-c-process__head {
+  margin-bottom: 1.5rem;
+  max-width: 42ch;
+}
+
+.prop-c-process__head h2 {
+  margin: 0 0 0.4rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.45rem);
+  font-weight: 400;
+  color: var(--c-ink);
+  line-height: 1.15;
+}
+
+.prop-c-process__head p {
+  margin: 0;
+  color: var(--c-muted);
+}
+
+.prop-c-flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+.prop-c-flow::before {
+  content: "";
+  position: absolute;
+  top: 1.55rem;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-accent), #94a3b8);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.prop-c-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0 0.75rem 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease;
+}
+
+.prop-c-step:hover { transform: translateY(-3px); }
+
+.prop-c-step__num {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--c-white);
+  border: 2px solid var(--c-accent);
+  color: var(--c-accent-dark);
+  font-weight: 800;
+  font-size: 0.85rem;
+  z-index: 1;
+}
+
+.prop-c-step h3 {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--c-ink);
+}
+
+.prop-c-step p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+
+.prop-c-step span {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+  color: var(--c-accent-dark);
+}
+
+@media (max-width: 900px) {
+  .prop-c-flow {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .prop-c-flow::before {
+    top: 0;
+    bottom: 0;
+    left: 1.05rem;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+  .prop-c-step {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 0.35rem 0;
+  }
+  .prop-c-step > div { flex: 1; }
+}

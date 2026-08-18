@@ -99,7 +99,8 @@
       "</a>" +
       '<button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav">☰</button>' +
       '<nav class="nav" id="mainNav" aria-label="Principal">' +
-      '<a href="catalogo.html">Productos</a>' +
+      '<a href="catalogo.html?tipo=equipo">Equipos</a>' +
+      '<a href="catalogo.html?tipo=repuesto">Repuestos</a>' +
       '<div class="nav-dropdown" id="navBrands">' +
       '<button type="button" class="nav-dropdown__toggle" id="navBrandsToggle" aria-expanded="false" aria-controls="navBrandsMenu">' +
       '<span>Representaciones y Distribución</span>' +
@@ -143,7 +144,8 @@
       '<li><a data-wa href="#">WhatsApp</a></li>' +
       "</ul></div>" +
       "<div><h3>Explorar</h3><ul>" +
-      '<li><a href="catalogo.html">Productos</a></li>' +
+      '<li><a href="catalogo.html?tipo=equipo">Equipos</a></li>' +
+      '<li><a href="catalogo.html?tipo=repuesto">Repuestos</a></li>' +
       '<li><a href="nosotros.html">Nosotros</a></li>' +
       '<li><a href="novedades.html">Novedades</a></li>' +
       '<li><a href="cotizacion.html">Pedir cotización</a></li>' +
