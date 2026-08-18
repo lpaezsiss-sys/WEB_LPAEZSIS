@@ -70,15 +70,23 @@ async function initBrandPage() {
       loadBrandDetailExtras(currentBrand.slug);
       loadBrandProducts(currentBrand.id || currentBrand.slug, currentBrand);
     } else {
-      renderSplitGrids([], "la marca");
+      var eqGrid = document.getElementById("brandEquiposGrid");
+      var rpSec = document.getElementById("brandRepuestosSection");
+      if (eqGrid) {
+        eqGrid.innerHTML =
+          '<p class="no-products">No hay marcas activas por ahora.</p>';
+      }
+      if (rpSec) rpSec.style.display = "none";
     }
   } catch (error) {
     console.error("Error inicializando la página de marcas:", error);
-    setGridError(
-      "brandEquiposGrid",
-      "No se pudieron cargar las marcas. Intenta recargar."
-    );
-    setGridError("brandRepuestosGrid", "");
+    var eqGridErr = document.getElementById("brandEquiposGrid");
+    var rpSecErr = document.getElementById("brandRepuestosSection");
+    if (eqGridErr) {
+      eqGridErr.innerHTML =
+        '<p class="no-products">No se pudieron cargar las marcas. Intenta recargar.</p>';
+    }
+    if (rpSecErr) rpSecErr.style.display = "none";
   }
 }
 
@@ -237,67 +245,21 @@ function renderProductCardHtml(p) {
   );
 }
 
-function setCount(elId, n, singular, plural) {
-  var el = document.getElementById(elId);
-  if (!el) return;
-  var label = n === 1 ? singular : plural;
-  el.textContent = n + " " + label;
-}
+async function loadBrandProducts(brandIdentifier, brandOrName) {
+  var equiposGrid = document.getElementById("brandEquiposGrid");
+  var repuestosGrid = document.getElementById("brandRepuestosGrid");
+  var equiposSection = document.getElementById("brandEquiposSection");
+  var repuestosSection = document.getElementById("brandRepuestosSection");
 
-function setGridError(gridId, message) {
-  var grid = document.getElementById(gridId);
-  if (!grid) return;
-  grid.innerHTML = message
-    ? '<p class="no-products empty-state">' + escapeHtml(message) + "</p>"
-    : "";
-}
+  var brandName =
+    typeof brandOrName === "string"
+      ? brandOrName
+      : (brandOrName && (brandOrName.nombre || brandOrName.name)) ||
+        (document.getElementById("brandTitle") &&
+          document.getElementById("brandTitle").textContent) ||
+        "";
 
-function renderSplitGrids(products, brandName) {
-  var equipos = [];
-  var repuestos = [];
-  (Array.isArray(products) ? products : []).forEach(function (p) {
-    if (productTipoOf(p) === "repuesto") repuestos.push(p);
-    else equipos.push(p);
-  });
-
-  var eqGrid = document.getElementById("brandEquiposGrid");
-  var rpGrid = document.getElementById("brandRepuestosGrid");
-  var eqSec = document.getElementById("brandEquiposSection");
-  var rpSec = document.getElementById("brandRepuestosSection");
-
-  setCount("equiposCount", equipos.length, "equipo", "equipos");
-  setCount("repuestosCount", repuestos.length, "repuesto", "repuestos");
-  updateSectionTitles(brandName || "");
-
-  if (eqGrid) {
-    eqGrid.innerHTML = equipos.length
-      ? equipos.map(renderProductCardHtml).join("")
-      : '<p class="no-products empty-state">No hay equipos disponibles para esta marca actualmente.</p>';
-  }
-  if (rpGrid) {
-    rpGrid.innerHTML = repuestos.length
-      ? repuestos.map(renderProductCardHtml).join("")
-      : '<p class="no-products empty-state">No hay repuestos disponibles para esta marca actualmente.</p>';
-  }
-
-  // Ocultar sección vacía solo si la otra tiene ítems (siempre mostrar ambas si ambas vacías)
-  if (eqSec) {
-    eqSec.hidden = equipos.length === 0 && repuestos.length > 0;
-  }
-  if (rpSec) {
-    rpSec.hidden = repuestos.length === 0 && equipos.length > 0;
-  }
-
-  if (window.Lpaez && typeof Lpaez.observeReveals === "function") {
-    Lpaez.observeReveals();
-  }
-}
-
-async function loadBrandProducts(brandIdentifier, brand) {
-  var nombre =
-    (brand && (brand.nombre || brand.name)) ||
-    (document.getElementById("brandTitle") && document.getElementById("brandTitle").textContent) ||
-    "";
+  if (!equiposGrid || !repuestosGrid) return;
 
   try {
     var res = await fetch(
@@ -309,18 +271,60 @@ async function loadBrandProducts(brandIdentifier, brand) {
     if (products && !Array.isArray(products) && Array.isArray(products.products)) {
       products = products.products;
     }
-    renderSplitGrids(Array.isArray(products) ? products : [], nombre);
+
+    if (!Array.isArray(products) || products.length === 0) {
+      equiposGrid.innerHTML =
+        '<p class="no-products">No hay productos disponibles para esta marca.</p>';
+      if (repuestosSection) repuestosSection.style.display = "none";
+      if (equiposSection) equiposSection.style.display = "block";
+      var eqCountEmpty = document.getElementById("equiposCount");
+      var rpCountEmpty = document.getElementById("repuestosCount");
+      if (eqCountEmpty) eqCountEmpty.textContent = "0 equipos";
+      if (rpCountEmpty) rpCountEmpty.textContent = "0 repuestos";
+      return;
+    }
+
+    // Filtrar por tipo (fallback sale_mode si tipo no viene)
+    var equipos = products.filter(function (p) {
+      return productTipoOf(p) === "equipo";
+    });
+    var repuestos = products.filter(function (p) {
+      return productTipoOf(p) === "repuesto";
+    });
+
+    // Actualizar títulos
+    var eqTitle = document.getElementById("brandEquiposTitle");
+    var rpTitle = document.getElementById("brandRepuestosTitle");
+    var eqCount = document.getElementById("equiposCount");
+    var rpCount = document.getElementById("repuestosCount");
+    if (eqTitle) eqTitle.textContent = "Equipos " + brandName;
+    if (rpTitle) rpTitle.textContent = "Repuestos y Consumibles " + brandName;
+    if (eqCount) eqCount.textContent = equipos.length + " equipos";
+    if (rpCount) rpCount.textContent = repuestos.length + " repuestos";
+
+    // Renderizar Equipos
+    if (equipos.length > 0) {
+      equiposGrid.innerHTML = equipos.map(renderProductCardHtml).join("");
+      if (equiposSection) equiposSection.style.display = "block";
+    } else if (equiposSection) {
+      equiposSection.style.display = "none";
+    }
+
+    // Renderizar Repuestos
+    if (repuestos.length > 0) {
+      repuestosGrid.innerHTML = repuestos.map(renderProductCardHtml).join("");
+      if (repuestosSection) repuestosSection.style.display = "block";
+    } else if (repuestosSection) {
+      repuestosSection.style.display = "none";
+    }
+
+    if (window.Lpaez && typeof Lpaez.observeReveals === "function") {
+      Lpaez.observeReveals();
+    }
   } catch (err) {
-    console.error("Error cargando productos de la marca:", err);
-    setGridError(
-      "brandEquiposGrid",
-      "No se pudieron cargar los equipos de esta marca."
-    );
-    setGridError(
-      "brandRepuestosGrid",
-      "No se pudieron cargar los repuestos de esta marca."
-    );
-    setCount("equiposCount", 0, "equipo", "equipos");
-    setCount("repuestosCount", 0, "repuesto", "repuestos");
+    console.error("Error cargando catálogo de la marca:", err);
+    equiposGrid.innerHTML =
+      '<p class="no-products">No se pudo cargar el catálogo de esta marca.</p>';
+    if (repuestosSection) repuestosSection.style.display = "none";
   }
 }
