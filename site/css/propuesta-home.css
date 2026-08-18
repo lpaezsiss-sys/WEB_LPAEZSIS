@@ -60,13 +60,6 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-.prop-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.35rem;
-}
-
 .prop-hero__micro {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;
@@ -75,23 +68,43 @@
   color: rgba(255, 255, 255, 0.68);
 }
 
-.prop-btn-asesoria {
-  border-color: rgba(255, 255, 255, 0.85);
+/* --- ESTILOS DE PRUEBA LOCAL PARA HOME PROPUESTA --- */
+
+/* Doble CTA Hero */
+.hero-cta-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.btn-secondary-outline {
+  border: 2px solid #ffffff;
   color: #ffffff;
   background: transparent;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.prop-btn-asesoria:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #ffffff;
-  color: #ffffff;
+.btn-secondary-outline:hover {
+  background: #ffffff;
+  color: #0f172a;
 }
 
-/* ——— Resuelve por aplicación ——— */
+/* Módulo por Aplicaciones */
 .home-solutions-section {
-  background:
-    linear-gradient(180deg, #f1f5f9 0%, var(--prop-white) 42%, var(--prop-white) 100%);
-  padding: clamp(2.75rem, 6vw, 4.25rem) 1.25rem;
+  padding: 4rem 1.5rem;
+  background-color: #f8fafc;
 }
 
 .home-solutions-section .container {
@@ -103,11 +116,7 @@
   display: block;
   border-bottom: 0;
   padding-bottom: 0;
-  margin-bottom: 1.75rem;
-  text-align: center;
-}
-
-.home-solutions-section .section-header.text-center {
+  margin-bottom: 0;
   text-align: center;
 }
 
@@ -129,69 +138,54 @@
 .solutions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .solution-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 1.25rem 1.2rem 1.15rem;
-  background: var(--prop-white);
-  border: 1px solid var(--prop-line);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
+  padding: 1.75rem 1.25rem;
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 100%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .solution-card:hover {
-  transform: translateY(-3px);
-  border-color: #cbd5e1;
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #dc2626;
 }
 
 .solution-card__icon {
-  display: grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 8px;
-  background: #fee2e2;
-  color: var(--prop-red);
-  font-size: 1.15rem;
+  font-size: 2rem;
+  margin-bottom: 1rem;
   line-height: 1;
 }
 
 .solution-card h3 {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--prop-ink);
-  line-height: 1.25;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
 }
 
 .solution-card p {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+  flex-grow: 1;
   margin: 0;
-  flex: 1;
-  font-size: 0.92rem;
-  line-height: 1.45;
-  color: var(--prop-ink-soft);
 }
 
 .solution-link {
-  margin-top: 0.35rem;
-  font-size: 0.82rem;
-  font-weight: 750;
-  letter-spacing: 0.02em;
-  color: var(--prop-red);
-}
-
-.solution-card:hover .solution-link {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #dc2626;
 }
 
 /* Banner aviso propuesta (solo local/preview) */
