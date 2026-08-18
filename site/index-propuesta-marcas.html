@@ -9,7 +9,7 @@
   <link rel="icon" href="img/icons/favicon.ico" sizes="any">
   <link rel="stylesheet" href="css/style.css?v=121">
   <link rel="stylesheet" href="css/propuesta-home.css?v=3">
-  <link rel="stylesheet" href="css/propuesta-marcas.css?v=1">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=2">
 </head>
 <body class="prop-home">
   <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -49,14 +49,18 @@
       </div>
     </section>
 
-    <!-- Clientes restaurados -->
-    <section class="pm-clients-section reveal" id="clientes" aria-labelledby="pm-clientes-title">
+    <!-- Sección Clientes en la Home -->
+    <section class="home-clients-section reveal" id="clientes" aria-labelledby="pm-clientes-title">
       <div class="container">
-        <div class="section-header">
-          <h2 id="pm-clientes-title">Empresas que confían en nosotros</h2>
-          <p>Soluciones de soplado y secado instaladas en las principales plantas del país.</p>
+        <div class="section-header text-center">
+          <h2 id="pm-clientes-title">Empresas que confían en nuestras soluciones</h2>
+          <p>Soplado, secado y fin de línea en las principales plantas de Chile</p>
         </div>
-        <div class="pm-clients-grid" id="homeClients" role="list"></div>
+
+        <!-- Grilla de Tarjetas Industriales de Clientes -->
+        <div class="clients-industrial-grid" id="clientsGridContainer" role="list">
+          <!-- Carga dinámica o lista estática de clientes -->
+        </div>
       </div>
     </section>
   </main>
@@ -136,8 +140,7 @@
       }
 
       function renderClients(clients) {
-        var container = document.getElementById("homeClients");
-        var section = document.getElementById("clientes");
+        var container = document.getElementById("clientsGridContainer");
         if (!container) return;
 
         if (!clients || !clients.length) {
@@ -149,16 +152,16 @@
         container.innerHTML = clients
           .map(function (c) {
             var nombre = c.nombre || c.name || "Cliente";
-            var src = normalizeLogoUrl(c.logo_url || c.logo, "");
+            var src = normalizeLogoUrl(c.logo_url || c.logo || c.imagen, c.slug || "");
             return (
-              '<div class="pm-client-card" role="listitem" title="' +
+              '<div class="industrial-client-card" role="listitem" title="' +
               escapeHtml(nombre) +
               '">' +
               '<img src="' +
               escapeHtml(src) +
               '" alt="' +
               escapeHtml(nombre) +
-              '" loading="lazy" ' +
+              '" loading="lazy" decoding="async" ' +
               'onerror="this.onerror=null;this.src=\'' +
               PLACEHOLDER +
               '\';">' +
