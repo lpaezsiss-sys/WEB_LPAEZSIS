@@ -5,170 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Representaciones y Distribución | LPAEZsis</title>
   <meta name="description" content="Representaciones y distribución LPAEZsis: Sonic Air Systems, LYC, MOVEX, ISODUR, COMBI, HAIDA.">
-  <link rel="canonical" href="https://lpaezsis.cl/marcas.html">
+  <link rel="canonical" id="brandCanonical" href="https://lpaezsis.cl/marcas.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Representaciones y Distribución | LPAEZsis">
   <meta property="og:description" content="Conoce las representaciones y distribución industrial de LPAEZsis en Chile.">
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=120">
 </head>
 <body>
   <div id="site-header-mount"></div>
-  <main id="main">
-    <div class="page-hero page-hero--compact">
-      <div class="page-hero-inner">
-        <h1 id="brandsTitle">Representaciones y Distribución</h1>
-        <p id="brandsLead">Socios tecnológicos para soplado, packaging, movimiento y control de calidad.</p>
-      </div>
+
+  <!-- Hero principal con contenedor oscuro permanente (maquetado independiente de la API) -->
+  <section class="brand-hero" aria-labelledby="brandTitle">
+    <div class="brand-hero__inner container">
+      <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
+      <p class="brand-hero__description" id="brandDescription">
+        Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
+      </p>
     </div>
-    <section class="section">
-      <div class="brand-strip mb-lg" id="brandsList"></div>
-      <div id="brandDetail" hidden>
-        <div class="brand-catalog-head">
-          <img id="brandLogo" class="brand-catalog-logo" alt="" hidden>
-          <div>
-            <h2 id="brandName"></h2>
-            <p id="brandDesc"></p>
-          </div>
-        </div>
-        <div class="brand-catalog-body" id="brandContent"></div>
-        <div class="brand-gallery" id="brandGallery" hidden></div>
-        <div class="section-head is-left stack-xl">
-          <h2 id="brandProductsTitle">Productos y equipos</h2>
-          <p id="brandProductsLead">Disponibles para cotizar o comprar según el ítem.</p>
-        </div>
-        <div class="product-grid" id="brandProducts"></div>
-        <div class="section-actions is-start">
-          <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
-          <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
-        </div>
+  </section>
+
+  <!-- Contenedor principal del cuerpo: estructura fija; JS solo rellena nodos -->
+  <main class="brand-content-wrapper container" id="main">
+
+    <!-- Selector de marcas estable -->
+    <div class="brand-selector-grid" id="brandSelectorGrid" aria-label="Seleccionar marca"></div>
+
+    <!-- Ficha enriquecida (nodo siempre presente; vacío/oculto si no hay HTML) -->
+    <div class="brand-catalog-body" id="brandContent" hidden></div>
+    <div class="brand-gallery" id="brandGallery" hidden></div>
+
+    <!-- Sección 1: Equipos Principales de la Marca -->
+    <section class="brand-catalog-section" id="brandEquiposSection" aria-labelledby="brandEquiposTitle">
+      <div class="section-header">
+        <h2 id="brandEquiposTitle">Equipos</h2>
+        <span class="badge-count" id="equiposCount">0 equipos</span>
+      </div>
+      <div class="catalog-grid product-grid" id="brandEquiposGrid">
+        <p class="empty-state">Cargando equipos…</p>
       </div>
     </section>
+
+    <!-- Sección 2: Repuestos y Consumibles de la Marca -->
+    <section class="brand-catalog-section" id="brandRepuestosSection" aria-labelledby="brandRepuestosTitle">
+      <div class="section-header">
+        <h2 id="brandRepuestosTitle">Repuestos y Consumibles</h2>
+        <span class="badge-count" id="repuestosCount">0 repuestos</span>
+      </div>
+      <div class="catalog-grid product-grid" id="brandRepuestosGrid">
+        <p class="empty-state">Cargando repuestos…</p>
+      </div>
+    </section>
+
+    <div class="section-actions is-start brand-catalog-actions">
+      <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
+      <a class="btn btn-outline" href="catalogo.html?tipo=equipo">Ver catálogo de equipos</a>
+      <a class="btn btn-outline" href="catalogo.html?tipo=repuesto">Ver catálogo de repuestos</a>
+    </div>
   </main>
+
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=22"></script>
-  <script>
-    var slug = Lpaez.queryParam("slug");
-
-    function brandPillHtml(b) {
-      var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
-      var active = slug && slug === b.slug ? " is-active" : "";
-      if (b.logo_url) {
-        return '<a class="brand-pill' + active + '" href="' + href + '"><img src="' +
-          Lpaez.escapeHtml(b.logo_url) + '" alt="' + Lpaez.escapeHtml(b.name) + '"></a>';
-      }
-      return '<a class="brand-pill' + active + '" href="' + href + '">' + Lpaez.escapeHtml(b.name) + "</a>";
-    }
-
-    function renderGallery(urls) {
-      var el = document.getElementById("brandGallery");
-      if (!urls || !urls.length) {
-        el.hidden = true;
-        el.innerHTML = "";
-        return;
-      }
-      el.hidden = false;
-      el.innerHTML = urls.map(function (u) {
-        return '<a class="brand-gallery-item" href="' + Lpaez.escapeHtml(u) + '" target="_blank" rel="noopener">' +
-          '<img src="' + Lpaez.escapeHtml(u) + '" alt="" loading="lazy"></a>';
-      }).join("");
-    }
-
-    Lpaez.api("/api/brands").then(function (res) {
-      var brands = (res.data && res.data.brands) || [];
-      if (!slug && brands.length) {
-        var sonic = brands.find(function (b) {
-          return b.slug === "sonic-air-systems" || /sonic/i.test(b.name || "");
-        });
-        slug = (sonic && sonic.slug) || brands[0].slug;
-        if (slug && history.replaceState) {
-          history.replaceState(null, "", "marcas.html?slug=" + encodeURIComponent(slug));
-        }
-      }
-      document.getElementById("brandsList").innerHTML = brands.map(brandPillHtml).join("");
-      if (!slug) {
-        document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandProducts").innerHTML =
-          "<p class='empty-state'>Elige una marca para ver su ficha y productos.</p>";
-        return;
-      }
-      return Lpaez.api("/api/brands/" + encodeURIComponent(slug)).then(function (r) {
-        if (!r.ok) {
-          document.getElementById("brandDetail").hidden = false;
-          document.getElementById("brandProducts").innerHTML =
-            "<p class='empty-state'>No se encontró esta marca.</p>";
-          return;
-        }
-        var brand = r.data.brand;
-        var products = r.data.products || [];
-        document.title = brand.name + " | LPAEZsis";
-        document.getElementById("brandsTitle").textContent = brand.name;
-        document.getElementById("brandsLead").textContent = brand.description || "";
-        document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandName").textContent = brand.name;
-        document.getElementById("brandDesc").textContent =
-          brand.description || "Productos e información de la representación.";
-        // Show name/desc in the catalog head when there is no rich HTML body.
-        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
-        document.getElementById("brandName").hidden = hasHtml;
-        document.getElementById("brandDesc").hidden = hasHtml && !brand.description;
-
-        var logo = document.getElementById("brandLogo");
-        if (brand.logo_url) {
-          logo.src = brand.logo_url;
-          logo.alt = brand.name;
-          logo.hidden = false;
-        } else {
-          logo.hidden = true;
-        }
-
-        var content = document.getElementById("brandContent");
-        if (hasHtml) {
-          content.innerHTML = brand.content_html;
-          content.querySelectorAll("img").forEach(function (img) {
-            var real =
-              img.getAttribute("data-src") ||
-              img.getAttribute("data-lazy-src") ||
-              img.getAttribute("data-original");
-            if (real) {
-              img.setAttribute("src", real);
-              img.removeAttribute("data-src");
-              img.removeAttribute("data-lazy-src");
-            }
-            if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
-              img.remove();
-            }
-          });
-          content.hidden = false;
-        } else if (brand.description) {
-          content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.description) + "</p>";
-          content.hidden = false;
-        } else {
-          content.innerHTML = "";
-          content.hidden = true;
-        }
-
-        renderGallery(brand.gallery || []);
-
-        document.getElementById("brandProductsTitle").textContent =
-          products.length ? "Productos " + brand.name : "Equipos " + brand.name;
-        document.getElementById("brandProducts").innerHTML = products.length
-          ? products.map(Lpaez.productCardHtml).join("")
-          : "<p class='empty-state'>Esta marca se cotiza por proyecto. Revisa la galería fotográfica arriba o solicita una cotización.</p>";
-        Lpaez.observeReveals();
-        var link = document.createElement("link");
-        link.rel = "canonical";
-        link.href = "https://lpaezsis.cl/marcas.html?slug=" + encodeURIComponent(brand.slug);
-        document.head.appendChild(link);
-      });
-    }).catch(function () {
-      document.getElementById("brandDetail").hidden = false;
-      document.getElementById("brandProducts").innerHTML =
-        "<p class='empty-state'>No se pudo cargar la marca. Intenta recargar.</p>";
-    });
-  </script>
+  <script src="js/layout.js?v=36"></script>
+  <script src="js/site.js?v=25"></script>
+  <script src="js/marcas.js?v=121"></script>
 </body>
 </html>
