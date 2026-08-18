@@ -46,6 +46,10 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/soluciones') {
+            self::soluciones();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -112,6 +116,55 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    /**
+     * Home "Soluciones para tu planta": JSON array plano de activos ordenados.
+     * Campos compatibles con admin (bullet_*, cta_*, imagen_url) + alias imagen/descripcion.
+     */
+    private static function soluciones(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, slug, titulo, bullet_1, bullet_2, bullet_3,
+                        cta_texto, cta_url, imagen_url, orden, activo
+                 FROM soluciones
+                 WHERE activo = 1
+                 ORDER BY orden ASC, titulo ASC
+                 LIMIT 8'
+            );
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultado = array_map(static function (array $item): array {
+                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                if ($imagen === '') {
+                    $imagen = 'img/hero/plant.jpg';
+                }
+                $titulo = (string) ($item['titulo'] ?? '');
+                $bullet1 = isset($item['bullet_1']) ? (string) $item['bullet_1'] : '';
+
+                return [
+                    'id' => (int) ($item['id'] ?? 0),
+                    'titulo' => $titulo,
+                    'slug' => (string) ($item['slug'] ?? ''),
+                    'descripcion' => $bullet1,
+                    'imagen' => $imagen,
+                    'imagen_url' => $imagen,
+                    'bullet_1' => $item['bullet_1'] ?? null,
+                    'bullet_2' => $item['bullet_2'] ?? null,
+                    'bullet_3' => $item['bullet_3'] ?? null,
+                    'cta_texto' => $item['cta_texto'] ?? null,
+                    'cta_url' => $item['cta_url'] ?? null,
+                    'orden' => (int) ($item['orden'] ?? 0),
+                    'activo' => !empty($item['activo']),
+                ];
+            }, $rows);
+
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener soluciones: ' . $e->getMessage(), 500);
+        }
     }
 
     private static function brandDetail(string $slug): void
