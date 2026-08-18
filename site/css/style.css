@@ -1303,43 +1303,36 @@ body.nav-open {
 }
 
 
-/* Secciones Equipos / Repuestos en ficha de marca */
+/* Secciones de catálogo por marca */
 .brand-catalog-section {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;
 }
 
-.brand-catalog-section:first-of-type,
-.brand-gallery + .brand-catalog-section {
-  margin-top: 1.75rem;
-}
-
-.brand-catalog-section .section-header {
+.section-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.brand-catalog-section .section-header h2 {
-  margin: 0;
+.section-header h2 {
   font-size: 1.35rem;
   font-weight: 800;
+  color: #0f172a;
+  margin: 0;
 }
 
 .badge-count {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 0.78rem;
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
 }
 
 .brand-catalog-actions {
