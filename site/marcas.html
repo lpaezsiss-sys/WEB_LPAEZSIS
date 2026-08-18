@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=117">
+  <link rel="stylesheet" href="css/style.css?v=119">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -37,22 +37,38 @@
     <div class="brand-catalog-body" id="brandContent" hidden></div>
     <div class="brand-gallery" id="brandGallery" hidden></div>
 
-    <!-- Sección de catálogo de la marca -->
-    <section class="brand-products-section" aria-labelledby="brandProductsTitle">
-      <h2 id="brandProductsTitle">Equipos de la marca</h2>
-      <div class="catalog-grid product-grid" id="brandProductsGrid">
-        <p class="empty-state" id="brandProductsPlaceholder">Cargando equipos…</p>
+    <!-- Sección 1: Equipos Principales de la Marca -->
+    <section class="brand-catalog-section" id="brandEquiposSection" aria-labelledby="brandEquiposTitle">
+      <div class="section-header">
+        <h2 id="brandEquiposTitle">Equipos</h2>
+        <span class="badge-count" id="equiposCount">0 equipos</span>
       </div>
-      <div class="section-actions is-start">
-        <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
-        <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
+      <div class="catalog-grid product-grid" id="brandEquiposGrid">
+        <p class="empty-state">Cargando equipos…</p>
       </div>
     </section>
+
+    <!-- Sección 2: Repuestos y Consumibles de la Marca -->
+    <section class="brand-catalog-section" id="brandRepuestosSection" aria-labelledby="brandRepuestosTitle">
+      <div class="section-header">
+        <h2 id="brandRepuestosTitle">Repuestos y Consumibles</h2>
+        <span class="badge-count" id="repuestosCount">0 repuestos</span>
+      </div>
+      <div class="catalog-grid product-grid" id="brandRepuestosGrid">
+        <p class="empty-state">Cargando repuestos…</p>
+      </div>
+    </section>
+
+    <div class="section-actions is-start brand-catalog-actions">
+      <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
+      <a class="btn btn-outline" href="catalogo.html?tipo=equipo">Ver catálogo de equipos</a>
+      <a class="btn btn-outline" href="catalogo.html?tipo=repuesto">Ver catálogo de repuestos</a>
+    </div>
   </main>
 
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=36"></script>
   <script src="js/site.js?v=25"></script>
-  <script src="js/marcas.js?v=115"></script>
+  <script src="js/marcas.js?v=119"></script>
 </body>
 </html>

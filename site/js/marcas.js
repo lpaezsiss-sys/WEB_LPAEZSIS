@@ -1,6 +1,6 @@
 /**
  * marcas.js — hidratación de datos sobre plantilla HTML estática.
- * No crea hero/selector/secciones: solo rellena nodos existentes.
+ * Catálogo de marca separado en Equipos y Repuestos.
  */
 document.addEventListener("DOMContentLoaded", function () {
   initBrandPage();
@@ -22,17 +22,22 @@ function escapeAttr(str) {
   return escapeHtml(str).replace(/`/g, "&#96;");
 }
 
+function productTipoOf(p) {
+  if (!p) return "equipo";
+  if (p.tipo === "repuesto" || p.tipo === "equipo") return p.tipo;
+  if (p.sale_mode === "buy") return "repuesto";
+  return "equipo";
+}
+
 async function initBrandPage() {
   var urlParams = new URLSearchParams(window.location.search);
   var currentSlug = urlParams.get("slug");
 
   try {
-    // 1. Obtener listado de marcas activas
     var brandsRes = await fetch("api/marcas.php", { credentials: "same-origin" });
     if (!brandsRes.ok) throw new Error("Error al consultar la API de marcas");
     var brandsData = await brandsRes.json();
 
-    // Filtrar solo marcas activas (la API ya filtra; refuerzo en cliente)
     var activeBrands = (Array.isArray(brandsData)
       ? brandsData
       : brandsData.marcas || brandsData.brands || []
@@ -40,7 +45,6 @@ async function initBrandPage() {
       return b && (b.activo == 1 || b.is_active == 1 || b.activo === true || b.is_active === true);
     });
 
-    // 2. Determinar marca actual (si la del slug no existe o está inactiva, preferir Sonic o la primera activa)
     var currentBrand = activeBrands.find(function (b) {
       return b.slug === currentSlug;
     });
@@ -59,28 +63,22 @@ async function initBrandPage() {
       currentSlug = currentBrand.slug;
     }
 
-    // 3. Renderizar el selector de marcas (con slug efectivo para is-active)
     renderBrandSelector(activeBrands, currentSlug);
 
     if (currentBrand) {
       updateBrandHero(currentBrand);
-      // Ficha enriquecida + galería (detalle) sin alterar el shell HTML
       loadBrandDetailExtras(currentBrand.slug);
-      loadBrandProducts(currentBrand.id || currentBrand.slug);
+      loadBrandProducts(currentBrand.id || currentBrand.slug, currentBrand);
     } else {
-      var gridEl = document.getElementById("brandProductsGrid");
-      if (gridEl) {
-        gridEl.innerHTML =
-          '<p class="no-products empty-state">No hay marcas activas por ahora.</p>';
-      }
+      renderSplitGrids([], "la marca");
     }
   } catch (error) {
     console.error("Error inicializando la página de marcas:", error);
-    var grid = document.getElementById("brandProductsGrid");
-    if (grid) {
-      grid.innerHTML =
-        '<p class="no-products empty-state">No se pudieron cargar las marcas. Intenta recargar.</p>';
-    }
+    setGridError(
+      "brandEquiposGrid",
+      "No se pudieron cargar las marcas. Intenta recargar."
+    );
+    setGridError("brandRepuestosGrid", "");
   }
 }
 
@@ -144,11 +142,20 @@ function updateBrandHero(brand) {
   if (quoteCta && brand.slug) {
     quoteCta.href = "cotizacion.html?brand=" + encodeURIComponent(brand.slug);
   }
-  var productsTitle = document.getElementById("brandProductsTitle");
-  if (productsTitle) {
-    productsTitle.textContent = nombre
-      ? "Equipos " + nombre
-      : "Equipos de la marca";
+
+  updateSectionTitles(nombre);
+}
+
+function updateSectionTitles(nombre) {
+  var eqTitle = document.getElementById("brandEquiposTitle");
+  var rpTitle = document.getElementById("brandRepuestosTitle");
+  if (eqTitle) {
+    eqTitle.textContent = nombre ? "Equipos " + nombre : "Equipos";
+  }
+  if (rpTitle) {
+    rpTitle.textContent = nombre
+      ? "Repuestos y Consumibles " + nombre
+      : "Repuestos y Consumibles";
   }
 }
 
@@ -230,9 +237,67 @@ function renderProductCardHtml(p) {
   );
 }
 
-async function loadBrandProducts(brandIdentifier) {
-  var gridEl = document.getElementById("brandProductsGrid");
-  if (!gridEl) return;
+function setCount(elId, n, singular, plural) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  var label = n === 1 ? singular : plural;
+  el.textContent = n + " " + label;
+}
+
+function setGridError(gridId, message) {
+  var grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = message
+    ? '<p class="no-products empty-state">' + escapeHtml(message) + "</p>"
+    : "";
+}
+
+function renderSplitGrids(products, brandName) {
+  var equipos = [];
+  var repuestos = [];
+  (Array.isArray(products) ? products : []).forEach(function (p) {
+    if (productTipoOf(p) === "repuesto") repuestos.push(p);
+    else equipos.push(p);
+  });
+
+  var eqGrid = document.getElementById("brandEquiposGrid");
+  var rpGrid = document.getElementById("brandRepuestosGrid");
+  var eqSec = document.getElementById("brandEquiposSection");
+  var rpSec = document.getElementById("brandRepuestosSection");
+
+  setCount("equiposCount", equipos.length, "equipo", "equipos");
+  setCount("repuestosCount", repuestos.length, "repuesto", "repuestos");
+  updateSectionTitles(brandName || "");
+
+  if (eqGrid) {
+    eqGrid.innerHTML = equipos.length
+      ? equipos.map(renderProductCardHtml).join("")
+      : '<p class="no-products empty-state">No hay equipos disponibles para esta marca actualmente.</p>';
+  }
+  if (rpGrid) {
+    rpGrid.innerHTML = repuestos.length
+      ? repuestos.map(renderProductCardHtml).join("")
+      : '<p class="no-products empty-state">No hay repuestos disponibles para esta marca actualmente.</p>';
+  }
+
+  // Ocultar sección vacía solo si la otra tiene ítems (siempre mostrar ambas si ambas vacías)
+  if (eqSec) {
+    eqSec.hidden = equipos.length === 0 && repuestos.length > 0;
+  }
+  if (rpSec) {
+    rpSec.hidden = repuestos.length === 0 && equipos.length > 0;
+  }
+
+  if (window.Lpaez && typeof Lpaez.observeReveals === "function") {
+    Lpaez.observeReveals();
+  }
+}
+
+async function loadBrandProducts(brandIdentifier, brand) {
+  var nombre =
+    (brand && (brand.nombre || brand.name)) ||
+    (document.getElementById("brandTitle") && document.getElementById("brandTitle").textContent) ||
+    "";
 
   try {
     var res = await fetch(
@@ -241,23 +306,21 @@ async function loadBrandProducts(brandIdentifier) {
     );
     if (!res.ok) throw new Error("HTTP " + res.status);
     var products = await res.json();
-    // Compat: a veces viene envuelto
     if (products && !Array.isArray(products) && Array.isArray(products.products)) {
       products = products.products;
     }
-
-    if (Array.isArray(products) && products.length > 0) {
-      gridEl.innerHTML = products.map(renderProductCardHtml).join("");
-      if (window.Lpaez && typeof Lpaez.observeReveals === "function") {
-        Lpaez.observeReveals();
-      }
-    } else {
-      gridEl.innerHTML =
-        '<p class="no-products empty-state">No hay equipos disponibles para esta marca actualmente.</p>';
-    }
+    renderSplitGrids(Array.isArray(products) ? products : [], nombre);
   } catch (err) {
     console.error("Error cargando productos de la marca:", err);
-    gridEl.innerHTML =
-      '<p class="no-products empty-state">No se pudieron cargar los equipos de esta marca.</p>';
+    setGridError(
+      "brandEquiposGrid",
+      "No se pudieron cargar los equipos de esta marca."
+    );
+    setGridError(
+      "brandRepuestosGrid",
+      "No se pudieron cargar los repuestos de esta marca."
+    );
+    setCount("equiposCount", 0, "equipo", "equipos");
+    setCount("repuestosCount", 0, "repuesto", "repuestos");
   }
 }
