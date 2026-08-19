@@ -438,7 +438,7 @@
       }
 
       function loadClients() {
-        return fetch("api/clientes.php", { credentials: "same-origin" })
+        return fetch("api/clientes.php?v=2", { credentials: "same-origin", cache: "no-store" })
           .then(function (res) {
             if (!res.ok) throw new Error("HTTP " + res.status);
             return res.json();
