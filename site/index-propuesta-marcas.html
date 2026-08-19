@@ -9,7 +9,7 @@
   <link rel="icon" href="img/icons/favicon.ico" sizes="any">
   <link rel="stylesheet" href="css/style.css?v=121">
   <link rel="stylesheet" href="css/propuesta-home.css?v=3">
-  <link rel="stylesheet" href="css/propuesta-marcas.css?v=3">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=4">
 </head>
 <body class="prop-home">
   <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -143,16 +143,17 @@
         var container = document.getElementById("clientsGridContainer");
         if (!container) return;
 
-        if (!clients || !clients.length) {
+        if (!clients || clients.length === 0) {
           container.innerHTML =
-            '<p class="pm-empty-hint">Aún no hay clientes publicados (API <code>api/clientes.php</code>). La sección queda lista para hidratar.</p>';
+            '<p class="text-muted text-center pm-empty-hint">Pronto publicaremos nuestros clientes principales.</p>';
           return;
         }
 
         container.innerHTML = clients
-          .map(function (c) {
-            var nombre = c.nombre || c.name || "Cliente";
-            var src = normalizeLogoUrl(c.logo_url || c.logo || c.imagen, c.slug || "");
+          .map(function (client) {
+            var nombre = client.nombre || client.name || "Cliente";
+            var src = client.logo_url || client.logo || client.imagen || PLACEHOLDER;
+            src = normalizeLogoUrl(src, client.slug || "");
             return (
               '<div class="industrial-client-card" role="listitem" title="' +
               escapeHtml(nombre) +

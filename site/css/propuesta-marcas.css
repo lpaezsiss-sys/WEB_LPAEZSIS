@@ -182,7 +182,8 @@
   text-align: center;
 }
 
-.pm-empty-hint {
+.pm-empty-hint,
+.text-muted.text-center {
   margin: 0;
   grid-column: 1 / -1;
   text-align: center;
