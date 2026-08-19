@@ -46,6 +46,22 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/clientes') {
+            self::clientes();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/marcas') {
+            self::marcas();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/productos') {
+            self::productosList();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/soluciones') {
+            self::soluciones();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -112,6 +128,193 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    /**
+     * GET /api/clientes
+     * Lista plana de clientes activos: [{ id, nombre, logo_url }, ...]
+     */
+    private static function clientes(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, nombre, logo_url
+                 FROM clientes
+                 WHERE activo = 1
+                 ORDER BY orden ASC, nombre ASC'
+            );
+            $stmt->execute();
+            Response::json($stmt->fetchAll());
+        } catch (\Throwable $e) {
+            // Tabla ausente o sin migrar: no romper home.
+            Response::json([]);
+        }
+    }
+
+    /**
+     * GET /api/marcas[?slug=]
+     * - Sin slug: { marcas: [...], brands: [...] } (aliases ES para marcas.js)
+     * - Con slug: { marca: {...}, todas: [...] }
+     * Tabla real: brands (is_active).
+     */
+    private static function marcas(): void
+    {
+        try {
+            $slug = isset($_GET['slug']) ? trim((string) $_GET['slug']) : '';
+
+            $mapRow = static function (array $b): array {
+                $nombre = (string) ($b['name'] ?? '');
+                $desc = (string) ($b['description'] ?? '');
+                $logo = (string) ($b['logo_url'] ?? '');
+                return [
+                    'id' => isset($b['id']) ? (int) $b['id'] : null,
+                    'slug' => (string) ($b['slug'] ?? ''),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'descripcion' => $desc,
+                    'description' => $desc,
+                    'logo_url' => $logo,
+                    'imagen' => $logo,
+                    'website_url' => $b['website_url'] ?? null,
+                    'sort_order' => isset($b['sort_order']) ? (int) $b['sort_order'] : 0,
+                    'activo' => 1,
+                    'is_active' => 1,
+                ];
+            };
+
+            if ($slug !== '') {
+                $stmt = self::pdo()->prepare(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE slug = ? AND is_active = 1 LIMIT 1'
+                );
+                $stmt->execute([$slug]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$row) {
+                    Response::error('Marca no encontrada o inactiva', 404);
+                    return;
+                }
+
+                $todas = self::pdo()->query(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+                )->fetchAll(PDO::FETCH_ASSOC);
+
+                $todasMapped = array_map($mapRow, $todas);
+                Response::json([
+                    'marca' => $mapRow($row),
+                    'todas' => $todasMapped,
+                    'marcas' => $todasMapped,
+                    'brands' => $todasMapped,
+                ]);
+                return;
+            }
+
+            $rows = self::pdo()->query(
+                'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                 FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            )->fetchAll(PDO::FETCH_ASSOC);
+            $marcas = array_map($mapRow, $rows);
+            Response::json(['marcas' => $marcas, 'brands' => $marcas]);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar marcas: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Lista plana de productos para api/productos.php (filtra por ?brand= / ?marca= / ?tipo=). */
+    private static function productosList(): void
+    {
+        $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
+        $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
+        $brand = isset($_GET['brand']) ? trim((string) $_GET['brand']) : '';
+        if ($brand === '' && isset($_GET['marca'])) {
+            $brand = trim((string) $_GET['marca']);
+        }
+
+        $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
+                       b.slug AS brand_slug, b.name AS brand_name
+                FROM products p
+                LEFT JOIN categories c ON c.id = p.category_id
+                LEFT JOIN brands b ON b.id = p.brand_id
+                WHERE p.is_active = 1';
+        $params = [];
+        if ($featured) {
+            $sql .= ' AND p.is_featured = 1';
+        }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
+        if ($brand !== '') {
+            if (ctype_digit($brand)) {
+                $sql .= ' AND p.brand_id = ?';
+                $params[] = (int) $brand;
+            } else {
+                $sql .= ' AND b.slug = ?';
+                $params[] = $brand;
+            }
+        }
+        $sql .= ' ORDER BY p.sort_order, p.name';
+        try {
+            if ($params) {
+                $st = self::pdo()->prepare($sql);
+                $st->execute($params);
+                $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $rows = self::pdo()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            }
+            Response::json($rows);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar productos: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Home "Soluciones para tu planta": JSON array plano de activos ordenados.
+     * Campos compatibles con admin (bullet_*, cta_*, imagen_url) + alias imagen/descripcion.
+     */
+    private static function soluciones(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, slug, titulo, bullet_1, bullet_2, bullet_3,
+                        cta_texto, cta_url, imagen_url, orden, activo
+                 FROM soluciones
+                 WHERE activo = 1
+                 ORDER BY orden ASC, titulo ASC
+                 LIMIT 8'
+            );
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultado = array_map(static function (array $item): array {
+                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                if ($imagen === '') {
+                    $imagen = 'img/hero/plant.jpg';
+                }
+                $titulo = (string) ($item['titulo'] ?? '');
+                $bullet1 = isset($item['bullet_1']) ? (string) $item['bullet_1'] : '';
+
+                return [
+                    'id' => (int) ($item['id'] ?? 0),
+                    'titulo' => $titulo,
+                    'slug' => (string) ($item['slug'] ?? ''),
+                    'descripcion' => $bullet1,
+                    'imagen' => $imagen,
+                    'imagen_url' => $imagen,
+                    'bullet_1' => $item['bullet_1'] ?? null,
+                    'bullet_2' => $item['bullet_2'] ?? null,
+                    'bullet_3' => $item['bullet_3'] ?? null,
+                    'cta_texto' => $item['cta_texto'] ?? null,
+                    'cta_url' => $item['cta_url'] ?? null,
+                    'orden' => (int) ($item['orden'] ?? 0),
+                    'activo' => !empty($item['activo']),
+                ];
+            }, $rows);
+
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener soluciones: ' . $e->getMessage(), 500);
+        }
     }
 
     private static function brandDetail(string $slug): void
@@ -367,3 +570,5 @@ final class PublicApi
         }
     }
 }
+
+// DEPLOY_BUST 2026-08-19-clientes
