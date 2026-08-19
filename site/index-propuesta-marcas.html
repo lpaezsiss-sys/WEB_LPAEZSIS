@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propuesta Marcas + Clientes | LPAEZsis (borrador aislado)</title>
+  <meta name="description" content="Borrador: logos de marcas con fallback, sección clientes y tarjetas industriales.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="img/icons/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="css/style.css?v=121">
+  <link rel="stylesheet" href="css/propuesta-home.css?v=3">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=4">
+</head>
+<body class="prop-home">
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <div class="prop-preview-banner" role="status">
+    BORRADOR AISLADO (marcas + clientes) —
+    <a href="index.html">Volver a index.html</a> ·
+    no desplegar a producción sin aprobación
+  </div>
+
+  <div id="site-header-mount"></div>
+
+  <main id="main">
+    <section class="hero hero-banner prop-hero" aria-label="Vista previa">
+      <div class="hero-media" aria-hidden="true">
+        <picture class="hero-media__slide is-active">
+          <source type="image/webp" srcset="img/hero/line.webp">
+          <img src="img/hero/line.jpg" alt="" width="1920" height="1440" loading="eager" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="prop-hero__brand">LPAEZsis</p>
+        <h1 class="prop-hero__title">Propuesta: marcas, logos y clientes</h1>
+        <p class="prop-hero__lead">Revisa en local los logos con fallback, las tarjetas industriales y la sección de clientes restaurada.</p>
+      </div>
+    </section>
+
+    <!-- Marcas con logos seguros -->
+    <section class="pm-brands-section reveal" aria-labelledby="pm-marcas-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="pm-marcas-title">Representaciones y Distribución</h2>
+          <a href="marcas.html">Ver todas →</a>
+        </div>
+        <div class="brands-industrial-grid" id="brandsGridContainer" role="list"></div>
+      </div>
+    </section>
+
+    <!-- Sección Clientes en la Home -->
+    <section class="home-clients-section reveal" id="clientes" aria-labelledby="pm-clientes-title">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 id="pm-clientes-title">Empresas que confían en nuestras soluciones</h2>
+          <p>Soplado, secado y fin de línea en las principales plantas de Chile</p>
+        </div>
+
+        <!-- Grilla de Tarjetas Industriales de Clientes -->
+        <div class="clients-industrial-grid" id="clientsGridContainer" role="list">
+          <!-- Carga dinámica o lista estática de clientes -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer-mount"></div>
+  <script src="js/layout.js?v=36"></script>
+  <script src="js/site.js?v=25"></script>
+  <script>
+    (function () {
+      var LOGO_BY_SLUG = {
+        "sonic-air-systems": "img/brand/sonic-air.png",
+        sonic: "img/brand/sonic-air.png",
+        lyc: "img/brand/lyc.png",
+        movex: "img/brand/movex.png",
+        isodur: "img/brand/isodur.png",
+        combi: "img/brand/combi.png",
+        haida: "img/brand/haida.png"
+      };
+
+      var PLACEHOLDER = "img/placeholder-logo.png";
+
+      function normalizeLogoUrl(raw, slug) {
+        var src = String(raw || "").trim();
+        if (src.charAt(0) === "/") src = src.slice(1);
+        if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
+        if (!src && slug) {
+          // Intentos locales por convención
+          src = "img/brand/" + slug.replace(/-systems$/i, "").replace(/_/g, "-") + ".png";
+        }
+        if (!src) src = PLACEHOLDER;
+        return src;
+      }
+
+      function escapeHtml(str) {
+        if (window.Lpaez && Lpaez.escapeHtml) return Lpaez.escapeHtml(str);
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      /** Renderizado seguro con fallback de imagen */
+      function renderBrandLogos(brands) {
+        var container = document.getElementById("brandsGridContainer");
+        if (!container) return;
+
+        if (!brands || !brands.length) {
+          container.innerHTML =
+            '<p class="pm-empty-hint">No hay marcas activas para mostrar.</p>';
+          return;
+        }
+
+        container.innerHTML = brands
+          .map(function (b) {
+            var slug = b.slug || "";
+            var nombre = b.nombre || b.name || slug || "Marca";
+            var src = normalizeLogoUrl(b.logo_url || b.imagen, slug);
+            return (
+              '<a href="marcas.html?slug=' +
+              encodeURIComponent(slug) +
+              '" class="industrial-brand-card" role="listitem" title="' +
+              escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              escapeHtml(src) +
+              '" alt="' +
+              escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</a>"
+            );
+          })
+          .join("");
+      }
+
+      function renderClients(clients) {
+        var container = document.getElementById("clientsGridContainer");
+        if (!container) return;
+
+        if (!clients || clients.length === 0) {
+          container.innerHTML =
+            '<p class="text-muted text-center pm-empty-hint">Pronto publicaremos nuestros clientes principales.</p>';
+          return;
+        }
+
+        container.innerHTML = clients
+          .map(function (client) {
+            var nombre = client.nombre || client.name || "Cliente";
+            var src = client.logo_url || client.logo || client.imagen || PLACEHOLDER;
+            src = normalizeLogoUrl(src, client.slug || "");
+            return (
+              '<div class="industrial-client-card" role="listitem" title="' +
+              escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              escapeHtml(src) +
+              '" alt="' +
+              escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function loadBrands() {
+        return fetch("api/marcas.php", { credentials: "same-origin" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            var brands = Array.isArray(data)
+              ? data
+              : data.marcas || data.brands || data.todas || [];
+            renderBrandLogos(brands);
+          })
+          .catch(function () {
+            // Fallback demo con mapa local de logos conocidos
+            renderBrandLogos([
+              { slug: "sonic-air-systems", nombre: "Sonic Air Systems", logo_url: "img/brand/sonic-air.png" },
+              { slug: "lyc", nombre: "LYC", logo_url: "img/brand/lyc.png" },
+              { slug: "movex", nombre: "MOVEX", logo_url: "img/brand/movex.png" },
+              { slug: "isodur", nombre: "ISODUR", logo_url: "img/brand/isodur.png" },
+              { slug: "combi", nombre: "COMBI", logo_url: "img/brand/combi.png" },
+              { slug: "haida", nombre: "HAIDA", logo_url: "img/brand/haida.png" }
+            ]);
+          });
+      }
+
+      function loadClients() {
+        return fetch("api/clientes.php", { credentials: "same-origin" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            var clients = Array.isArray(data) ? data : data.clientes || [];
+            renderClients(clients);
+          })
+          .catch(function () {
+            renderClients([]);
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        loadBrands();
+        loadClients();
+        if (window.Lpaez && Lpaez.observeReveals) Lpaez.observeReveals();
+      });
+    })();
+  </script>
+</body>
+</html>
