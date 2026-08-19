@@ -46,6 +46,10 @@ final class PublicApi
             self::brands();
             return;
         }
+        if ($method === 'GET' && $path === '/api/clientes') {
+            self::clientes();
+            return;
+        }
         if ($method === 'GET' && $path === '/api/marcas') {
             self::marcas();
             return;
@@ -124,6 +128,27 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    /**
+     * GET /api/clientes
+     * Lista plana de clientes activos: [{ id, nombre, logo_url }, ...]
+     */
+    private static function clientes(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, nombre, logo_url
+                 FROM clientes
+                 WHERE activo = 1
+                 ORDER BY orden ASC, nombre ASC'
+            );
+            $stmt->execute();
+            Response::json($stmt->fetchAll());
+        } catch (\Throwable $e) {
+            // Tabla ausente o sin migrar: no romper home.
+            Response::json([]);
+        }
     }
 
     /**

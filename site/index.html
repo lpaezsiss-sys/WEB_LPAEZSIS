@@ -23,8 +23,9 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=121">
+  <link rel="stylesheet" href="css/style.css?v=122">
   <link rel="stylesheet" href="css/propuesta-home.css?v=3">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=4">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -288,12 +289,25 @@
       </div>
     </section>
 
-    <section class="section reveal brands-compact" aria-labelledby="marcas-title">
-      <div class="section-head is-left">
-        <h2 id="marcas-title">Representaciones y Distribución</h2>
-        <p><a href="marcas.html">Ver todas →</a></p>
+    <section class="section reveal pm-brands-section" aria-labelledby="marcas-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="marcas-title">Representaciones y Distribución</h2>
+          <a href="marcas.html">Ver todas →</a>
+        </div>
+        <div class="brands-industrial-grid" id="brandsGridContainer" role="list"></div>
       </div>
-      <div class="brand-strip" id="homeBrands"></div>
+    </section>
+
+    <!-- Sección Clientes en la Home -->
+    <section class="home-clients-section reveal" id="clientes" aria-labelledby="clientes-title">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 id="clientes-title">Empresas que confían en nuestras soluciones</h2>
+          <p>Soplado, secado y fin de línea en las principales plantas de Chile</p>
+        </div>
+        <div class="clients-industrial-grid" id="clientsGridContainer" role="list"></div>
+      </div>
     </section>
 
     <section class="cta-band reveal" aria-labelledby="cta-title">
@@ -334,28 +348,108 @@
         } catch (e) { /* keep static JSON-LD */ }
       }
 
-      function brandPillHtml(b) {
-        var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
-        var label = Lpaez.escapeHtml(b.name);
-        if (b.logo_url || b.slug === "sonic-air-systems") {
-          var src = b.logo_url || "img/brand/sonic-air.png";
-          var webp =
-            b.slug === "sonic-air-systems" && !b.logo_url
-              ? "img/brand/sonic-air.webp"
-              : String(src).replace(/\.(jpe?g|png)$/i, ".webp");
-          var useWebp = /\.(jpe?g|png)$/i.test(src) || b.slug === "sonic-air-systems";
-          return (
-            '<a class="brand-pill" href="' + href + '" title="' + label + '">' +
-            (useWebp
-              ? '<picture><source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">'
-              : "") +
-            '<img src="' + Lpaez.escapeHtml(src) + '" alt="' + label +
-            '" title="' + label + '" width="120" height="48" loading="lazy" decoding="async">' +
-            (useWebp ? "</picture>" : "") +
-            "</a>"
-          );
+      var PLACEHOLDER = "img/placeholder-logo.png";
+      var LOGO_BY_SLUG = {
+        "sonic-air-systems": "img/brand/sonic-air.png",
+        sonic: "img/brand/sonic-air.png",
+        lyc: "img/brand/lyc.png",
+        movex: "img/brand/movex.png",
+        isodur: "img/brand/isodur.png",
+        combi: "img/brand/combi.png",
+        haida: "img/brand/haida.png"
+      };
+
+      function normalizeLogoUrl(raw, slug) {
+        var src = String(raw || "").trim();
+        if (src.charAt(0) === "/") src = src.slice(1);
+        if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
+        if (!src && slug) {
+          src = "img/brand/" + String(slug).replace(/-systems$/i, "").replace(/_/g, "-") + ".png";
         }
-        return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
+        if (!src) src = PLACEHOLDER;
+        return src;
+      }
+
+      function renderBrandLogos(brands) {
+        var container = document.getElementById("brandsGridContainer");
+        if (!container) return;
+        if (!brands || !brands.length) {
+          container.innerHTML = '<p class="pm-empty-hint">No hay marcas activas para mostrar.</p>';
+          return;
+        }
+        container.innerHTML = brands
+          .map(function (b) {
+            var slug = b.slug || "";
+            var nombre = b.nombre || b.name || slug || "Marca";
+            var src = normalizeLogoUrl(b.logo_url || b.imagen, slug);
+            return (
+              '<a href="marcas.html?slug=' +
+              encodeURIComponent(slug) +
+              '" class="industrial-brand-card" role="listitem" title="' +
+              Lpaez.escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              Lpaez.escapeHtml(src) +
+              '" alt="' +
+              Lpaez.escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</a>"
+            );
+          })
+          .join("");
+      }
+
+      function renderClients(clients) {
+        var container = document.getElementById("clientsGridContainer");
+        if (!container) return;
+
+        if (!clients || clients.length === 0) {
+          container.innerHTML =
+            '<p class="text-muted text-center pm-empty-hint">Pronto publicaremos nuestros clientes principales.</p>';
+          return;
+        }
+
+        container.innerHTML = clients
+          .map(function (client) {
+            var nombre = client.nombre || client.name || "Cliente";
+            var src = normalizeLogoUrl(
+              client.logo_url || client.logo || client.imagen,
+              client.slug || ""
+            );
+            return (
+              '<div class="industrial-client-card" role="listitem" title="' +
+              Lpaez.escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              Lpaez.escapeHtml(src) +
+              '" alt="' +
+              Lpaez.escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function loadClients() {
+        return fetch("api/clientes.php", { credentials: "same-origin" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            var clients = Array.isArray(data) ? data : data.clientes || [];
+            renderClients(clients);
+          })
+          .catch(function () {
+            renderClients([]);
+          });
       }
 
       var sectores = document.getElementById("sectores");
@@ -411,9 +505,8 @@
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
         var products = (results[1].data && results[1].data.products) || [];
-        var brandsEl = document.getElementById("homeBrands");
+        renderBrandLogos(brands);
         var productsEl = document.getElementById("homeProducts");
-        if (brandsEl) brandsEl.innerHTML = brands.map(brandPillHtml).join("");
         if (productsEl) {
           productsEl.innerHTML =
             products.map(function (p) {
@@ -423,6 +516,7 @@
         }
         Lpaez.observeReveals();
       }).catch(function () {
+        renderBrandLogos([]);
         var productsEl = document.getElementById("homeProducts");
         if (productsEl) {
           productsEl.innerHTML =
@@ -434,6 +528,7 @@
       document.addEventListener("DOMContentLoaded", function () {
         initHeroCarousel();
         initAsesoriaModal();
+        loadClients();
         Lpaez.observeReveals();
       });
     })();
