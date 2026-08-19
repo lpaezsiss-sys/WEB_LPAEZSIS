@@ -9,7 +9,7 @@
   --pm-line: #e2e8f0;
   --pm-surface: #f1f5f9;
   --pm-white: #ffffff;
-  --pm-red: #d81f37;
+  --pm-red: #dc2626;
   --pm-max: 1100px;
 }
 
@@ -28,11 +28,10 @@
   font-weight: 750;
 }
 
-/* ——— Marcas: tarjetas industriales ——— */
+/* ——— Marcas: encabezado de sección ——— */
 .pm-brands-section {
-  background:
-    linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 48%);
-  padding: clamp(2.5rem, 5vw, 3.75rem) 1.25rem;
+  background: linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 48%);
+  padding: clamp(2.5rem, 5vw, 3.75rem) 1.5rem;
 }
 
 .pm-brands-section .container {
@@ -46,7 +45,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   border: 0;
   padding: 0;
 }
@@ -70,61 +69,11 @@
   text-decoration: underline;
 }
 
-.industrial-brands-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-}
-
-.industrial-brand-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 96px;
-  padding: 1.1rem 1rem;
-  background: var(--pm-white);
-  border: 1px solid var(--pm-line);
-  border-radius: 10px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.industrial-brand-card:hover {
-  transform: translateY(-3px);
-  border-color: #cbd5e1;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-}
-
-.industrial-brand-card img {
-  max-width: 100%;
-  max-height: 52px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  filter: grayscale(1);
-  opacity: 0.85;
-  transition: filter 0.2s ease, opacity 0.2s ease;
-}
-
-.industrial-brand-card:hover img {
-  filter: none;
-  opacity: 1;
-}
-
-.industrial-brand-card__name {
-  font-size: 0.82rem;
-  font-weight: 750;
-  color: var(--pm-ink);
-  text-align: center;
-}
-
-/* ——— Clientes (Home) ——— */
+/* ——— Clientes: encabezado de sección ——— */
 .home-clients-section {
-  background:
-    linear-gradient(180deg, var(--pm-white) 0%, #f8fafc 100%);
-  padding: clamp(2.5rem, 5vw, 3.75rem) 1.25rem 3.25rem;
-  border-top: 1px solid var(--pm-line);
+  padding: 3.5rem 1.5rem;
+  background-color: #f1f5f9;
+  border-top: 1px solid #e2e8f0;
 }
 
 .home-clients-section .container {
@@ -133,7 +82,7 @@
 }
 
 .home-clients-section .section-header {
-  margin-bottom: 1.65rem;
+  margin-bottom: 0;
   border: 0;
   padding: 0;
 }
@@ -159,44 +108,78 @@
   line-height: 1.45;
 }
 
-.clients-industrial-grid {
+/* --- TARJETAS INDUSTRIALES DE MARCAS Y CLIENTES --- */
+
+/* Grilla Responsiva para Logos */
+.clients-industrial-grid,
+.brands-industrial-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-  gap: 0.95rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+  align-items: center;
 }
 
+/* Estilo Tarjeta Industrial */
+.industrial-brand-card,
 .industrial-client-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #dc2626; /* Acento técnico rojo LPAEZsis */
+  border-radius: 6px;
+  height: 90px;
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 92px;
-  padding: 1rem 0.9rem;
-  background: var(--pm-white);
-  border: 1px solid var(--pm-line);
-  border-radius: 10px;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Hover con efecto industrial */
+.industrial-brand-card:hover,
 .industrial-client-card:hover {
-  transform: translateY(-2px);
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+  transform: translateY(-3px);
+  border-color: #0f172a;
+  border-left-color: #dc2626;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Ajuste de Imágenes a todo Color y aprovechando el máximo espacio */
+.industrial-brand-card img,
 .industrial-client-card img {
-  max-width: 100%;
-  max-height: 46px;
+  max-width: 92%;
+  max-height: 68px;
   width: auto;
   height: auto;
   object-fit: contain;
-  filter: grayscale(1);
-  opacity: 0.82;
-  transition: filter 0.2s ease, opacity 0.2s ease;
+  /* Garantizar color natural completo sin filtros escala de grises */
+  filter: none !important;
+  opacity: 1 !important;
 }
 
-.industrial-client-card:hover img {
-  filter: none;
-  opacity: 1;
+/* Sombra técnica en esquina (Detalle visual de maquetado) */
+.industrial-brand-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 10px 10px 0;
+  border-color: transparent #e2e8f0 transparent transparent;
+}
+
+.industrial-brand-card__name {
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: var(--pm-ink);
+  text-align: center;
 }
 
 .pm-empty-hint {
@@ -208,8 +191,9 @@
 }
 
 @media (max-width: 640px) {
-  .industrial-brands-grid,
+  .brands-industrial-grid,
   .clients-industrial-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
   }
 }
