@@ -390,6 +390,16 @@ final class AdminApi
                 return isset($existing[$f]);
             }));
             if (!array_key_exists('name', $b)) {
+                if (array_key_exists('logo_url', $b) && !array_key_exists('schema_json_ld', $b)
+                    && isset($existing['schema_json_ld'])) {
+                    $stmt = self::pdo()->prepare('SELECT * FROM brands WHERE id = ? LIMIT 1');
+                    $stmt->execute([$id]);
+                    $current = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (is_array($current)) {
+                        $current['logo_url'] = $b['logo_url'];
+                        $b['schema_json_ld'] = BrandSeo::buildJson(BrandSeo::present($current));
+                    }
+                }
                 $row = self::patch('brands', $id, $b, $writable, false);
                 if ($row === null) {
                     self::brandFail('Sin cambios');

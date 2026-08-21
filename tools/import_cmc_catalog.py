@@ -20,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data" / "cmc_klebetechnik_catalog.json"
 DEFAULT_API = os.environ.get("LPAEZSIS_API", "https://prueba1.lpaezsis.cl")
+DEFAULT_ORIGIN = os.environ.get("LPAEZSIS_ORIGIN", "https://prueba1.lpaezsis.cl")
 
 SPECS_HEADER = "Especificaciones técnicas:"
 FICHA_PREFIX = "Ficha técnica:"
@@ -55,13 +56,82 @@ def compose_description(product: dict) -> str:
     return "\n".join(lines)
 
 
-def schema_string(brand: dict) -> str:
-    raw = brand.get("schema_json_ld")
-    if raw is None or raw == "":
-        return ""
-    if isinstance(raw, str):
-        return raw
-    return json.dumps(raw, ensure_ascii=False, indent=2)
+def normalize_public_url(url: str) -> str:
+    url = (url or "").strip().replace("\\", "/")
+    if url.startswith("/site/"):
+        url = url[5:]
+    elif url.lower().startswith("site/"):
+        url = "/" + url[5:]
+    if url and not url.startswith("/") and not url.startswith("http"):
+        url = "/" + url.lstrip("./")
+    return url
+
+
+def local_public_file(url: str) -> Path:
+    return ROOT / "site" / normalize_public_url(url).lstrip("/")
+
+
+def resolve_public_logo(brand: dict) -> str:
+    """Vincula logo_url a un archivo real bajo site/img/ (nunca /img/uploads/)."""
+    slug = str(brand.get("slug") or "")
+    candidates: list[str] = []
+    declared = str(brand.get("logo_url") or "").strip()
+    if declared:
+        candidates.append(declared)
+    if slug:
+        candidates.extend(
+            [
+                f"/img/logo-{slug}.webp",
+                f"/img/logo-{slug}.png",
+                f"/img/brand/{slug}.webp",
+                f"/img/brand/{slug}.png",
+            ]
+        )
+    seen: set[str] = set()
+    for raw in candidates:
+        url = normalize_public_url(raw)
+        if not url or url.startswith("/img/uploads/") or url in seen:
+            continue
+        seen.add(url)
+        if local_public_file(url).is_file():
+            return url
+    raise SystemExit(
+        f"No hay logo en site/img/ para slug={slug or '?'} (probado: {candidates})"
+    )
+
+
+def apply_logo_to_schema(schema: object, logo_url: str, origin: str = DEFAULT_ORIGIN) -> str:
+    origin = origin.rstrip("/")
+    abs_logo = logo_url if logo_url.startswith("http") else origin + (
+        logo_url if logo_url.startswith("/") else "/" + logo_url
+    )
+    logo_obj = {"@type": "ImageObject", "url": abs_logo}
+    data: dict
+    if isinstance(schema, str) and schema.strip():
+        try:
+            parsed = json.loads(schema)
+            data = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            data = {}
+    elif isinstance(schema, dict):
+        data = dict(schema)
+    else:
+        data = {}
+    if not data:
+        data = {"@context": "https://schema.org", "@graph": []}
+    nodes = data.get("@graph")
+    if not isinstance(nodes, list):
+        nodes = [data] if data.get("@type") else []
+        data = {"@context": data.get("@context") or "https://schema.org", "@graph": nodes}
+    found = False
+    for node in nodes:
+        if isinstance(node, dict) and node.get("@type") == "Brand":
+            node["logo"] = logo_obj
+            found = True
+    if not found:
+        nodes.insert(0, {"@type": "Brand", "logo": logo_obj})
+    data["@graph"] = nodes
+    return json.dumps(data, ensure_ascii=False, indent=2)
 
 
 class AdminClient:
@@ -164,7 +234,7 @@ def brand_payload(brand: dict, logo_url: str) -> dict:
         "seo_description": brand.get("seo_description"),
         "seo_keywords": brand.get("seo_keywords"),
         "canonical_url": brand.get("canonical_url") or f"/marcas.html?slug={brand['slug']}",
-        "schema_json_ld": schema_string(brand),
+        "schema_json_ld": apply_logo_to_schema(brand.get("schema_json_ld"), logo_url),
         "logo_url": logo_url,
         "website_url": brand.get("website_url") or None,
         "datasheet_url": brand.get("datasheet_url") or None,
@@ -221,19 +291,8 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
     cats = index_by_slug(envelope_rows(client.request("GET", "/api/admin/categories"), "categories"))
 
     brand = catalog["brand"]
-    logo_url = brand["logo_url"]
-    logo_file = ROOT / "site" / brand["logo_url"].lstrip("/")
-    if logo_file.is_file():
-        try:
-            uploaded = client.upload_file(logo_file)
-            if uploaded:
-                logo_url = uploaded
-                print("uploaded logo", logo_url)
-        except SystemExit as exc:
-            print("logo upload skipped:", exc)
-    if remote_ok(client.base, brand["logo_url"]):
-        logo_url = brand["logo_url"]
-        print("using canonical logo", logo_url)
+    logo_url = resolve_public_logo(brand)
+    print("canonical logo", logo_url, "file", local_public_file(logo_url))
 
     datasheet_url = brand.get("datasheet_url")
     if datasheet_url:
