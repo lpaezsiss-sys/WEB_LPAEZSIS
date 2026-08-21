@@ -366,7 +366,7 @@ final class AdminApi
             )->execute($vals);
             self::respondBrand((int) self::pdo()->lastInsertId());
         } catch (\Throwable $e) {
-            self::brandException($e, 'No se pudo guardar la marca');
+            self::brandException($e);
         }
     }
 
@@ -410,7 +410,7 @@ final class AdminApi
             }
             self::respondBrand($id);
         } catch (\Throwable $e) {
-            self::brandException($e, 'No se pudo actualizar la marca');
+            self::brandException($e);
         }
     }
 
@@ -431,7 +431,7 @@ final class AdminApi
     {
         $name = trim((string) ($b['name'] ?? ''));
         if ($name === '') {
-            self::brandFail('El nombre de la marca es requerido');
+            self::brandFail(BrandSeo::ERR_NAME_REQUIRED);
             return null;
         }
         $excludeId = (int) ($b['id'] ?? 0);
@@ -449,7 +449,7 @@ final class AdminApi
         $slugInput = trim((string) ($b['slug'] ?? ''));
         $slug = $slugInput !== '' ? Slug::make($slugInput) : Slug::makeBrand($name);
         if ($slugExists($slug)) {
-            self::brandFail('El slug de marca ya existe', 409);
+            self::brandFail(BrandSeo::ERR_SLUG_EXISTS, 409);
             return null;
         }
 
@@ -530,14 +530,18 @@ final class AdminApi
         Response::json(BrandSeo::failResult($message, $data), $status);
     }
 
-    private static function brandException(\Throwable $e, string $userMessage): void
+    private static function brandException(\Throwable $e, string $userMessage = BrandSeo::ERR_SAVE): void
     {
         if ($e instanceof \PDOException && (string) $e->getCode() === '23000') {
-            self::brandFail('El slug de marca ya existe', 409);
+            self::brandFail(BrandSeo::ERR_SLUG_EXISTS, 409);
             return;
         }
+        $debug = BrandSeo::exceptionDebug($e);
+        if ($debug === '') {
+            $debug = get_class($e);
+        }
         self::brandFail($userMessage, 500, [
-            'debug' => BrandSeo::exceptionDebug($e),
+            'debug' => $debug,
         ]);
     }
 

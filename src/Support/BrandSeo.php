@@ -62,6 +62,9 @@ use PDO;
 final class BrandSeo
 {
     public const TITLE_SUFFIX = ' Chile | Soluciones Industriales - LPAEZSIS';
+    public const ERR_NAME_REQUIRED = 'El nombre de la marca es requerido';
+    public const ERR_SLUG_EXISTS = 'El slug de marca ya existe';
+    public const ERR_SAVE = 'No se pudo guardar la marca';
     public const DESC_IDEAL_MIN = 155;
     public const DESC_IDEAL_MAX = 160;
     public const DEFAULT_ORIGIN = 'https://prueba1.lpaezsis.cl';
