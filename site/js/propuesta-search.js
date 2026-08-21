@@ -204,6 +204,51 @@
     return { products: products, brands: brands };
   }
 
+  function normalizeImg(src) {
+    var s = String(src || "").trim();
+    if (!s) return "img/placeholder-logo.png";
+    if (s.charAt(0) === "/") s = s.slice(1);
+    return s;
+  }
+
+  function badgeClass(tipo, categoria) {
+    var t = String(tipo || "").toLowerCase();
+    var c = String(categoria || "").toLowerCase();
+    if (c === "marca" || t === "marca") return "marca";
+    if (t === "repuesto") return "repuesto";
+    if (t === "equipo") return "equipo";
+    return "equipo";
+  }
+
+  function resultItemHtml(row, index, href, title, meta) {
+    var badge = badgeClass(row.tipo, row.categoria);
+    var img = normalizeImg(row.imagen || row.image_url || row.logo_url);
+    return (
+      '<a class="search-result-item" role="option" data-index="' +
+      index +
+      '" href="' +
+      href +
+      '">' +
+      '<img class="search-item-img" src="' +
+      escapeHtml(img) +
+      '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'img/placeholder-logo.png\';">' +
+      '<span class="search-result-item__main">' +
+      '<span class="search-result-item__title">' +
+      escapeHtml(title) +
+      "</span>" +
+      (meta
+        ? '<span class="search-result-item__meta">' + escapeHtml(meta) + "</span>"
+        : "") +
+      "</span>" +
+      '<span class="search-badge ' +
+      badge +
+      '">' +
+      escapeHtml(tipoLabel(badge === "marca" ? "marca" : row.tipo)) +
+      "</span>" +
+      "</a>"
+    );
+  }
+
   function renderDropdown(results, query) {
     var dropdown = document.getElementById("searchResultsDropdown");
     var input = document.getElementById("globalSearchInput");
@@ -220,7 +265,7 @@
 
     if (!products.length && !brands.length) {
       dropdown.innerHTML =
-        '<div class="search-empty">Sin resultados para “' +
+        '<div class="search-no-results">Sin resultados para “' +
         escapeHtml(query.trim()) +
         '”. Prueba con otra marca o modelo.</div>';
       showDropdown();
@@ -234,24 +279,7 @@
         var href = "producto.html?slug=" + encodeURIComponent(p.slug || "");
         var title = p.titulo || p.name || "";
         var meta = [tipoLabel(p.tipo), p.brand_name].filter(Boolean).join(" · ");
-        html +=
-          '<a class="search-result-item" role="option" data-index="' +
-          i +
-          '" href="' +
-          href +
-          '">' +
-          '<span class="search-result-item__main">' +
-          '<span class="search-result-item__title">' +
-          escapeHtml(title) +
-          "</span>" +
-          (meta
-            ? '<span class="search-result-item__meta">' + escapeHtml(meta) + "</span>"
-            : "") +
-          "</span>" +
-          '<span class="search-result-item__kind">' +
-          escapeHtml(tipoLabel(p.tipo)) +
-          "</span>" +
-          "</a>";
+        html += resultItemHtml(p, i, href, title, meta);
       });
     }
 
@@ -262,20 +290,13 @@
         var nombre = b.titulo || b.name || b.nombre || slug;
         var href = "marcas.html?slug=" + encodeURIComponent(slug);
         var idx = products.length + i;
-        html +=
-          '<a class="search-result-item search-result-item--brand" role="option" data-index="' +
-          idx +
-          '" href="' +
-          href +
-          '">' +
-          '<span class="search-result-item__main">' +
-          '<span class="search-result-item__title">' +
-          escapeHtml(nombre) +
-          "</span>" +
-          '<span class="search-result-item__meta">Representación / distribución</span>' +
-          "</span>" +
-          '<span class="search-result-item__kind">Marca</span>' +
-          "</a>";
+        html += resultItemHtml(
+          b,
+          idx,
+          href,
+          nombre,
+          "Representación / distribución"
+        );
       });
     }
 
