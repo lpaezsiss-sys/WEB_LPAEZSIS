@@ -150,13 +150,12 @@ final class PublicApi
         );
         $p->execute([(int) $brand['id']]);
         $products = $p->fetchAll();
-        Response::json([
-            'success' => true,
-            'ok' => true,
+        $url = trim((string) ($brand['canonical_url'] ?? ''));
+        Response::json(BrandSeo::envelope([
             'brand' => $brand,
             'products' => $products,
-            'data' => ['brand' => $brand, 'products' => $products],
-        ]);
+            'url' => $url !== '' ? $url : BrandSeo::defaultCanonical((string) ($brand['slug'] ?? '')),
+        ]));
     }
 
     private static function products(): void

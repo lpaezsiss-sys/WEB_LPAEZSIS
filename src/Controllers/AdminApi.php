@@ -250,17 +250,10 @@ final class AdminApi
             Response::error((string) $result['error']);
             return;
         }
-        Response::json([
-            'success' => true,
-            'ok' => true,
+        Response::ok([
             'url' => $result['url'],
             'type' => $result['type'] ?? 'file',
             'converted' => !empty($result['converted']),
-            'data' => [
-                'url' => $result['url'],
-                'type' => $result['type'] ?? 'file',
-                'converted' => !empty($result['converted']),
-            ],
         ]);
     }
 
@@ -403,7 +396,7 @@ final class AdminApi
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!is_array($row)) {
-            Response::json(['success' => true, 'ok' => true, 'id' => $id, 'data' => ['id' => $id]]);
+            Response::json(BrandSeo::envelope(['id' => $id]));
             return;
         }
         Response::json(BrandSeo::actionResult(BrandSeo::present($row)));
@@ -495,7 +488,7 @@ final class AdminApi
     private static function deleteBrand(int $id): void
     {
         self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
-        Response::json(['success' => true, 'ok' => true, 'id' => $id, 'data' => ['id' => $id]]);
+        Response::json(BrandSeo::envelope(['id' => $id]));
     }
 
     private static function createProduct(): void

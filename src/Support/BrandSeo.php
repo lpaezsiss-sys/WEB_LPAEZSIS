@@ -50,7 +50,8 @@ use PDO;
  *   id?: int,
  *   slug?: string,
  *   brand?: Brand,
- *   data?: array{id?: int, slug?: string, brand?: Brand, brands?: list<Brand>},
+ *   url?: string,
+ *   data?: array{id?: int, slug?: string, brand?: Brand, brands?: list<Brand>, url?: string},
  *   error?: string
  * }
  */
@@ -253,6 +254,17 @@ final class BrandSeo
     }
 
     /**
+     * Sobre {success:true, ok:true, data} y replica cada clave de $payload en la raíz.
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public static function envelope(array $payload): array
+    {
+        return array_merge(['success' => true, 'ok' => true, 'data' => $payload], $payload);
+    }
+
+    /**
      * @param Brand $brand
      * @return BrandActionResult
      */
@@ -260,32 +272,25 @@ final class BrandSeo
     {
         $id = isset($brand['id']) ? (int) $brand['id'] : 0;
         $slug = (string) ($brand['slug'] ?? '');
-        return [
-            'success' => true,
-            'ok' => true,
+        $url = trim((string) ($brand['canonical_url'] ?? ''));
+        if ($url === '') {
+            $url = self::defaultCanonical($slug);
+        }
+        return self::envelope([
             'id' => $id,
             'slug' => $slug,
             'brand' => $brand,
-            'data' => [
-                'id' => $id,
-                'slug' => $slug,
-                'brand' => $brand,
-            ],
-        ];
+            'url' => $url,
+        ]);
     }
 
     /**
      * @param list<Brand> $brands
-     * @return array{success: true, ok: true, brands: list<Brand>, data: array{brands: list<Brand>}}
+     * @return array<string, mixed>
      */
     public static function listResult(array $brands): array
     {
-        return [
-            'success' => true,
-            'ok' => true,
-            'brands' => $brands,
-            'data' => ['brands' => $brands],
-        ];
+        return self::envelope(['brands' => $brands]);
     }
 
     /**

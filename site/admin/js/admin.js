@@ -59,7 +59,8 @@
    * @property {number} [id]
    * @property {string} [slug]
    * @property {Brand} [brand]
-   * @property {{id?: number, slug?: string, brand?: Brand, brands?: Brand[]}} [data]
+   * @property {string} [url]
+   * @property {{id?: number, slug?: string, brand?: Brand, brands?: Brand[], url?: string}} [data]
    * @property {string} [error]
    */
 
