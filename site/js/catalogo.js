@@ -150,7 +150,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/fl3000_columbia.jpg",
+    image_url: "img/productos/fl3000.jpg",
     image_webp: "",
     category_slug: "paletizado-convencional",
     category_name: "Paletizado Convencional / Final de Línea",
@@ -167,7 +167,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/hl7200_columbia.jpg",
+    image_url: "img/productos/hl7200.jpg",
     image_webp: "",
     category_slug: "paletizado-alta-velocidad",
     category_name: "Paletizado de Alta Velocidad / Final de Línea",
@@ -184,7 +184,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/ai1800_columbia.jpg",
+    image_url: "img/productos/ai1800.jpg",
     image_webp: "",
     category_slug: "paletizado-robotico",
     category_name: "Paletizado Robótico / Células de Automatización",
@@ -201,7 +201,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/fl1000sw_columbia.jpg",
+    image_url: "img/productos/fl1000sw.jpg",
     image_webp: "",
     category_slug: "paletizado-integrado",
     category_name: "Paletizado Integrado / Soluciones Compactas",
@@ -379,15 +379,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
       if (file) image = "img/products/" + file[1];
     }
-    if (!image && window.Lpaez?.resolveProductImage) {
+    if (
+      (!image || /p-6ffb39180d4af541|p-f65d2c9f90c7de1a|p-822eb15cf1463d95|p-f2f7618440e07dfc/i.test(image)) &&
+      window.Lpaez?.resolveProductImage
+    ) {
       try {
-        image = Lpaez.resolveProductImage(prod);
+        image = Lpaez.resolveProductImage(prod) || image;
       } catch (_) {
-        image = "img/products/A07-10015.jpg";
+        /* keep API image */
       }
     }
     if (!image) image = "img/products/A07-10015.jpg";
-    const knownWebp = /\.(jpe?g|png)$/i.test(image) && !/\/img\/uploads\//i.test(image);
+    const knownWebp =
+      /\.(jpe?g|png)$/i.test(image) &&
+      !/\/img\/uploads\//i.test(image) &&
+      !/\/img\/productos\//i.test(image);
     const webp = knownWebp && !/columbia/i.test(image)
       ? image.replace(/\.(jpe?g|png)$/i, ".webp")
       : "";

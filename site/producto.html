@@ -41,7 +41,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=24"></script>
+  <script src="js/site.js?v=25"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -132,26 +132,16 @@
         crumb.hidden = false;
 
         if (product.image_url || Lpaez.resolveProductImage(product)) {
-          var src = Lpaez.resolveProductImage(product);
           var fallbacks = Lpaez.productImageCandidates
             ? Lpaez.productImageCandidates(product)
-            : [src, "img/products/A07-10015.jpg"];
+            : [product.image_url, "img/products/A07-10015.jpg"];
+          var src = product.image_url && fallbacks.indexOf(product.image_url) !== -1
+            ? product.image_url
+            : (fallbacks[0] || Lpaez.resolveProductImage(product));
           var imgHtml = Lpaez.imgTagHtml
-            ? Lpaez.imgTagHtml(src, product.name)
+            ? Lpaez.imgTagHtml(src, product.name, "", fallbacks)
             : '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
           document.getElementById("productVisual").innerHTML = imgHtml;
-          var visImg = document.querySelector("#productVisual img");
-          if (visImg && fallbacks.length > 1) {
-            visImg.addEventListener("error", function onErr() {
-              var i = Number(visImg.dataset.idx || "0") + 1;
-              if (i >= fallbacks.length) {
-                visImg.removeEventListener("error", onErr);
-                return;
-              }
-              visImg.dataset.idx = String(i);
-              visImg.src = fallbacks[i];
-            });
-          }
         }
         var actions = document.getElementById("productActions");
         var datasheetUrl = Lpaez.resolveDatasheetUrl ? Lpaez.resolveDatasheetUrl(product) : "";

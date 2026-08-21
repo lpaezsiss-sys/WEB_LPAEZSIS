@@ -57,7 +57,7 @@
         ["Control", "HMI Táctil intuitivo"]
       ],
       "datasheet": "/img/fichas/ficha_tecnica_fl3000_columbia.pdf",
-      "image_url": "/img/products/fl3000_columbia.jpg",
+      "image_url": "/img/productos/fl3000.jpg",
       "sort_order": 6
     },
     {
@@ -73,7 +73,7 @@
         ["Aplicaciones", "Embotellado, enlatado, alimentos y consumo masivo"]
       ],
       "datasheet": "/img/fichas/ficha_tecnica_hl7200_columbia.pdf",
-      "image_url": "/img/products/hl7200_columbia.jpg",
+      "image_url": "/img/productos/hl7200.jpg",
       "sort_order": 7
     },
     {
@@ -89,7 +89,7 @@
         ["Configuración", "Celda multilínea con cabezal/gripper adaptable"]
       ],
       "datasheet": "/img/fichas/ficha_tecnica_ai1800_columbia.pdf",
-      "image_url": "/img/products/ai1800_columbia.jpg",
+      "image_url": "/img/productos/ai1800.jpg",
       "sort_order": 8
     },
     {
@@ -104,7 +104,7 @@
         ["Ahorro de espacio", "Reducción de footprint de hasta un 40%"]
       ],
       "datasheet": "/img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
-      "image_url": "/img/products/fl1000sw_columbia.jpg",
+      "image_url": "/img/productos/fl1000sw.jpg",
       "sort_order": 9
     }
   ]

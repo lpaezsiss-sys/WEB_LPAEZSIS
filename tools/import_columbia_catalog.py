@@ -280,18 +280,35 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
             raise SystemExit(f"Categoría no encontrada: {prod['category_slug']}")
         image_url = prod["image_url"]
         img_file = ROOT / "site" / prod["image_url"].lstrip("/")
+        uploaded_url = ""
         if img_file.is_file():
+            suffix = img_file.suffix.lower()
+            mime = "image/jpeg" if suffix in {".jpg", ".jpeg"} else "image/png"
             try:
                 uploaded = client.request(
                     "POST",
                     "/api/admin/upload",
-                    files={"file": (img_file.name, img_file.read_bytes(), "image/png")},
+                    files={"file": (img_file.name, img_file.read_bytes(), mime)},
                 )
                 if uploaded.get("url"):
-                    image_url = uploaded["url"]
-                    print("uploaded image", prod["slug"], image_url)
+                    uploaded_url = uploaded["url"]
+                    print("uploaded image", prod["slug"], uploaded_url)
             except SystemExit as exc:
                 print("image upload skipped:", prod["slug"], exc)
+        # Prefer the public /img/productos/*.jpg path when it is already deployed;
+        # otherwise keep the uploaded photo so the catalog does not fall back to diagrams.
+        if uploaded_url:
+            image_url = uploaded_url
+            try:
+                req = urllib.request.Request(
+                    client.base + prod["image_url"], method="HEAD"
+                )
+                with urllib.request.urlopen(req, timeout=15) as res:
+                    if 200 <= getattr(res, "status", 200) < 400:
+                        image_url = prod["image_url"]
+                        print("using canonical image", prod["slug"], image_url)
+            except Exception:
+                print("canonical image not live yet", prod["slug"], prod["image_url"])
 
         payload = {
             "name": prod["name"],

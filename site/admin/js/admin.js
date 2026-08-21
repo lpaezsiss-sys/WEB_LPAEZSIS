@@ -326,10 +326,10 @@
     "turbina-soplado-sonic-100": "/img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "/img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "/img/products/A07-10976.jpg",
-    "paletizador-nivel-inferior-columbia-fl3000": "/img/products/fl3000_columbia.jpg",
-    "paletizador-alto-nivel-columbia-hl7200": "/img/products/hl7200_columbia.jpg",
-    "celda-paletizado-robotico-columbia-ai1800": "/img/products/ai1800_columbia.jpg",
-    "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/products/fl1000sw_columbia.jpg",
+    "paletizador-nivel-inferior-columbia-fl3000": "/img/productos/fl3000.jpg",
+    "paletizador-alto-nivel-columbia-hl7200": "/img/productos/hl7200.jpg",
+    "celda-paletizado-robotico-columbia-ai1800": "/img/productos/ai1800.jpg",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/productos/fl1000sw.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -357,8 +357,12 @@
 
   function resolveProductImage(p) {
     if (!p) return PRODUCT_FALLBACKS[0];
+    var mapped = PRODUCT_IMAGES[p.slug];
+    if (mapped && (!p.image_url || /p-6ffb39180d4af541|p-f65d2c9f90c7de1a|p-822eb15cf1463d95|p-f2f7618440e07dfc/i.test(p.image_url))) {
+      return toSitePath(mapped);
+    }
     if (p.image_url) return toSitePath(p.image_url);
-    if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
+    if (mapped) return mapped;
     var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
     return PRODUCT_FALLBACKS[idx];
   }
