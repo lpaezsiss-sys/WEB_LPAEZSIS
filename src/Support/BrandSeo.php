@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Lpaezsis\Support;
 
+use Lpaezsis\Config;
 use PDO;
 
 /**
@@ -297,10 +298,11 @@ final class BrandSeo
     }
 
     /**
-     * Error cerrado: raíz solo success/ok/error. `data.route` y `data.debug` son opcionales.
+     * Error cerrado: raíz solo success/ok/error.
+     * data opcional: { route, debug } (debug = detalle técnico de la excepción).
      *
      * @param array<string, mixed> $data
-     * @return array{success: false, ok: false, error: string, data?: array<string, mixed>}
+     * @return array{success: false, ok: false, error: string, data?: array{route?: string, debug?: string}}
      */
     public static function failResult(string $message, array $data = []): array
     {
@@ -313,10 +315,33 @@ final class BrandSeo
             $data['route'] = $data['path'];
             unset($data['path']);
         }
-        if ($data !== []) {
-            $payload['data'] = $data;
+        $route = isset($data['route']) ? (string) $data['route'] : '';
+        $debug = isset($data['debug']) ? (string) $data['debug'] : '';
+        unset($data['route'], $data['debug'], $data['path']);
+        $block = [];
+        if ($route !== '') {
+            $block['route'] = $route;
+        }
+        if ($debug !== '') {
+            $block['debug'] = $debug;
+        }
+        $block = array_merge($block, $data);
+        if ($block !== []) {
+            $payload['data'] = $block;
         }
         return $payload;
+    }
+
+    public static function exceptionDebug(\Throwable $e): string
+    {
+        $msg = trim($e->getMessage());
+        if ($msg === '') {
+            $msg = get_class($e);
+        }
+        if (Config::bool('APP_DEBUG')) {
+            return $msg . ' @ ' . $e->getFile() . ':' . $e->getLine();
+        }
+        return $msg;
     }
 
     public static function ensureColumns(PDO $pdo): void

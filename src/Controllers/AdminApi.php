@@ -72,11 +72,17 @@ final class AdminApi
         }
 
         if ($method === 'GET' && $sub === '/brands') {
-            BrandSeo::ensureColumns(self::pdo());
-            $rows = BrandSeo::presentMany(
-                self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll()
-            );
-            Response::json(BrandSeo::listResult($rows));
+            try {
+                BrandSeo::ensureColumns(self::pdo());
+                $rows = BrandSeo::presentMany(
+                    self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll()
+                );
+                Response::json(BrandSeo::listResult($rows));
+            } catch (\Throwable $e) {
+                self::brandFail('No se pudieron listar las marcas', 500, [
+                    'debug' => BrandSeo::exceptionDebug($e),
+                ]);
+            }
             return;
         }
         if ($method === 'POST' && $sub === '/brands') {
@@ -245,16 +251,26 @@ final class AdminApi
             Response::error('Archivo requerido', 400, ['route' => '/api/admin/upload']);
             return;
         }
-        $result = Upload::store($file, 'auto');
-        if (!$result['ok']) {
-            Response::error((string) $result['error'], 400, ['route' => '/api/admin/upload']);
-            return;
+        try {
+            $result = Upload::store($file, 'auto');
+            if (!$result['ok']) {
+                Response::error((string) $result['error'], 400, [
+                    'route' => '/api/admin/upload',
+                    'debug' => (string) $result['error'],
+                ]);
+                return;
+            }
+            Response::ok([
+                'url' => $result['url'],
+                'type' => $result['type'] ?? 'file',
+                'converted' => !empty($result['converted']),
+            ]);
+        } catch (\Throwable $e) {
+            Response::error('No se pudo completar la subida', 500, [
+                'route' => '/api/admin/upload',
+                'debug' => BrandSeo::exceptionDebug($e),
+            ]);
         }
-        Response::ok([
-            'url' => $result['url'],
-            'type' => $result['type'] ?? 'file',
-            'converted' => !empty($result['converted']),
-        ]);
     }
 
     private static function saveSettings(): void
@@ -326,68 +342,76 @@ final class AdminApi
 
     private static function createBrand(): void
     {
-        BrandSeo::ensureColumns(self::pdo());
-        $b = BrandSeo::aliasInput(self::body());
-        $row = self::normalizeBrandPayload($b, true);
-        if ($row === null) {
-            return;
-        }
-        $existing = BrandSeo::existingColumns(self::pdo());
-        $cols = [];
-        $placeholders = [];
-        $vals = [];
-        foreach ($row as $key => $val) {
-            if (!isset($existing[$key])) {
-                continue;
+        try {
+            BrandSeo::ensureColumns(self::pdo());
+            $b = BrandSeo::aliasInput(self::body());
+            $row = self::normalizeBrandPayload($b, true);
+            if ($row === null) {
+                return;
             }
-            $cols[] = '`' . $key . '`';
-            $placeholders[] = '?';
-            $vals[] = $val;
+            $existing = BrandSeo::existingColumns(self::pdo());
+            $cols = [];
+            $placeholders = [];
+            $vals = [];
+            foreach ($row as $key => $val) {
+                if (!isset($existing[$key])) {
+                    continue;
+                }
+                $cols[] = '`' . $key . '`';
+                $placeholders[] = '?';
+                $vals[] = $val;
+            }
+            self::pdo()->prepare(
+                'INSERT INTO brands (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $placeholders) . ')'
+            )->execute($vals);
+            self::respondBrand((int) self::pdo()->lastInsertId());
+        } catch (\Throwable $e) {
+            self::brandException($e, 'No se pudo guardar la marca');
         }
-        self::pdo()->prepare(
-            'INSERT INTO brands (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $placeholders) . ')'
-        )->execute($vals);
-        self::respondBrand((int) self::pdo()->lastInsertId());
     }
 
     private static function updateBrand(int $id): void
     {
-        BrandSeo::ensureColumns(self::pdo());
-        $b = BrandSeo::aliasInput(self::body());
-        if (isset($b['gallery']) && is_array($b['gallery'])) {
-            $b['gallery_json'] = json_encode($b['gallery']);
-        }
-        $existing = BrandSeo::existingColumns(self::pdo());
-        $writable = [
-            'slug', 'name', 'description', 'short_description', 'long_description',
-            'logo_url', 'website_url', 'content_html',
-            'gallery_json', 'sort_order', 'is_active',
-            'subtitle', 'origin_country', 'seo_title', 'seo_description', 'seo_keywords',
-            'canonical_url', 'schema_json_ld', 'datasheet_url',
-        ];
-        $writable = array_values(array_filter($writable, static function (string $f) use ($existing): bool {
-            return isset($existing[$f]);
-        }));
-        if (!array_key_exists('name', $b)) {
-            $row = self::patch('brands', $id, $b, $writable, false);
+        try {
+            BrandSeo::ensureColumns(self::pdo());
+            $b = BrandSeo::aliasInput(self::body());
+            if (isset($b['gallery']) && is_array($b['gallery'])) {
+                $b['gallery_json'] = json_encode($b['gallery']);
+            }
+            $existing = BrandSeo::existingColumns(self::pdo());
+            $writable = [
+                'slug', 'name', 'description', 'short_description', 'long_description',
+                'logo_url', 'website_url', 'content_html',
+                'gallery_json', 'sort_order', 'is_active',
+                'subtitle', 'origin_country', 'seo_title', 'seo_description', 'seo_keywords',
+                'canonical_url', 'schema_json_ld', 'datasheet_url',
+            ];
+            $writable = array_values(array_filter($writable, static function (string $f) use ($existing): bool {
+                return isset($existing[$f]);
+            }));
+            if (!array_key_exists('name', $b)) {
+                $row = self::patch('brands', $id, $b, $writable, false);
+                if ($row === null) {
+                    self::brandFail('Sin cambios');
+                    return;
+                }
+                self::respondBrand($id);
+                return;
+            }
+            $b['id'] = $id;
+            $row = self::normalizeBrandPayload($b, false);
             if ($row === null) {
+                return;
+            }
+            $saved = self::patch('brands', $id, $row, $writable, false);
+            if ($saved === null) {
                 self::brandFail('Sin cambios');
                 return;
             }
             self::respondBrand($id);
-            return;
+        } catch (\Throwable $e) {
+            self::brandException($e, 'No se pudo actualizar la marca');
         }
-        $b['id'] = $id;
-        $row = self::normalizeBrandPayload($b, false);
-        if ($row === null) {
-            return;
-        }
-        $saved = self::patch('brands', $id, $row, $writable, false);
-        if ($saved === null) {
-            self::brandFail('Sin cambios');
-            return;
-        }
-        self::respondBrand($id);
     }
 
     private static function respondBrand(int $id): void
@@ -487,8 +511,12 @@ final class AdminApi
 
     private static function deleteBrand(int $id): void
     {
-        self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
-        Response::json(BrandSeo::envelope(['id' => $id]));
+        try {
+            self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
+            Response::json(BrandSeo::envelope(['id' => $id]));
+        } catch (\Throwable $e) {
+            self::brandException($e, 'No se pudo eliminar la marca');
+        }
     }
 
     private static function brandFail(string $message, int $status = 400, array $data = []): void
@@ -497,6 +525,15 @@ final class AdminApi
             $data['route'] = '/api/admin/brands';
         }
         Response::json(BrandSeo::failResult($message, $data), $status);
+    }
+
+    private static function brandException(\Throwable $e, string $userMessage): void
+    {
+        $status = ($e instanceof \PDOException && (string) $e->getCode() === '23000') ? 409 : 500;
+        $error = $status === 409 ? 'El slug de marca ya existe' : $userMessage;
+        self::brandFail($error, $status, [
+            'debug' => BrandSeo::exceptionDebug($e),
+        ]);
     }
 
     private static function createProduct(): void
