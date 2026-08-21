@@ -6,18 +6,62 @@ namespace Lpaezsis\Support;
 use PDO;
 
 /**
- * SEO de marcas (admin + catálogo público).
+ * SEO y normalización de marcas (admin + catálogo público).
  *
- * Brand: id, name, slug, subtitle, origin_country, description, logo_url,
- *        datasheet_url, website_url, content_html, sort_order, is_active
- * SEOData: seo_title, seo_description, seo_keywords, canonical_url, schema_json_ld
- * BrandActionResult: ok, id?, slug?, error?
+ * Columnas canónicas (además de las legacy `description` / `content_html`):
+ * id, name, slug, subtitle, origin_country, short_description, long_description,
+ * logo_url, datasheet_url, website_url,
+ * seo_title, seo_description, seo_keywords, canonical_url, schema_json_ld.
+ *
+ * Canonical por defecto: `/marcas.html?slug={slug}`.
+ * JSON-LD: grafo `Brand` + `Organization` (schema.org).
+ *
+ * @phpstan-type Brand array{
+ *   id?: int,
+ *   name: string,
+ *   slug: string,
+ *   subtitle?: ?string,
+ *   origin_country?: ?string,
+ *   short_description?: ?string,
+ *   long_description?: ?string,
+ *   description?: ?string,
+ *   content_html?: ?string,
+ *   logo_url?: ?string,
+ *   datasheet_url?: ?string,
+ *   website_url?: ?string,
+ *   seo_title?: ?string,
+ *   seo_description?: ?string,
+ *   seo_keywords?: ?string,
+ *   canonical_url?: ?string,
+ *   schema_json_ld?: ?string,
+ *   sort_order?: int,
+ *   is_active?: int|bool
+ * }
+ * @phpstan-type SEOData array{
+ *   seo_title: string,
+ *   seo_description: ?string,
+ *   seo_keywords: ?string,
+ *   canonical_url: string,
+ *   schema_json_ld: string
+ * }
+ * @phpstan-type BrandActionResult array{
+ *   success: bool,
+ *   ok?: bool,
+ *   id?: int,
+ *   slug?: string,
+ *   brand?: Brand,
+ *   data?: array{id?: int, slug?: string, brand?: Brand, brands?: list<Brand>},
+ *   error?: string
+ * }
  */
 final class BrandSeo
 {
     public const TITLE_SUFFIX = ' Chile | Soluciones Industriales - LPAEZSIS';
     public const DESC_IDEAL_MIN = 155;
     public const DESC_IDEAL_MAX = 160;
+    public const DEFAULT_ORIGIN = 'https://prueba1.lpaezsis.cl';
+    public const ORG_NAME = 'LPAEZ SOLUCIONES INDUSTRIALES SPA';
+    public const ORG_ALT = 'LPAEZSIS';
 
     /** @var array<string, bool>|null */
     private static $columns = null;
@@ -31,6 +75,9 @@ final class BrandSeo
         return $name . self::TITLE_SUFFIX;
     }
 
+    /**
+     * Ruta canónica relativa. Siempre `/marcas.html?slug={slug}` (o `/marcas.html` sin slug).
+     */
     public static function defaultCanonical(string $slug): string
     {
         $slug = trim($slug);
@@ -41,21 +88,90 @@ final class BrandSeo
     }
 
     /**
-     * @param array<string, mixed> $brand
+     * Acepta short_description / long_description y alias legacy description / content_html.
+     *
+     * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
-    public static function buildGraph(array $brand, string $origin = 'https://prueba1.lpaezsis.cl'): array
+    public static function aliasInput(array $input): array
+    {
+        if (!array_key_exists('description', $input) && array_key_exists('short_description', $input)) {
+            $input['description'] = $input['short_description'];
+        }
+        if (!array_key_exists('short_description', $input) && array_key_exists('description', $input)) {
+            $input['short_description'] = $input['description'];
+        }
+        if (!array_key_exists('content_html', $input) && array_key_exists('long_description', $input)) {
+            $input['content_html'] = $input['long_description'];
+        }
+        if (!array_key_exists('long_description', $input) && array_key_exists('content_html', $input)) {
+            $input['long_description'] = $input['content_html'];
+        }
+        return $input;
+    }
+
+    /**
+     * Hidrata alias para que el admin y `marcas.html` reciban ambos nombres.
+     *
+     * @param array<string, mixed> $row
+     * @return Brand
+     */
+    public static function present(array $row): array
+    {
+        $short = trim((string) ($row['short_description'] ?? $row['description'] ?? ''));
+        $long = trim((string) ($row['long_description'] ?? $row['content_html'] ?? ''));
+        $row['short_description'] = $short !== '' ? $short : null;
+        $row['description'] = $row['short_description'];
+        $row['long_description'] = $long !== '' ? $long : null;
+        $row['content_html'] = $row['long_description'];
+        $slug = trim((string) ($row['slug'] ?? ''));
+        if (trim((string) ($row['canonical_url'] ?? '')) === '' && $slug !== '') {
+            $row['canonical_url'] = self::defaultCanonical($slug);
+        }
+        return $row;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows
+     * @return list<Brand>
+     */
+    public static function presentMany(array $rows): array
+    {
+        $out = [];
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $out[] = self::present($row);
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * @param Brand|array<string, mixed> $brand
+     * @return array<string, mixed>
+     */
+    public static function buildGraph(array $brand, string $origin = self::DEFAULT_ORIGIN): array
     {
         $origin = rtrim($origin, '/');
         $name = trim((string) ($brand['name'] ?? ''));
         $slug = trim((string) ($brand['slug'] ?? ''));
-        $pagePath = self::defaultCanonical($slug);
-        $url = $origin . $pagePath;
+        $customCanon = trim((string) ($brand['canonical_url'] ?? ''));
+        if ($customCanon !== '' && preg_match('#^https?://#i', $customCanon)) {
+            $url = $customCanon;
+        } else {
+            $path = $customCanon !== '' ? $customCanon : self::defaultCanonical($slug);
+            $url = $origin . (strpos($path, '/') === 0 ? $path : '/' . $path);
+        }
         $logo = trim((string) ($brand['logo_url'] ?? ''));
         if ($logo !== '' && !preg_match('#^https?://#i', $logo)) {
             $logo = $origin . '/' . ltrim($logo, '/');
         }
-        $desc = trim((string) ($brand['seo_description'] ?? $brand['description'] ?? ''));
+        $desc = trim((string) (
+            $brand['seo_description']
+            ?? $brand['short_description']
+            ?? $brand['description']
+            ?? ''
+        ));
 
         $brandNode = [
             '@type' => 'Brand',
@@ -69,15 +185,12 @@ final class BrandSeo
         $subtitle = trim((string) ($brand['subtitle'] ?? ''));
         if ($subtitle !== '') {
             $brandNode['alternateName'] = $subtitle;
+            $brandNode['slogan'] = $subtitle;
         }
         if ($logo !== '') {
-            $brandNode['logo'] = $logo;
-        }
-        $country = trim((string) ($brand['origin_country'] ?? ''));
-        if ($country !== '') {
-            $brandNode['countryOfOrigin'] = [
-                '@type' => 'Country',
-                'name' => $country,
+            $brandNode['logo'] = [
+                '@type' => 'ImageObject',
+                'url' => $logo,
             ];
         }
         $website = trim((string) ($brand['website_url'] ?? ''));
@@ -85,14 +198,27 @@ final class BrandSeo
             $brandNode['sameAs'] = [$website];
         }
 
+        $orgLogo = $origin . '/img/brand/logo.png';
         $org = [
             '@type' => 'Organization',
             '@id' => $origin . '/#organization',
-            'name' => 'LPAEZ SOLUCIONES INDUSTRIALES SPA',
-            'alternateName' => 'LPAEZSIS',
+            'name' => self::ORG_NAME,
+            'alternateName' => self::ORG_ALT,
             'url' => $origin . '/',
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => $orgLogo,
+            ],
             'brand' => ['@id' => $url . '#brand'],
         ];
+        $country = trim((string) ($brand['origin_country'] ?? ''));
+        if ($country !== '') {
+            $brandNode['additionalProperty'] = [
+                '@type' => 'PropertyValue',
+                'name' => 'País de origen',
+                'value' => $country,
+            ];
+        }
 
         return [
             '@context' => 'https://schema.org',
@@ -101,9 +227,9 @@ final class BrandSeo
     }
 
     /**
-     * @param array<string, mixed> $brand
+     * @param Brand|array<string, mixed> $brand
      */
-    public static function buildJson(array $brand, string $origin = 'https://prueba1.lpaezsis.cl'): string
+    public static function buildJson(array $brand, string $origin = self::DEFAULT_ORIGIN): string
     {
         $json = json_encode(
             self::buildGraph($brand, $origin),
@@ -126,6 +252,28 @@ final class BrandSeo
         return is_string($json) ? $json : $raw;
     }
 
+    /**
+     * @param Brand $brand
+     * @return BrandActionResult
+     */
+    public static function actionResult(array $brand): array
+    {
+        $id = isset($brand['id']) ? (int) $brand['id'] : 0;
+        $slug = (string) ($brand['slug'] ?? '');
+        return [
+            'success' => true,
+            'ok' => true,
+            'id' => $id,
+            'slug' => $slug,
+            'brand' => $brand,
+            'data' => [
+                'id' => $id,
+                'slug' => $slug,
+                'brand' => $brand,
+            ],
+        ];
+    }
+
     public static function ensureColumns(PDO $pdo): void
     {
         if (self::$columns !== null) {
@@ -146,6 +294,8 @@ final class BrandSeo
         $needed = [
             'subtitle' => 'VARCHAR(200) NULL DEFAULT NULL',
             'origin_country' => 'VARCHAR(80) NULL DEFAULT NULL',
+            'short_description' => 'TEXT NULL DEFAULT NULL',
+            'long_description' => 'MEDIUMTEXT NULL',
             'seo_title' => 'VARCHAR(200) NULL DEFAULT NULL',
             'seo_description' => 'VARCHAR(320) NULL DEFAULT NULL',
             'seo_keywords' => 'VARCHAR(500) NULL DEFAULT NULL',

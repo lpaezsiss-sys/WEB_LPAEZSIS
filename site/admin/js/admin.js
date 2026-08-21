@@ -32,11 +32,13 @@
    * @property {string} slug
    * @property {string} [subtitle]
    * @property {string} [origin_country]
-   * @property {string} [description]
+   * @property {string} [short_description]
+   * @property {string} [long_description]
+   * @property {string} [description] Alias legacy de short_description
+   * @property {string} [content_html] Alias legacy de long_description
    * @property {string} [logo_url]
    * @property {string} [datasheet_url]
    * @property {string} [website_url]
-   * @property {string} [content_html]
    * @property {number} [sort_order]
    * @property {boolean|number} [is_active]
    */
@@ -48,6 +50,17 @@
    * @property {string} seo_keywords
    * @property {string} canonical_url
    * @property {string} schema_json_ld
+   */
+
+  /**
+   * @typedef {Object} BrandActionResult
+   * @property {boolean} success
+   * @property {boolean} [ok]
+   * @property {number} [id]
+   * @property {string} [slug]
+   * @property {Brand} [brand]
+   * @property {{id?: number, slug?: string, brand?: Brand, brands?: Brand[]}} [data]
+   * @property {string} [error]
    */
 
   var BRAND_SEO_TITLE_SUFFIX = " Chile | Soluciones Industriales - LPAEZSIS";
@@ -98,7 +111,9 @@
     if (logo && !/^https?:\/\//i.test(logo)) {
       logo = origin + (logo.charAt(0) === "/" ? logo : "/" + logo);
     }
-    var desc = String((brand && (brand.seo_description || brand.description)) || "").trim();
+    var desc = String(
+      (brand && (brand.seo_description || brand.short_description || brand.description)) || ""
+    ).trim();
     var brandNode = {
       "@type": "Brand",
       "@id": url + "#brand",
@@ -106,10 +121,17 @@
       url: url,
     };
     if (desc) brandNode.description = desc;
-    if (brand && brand.subtitle) brandNode.alternateName = brand.subtitle;
-    if (logo) brandNode.logo = logo;
+    if (brand && brand.subtitle) {
+      brandNode.alternateName = brand.subtitle;
+      brandNode.slogan = brand.subtitle;
+    }
+    if (logo) brandNode.logo = { "@type": "ImageObject", url: logo };
     if (brand && brand.origin_country) {
-      brandNode.countryOfOrigin = { "@type": "Country", name: brand.origin_country };
+      brandNode.additionalProperty = {
+        "@type": "PropertyValue",
+        name: "País de origen",
+        value: brand.origin_country,
+      };
     }
     if (brand && brand.website_url) brandNode.sameAs = [brand.website_url];
     var graph = {
@@ -122,6 +144,7 @@
           name: "LPAEZ SOLUCIONES INDUSTRIALES SPA",
           alternateName: "LPAEZSIS",
           url: origin + "/",
+          logo: { "@type": "ImageObject", url: origin + "/img/brand/logo.png" },
           brand: { "@id": url + "#brand" },
         },
       ],
@@ -137,6 +160,7 @@
       subtitle: form.subtitle ? form.subtitle.value.trim() : "",
       origin_country: form.origin_country ? form.origin_country.value.trim() : "",
       description: form.description.value.trim(),
+      short_description: form.description.value.trim(),
       seo_description: form.seo_description.value.trim(),
       logo_url: (document.getElementById("brandLogoUrl") || {}).value || "",
       website_url: form.website_url ? form.website_url.value.trim() : "",
@@ -915,7 +939,7 @@
       list.innerHTML = items
         .map(function (b) {
           var src = resolveBrandLogo(b);
-          var desc = (b.description || "").trim();
+          var desc = (b.short_description || b.description || "").trim();
           return (
             '<article class="brand-row">' +
             '<img class="brand-row__logo" src="' +
@@ -1271,7 +1295,7 @@
     form.id.value = item && item.id ? item.id : "";
     form.name.value = (item && item.name) || "";
     form.slug.value = (item && item.slug) || "";
-    form.description.value = (item && item.description) || "";
+    form.description.value = (item && (item.short_description || item.description)) || "";
     form.seo_title.value = (item && item.seo_title) || "";
     form.seo_description.value = (item && item.seo_description) || "";
     form.sort_order.value = (item && item.sort_order) || 0;
@@ -1307,7 +1331,7 @@
       form.canonical_url.value = (item && item.canonical_url) || "";
       form.schema_json_ld.value = (item && item.schema_json_ld) || "";
       setBrandDatasheet((item && item.datasheet_url) || "");
-      resetBrandSections((item && item.content_html) || "");
+      resetBrandSections((item && (item.long_description || item.content_html)) || "");
       if (item && item.logo_url) {
         setBrandLogoPreview(item.logo_url);
       } else if (item) {
@@ -1597,6 +1621,9 @@
       var serialized = serializeBrandSections();
       document.getElementById("brandContentHtml").value = serialized;
       body.content_html = serialized;
+      body.long_description = serialized;
+      body.short_description = form.description.value;
+      body.description = form.description.value;
     }
     var id = form.id.value;
     var req = id

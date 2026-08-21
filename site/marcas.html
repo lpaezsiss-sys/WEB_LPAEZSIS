@@ -78,7 +78,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=37"></script>
-  <script src="js/site.js?v=28"></script>
+  <script src="js/site.js?v=29"></script>
   <script>
     var slug = Lpaez.queryParam("slug");
     var origin = Lpaez.pageOrigin();
@@ -144,6 +144,7 @@
           : name + " | Soluciones Industriales LPAEZsis");
       var descSource =
         brand.seo_description ||
+        brand.short_description ||
         brand.description ||
         brand.descripcion_corta ||
         ("Equipos y soluciones " + name + " representados por LPAEZsis en Chile.");
@@ -154,8 +155,9 @@
       var logo = Lpaez.absoluteUrl(brand.logo_url || "/img/brand/logo.png");
       var thin =
         !(products && products.length) &&
+        !(brand.long_description && String(brand.long_description).trim()) &&
         !(brand.content_html && String(brand.content_html).trim()) &&
-        String(brand.description || "").trim().length < 80;
+        String(brand.short_description || brand.description || "").trim().length < 80;
 
       document.title = title;
       Lpaez.setHeadMeta("description", desc);
@@ -265,7 +267,7 @@
         document.getElementById("brandsTitle").textContent = subtitle
           ? brand.name + " - " + subtitle
           : brand.name;
-        document.getElementById("brandsLead").textContent = brand.description || "";
+        document.getElementById("brandsLead").textContent = brand.short_description || brand.description || "";
         document.getElementById("brandDetail").hidden = false;
         var originEl = document.getElementById("brandOrigin");
         if (brand.origin_country) {
@@ -276,7 +278,7 @@
           originEl.textContent = "";
         }
         document.getElementById("brandDesc").textContent =
-          brand.description || "Productos e información de la representación.";
+          brand.short_description || brand.description || "Productos e información de la representación.";
 
         var logo = document.getElementById("brandLogo");
         if (brand.logo_url) {
@@ -287,11 +289,12 @@
           logo.hidden = true;
         }
 
-        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
+        var longHtml = brand.long_description || brand.content_html;
+        var hasHtml = !!(longHtml && String(longHtml).trim());
         var content = document.getElementById("brandContent");
         var specSection = document.getElementById("brandSpecSection");
         if (hasHtml) {
-          content.innerHTML = brand.content_html;
+          content.innerHTML = longHtml;
           content.querySelectorAll("img").forEach(function (img) {
             var real =
               img.getAttribute("data-src") ||
@@ -313,8 +316,8 @@
           demoteContentHeadings(content);
           content.hidden = false;
           specSection.hidden = false;
-        } else if (brand.description) {
-          content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.description) + "</p>";
+        } else if (brand.short_description || brand.description) {
+          content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.short_description || brand.description) + "</p>";
           content.hidden = false;
           specSection.hidden = false;
         } else {

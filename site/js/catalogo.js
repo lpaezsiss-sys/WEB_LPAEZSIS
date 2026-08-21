@@ -592,6 +592,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "Productos " + brand.name + " | Soluciones Industriales LPAEZsis");
       desc = clip(
         brand.seo_description ||
+          brand.short_description ||
           brand.description ||
           "Catálogo de equipos y soluciones " +
             brand.name +

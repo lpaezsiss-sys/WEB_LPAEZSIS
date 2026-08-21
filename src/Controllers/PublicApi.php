@@ -109,10 +109,12 @@ final class PublicApi
     private static function brands(): void
     {
         BrandSeo::ensureColumns(self::pdo());
-        $rows = self::pdo()->query(
-            'SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
-        )->fetchAll();
-        Response::json(['brands' => $rows]);
+        $rows = BrandSeo::presentMany(
+            self::pdo()->query(
+                'SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            )->fetchAll()
+        );
+        Response::json(['success' => true, 'brands' => $rows, 'data' => ['brands' => $rows]]);
     }
 
     private static function brandDetail(string $slug): void
@@ -135,6 +137,7 @@ final class PublicApi
             }
         }
         $brand['gallery'] = $gallery;
+        $brand = BrandSeo::present($brand);
 
         $p = self::pdo()->prepare(
             'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -146,7 +149,13 @@ final class PublicApi
              ORDER BY p.sort_order, p.name'
         );
         $p->execute([(int) $brand['id']]);
-        Response::json(['brand' => $brand, 'products' => $p->fetchAll()]);
+        $products = $p->fetchAll();
+        Response::json([
+            'success' => true,
+            'brand' => $brand,
+            'products' => $products,
+            'data' => ['brand' => $brand, 'products' => $products],
+        ]);
     }
 
     private static function products(): void

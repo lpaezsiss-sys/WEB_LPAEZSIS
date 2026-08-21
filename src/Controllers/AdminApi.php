@@ -13,6 +13,9 @@ use PDO;
 
 final class AdminApi
 {
+    /** @var array<string, mixed>|null */
+    private static $bodyCache = null;
+
     public static function handle(string $method, string $path): void
     {
         $sub = substr($path, strlen('/api/admin')) ?: '/';
@@ -70,12 +73,27 @@ final class AdminApi
 
         if ($method === 'GET' && $sub === '/brands') {
             BrandSeo::ensureColumns(self::pdo());
-            $rows = self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll();
-            Response::json(['brands' => $rows]);
+            $rows = BrandSeo::presentMany(
+                self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll()
+            );
+            Response::json([
+                'success' => true,
+                'brands' => $rows,
+                'data' => ['brands' => $rows],
+            ]);
             return;
         }
         if ($method === 'POST' && $sub === '/brands') {
             self::createBrand();
+            return;
+        }
+        if ($method === 'PUT' && $sub === '/brands') {
+            $id = (int) (self::body()['id'] ?? 0);
+            if ($id <= 0) {
+                Response::error('id requerido');
+                return;
+            }
+            self::updateBrand($id);
             return;
         }
         if ($method === 'PUT' && preg_match('#^/brands/(\d+)$#', $sub, $m)) {
@@ -176,9 +194,13 @@ final class AdminApi
 
     private static function body(): array
     {
+        if (self::$bodyCache !== null) {
+            return self::$bodyCache;
+        }
         $raw = file_get_contents('php://input') ?: '';
         $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        self::$bodyCache = is_array($data) ? $data : [];
+        return self::$bodyCache;
     }
 
     private static function login(): void
@@ -310,7 +332,7 @@ final class AdminApi
     private static function createBrand(): void
     {
         BrandSeo::ensureColumns(self::pdo());
-        $b = self::body();
+        $b = BrandSeo::aliasInput(self::body());
         $row = self::normalizeBrandPayload($b, true);
         if ($row === null) {
             return;
@@ -330,23 +352,20 @@ final class AdminApi
         self::pdo()->prepare(
             'INSERT INTO brands (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $placeholders) . ')'
         )->execute($vals);
-        Response::json([
-            'ok' => true,
-            'id' => (int) self::pdo()->lastInsertId(),
-            'slug' => (string) $row['slug'],
-        ]);
+        self::respondBrand((int) self::pdo()->lastInsertId());
     }
 
     private static function updateBrand(int $id): void
     {
         BrandSeo::ensureColumns(self::pdo());
-        $b = self::body();
+        $b = BrandSeo::aliasInput(self::body());
         if (isset($b['gallery']) && is_array($b['gallery'])) {
             $b['gallery_json'] = json_encode($b['gallery']);
         }
         $existing = BrandSeo::existingColumns(self::pdo());
         $writable = [
-            'slug', 'name', 'description', 'logo_url', 'website_url', 'content_html',
+            'slug', 'name', 'description', 'short_description', 'long_description',
+            'logo_url', 'website_url', 'content_html',
             'gallery_json', 'sort_order', 'is_active',
             'subtitle', 'origin_country', 'seo_title', 'seo_description', 'seo_keywords',
             'canonical_url', 'schema_json_ld', 'datasheet_url',
@@ -355,7 +374,12 @@ final class AdminApi
             return isset($existing[$f]);
         }));
         if (!array_key_exists('name', $b)) {
-            self::patch('brands', $id, $b, $writable);
+            $row = self::patch('brands', $id, $b, $writable, false);
+            if ($row === null) {
+                Response::error('Sin cambios');
+                return;
+            }
+            self::respondBrand($id);
             return;
         }
         $b['id'] = $id;
@@ -363,7 +387,24 @@ final class AdminApi
         if ($row === null) {
             return;
         }
-        self::patch('brands', $id, $row, $writable);
+        $saved = self::patch('brands', $id, $row, $writable, false);
+        if ($saved === null) {
+            Response::error('Sin cambios');
+            return;
+        }
+        self::respondBrand($id);
+    }
+
+    private static function respondBrand(int $id): void
+    {
+        $stmt = self::pdo()->prepare('SELECT * FROM brands WHERE id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($row)) {
+            Response::json(['success' => true, 'ok' => true, 'id' => $id, 'data' => ['id' => $id]]);
+            return;
+        }
+        Response::json(BrandSeo::actionResult(BrandSeo::present($row)));
     }
 
     /** @return array<string, mixed>|null */
@@ -398,13 +439,22 @@ final class AdminApi
         if ($canonical === '') {
             $canonical = BrandSeo::defaultCanonical($slug);
         }
+        $short = self::nullableString($b, 'short_description');
+        if ($short === null) {
+            $short = self::nullableString($b, 'description');
+        }
+        $long = array_key_exists('long_description', $b)
+            ? (trim((string) $b['long_description']) ?: null)
+            : (array_key_exists('content_html', $b) ? (trim((string) $b['content_html']) ?: null) : null);
         $row = [
             'name' => $name,
             'slug' => $slug,
-            'description' => self::nullableString($b, 'description'),
+            'description' => $short,
+            'short_description' => $short,
+            'long_description' => $long,
             'logo_url' => self::nullableString($b, 'logo_url'),
             'website_url' => self::nullableString($b, 'website_url'),
-            'content_html' => array_key_exists('content_html', $b) ? (trim((string) $b['content_html']) ?: null) : null,
+            'content_html' => $long,
             'gallery_json' => isset($b['gallery'])
                 ? json_encode($b['gallery'])
                 : (array_key_exists('gallery_json', $b) ? $b['gallery_json'] : null),
@@ -418,8 +468,8 @@ final class AdminApi
             'canonical_url' => $canonical,
             'datasheet_url' => self::nullableString($b, 'datasheet_url'),
         ];
-        if (!array_key_exists('content_html', $b) && !$creating) {
-            unset($row['content_html']);
+        if (!array_key_exists('content_html', $b) && !array_key_exists('long_description', $b) && !$creating) {
+            unset($row['content_html'], $row['long_description']);
         }
         if (!array_key_exists('gallery_json', $b) && !isset($b['gallery'])) {
             unset($row['gallery_json']);
@@ -443,7 +493,7 @@ final class AdminApi
     private static function deleteBrand(int $id): void
     {
         self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
-        Response::json(['ok' => true]);
+        Response::json(['success' => true, 'ok' => true, 'data' => ['id' => $id]]);
     }
 
     private static function createProduct(): void
@@ -524,7 +574,7 @@ final class AdminApi
         Response::json($stmt->fetch() ?: ['ok' => true]);
     }
 
-    private static function patch(string $table, int $id, array $body, array $fields): void
+    private static function patch(string $table, int $id, array $body, array $fields, bool $respond = true): ?array
     {
         $sets = [];
         $vals = [];
@@ -539,13 +589,20 @@ final class AdminApi
             }
         }
         if (!$sets) {
-            Response::error('Sin cambios');
-            return;
+            if ($respond) {
+                Response::error('Sin cambios');
+            }
+            return null;
         }
         $vals[] = $id;
         self::pdo()->prepare("UPDATE {$table} SET " . implode(', ', $sets) . ' WHERE id = ?')->execute($vals);
         $stmt = self::pdo()->prepare("SELECT * FROM {$table} WHERE id = ?");
         $stmt->execute([$id]);
-        Response::json($stmt->fetch() ?: ['ok' => true]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = is_array($row) ? $row : null;
+        if ($respond) {
+            Response::json($row ?: ['ok' => true]);
+        }
+        return $row;
     }
 }
