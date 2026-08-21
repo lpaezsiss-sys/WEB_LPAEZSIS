@@ -326,10 +326,10 @@
     "turbina-soplado-sonic-100": "/img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "/img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "/img/products/A07-10976.jpg",
-    "paletizador-nivel-inferior-columbia-fl3000": "/img/products/columbia-fl3000.png",
-    "paletizador-alto-nivel-columbia-hl7200": "/img/products/columbia-hl7200.png",
-    "celda-paletizado-robotico-columbia-ai1800": "/img/products/columbia-ai1800.png",
-    "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/products/columbia-fl1000sw.png",
+    "paletizador-nivel-inferior-columbia-fl3000": "/img/products/fl3000_columbia.jpg",
+    "paletizador-alto-nivel-columbia-hl7200": "/img/products/hl7200_columbia.jpg",
+    "celda-paletizado-robotico-columbia-ai1800": "/img/products/ai1800_columbia.jpg",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/products/fl1000sw_columbia.jpg",
   };
 
   var PRODUCT_FALLBACKS = [

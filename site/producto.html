@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=84">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -41,7 +41,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=23"></script>
+  <script src="js/site.js?v=24"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -133,8 +133,25 @@
 
         if (product.image_url || Lpaez.resolveProductImage(product)) {
           var src = Lpaez.resolveProductImage(product);
-          document.getElementById("productVisual").innerHTML =
-            '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
+          var fallbacks = Lpaez.productImageCandidates
+            ? Lpaez.productImageCandidates(product)
+            : [src, "img/products/A07-10015.jpg"];
+          var imgHtml = Lpaez.imgTagHtml
+            ? Lpaez.imgTagHtml(src, product.name)
+            : '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
+          document.getElementById("productVisual").innerHTML = imgHtml;
+          var visImg = document.querySelector("#productVisual img");
+          if (visImg && fallbacks.length > 1) {
+            visImg.addEventListener("error", function onErr() {
+              var i = Number(visImg.dataset.idx || "0") + 1;
+              if (i >= fallbacks.length) {
+                visImg.removeEventListener("error", onErr);
+                return;
+              }
+              visImg.dataset.idx = String(i);
+              visImg.src = fallbacks[i];
+            });
+          }
         }
         var actions = document.getElementById("productActions");
         var datasheetUrl = Lpaez.resolveDatasheetUrl ? Lpaez.resolveDatasheetUrl(product) : "";

@@ -150,7 +150,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/columbia-fl3000.png",
+    image_url: "img/products/fl3000_columbia.jpg",
     image_webp: "",
     category_slug: "paletizado-convencional",
     category_name: "Paletizado Convencional / Final de Línea",
@@ -167,7 +167,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/columbia-hl7200.png",
+    image_url: "img/products/hl7200_columbia.jpg",
     image_webp: "",
     category_slug: "paletizado-alta-velocidad",
     category_name: "Paletizado de Alta Velocidad / Final de Línea",
@@ -184,7 +184,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/columbia-ai1800.png",
+    image_url: "img/products/ai1800_columbia.jpg",
     image_webp: "",
     category_slug: "paletizado-robotico",
     category_name: "Paletizado Robótico / Células de Automatización",
@@ -201,7 +201,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/products/columbia-fl1000sw.png",
+    image_url: "img/products/fl1000sw_columbia.jpg",
     image_webp: "",
     category_slug: "paletizado-integrado",
     category_name: "Paletizado Integrado / Soluciones Compactas",
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const desc = String(prod.description || "");
     const m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i);
     if (m) sku = m[1];
-    let image = prod.image_url || "";
+    let image = prod.image_url || prod.featured_image || prod.image || "";
     if (/wp-content\/uploads/i.test(image)) {
       const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
       if (file) image = "img/products/" + file[1];
@@ -387,9 +387,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
     if (!image) image = "img/products/A07-10015.jpg";
-    const webp = /\.(jpe?g|png)$/i.test(image)
+    const knownWebp = /\.(jpe?g|png)$/i.test(image) && !/\/img\/uploads\//i.test(image);
+    const webp = knownWebp && !/columbia/i.test(image)
       ? image.replace(/\.(jpe?g|png)$/i, ".webp")
-      : prod.image_webp || "";
+      : "";
     return {
       id: prod.id,
       slug,
@@ -458,12 +459,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const quote =
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
-    const picture = webp
-      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480"></picture>`
-      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
+    const imgTag = webp
+      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'"></picture>`
+      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'">`;
     return (
       `<article class="product-card catalog-card reveal">` +
-      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${picture}</a>` +
+      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${imgTag}</a>` +
       `<div class="product-card-body">` +
       `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>` +
       `<span class="badge-mode ${sale === "buy" ? "badge-buy" : "badge-quote"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span></div>` +

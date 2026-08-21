@@ -2574,6 +2574,8 @@ body.nav-open {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: #fff;
+  display: block;
 }
 
 .qty-row {

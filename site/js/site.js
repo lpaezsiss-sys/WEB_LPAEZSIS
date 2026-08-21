@@ -255,13 +255,13 @@
         : "Cotización";
     var img = resolveProductImage(p);
     var visual = img
-      ? '<img src="' +
-        img +
-        '" alt="' +
-        escapeAttr(p.name) +
-        '" title="' +
-        escapeAttr(p.name) +
-        '" loading="lazy" decoding="async" width="480" height="480">'
+      ? imgTagHtml(
+          img,
+          p.name,
+          'title="' +
+            escapeAttr(p.name) +
+            '" loading="lazy" decoding="async" width="480" height="480"'
+        )
       : "LPAEZ";
     var payload = productPayload(p);
     var primaryCta =
@@ -345,10 +345,10 @@
     "turbina-soplado-sonic-100": "img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "img/products/A07-10976.jpg",
-    "paletizador-nivel-inferior-columbia-fl3000": "img/products/columbia-fl3000.png",
-    "paletizador-alto-nivel-columbia-hl7200": "img/products/columbia-hl7200.png",
-    "celda-paletizado-robotico-columbia-ai1800": "img/products/columbia-ai1800.png",
-    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/products/columbia-fl1000sw.png",
+    "paletizador-nivel-inferior-columbia-fl3000": "img/products/fl3000_columbia.jpg",
+    "paletizador-alto-nivel-columbia-hl7200": "img/products/hl7200_columbia.jpg",
+    "celda-paletizado-robotico-columbia-ai1800": "img/products/ai1800_columbia.jpg",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/products/fl1000sw_columbia.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -368,10 +368,10 @@
     "cuchillos-aire": "img/hero/conserves.jpg",
     repuestos: "img/products/A07-10015.jpg",
     "fin-de-linea": "img/hero/line.jpg",
-    "paletizado-convencional": "img/products/columbia-fl3000.png",
-    "paletizado-alta-velocidad": "img/products/columbia-hl7200.png",
-    "paletizado-robotico": "img/products/columbia-ai1800.png",
-    "paletizado-integrado": "img/products/columbia-fl1000sw.png",
+    "paletizado-convencional": "img/products/fl3000_columbia.jpg",
+    "paletizado-alta-velocidad": "img/products/hl7200_columbia.jpg",
+    "paletizado-robotico": "img/products/ai1800_columbia.jpg",
+    "paletizado-integrado": "img/products/fl1000sw_columbia.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 
@@ -419,12 +419,54 @@
     return "";
   }
 
+  function publicImageUrl(url) {
+    if (!url) return "";
+    url = String(url).trim();
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.charAt(0) === "/") return url;
+    return url.replace(/^\.\//, "");
+  }
+
+  function productImageCandidates(p) {
+    var list = [];
+    function add(url) {
+      url = publicImageUrl(url);
+      if (url && list.indexOf(url) === -1) list.push(url);
+    }
+    if (p) {
+      add(p.image_url);
+      add(p.featured_image);
+      add(p.image);
+      if (p.slug && PRODUCT_IMAGES[p.slug]) add(PRODUCT_IMAGES[p.slug]);
+      if (p.slug) {
+        add("img/products/" + p.slug + ".jpg");
+        add("/img/products/" + p.slug + ".jpg");
+      }
+    }
+    add(PRODUCT_FALLBACKS[0]);
+    return list;
+  }
+
   function resolveProductImage(p) {
-    if (!p) return PRODUCT_FALLBACKS[0];
-    if (p.image_url) return p.image_url;
-    if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
-    var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
-    return PRODUCT_FALLBACKS[idx];
+    var candidates = productImageCandidates(p);
+    return candidates[0] || PRODUCT_FALLBACKS[0];
+  }
+
+  function imgTagHtml(src, alt, extra) {
+    var fallback = PRODUCT_FALLBACKS[0];
+    extra = extra || "";
+    return (
+      '<img src="' +
+      escapeAttr(src) +
+      '" alt="' +
+      escapeAttr(alt || "") +
+      '" ' +
+      extra +
+      ' onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src=\'' +
+      fallback +
+      '\';}" >'
+    );
   }
 
   function resolveCategoryImage(slug) {
@@ -572,6 +614,8 @@
     parseProductFicha: parseProductFicha,
     resolveDatasheetUrl: resolveDatasheetUrl,
     resolveProductImage: resolveProductImage,
+    productImageCandidates: productImageCandidates,
+    imgTagHtml: imgTagHtml,
     resolveCategoryImage: resolveCategoryImage,
     observeReveals: observeReveals,
     queryParam: queryParam,

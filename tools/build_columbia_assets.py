@@ -29,7 +29,8 @@ PRODUCTS = [
         "code": "FL3000",
         "pdf": "ficha_tecnica_fl3000_columbia.pdf",
         "slug": "paletizador-nivel-inferior-columbia-fl3000",
-        "image": "columbia-fl3000.png",
+        "image": "fl3000_columbia.jpg",
+        "image_aliases": ["columbia-fl3000.png"],
         "name": "Paletizador de Nivel Inferior Columbia FL3000",
         "summary": (
             "Paletizador automático a nivel de piso de velocidad media-alta (30-40 CPM), "
@@ -53,7 +54,8 @@ PRODUCTS = [
         "code": "HL7200",
         "pdf": "ficha_tecnica_hl7200_columbia.pdf",
         "slug": "paletizador-alto-nivel-columbia-hl7200",
-        "image": "columbia-hl7200.png",
+        "image": "hl7200_columbia.jpg",
+        "image_aliases": ["columbia-hl7200.png"],
         "name": "Paletizador de Alto Nivel Columbia HL7200",
         "summary": (
             "Paletizador de alta velocidad (hasta 120 CPM) de entrada superior, ideal para "
@@ -77,7 +79,8 @@ PRODUCTS = [
         "code": "Ai1800",
         "pdf": "ficha_tecnica_ai1800_columbia.pdf",
         "slug": "celda-paletizado-robotico-columbia-ai1800",
-        "image": "columbia-ai1800.png",
+        "image": "ai1800_columbia.jpg",
+        "image_aliases": ["columbia-ai1800.png"],
         "name": "Celda de Paletizado Robótico Columbia-Okura Ai1800",
         "summary": (
             "Robot industrial de paletizado de alta precisión para el manejo versátil de sacos, "
@@ -101,7 +104,8 @@ PRODUCTS = [
         "code": "FL1000-SW",
         "pdf": "ficha_tecnica_fl1000sw_columbia.pdf",
         "slug": "paletizador-compacto-envolvedora-columbia-fl1000sw",
-        "image": "columbia-fl1000sw.png",
+        "image": "fl1000sw_columbia.jpg",
+        "image_aliases": ["columbia-fl1000sw.png"],
         "name": "Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW",
         "summary": (
             "Sistema híbrido que integra paletizado automático a nivel de piso y envoltura con "
@@ -177,60 +181,70 @@ def draw_cases(d: ImageDraw.ImageDraw, x: int, y: int, rows: int, cols: int, sca
             yy = y - r * (ch + 3)
             color = GOLD if (r + c) % 2 == 0 else (46, 78, 122, 255)
             d.rounded_rectangle((xx, yy, xx + cw, yy + ch), 3, fill=color)
-            d.rectangle((xx + 4, yy + 4, xx + cw - 4, yy + 8), fill=(255, 255, 255, 60))
+            d.rectangle((xx + 4, yy + 4, xx + cw - 4, yy + 8), fill=(255, 255, 255))
 
 
 def make_product_image(product: dict) -> None:
     PRODUCT_DIR.mkdir(parents=True, exist_ok=True)
     w, h = 960, 720
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    bg = Image.new("RGBA", (w, h), (244, 242, 236, 255))
+    bg = Image.new("RGB", (w, h), (245, 247, 250))
     d = ImageDraw.Draw(bg)
-    d.rectangle((0, 0, w, 16), fill=NAVY)
-    d.rectangle((0, h - 88, w, h), fill=NAVY)
-    d.text((36, 28), "COLUMBIA MACHINE", font=font(22, True), fill=NAVY)
-    d.text((36, 58), "Paletizado · LPAEZsis", font=font(16), fill=STEEL)
+    # High-contrast frame so the asset is visible on light catalog cards.
+    d.rectangle((0, 0, w, h), fill=(11, 31, 58))
+    d.rounded_rectangle((28, 28, w - 28, h - 28), 28, fill=(248, 250, 252))
+    d.rectangle((28, 28, w - 28, 108), fill=(11, 31, 58))
+    d.text((52, 48), "COLUMBIA MACHINE", font=font(26, True), fill=(255, 255, 255))
+    d.text((52, 80), "Paletizado · LPAEZsis", font=font(16), fill=(201, 162, 39))
 
     kind = product["kind"]
     if kind == "floor":
-        d.rounded_rectangle((180, 280, 780, 520), 18, fill=(220, 226, 234, 255))
-        d.rounded_rectangle((210, 250, 520, 500), 12, fill=NAVY)
-        d.rounded_rectangle((230, 270, 500, 430), 8, fill=(24, 52, 92, 255))
-        draw_cases(d, 260, 390, 4, 4, 1.15)
-        draw_pallet(d, 540, 470, 1.3)
-        draw_cases(d, 560, 430, 3, 3, 1.0)
-        d.rectangle((210, 500, 750, 516), fill=STEEL)  # floor conveyor
+        d.rounded_rectangle((90, 200, 870, 560), 22, fill=(226, 232, 240))
+        d.rounded_rectangle((130, 230, 520, 530), 16, fill=(11, 31, 58))
+        d.rounded_rectangle((160, 260, 490, 430), 10, fill=(30, 64, 110))
+        draw_cases(d, 190, 390, 4, 4, 1.2)
+        draw_pallet(d, 560, 500, 1.45)
+        draw_cases(d, 590, 460, 3, 3, 1.15)
+        d.rectangle((130, 530, 820, 552), fill=(70, 92, 118))
     elif kind == "high":
-        d.rectangle((140, 180, 200, 520), fill=NAVY)  # column
-        d.rectangle((200, 180, 820, 220), fill=STEEL)  # high infeed
-        d.polygon([(240, 220), (320, 220), (280, 340), (210, 340)], fill=GOLD)
-        d.rounded_rectangle((300, 300, 760, 530), 14, fill=(220, 226, 234, 255))
-        d.rounded_rectangle((340, 250, 720, 500), 10, fill=NAVY)
-        draw_cases(d, 390, 430, 5, 6, 1.05)
-        draw_pallet(d, 400, 500, 1.6)
+        d.rectangle((90, 170, 160, 560), fill=(11, 31, 58))
+        d.rectangle((160, 170, 860, 230), fill=(70, 92, 118))
+        d.polygon([(200, 230), (300, 230), (250, 370), (160, 370)], fill=(201, 162, 39))
+        d.rounded_rectangle((280, 280, 840, 560), 16, fill=(226, 232, 240))
+        d.rounded_rectangle((320, 250, 800, 520), 12, fill=(11, 31, 58))
+        draw_cases(d, 370, 440, 5, 6, 1.1)
+        draw_pallet(d, 380, 520, 1.7)
     elif kind == "robot":
-        d.ellipse((430, 430, 560, 520), fill=STEEL)
-        d.rectangle((480, 250, 510, 450), fill=NAVY)
-        d.polygon([(490, 250), (680, 210), (700, 250), (510, 300)], fill=GOLD)
-        d.ellipse((670, 190, 760, 280), fill=NAVY)
-        d.rounded_rectangle((200, 480, 420, 560), 8, fill=(220, 226, 234, 255))
-        draw_pallet(d, 620, 500, 1.2)
-        draw_cases(d, 640, 460, 3, 3, 0.95)
-        d.arc((300, 160, 820, 520), 200, 20, fill=STEEL, width=10)
+        d.ellipse((400, 420, 560, 560), fill=(70, 92, 118))
+        d.rectangle((460, 230, 500, 460), fill=(11, 31, 58))
+        d.polygon([(470, 230), (700, 180), (730, 230), (500, 290)], fill=(201, 162, 39))
+        d.ellipse((680, 160, 790, 270), fill=(11, 31, 58))
+        d.rounded_rectangle((120, 480, 380, 580), 10, fill=(226, 232, 240))
+        draw_pallet(d, 620, 510, 1.35)
+        draw_cases(d, 650, 470, 3, 3, 1.05)
+        d.arc((260, 150, 820, 540), 200, 20, fill=(70, 92, 118), width=14)
     else:
-        d.rounded_rectangle((160, 260, 520, 530), 16, fill=NAVY)
-        draw_cases(d, 210, 430, 4, 4, 1.1)
-        d.rounded_rectangle((540, 250, 820, 540), 16, fill=(24, 52, 92, 255))
-        d.ellipse((560, 280, 800, 430), fill=STEEL)
-        d.arc((560, 280, 800, 430), 200, 40, fill=GOLD, width=14)
-        draw_pallet(d, 590, 470, 1.15)
+        d.rounded_rectangle((90, 220, 470, 560), 18, fill=(11, 31, 58))
+        draw_cases(d, 140, 430, 4, 4, 1.2)
+        d.rounded_rectangle((500, 220, 860, 560), 18, fill=(24, 52, 92))
+        d.ellipse((530, 260, 830, 430), fill=(70, 92, 118))
+        d.arc((530, 260, 830, 430), 200, 40, fill=(201, 162, 39), width=16)
+        draw_pallet(d, 560, 490, 1.3)
 
-    d.text((36, h - 62), product["code"], font=font(28, True), fill=GOLD)
-    d.text((36, h - 32), product["name"][:72], font=font(16), fill=(255, 255, 255, 230))
+    d.rectangle((28, h - 108, w - 28, h - 28), fill=(11, 31, 58))
+    d.text((52, h - 92), product["code"], font=font(32, True), fill=(201, 162, 39))
+    d.text((52, h - 56), product["name"][:64], font=font(16), fill=(255, 255, 255))
 
     dest = PRODUCT_DIR / product["image"]
-    bg.save(dest, "PNG")
+    rgb = bg.convert("RGB")
+    rgb.save(dest, "JPEG", quality=90, optimize=True)
     print("image", dest)
+    for alias in product.get("image_aliases") or []:
+        alias_path = PRODUCT_DIR / alias
+        if alias_path.suffix.lower() == ".png":
+            bg.save(alias_path, "PNG")
+        else:
+            rgb.save(alias_path, "JPEG", quality=90, optimize=True)
+        print("alias", alias_path)
 
 
 def make_pdf(product: dict) -> None:

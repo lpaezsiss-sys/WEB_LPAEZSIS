@@ -320,7 +320,7 @@ Especificaciones técnicas:
 • Tipos de Empaque: Cajas de cartón, charolas (trays) y paquetes envueltos
 • Control: HMI Táctil intuitivo
 
-Ficha técnica: /img/fichas/ficha_tecnica_fl3000_columbia.pdf','quote','on_request',NULL,'/img/products/columbia-fl3000.png',1,1,'Paletizador de Nivel Inferior Columbia FL3000 | Cotizar LPAEZsis','Paletizador automático a nivel de piso de velocidad media-alta (30-40 CPM), diseñado para el manejo seguro y eficiente de cajas, charolas y paquetes.',6,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
+Ficha técnica: /img/fichas/ficha_tecnica_fl3000_columbia.pdf','quote','on_request',NULL,'/img/products/fl3000_columbia.jpg',1,1,'Paletizador de Nivel Inferior Columbia FL3000 | Cotizar LPAEZsis','Paletizador automático a nivel de piso de velocidad media-alta (30-40 CPM), diseñado para el manejo seguro y eficiente de cajas, charolas y paquetes.',6,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
 (18,8,8,'paletizador-alto-nivel-columbia-hl7200','Paletizador de Alto Nivel Columbia HL7200','Diseñado para plantas de producción masiva con altos volúmenes de salida, el HL7200 recibe el producto desde líneas elevadas para formar pallets a velocidades de hasta 120 cajas por minuto. Maximiza la eficiencia operativa, reduce los tiempos de parada y garantiza un manejo ultra suave de productos.
 
 Especificaciones técnicas:
@@ -329,7 +329,7 @@ Especificaciones técnicas:
 • Patrones: Formación multipatrón electrónica programable
 • Aplicaciones: Embotellado, enlatado, alimentos y consumo masivo
 
-Ficha técnica: /img/fichas/ficha_tecnica_hl7200_columbia.pdf','quote','on_request',NULL,'/img/products/columbia-hl7200.png',1,1,'Paletizador de Alto Nivel Columbia HL7200 | Cotizar LPAEZsis','Paletizador de alta velocidad (hasta 120 CPM) de entrada superior, ideal para líneas masivas de embotellado, alimentos y consumo masivo.',7,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
+Ficha técnica: /img/fichas/ficha_tecnica_hl7200_columbia.pdf','quote','on_request',NULL,'/img/products/hl7200_columbia.jpg',1,1,'Paletizador de Alto Nivel Columbia HL7200 | Cotizar LPAEZsis','Paletizador de alta velocidad (hasta 120 CPM) de entrada superior, ideal para líneas masivas de embotellado, alimentos y consumo masivo.',7,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
 (19,9,8,'celda-paletizado-robotico-columbia-ai1800','Celda de Paletizado Robótico Columbia-Okura Ai1800','Desarrollado bajo la alianza Columbia-Okura, el robot Ai1800 resuelve los desafíos de empaques complejos y variables en planta. Su brazo articulado de diseño propio permite manipular simultáneamente sacos, baldes, cajas o atados con mínima ocupación de espacio y máxima adaptabilidad.
 
 Especificaciones técnicas:
@@ -338,7 +338,7 @@ Especificaciones técnicas:
 • Arquitectura: Robot articulado de 4 ejes dedicado a paletizado
 • Configuración: Celda multilínea con cabezal/gripper adaptable
 
-Ficha técnica: /img/fichas/ficha_tecnica_ai1800_columbia.pdf','quote','on_request',NULL,'/img/products/columbia-ai1800.png',1,1,'Celda de Paletizado Robótico Columbia-Okura Ai1800 | Cotizar LPAEZsis','Robot industrial de paletizado de alta precisión para el manejo versátil de sacos, cajas, baldes y múltiples líneas simultáneas.',8,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
+Ficha técnica: /img/fichas/ficha_tecnica_ai1800_columbia.pdf','quote','on_request',NULL,'/img/products/ai1800_columbia.jpg',1,1,'Celda de Paletizado Robótico Columbia-Okura Ai1800 | Cotizar LPAEZsis','Robot industrial de paletizado de alta precisión para el manejo versátil de sacos, cajas, baldes y múltiples líneas simultáneas.',8,'2026-08-21 01:00:00','2026-08-21 01:00:00'),
 (20,10,8,'paletizador-compacto-envolvedora-columbia-fl1000sw','Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW','El FL1000-SW combina en una sola máquina el apilado y el emplayado del pallet. Elimina transportadores de conexión adicionales, ahorra hasta un 40% de espacio en planta y entrega tarimas completamente aseguradas y listas para su almacenamiento.
 
 Especificaciones técnicas:
@@ -346,7 +346,7 @@ Especificaciones técnicas:
 • Integración: Paletizador a nivel de piso + Envolvedora Stretch Wrap
 • Ahorro de espacio: Reducción de footprint de hasta un 40%
 
-Ficha técnica: /img/fichas/ficha_tecnica_fl1000sw_columbia.pdf','quote','on_request',NULL,'/img/products/columbia-fl1000sw.png',1,1,'Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW | Cotizar LPAEZsis','Sistema híbrido que integra paletizado automático a nivel de piso y envoltura con película estirable (Stretch Wrap) en una sola huella reducida.',9,'2026-08-21 01:00:00','2026-08-21 01:00:00');
+Ficha técnica: /img/fichas/ficha_tecnica_fl1000sw_columbia.pdf','quote','on_request',NULL,'/img/products/fl1000sw_columbia.jpg',1,1,'Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW | Cotizar LPAEZsis','Sistema híbrido que integra paletizado automático a nivel de piso y envoltura con película estirable (Stretch Wrap) en una sola huella reducida.',9,'2026-08-21 01:00:00','2026-08-21 01:00:00');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
