@@ -74,6 +74,20 @@
       }
       robots.setAttribute("content", "noindex,nofollow");
     }
+
+    if (!document.querySelector('link[href*="propuesta-search.css"]')) {
+      var searchCss = document.createElement("link");
+      searchCss.rel = "stylesheet";
+      searchCss.href = "css/propuesta-search.css?v=4";
+      document.head.appendChild(searchCss);
+    }
+  }
+
+  function loadSearchRuntime() {
+    if (document.querySelector('script[src*="propuesta-search.js"]')) return;
+    var searchJs = document.createElement("script");
+    searchJs.src = "js/propuesta-search.js?v=4";
+    (document.body || document.documentElement).appendChild(searchJs);
   }
 
   function navIcon(paths) {
@@ -117,6 +131,16 @@
       '<a href="nosotros.html">Nosotros</a>' +
       '<a href="novedades.html">Novedades</a>' +
       '<a href="contacto.html">Contacto</a>' +
+      '<div class="header-search-container">' +
+      '<form id="globalSearchForm" class="search-form" onsubmit="return false;">' +
+      '<input type="text" id="globalSearchInput" placeholder="Buscar equipo, repuesto o marca..." autocomplete="off" aria-label="Buscar productos o repuestos" aria-autocomplete="list" aria-controls="searchResultsDropdown" aria-expanded="false">' +
+      '<button type="button" class="search-btn" aria-label="Buscar">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<circle cx="11" cy="11" r="8"></circle>' +
+      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+      "</svg></button></form>" +
+      '<div id="searchResultsDropdown" class="search-results-dropdown" style="display: none;" role="listbox" aria-label="Resultados de búsqueda"></div>' +
+      "</div>" +
       '<div class="nav-cta">' +
       '<a class="icon-count" href="carrito.html" aria-label="Carrito" title="Carrito">' +
       navIcon(icoCart) +
@@ -168,6 +192,7 @@
   var mountFooter = document.getElementById("site-footer-mount");
   if (mountHeader) mountHeader.outerHTML = headerHtml();
   if (mountFooter) mountFooter.outerHTML = footerHtml();
+  loadSearchRuntime();
 
   var path = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav > a").forEach(function (a) {
