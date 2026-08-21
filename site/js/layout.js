@@ -109,6 +109,7 @@
       '<a href="marcas.html?slug=sonic-air-systems">Sonic Air Systems</a>' +
       '<a href="marcas.html?slug=columbia-machine">Columbia Machine</a>' +
       '<a href="marcas.html?slug=lyc">LYC</a>' +
+      '<a href="marcas.html?slug=cmc-klebetechnik">CMC Klebetechnik</a>' +
       '<a href="marcas.html?slug=movex">MOVEX</a>' +
       '<a href="marcas.html?slug=isodur">ISODUR</a>' +
       '<a href="marcas.html?slug=combi">COMBI packaging systems</a>' +

@@ -236,6 +236,7 @@
   var BRAND_SUBTITLES = {
     lyc: "Logistics & Conveyors",
     "columbia-machine": "Columbia-Okura LLC",
+    "cmc-klebetechnik": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
   };
 
   function pageOrigin() {
@@ -481,6 +482,7 @@
     "celda-paletizado-robotico-columbia-ai1800": "img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
     "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/productos/lyc-transportadores.jpg",
+    "cinta-doble-contacto-cmc-10730": "img/productos/cmc-10730.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -505,6 +507,7 @@
     "paletizado-robotico": "img/productos/ai1800.jpg",
     "paletizado-integrado": "img/productos/fl1000sw.jpg",
     "transportadores-manejo-materiales": "img/productos/lyc-transportadores.jpg",
+    "cintas-adhesivas-tecnicas": "img/productos/cmc-10730.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 
@@ -514,6 +517,7 @@
     "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
     "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/fichas/PRESENTACION_L&C_Ltda_Tx.pdf",
+    "cinta-doble-contacto-cmc-10730": "img/fichas/Cinta_Doble_Contacto_Union_Etiquetas_Siliconadas_CMC_LPAEZSIS.pdf",
   };
 
   function parseProductFicha(raw) {

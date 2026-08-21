@@ -226,6 +226,23 @@ const MOCK_PRODUCTS = [
     brand_name: "LYC",
     quote_url: "cotizacion.html?sku=fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc",
   },
+  {
+    id: 22,
+    slug: "cinta-doble-contacto-cmc-10730",
+    name: "Cinta Doble Contacto CMC 10730",
+    sku: "CMC-10730",
+    description: "Cinta adhesiva de doble contacto con soporte de poliéster (PET) y adhesivo de polisiloxano (silicona) en ambas caras. Especialmente concebida para el empalme superpuesto (splicing) de materiales siliconados y release liners.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/cmc-10730.jpg",
+    image_webp: "",
+    category_slug: "cintas-adhesivas-tecnicas",
+    category_name: "Cintas Adhesivas Técnicas / Empalme Siliconado",
+    brand_slug: "cmc-klebetechnik",
+    brand_name: "CMC Klebetechnik GmbH",
+    quote_url: "cotizacion.html?sku=cinta-doble-contacto-cmc-10730",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -240,6 +257,7 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
   { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
+  { slug: "cintas-adhesivas-tecnicas", name: "Cintas Adhesivas Técnicas / Empalme Siliconado" },
 ];
 
 const MOCK_BRANDS = [
@@ -247,6 +265,7 @@ const MOCK_BRANDS = [
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
   { slug: "lyc", name: "LYC" },
+  { slug: "cmc-klebetechnik", name: "CMC Klebetechnik GmbH" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -254,7 +273,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales", "cintas-adhesivas-tecnicas"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -485,9 +504,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
     const imgFallback =
-      prod?.brand_slug === "lyc" || /lyc/i.test(slug)
-        ? "/img/productos/lyc-transportadores.jpg"
-        : "img/products/A07-10015.jpg";
+      prod?.brand_slug === "cmc-klebetechnik" || /cmc-10730/i.test(slug)
+        ? "/img/productos/cmc-10730.jpg"
+        : prod?.brand_slug === "lyc" || /lyc/i.test(slug)
+          ? "/img/productos/lyc-transportadores.jpg"
+          : "img/products/A07-10015.jpg";
     const imgTag = webp
       ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'"></picture>`
       : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'">`;
