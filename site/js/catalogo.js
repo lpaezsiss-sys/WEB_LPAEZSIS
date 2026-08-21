@@ -186,7 +186,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const industrySelect = document.getElementById("industryFilter");
   const categorySelect = document.getElementById("categoryFilter");
   const brandSelect = document.getElementById("brandFilter");
-  const modeSelect = document.getElementById("modeFilter");
   const catalogCount = document.getElementById("catalogCount");
   const pager = document.getElementById("catalogPager");
   const ldScript = document.getElementById("catalogItemListLd");
@@ -196,8 +195,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const heroLead =
     document.querySelector(".page-hero-inner .hero-description") ||
     document.querySelector(".page-hero-inner p");
-  const catalogHint = document.querySelector(".catalog-hint");
   const catalogGridLabel = document.getElementById("catalogGridLabel");
+  // Remueve restos de depuración si quedaran en el DOM
+  document.querySelectorAll(".catalog-hint, .catalog-debug-info").forEach((el) => el.remove());
 
   const escapeHtml =
     window.Lpaez?.escapeHtml ||
@@ -239,7 +239,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     brand: queryParam("brand") || "",
     industry: queryParam("industry") || "",
     industria: queryParam("industria") || "",
-    mode: queryParam("sale_mode") || queryParam("mode") || "",
     page: Math.max(1, parseInt(queryParam("page") || "1", 10) || 1),
   };
 
@@ -252,10 +251,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (heroLead) {
         heroLead.textContent = "Repuestos y Consumibles";
       }
-      if (catalogHint) {
-        catalogHint.innerHTML =
-          "Catálogo de <strong>repuestos</strong>. Filtra por marca o tipo de venta. Enlace: <code>?tipo=repuesto</code>.";
-      }
       if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de repuestos";
       document.title = "Repuestos industriales | Catálogo B2B LPAEZsis";
     } else if (state.tipo === "equipo") {
@@ -264,21 +259,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         heroLead.textContent =
           "Equipos industriales: filtra por industria o marca y solicita cotización con ficha técnica.";
       }
-      if (catalogHint) {
-        catalogHint.innerHTML =
-          "Catálogo de <strong>equipos</strong>. Cotiza proyectos a medida. Enlace: <code>?tipo=equipo</code>.";
-      }
       if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de equipos";
       document.title = "Equipos industriales | Catálogo B2B LPAEZsis";
     } else {
       if (heroTitle) heroTitle.textContent = "Productos";
       if (heroLead) {
         heroLead.textContent =
-          "Catálogo B2B: equipos y repuestos. Filtra por tipo, industria o marca.";
-      }
-      if (catalogHint) {
-        catalogHint.innerHTML =
-          "Navega por <a href=\"catalogo.html?tipo=equipo\"><strong>Equipos</strong></a> o <a href=\"catalogo.html?tipo=repuesto\"><strong>Repuestos</strong></a>.";
+          "Catálogo B2B: equipos y repuestos. Filtra por industria o marca.";
       }
       if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de productos";
     }
@@ -503,7 +490,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (state.industry) params.set("industry", state.industry);
       if (state.category) params.set("category", state.category);
       if (state.brand) params.set("brand", state.brand);
-      if (state.mode) params.set("sale_mode", state.mode);
       if (state.page > 1) params.set("page", String(state.page));
       const q = params.toString();
       history.replaceState({}, "", "catalogo.html" + (q ? "?" + q : ""));
@@ -528,7 +514,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (state.category && p.category_slug !== state.category) return false;
       if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
-      if (state.mode && p.sale_mode !== state.mode) return false;
       return true;
     });
   }
@@ -611,7 +596,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       base.forEach((p) => {
         if (!p) return;
         if (state.tipo && productTipoOf(p) !== state.tipo) return;
-        if (state.mode && p.sale_mode !== state.mode) return;
         if (state.brand && p.brand_slug !== state.brand) return;
         const ind = INDUSTRIES.find((i) => i.id === state.industry);
         if (ind && !ind.categories.includes(p.category_slug)) return;
@@ -639,9 +623,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             return `<option value="${escapeAttr(slug)}"${state.brand === slug ? " selected" : ""}>${escapeHtml(name)}</option>`;
           })
           .join("");
-    }
-    if (modeSelect) {
-      modeSelect.value = state.mode || "";
     }
   }
 
@@ -725,7 +706,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         state.category = "";
         state.brand = "";
         state.industry = "";
-        state.mode = "";
         state.page = 1;
         renderGrid();
       });
@@ -751,11 +731,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     categorySelect?.addEventListener("change", () => {
       state.category = categorySelect.value || "";
-      state.page = 1;
-      renderGrid();
-    });
-    modeSelect?.addEventListener("change", () => {
-      state.mode = modeSelect.value || "";
       state.page = 1;
       renderGrid();
     });

@@ -2657,17 +2657,16 @@ body.nav-open {
   margin-bottom: 1.5rem;
 }
 
-/* Cuando hay solo 2 filtros visibles */
-
+/* Cuando hay 3 filtros visibles (industria / categoría / marca) */
 .catalog-filters:not(.filters-repuestos) {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
 @media (max-width: 900px) {
   .catalog-filters:not(.filters-repuestos) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2679,8 +2678,9 @@ body.nav-open {
 
 .catalog-filters.filters-repuestos {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
+  max-width: 360px;
 }
 
 .filter-group {
@@ -2726,7 +2726,13 @@ body.nav-open {
   background: var(--off-white);
   border-bottom: 1px solid var(--line);
   padding-top: 0.85rem;
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.65rem;
+}
+
+.catalog-toolbar .catalog-filters {
+  max-width: var(--max);
+  margin: 0 auto 0.5rem;
+  width: calc(100% - 2.5rem);
 }
 
 .catalog-toolbar__row {
