@@ -564,13 +564,99 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function applyCatalogSeo(filteredList, pageItems) {
+    const origin =
+      (window.Lpaez && Lpaez.pageOrigin && Lpaez.pageOrigin()) ||
+      window.location.origin ||
+      "https://prueba1.lpaezsis.cl";
+    const brand = allBrands.find((b) => b.slug === state.brand);
+    const h1 = document.getElementById("catalogTitle");
+    const clip =
+      (window.Lpaez && Lpaez.clipMetaDescription) ||
+      ((t) => String(t || "").slice(0, 160));
+    const setMeta = window.Lpaez && Lpaez.setHeadMeta;
+    const setCanon = window.Lpaez && Lpaez.setCanonical;
+    const subtitle =
+      brand && window.Lpaez && Lpaez.brandSubtitle
+        ? Lpaez.brandSubtitle(brand)
+        : "";
+    let title = "Productos industriales | Soluciones Industriales LPAEZsis";
+    let desc =
+      "Catálogo B2B LPAEZsis: secadores, turbinas, paletizado Columbia, transportadores LYC y repuestos Sonic Air. Filtra por industria y marca.";
+    let canonical = origin + "/catalogo.html";
+    if (brand) {
+      title = subtitle
+        ? brand.name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
+        : "Productos " + brand.name + " | Soluciones Industriales LPAEZsis";
+      desc = clip(
+        brand.description ||
+          "Catálogo de equipos y soluciones " +
+            brand.name +
+            " representados por LPAEZsis en Chile.",
+        160
+      );
+      canonical = origin + "/catalogo.html?brand=" + encodeURIComponent(brand.slug);
+      if (h1) h1.textContent = "Catálogo de Equipos y Soluciones " + brand.name;
+    } else if (h1) {
+      h1.textContent = "Productos";
+    }
+    const thin = !filteredList || !filteredList.length;
+    document.title = title;
+    if (setMeta) {
+      setMeta("description", desc);
+      setMeta("robots", thin ? "noindex,follow" : "index,follow");
+      setMeta("og:title", title, "property");
+      setMeta("og:description", desc, "property");
+      setMeta("og:url", canonical, "property");
+      setMeta("twitter:title", title);
+      setMeta("twitter:description", desc);
+    }
+    if (setCanon) setCanon(canonical);
+    const ou = document.getElementById("ogUrl");
+    if (ou) ou.setAttribute("content", canonical);
+    if (brand && window.Lpaez?.upsertJsonLd) {
+      const logo = window.Lpaez.absoluteUrl
+        ? Lpaez.absoluteUrl(brand.logo_url || "/img/brand/logo.png")
+        : origin + "/img/brand/logo.png";
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "Brand",
+        name: brand.name,
+        url: canonical,
+        logo,
+        description: desc,
+      };
+      if (subtitle) schema.alternateName = subtitle;
+      if (pageItems && pageItems.length) {
+        schema.makesOffer = pageItems.map((prod) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: prod.name,
+            image:
+              (prod.image_url || "").indexOf("http") === 0
+                ? prod.image_url
+                : origin + "/" + String(prod.image_url || "").replace(/^\//, ""),
+            description: clip(prod.description || prod.seo_description || "", 160),
+            category: prod.category_name || "",
+            url: origin + "/producto.html?slug=" + encodeURIComponent(prod.slug || ""),
+          },
+        }));
+      }
+      Lpaez.upsertJsonLd("brandJsonLd", schema);
+    }
+  }
+
   function injectJsonLd(products) {
     const origin = window.location.origin || "https://prueba1.lpaezsis.cl";
     const list = Array.isArray(products) ? products : [];
+    const brandRow = allBrands.find((b) => b.slug === state.brand);
     const graph = {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: "Catálogo de productos LPAEZsis",
+      name: brandRow
+        ? "Catálogo de Equipos y Soluciones " + brandRow.name
+        : "Catálogo de productos LPAEZsis",
       numberOfItems: list.length,
       itemListElement: list.map((p, i) => ({
         "@type": "ListItem",
@@ -639,6 +725,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       renderPager(0, 1, 1);
       injectJsonLd([]);
+      applyCatalogSeo([], []);
       console.log("[CATALOGO JS] Productos renderizados exitosamente:", 0);
       return;
     }
@@ -646,6 +733,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = pageItems.map(cardHtml).join("");
     renderPager(products.length, state.page, pages);
     injectJsonLd(pageItems);
+    applyCatalogSeo(products, pageItems);
     window.Lpaez?.observeReveals?.();
     console.log("[CATALOGO JS] Productos renderizados exitosamente:", pageItems.length);
   }

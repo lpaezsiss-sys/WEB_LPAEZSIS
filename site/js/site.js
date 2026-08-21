@@ -233,6 +233,97 @@
     document.head.appendChild(script);
   }
 
+  var BRAND_SUBTITLES = {
+    lyc: "Logistics & Conveyors",
+    "columbia-machine": "Columbia-Okura LLC",
+  };
+
+  function pageOrigin() {
+    var origin = window.location.origin || "";
+    if (/^https?:\/\//i.test(origin)) return origin.replace(/\/$/, "");
+    return "https://prueba1.lpaezsis.cl";
+  }
+
+  function absoluteUrl(path) {
+    if (!path) return "";
+    path = String(path).trim();
+    if (/^https?:\/\//i.test(path)) return path;
+    return pageOrigin() + (path.charAt(0) === "/" ? path : "/" + path);
+  }
+
+  function clipMetaDescription(text, maxLen) {
+    maxLen = maxLen || 160;
+    var raw = String(text || "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (raw.length <= maxLen) return raw;
+    var cut = raw.slice(0, maxLen);
+    var sp = cut.lastIndexOf(" ");
+    if (sp > 110) cut = cut.slice(0, sp);
+    return cut.replace(/[.,;:\s]+$/, "") + "…";
+  }
+
+  function setHeadMeta(key, content, attr) {
+    attr = attr || "name";
+    var sel =
+      attr === "property"
+        ? 'meta[property="' + key + '"]'
+        : 'meta[name="' + key + '"]';
+    var el = document.querySelector(sel);
+    if (!el) {
+      el = document.createElement("meta");
+      el.setAttribute(attr, key);
+      document.head.appendChild(el);
+    }
+    el.setAttribute("content", content == null ? "" : String(content));
+    return el;
+  }
+
+  function setCanonical(url) {
+    var el =
+      document.getElementById("canonicalLink") ||
+      document.querySelector('link[rel="canonical"]');
+    if (!el) {
+      el = document.createElement("link");
+      el.rel = "canonical";
+      el.id = "canonicalLink";
+      document.head.appendChild(el);
+    } else if (!el.id) {
+      el.id = "canonicalLink";
+    }
+    el.setAttribute("href", url);
+    var alt = document.querySelector('link[rel="alternate"][hreflang="es-CL"]');
+    if (alt) alt.setAttribute("href", url);
+    return el;
+  }
+
+  function upsertJsonLd(id, data) {
+    var el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement("script");
+      el.type = "application/ld+json";
+      el.id = id;
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(data);
+    return el;
+  }
+
+  function brandSubtitle(brand) {
+    if (!brand) return "";
+    var raw =
+      brand.subtitle ||
+      brand.razon_social ||
+      brand.alternate_name ||
+      BRAND_SUBTITLES[brand.slug] ||
+      "";
+    raw = String(raw).replace(/\s+/g, " ").trim();
+    if (!raw) return "";
+    if (String(brand.name || "").toLowerCase() === raw.toLowerCase()) return "";
+    return raw;
+  }
+
   function productPayload(p) {
     return encodeURIComponent(
       JSON.stringify({
@@ -657,6 +748,13 @@
     queryParam: queryParam,
     escapeHtml: escapeHtml,
     injectJsonLd: injectJsonLd,
+    upsertJsonLd: upsertJsonLd,
+    pageOrigin: pageOrigin,
+    absoluteUrl: absoluteUrl,
+    clipMetaDescription: clipMetaDescription,
+    setHeadMeta: setHeadMeta,
+    setCanonical: setCanonical,
+    brandSubtitle: brandSubtitle,
     updateBadges: updateBadges,
     getSettings: function () {
       return siteSettings;

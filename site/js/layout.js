@@ -107,6 +107,7 @@
       "</button>" +
       '<div class="nav-dropdown__menu" id="navBrandsMenu" hidden>' +
       '<a href="marcas.html?slug=sonic-air-systems">Sonic Air Systems</a>' +
+      '<a href="marcas.html?slug=columbia-machine">Columbia Machine</a>' +
       '<a href="marcas.html?slug=lyc">LYC</a>' +
       '<a href="marcas.html?slug=movex">MOVEX</a>' +
       '<a href="marcas.html?slug=isodur">ISODUR</a>' +
@@ -144,6 +145,7 @@
       "</ul></div>" +
       "<div><h3>Explorar</h3><ul>" +
       '<li><a href="catalogo.html">Productos</a></li>' +
+      '<li><a href="marcas.html">Representaciones y Distribución</a></li>' +
       '<li><a href="nosotros.html">Nosotros</a></li>' +
       '<li><a href="novedades.html">Novedades</a></li>' +
       '<li><a href="cotizacion.html">Pedir cotización</a></li>' +

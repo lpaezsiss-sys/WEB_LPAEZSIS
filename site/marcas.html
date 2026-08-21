@@ -1,57 +1,85 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Representaciones y Distribución | LPAEZsis</title>
-  <meta name="description" content="Representaciones y distribución LPAEZsis: Sonic Air Systems, LYC, MOVEX, ISODUR, COMBI, HAIDA.">
-  <link rel="canonical" href="https://lpaezsis.cl/marcas.html">
+  <title>Representaciones y Distribución | Soluciones Industriales LPAEZsis</title>
+  <meta name="description" content="Representaciones industriales LPAEZsis en Chile: Sonic Air Systems, Columbia Machine, LYC, MOVEX, ISODUR, COMBI y HAIDA. Cotiza equipos y soluciones de fin de línea.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" id="canonicalLink" href="https://prueba1.lpaezsis.cl/marcas.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Representaciones y Distribución | LPAEZsis">
-  <meta property="og:description" content="Conoce las representaciones y distribución industrial de LPAEZsis en Chile.">
-  <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
-  <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="LPAEZsis">
+  <meta property="og:title" content="Representaciones y Distribución | Soluciones Industriales LPAEZsis">
+  <meta property="og:description" content="Marcas representadas por LPAEZsis: soplado, paletizado, transportadores y packaging industrial en Chile.">
+  <meta property="og:url" id="ogUrl" content="https://prueba1.lpaezsis.cl/marcas.html">
+  <meta property="og:image" id="ogImage" content="https://prueba1.lpaezsis.cl/img/brand/logo.png">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Representaciones y Distribución | Soluciones Industriales LPAEZsis">
+  <meta name="twitter:description" content="Marcas representadas por LPAEZsis en Chile.">
+  <script type="application/ld+json" id="brandJsonLd">{}</script>
   <link rel="stylesheet" href="css/style.css?v=83">
+  <script>
+    (function () {
+      var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
+      var c = document.getElementById("canonicalLink");
+      var ou = document.getElementById("ogUrl");
+      var oi = document.getElementById("ogImage");
+      if (c) c.href = origin + "/marcas.html";
+      if (ou) ou.content = origin + "/marcas.html";
+      if (oi) oi.content = origin + "/img/brand/logo.png";
+    })();
+  </script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
   <div id="site-header-mount"></div>
   <main id="main">
     <div class="page-hero page-hero--compact">
       <div class="page-hero-inner">
+        <nav class="breadcrumb" id="brandBreadcrumb" aria-label="Migas de pan">
+          <a href="index.html">Inicio</a>
+          <span class="breadcrumb-sep" aria-hidden="true">/</span>
+          <a href="marcas.html" id="crumbBrands">Representaciones</a>
+          <span class="breadcrumb-sep" id="crumbBrandSep" aria-hidden="true" hidden>/</span>
+          <span id="crumbBrand" hidden></span>
+        </nav>
         <h1 id="brandsTitle">Representaciones y Distribución</h1>
-        <p id="brandsLead">Socios tecnológicos para soplado, packaging, movimiento y control de calidad.</p>
+        <p id="brandsLead">Socios tecnológicos para soplado, packaging, paletizado, transportadores y control de calidad.</p>
       </div>
     </div>
     <section class="section">
       <div class="brand-strip mb-lg" id="brandsList"></div>
       <div id="brandDetail" hidden>
         <div class="brand-catalog-head">
-          <img id="brandLogo" class="brand-catalog-logo" alt="" hidden>
+          <img id="brandLogo" class="brand-catalog-logo" alt="" width="220" height="80" hidden>
           <div>
-            <h2 id="brandName"></h2>
             <p id="brandDesc"></p>
           </div>
         </div>
-        <div class="brand-catalog-body" id="brandContent"></div>
-        <div class="brand-gallery" id="brandGallery" hidden></div>
+        <section class="brand-spec-section" id="brandSpecSection" aria-labelledby="brandSpecTitle">
+          <h2 id="brandSpecTitle">Especificaciones Técnicas y Capacidades</h2>
+          <div class="brand-catalog-body" id="brandContent"></div>
+          <div class="brand-gallery" id="brandGallery" hidden></div>
+        </section>
         <div class="section-head is-left stack-xl">
-          <h2 id="brandProductsTitle">Productos y equipos</h2>
+          <h2 id="brandProductsTitle">Catálogo de Equipos y Soluciones</h2>
           <p id="brandProductsLead">Disponibles para cotizar o comprar según el ítem.</p>
         </div>
         <div class="product-grid" id="brandProducts"></div>
         <div class="section-actions is-start">
-          <a class="btn btn-primary" href="cotizacion.html">Pedir cotización de esta marca</a>
-          <a class="btn btn-outline" href="catalogo.html">Ver todos los productos</a>
+          <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
+          <a class="btn btn-outline" id="brandCatalogCta" href="catalogo.html">Ver todos los productos</a>
         </div>
       </div>
     </section>
   </main>
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=36"></script>
-  <script src="js/site.js?v=26"></script>
+  <script src="js/layout.js?v=37"></script>
+  <script src="js/site.js?v=27"></script>
   <script>
     var slug = Lpaez.queryParam("slug");
+    var origin = Lpaez.pageOrigin();
 
     function brandPillHtml(b) {
       var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
@@ -63,7 +91,7 @@
       return '<a class="brand-pill' + active + '" href="' + href + '">' + Lpaez.escapeHtml(b.name) + "</a>";
     }
 
-    function renderGallery(urls) {
+    function renderGallery(urls, brandName) {
       var el = document.getElementById("brandGallery");
       if (!urls || !urls.length) {
         el.hidden = true;
@@ -71,32 +99,142 @@
         return;
       }
       el.hidden = false;
-      el.innerHTML = urls.map(function (u) {
+      el.innerHTML = urls.map(function (u, i) {
         return '<a class="brand-gallery-item" href="' + Lpaez.escapeHtml(u) + '" target="_blank" rel="noopener">' +
-          '<img src="' + Lpaez.escapeHtml(u) + '" alt="" loading="lazy"></a>';
+          '<img src="' + Lpaez.escapeHtml(u) + '" alt="' +
+          Lpaez.escapeHtml(brandName + " — galería " + (i + 1)) +
+          '" loading="lazy"></a>';
       }).join("");
+    }
+
+    function applyHubSeo() {
+      var title = "Representaciones y Distribución | Soluciones Industriales LPAEZsis";
+      var desc =
+        "Representaciones industriales LPAEZsis en Chile: Sonic Air Systems, Columbia Machine, LYC, MOVEX, ISODUR, COMBI y HAIDA. Cotiza equipos y soluciones de fin de línea.";
+      var url = origin + "/marcas.html";
+      document.title = title;
+      Lpaez.setHeadMeta("description", desc);
+      Lpaez.setHeadMeta("robots", "index,follow");
+      Lpaez.setCanonical(url);
+      Lpaez.setHeadMeta("og:title", title, "property");
+      Lpaez.setHeadMeta("og:description", desc, "property");
+      Lpaez.setHeadMeta("og:url", url, "property");
+      Lpaez.setHeadMeta("og:image", origin + "/img/brand/logo.png", "property");
+      Lpaez.setHeadMeta("twitter:title", title);
+      Lpaez.setHeadMeta("twitter:description", desc);
+      Lpaez.upsertJsonLd("brandJsonLd", {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Representaciones y Distribución",
+        url: url,
+        description: desc,
+        isPartOf: { "@type": "WebSite", name: "LPAEZsis", url: origin + "/" }
+      });
+    }
+
+    function applyBrandSeo(brand, products) {
+      var name = brand.name || brand.nombre || "Marca";
+      var subtitle = Lpaez.brandSubtitle(brand);
+      var title = subtitle
+        ? name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
+        : name + " | Soluciones Industriales LPAEZsis";
+      var descSource =
+        brand.seo_description ||
+        brand.description ||
+        brand.descripcion_corta ||
+        ("Equipos y soluciones " + name + " representados por LPAEZsis en Chile.");
+      var desc = Lpaez.clipMetaDescription(descSource, 160);
+      var url = origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug);
+      var logo = Lpaez.absoluteUrl(brand.logo_url || "/img/brand/logo.png");
+      var thin =
+        !(products && products.length) &&
+        !(brand.content_html && String(brand.content_html).trim()) &&
+        String(brand.description || "").trim().length < 80;
+
+      document.title = title;
+      Lpaez.setHeadMeta("description", desc);
+      Lpaez.setHeadMeta("robots", thin ? "noindex,follow" : "index,follow");
+      Lpaez.setCanonical(url);
+      Lpaez.setHeadMeta("og:title", title, "property");
+      Lpaez.setHeadMeta("og:description", desc, "property");
+      Lpaez.setHeadMeta("og:url", url, "property");
+      Lpaez.setHeadMeta("og:image", logo, "property");
+      Lpaez.setHeadMeta("twitter:title", title);
+      Lpaez.setHeadMeta("twitter:description", desc);
+      Lpaez.setHeadMeta("twitter:image", logo);
+
+      var schema = {
+        "@context": "https://schema.org",
+        "@type": "Brand",
+        name: name,
+        url: url,
+        logo: logo,
+        description: desc
+      };
+      if (subtitle) schema.alternateName = subtitle;
+      if (products && products.length) {
+        schema.makesOffer = products.map(function (prod) {
+          var img = Lpaez.absoluteUrl(
+            prod.image_url || prod.featured_image || prod.image || ""
+          );
+          var item = {
+            "@type": "Product",
+            name: prod.name || prod.nombre || "",
+            description: Lpaez.clipMetaDescription(
+              prod.seo_description || prod.description || prod.resumen || "",
+              160
+            ),
+            category: prod.category_name || prod.categoria || "",
+            url: origin + "/producto.html?slug=" + encodeURIComponent(prod.slug || "")
+          };
+          if (img) item.image = img;
+          return {
+            "@type": "Offer",
+            availability: "https://schema.org/InStock",
+            businessFunction: "https://schema.org/ProvideService",
+            itemOffered: item
+          };
+        });
+      }
+      Lpaez.upsertJsonLd("brandJsonLd", schema);
+    }
+
+    function setBreadcrumb(brand) {
+      var sep = document.getElementById("crumbBrandSep");
+      var crumb = document.getElementById("crumbBrand");
+      if (!brand) {
+        sep.hidden = true;
+        crumb.hidden = true;
+        crumb.textContent = "";
+        return;
+      }
+      sep.hidden = false;
+      crumb.hidden = false;
+      crumb.textContent = brand.name;
+    }
+
+    function demoteContentHeadings(root) {
+      root.querySelectorAll("h1, h2").forEach(function (el) {
+        var h3 = document.createElement("h3");
+        h3.innerHTML = el.innerHTML;
+        el.parentNode.replaceChild(h3, el);
+      });
     }
 
     Lpaez.api("/api/brands").then(function (res) {
       var brands = (res.data && res.data.brands) || [];
-      if (!slug && brands.length) {
-        var sonic = brands.find(function (b) {
-          return b.slug === "sonic-air-systems" || /sonic/i.test(b.name || "");
-        });
-        slug = (sonic && sonic.slug) || brands[0].slug;
-        if (slug && history.replaceState) {
-          history.replaceState(null, "", "marcas.html?slug=" + encodeURIComponent(slug));
-        }
-      }
       document.getElementById("brandsList").innerHTML = brands.map(brandPillHtml).join("");
       if (!slug) {
-        document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandProducts").innerHTML =
-          "<p class='empty-state'>Elige una marca para ver su ficha y productos.</p>";
+        applyHubSeo();
+        document.getElementById("brandDetail").hidden = true;
+        setBreadcrumb(null);
         return;
       }
       return Lpaez.api("/api/brands/" + encodeURIComponent(slug)).then(function (r) {
         if (!r.ok) {
+          document.title = "Marca no encontrada | LPAEZsis";
+          Lpaez.setHeadMeta("robots", "noindex,follow");
+          Lpaez.setCanonical(origin + "/marcas.html");
           document.getElementById("brandDetail").hidden = false;
           document.getElementById("brandProducts").innerHTML =
             "<p class='empty-state'>No se encontró esta marca.</p>";
@@ -104,17 +242,17 @@
         }
         var brand = r.data.brand;
         var products = r.data.products || [];
-        document.title = brand.name + " | LPAEZsis";
-        document.getElementById("brandsTitle").textContent = brand.name;
+        var subtitle = Lpaez.brandSubtitle(brand);
+        applyBrandSeo(brand, products);
+        setBreadcrumb(brand);
+
+        document.getElementById("brandsTitle").textContent = subtitle
+          ? brand.name + " - " + subtitle
+          : brand.name;
         document.getElementById("brandsLead").textContent = brand.description || "";
         document.getElementById("brandDetail").hidden = false;
-        document.getElementById("brandName").textContent = brand.name;
         document.getElementById("brandDesc").textContent =
           brand.description || "Productos e información de la representación.";
-        // Show name/desc in the catalog head when there is no rich HTML body.
-        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
-        document.getElementById("brandName").hidden = hasHtml;
-        document.getElementById("brandDesc").hidden = hasHtml && !brand.description;
 
         var logo = document.getElementById("brandLogo");
         if (brand.logo_url) {
@@ -125,7 +263,9 @@
           logo.hidden = true;
         }
 
+        var hasHtml = !!(brand.content_html && String(brand.content_html).trim());
         var content = document.getElementById("brandContent");
+        var specSection = document.getElementById("brandSpecSection");
         if (hasHtml) {
           content.innerHTML = brand.content_html;
           content.querySelectorAll("img").forEach(function (img) {
@@ -140,33 +280,42 @@
             }
             if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
               img.remove();
+              return;
+            }
+            if (!(img.getAttribute("alt") || "").trim()) {
+              img.setAttribute("alt", brand.name);
             }
           });
+          demoteContentHeadings(content);
           content.hidden = false;
+          specSection.hidden = false;
         } else if (brand.description) {
           content.innerHTML = "<p>" + Lpaez.escapeHtml(brand.description) + "</p>";
           content.hidden = false;
+          specSection.hidden = false;
         } else {
           content.innerHTML = "";
           content.hidden = true;
+          specSection.hidden = true;
         }
 
-        renderGallery(brand.gallery || []);
+        renderGallery(brand.gallery || [], brand.name);
 
         document.getElementById("brandProductsTitle").textContent =
-          products.length ? "Productos " + brand.name : "Equipos " + brand.name;
+          "Catálogo de Equipos y Soluciones";
+        document.getElementById("brandCatalogCta").href =
+          "catalogo.html?brand=" + encodeURIComponent(brand.slug);
+        document.getElementById("brandQuoteCta").href =
+          "cotizacion.html?marca=" + encodeURIComponent(brand.slug);
         document.getElementById("brandProducts").innerHTML = products.length
           ? products.map(function (producto) {
               return Lpaez.productCardHtml(producto);
             }).join("")
           : "<p class='empty-state'>Esta marca se cotiza por proyecto. Revisa la galería fotográfica arriba o solicita una cotización.</p>";
         Lpaez.observeReveals();
-        var link = document.createElement("link");
-        link.rel = "canonical";
-        link.href = "https://lpaezsis.cl/marcas.html?slug=" + encodeURIComponent(brand.slug);
-        document.head.appendChild(link);
       });
     }).catch(function () {
+      Lpaez.setHeadMeta("robots", "noindex,follow");
       document.getElementById("brandDetail").hidden = false;
       document.getElementById("brandProducts").innerHTML =
         "<p class='empty-state'>No se pudo cargar la marca. Intenta recargar.</p>";
