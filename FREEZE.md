@@ -4,6 +4,7 @@
 **Tag:** `freeze-prueba1-2026-08-21`  
 **Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260821-5af8`  
 **Rama de trabajo al momento del freeze:** `cursor/catalogo-image-url-5af8`  
+**Commit:** `3767395` (tip de la rama de respaldo / tag anotado)  
 **PR relacionada (imágenes catálogo):** https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/pull/19
 
 Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **19** productos (9 equipos / 10 repuestos), **8** marcas, **8** clientes, **5** soluciones activas.
