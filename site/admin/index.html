@@ -7,7 +7,7 @@
   <title>Admin | LPAEZsis</title>
   <base href="/admin/">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
-  <link rel="stylesheet" href="css/admin.css?v=7">
+  <link rel="stylesheet" href="css/admin.css?v=8">
 </head>
 <body>
   <div id="loginView" class="login-view">
@@ -119,8 +119,8 @@
       <label>Marca</label><select name="brand_id" id="productBrand"><option value="">—</option></select>
       <label>Modo de venta</label>
       <select name="sale_mode">
-        <option value="buy">Comprar</option>
         <option value="quote">Cotizar</option>
+        <option value="buy">Comprar</option>
       </select>
       <label>Stock</label>
       <select name="stock_status">
@@ -130,7 +130,16 @@
         <option value="discontinued">Descontinuado</option>
       </select>
       <label>Precio CLP (solo buy)</label><input name="price_clp" type="number" min="0">
-      <label>Descripción</label><textarea name="description" rows="4"></textarea>
+      <label>Descripción detallada</label><textarea name="description" rows="4"></textarea>
+      <label>Especificaciones técnicas</label>
+      <textarea name="specs" id="productSpecs" rows="5" placeholder="Velocidad: 30 a 40 CPM"></textarea>
+      <p class="meta">Una por línea, formato Atributo: Valor. Se publican en la ficha del producto.</p>
+      <label>Ficha técnica PDF</label>
+      <div class="datasheet-row">
+        <input type="text" name="datasheet_url" id="productDatasheetUrl" placeholder="/img/fichas/ficha_tecnica_….pdf">
+        <input type="file" id="productDatasheetFile" accept="application/pdf,.pdf">
+      </div>
+      <p class="meta" id="productDatasheetHint">Sube un PDF o indica la ruta en la biblioteca (/img/fichas/…).</p>
       <label>Imagen</label>
       <button type="button" class="image-pick" id="productImagePick" title="Elegir imagen">
         <img id="productImagePreview" alt="" hidden>
@@ -138,7 +147,7 @@
       </button>
       <input type="hidden" name="image_url" id="productImageUrl">
       <label>SEO title</label><input name="seo_title">
-      <label>SEO description</label><textarea name="seo_description" rows="2"></textarea>
+      <label>Resumen corto (listado / SEO)</label><textarea name="seo_description" rows="2"></textarea>
       <label><input type="checkbox" name="is_featured"> Destacado</label>
       <label><input type="checkbox" name="is_active" checked> Activo</label>
       <div class="dialog-actions">
@@ -212,6 +221,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=14"></script>
+  <script src="js/admin.js?v=16"></script>
 </body>
 </html>

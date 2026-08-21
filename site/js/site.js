@@ -253,15 +253,21 @@
       p.sale_mode === "buy" && p.price_clp != null
         ? formatPrice(p.price_clp)
         : "Cotización";
-    var img = resolveProductImage(p);
+    var apiImg =
+      publicImageUrl(p.image_url) ||
+      publicImageUrl(p.featured_image) ||
+      publicImageUrl(p.image);
+    if (apiImg && isStalePlaceholder(apiImg)) apiImg = "";
+    var img = apiImg || resolveProductImage(p);
     var visual = img
-      ? '<img src="' +
-        img +
-        '" alt="' +
-        escapeAttr(p.name) +
-        '" title="' +
-        escapeAttr(p.name) +
-        '" loading="lazy" decoding="async" width="480" height="480">'
+      ? imgTagHtml(
+          img,
+          p.name,
+          'title="' +
+            escapeAttr(p.name) +
+            '" loading="lazy" decoding="async" width="480" height="480"',
+          productImageCandidates(p)
+        )
       : "LPAEZ";
     var payload = productPayload(p);
     var primaryCta =
@@ -345,6 +351,10 @@
     "turbina-soplado-sonic-100": "img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "img/products/A07-10976.jpg",
+    "paletizador-nivel-inferior-columbia-fl3000": "img/productos/fl3000.jpg",
+    "paletizador-alto-nivel-columbia-hl7200": "img/productos/hl7200.jpg",
+    "celda-paletizado-robotico-columbia-ai1800": "img/productos/ai1800.jpg",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -364,15 +374,137 @@
     "cuchillos-aire": "img/hero/conserves.jpg",
     repuestos: "img/products/A07-10015.jpg",
     "fin-de-linea": "img/hero/line.jpg",
+    "paletizado-convencional": "img/productos/fl3000.jpg",
+    "paletizado-alta-velocidad": "img/productos/hl7200.jpg",
+    "paletizado-robotico": "img/productos/ai1800.jpg",
+    "paletizado-integrado": "img/productos/fl1000sw.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 
+  var DATASHEET_FILES = {
+    "paletizador-nivel-inferior-columbia-fl3000": "img/fichas/ficha_tecnica_fl3000_columbia.pdf",
+    "paletizador-alto-nivel-columbia-hl7200": "img/fichas/ficha_tecnica_hl7200_columbia.pdf",
+    "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
+  };
+
+  function parseProductFicha(raw) {
+    var text = String(raw || "").replace(/\r\n/g, "\n").trim();
+    var specs = [];
+    var datasheet = "";
+    var detail = text;
+    var fichaIdx = text.lastIndexOf("Ficha técnica:");
+    if (fichaIdx >= 0) {
+      datasheet = text.slice(fichaIdx + "Ficha técnica:".length).trim().split("\n")[0].trim();
+      text = text.slice(0, fichaIdx).trim();
+    }
+    var specsIdx = text.indexOf("Especificaciones técnicas:");
+    if (specsIdx >= 0) {
+      detail = text.slice(0, specsIdx).trim();
+      text.slice(specsIdx + "Especificaciones técnicas:".length)
+        .split("\n")
+        .forEach(function (line) {
+          var cleaned = line.replace(/^[•\-\*]\s*/, "").trim();
+          if (!cleaned) return;
+          var parts = cleaned.split(":");
+          if (parts.length < 2) return;
+          specs.push({ label: parts[0].trim(), value: parts.slice(1).join(":").trim() });
+        });
+    } else {
+      detail = text;
+    }
+    return { detail: detail, specs: specs, datasheet: datasheet };
+  }
+
+  function resolveDatasheetUrl(product) {
+    if (!product) return "";
+    var parsed = parseProductFicha(product.description);
+    if (parsed.datasheet) return parsed.datasheet.replace(/^\//, "");
+    if (DATASHEET_FILES[product.slug]) return DATASHEET_FILES[product.slug];
+    if (product.slug) return "img/fichas/" + product.slug + ".pdf";
+    return "";
+  }
+
+  function publicImageUrl(url) {
+    if (!url) return "";
+    url = String(url).trim();
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.charAt(0) === "/") return url;
+    return url.replace(/^\.\//, "");
+  }
+
+  var STALE_COLUMBIA_UPLOADS = [
+    "p-6ffb39180d4af541.jpg",
+    "p-f65d2c9f90c7de1a.jpg",
+    "p-822eb15cf1463d95.jpg",
+    "p-f2f7618440e07dfc.jpg",
+  ];
+
+  function isStalePlaceholder(url) {
+    if (!url) return false;
+    url = String(url);
+    return STALE_COLUMBIA_UPLOADS.some(function (name) {
+      return url.indexOf(name) !== -1;
+    });
+  }
+
+  function productImageCandidates(p) {
+    var list = [];
+    function add(url) {
+      url = publicImageUrl(url);
+      if (!url || isStalePlaceholder(url)) return;
+      if (list.indexOf(url) === -1) list.push(url);
+    }
+    if (p) {
+      add(p.image_url);
+      add(p.featured_image);
+      add(p.image);
+      if (p.slug && PRODUCT_IMAGES[p.slug]) {
+        add(PRODUCT_IMAGES[p.slug]);
+        add("/" + String(PRODUCT_IMAGES[p.slug]).replace(/^\//, ""));
+      }
+      if (p.slug) {
+        add("img/products/" + p.slug + ".jpg");
+        add("/img/products/" + p.slug + ".jpg");
+      }
+    }
+    add(PRODUCT_FALLBACKS[0]);
+    return list;
+  }
+
   function resolveProductImage(p) {
-    if (!p) return PRODUCT_FALLBACKS[0];
-    if (p.image_url) return p.image_url;
-    if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
-    var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
-    return PRODUCT_FALLBACKS[idx];
+    var candidates = productImageCandidates(p);
+    return candidates[0] || PRODUCT_FALLBACKS[0];
+  }
+
+  function imgTagHtml(src, alt, extra, fallbacks) {
+    extra = extra || "";
+    var chain = [];
+    function add(url) {
+      url = publicImageUrl(url);
+      if (url && chain.indexOf(url) === -1) chain.push(url);
+    }
+    add(src);
+    (fallbacks || []).forEach(add);
+    add(PRODUCT_FALLBACKS[0]);
+    var first = chain[0] || PRODUCT_FALLBACKS[0];
+    var rest = chain.slice(1);
+    var onerror = rest.length
+      ? ' data-fallbacks="' +
+        escapeAttr(JSON.stringify(rest)) +
+        '" onerror="(function(el){var n=+el.dataset.fi||0;var list=[];try{list=JSON.parse(el.getAttribute(\'data-fallbacks\')||\'[]\');}catch(e){}if(n<list.length){el.dataset.fi=String(n+1);el.src=list[n];}else{el.onerror=null;}})(this)"'
+      : "";
+    return (
+      '<img src="' +
+      escapeAttr(first) +
+      '" alt="' +
+      escapeAttr(alt || "") +
+      '" ' +
+      extra +
+      onerror +
+      " >"
+    );
   }
 
   function resolveCategoryImage(slug) {
@@ -517,7 +649,11 @@
     clearQuote: clearQuote,
     showToast: showToast,
     productCardHtml: productCardHtml,
+    parseProductFicha: parseProductFicha,
+    resolveDatasheetUrl: resolveDatasheetUrl,
     resolveProductImage: resolveProductImage,
+    productImageCandidates: productImageCandidates,
+    imgTagHtml: imgTagHtml,
     resolveCategoryImage: resolveCategoryImage,
     observeReveals: observeReveals,
     queryParam: queryParam,

@@ -326,6 +326,10 @@
     "turbina-soplado-sonic-100": "/img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "/img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "/img/products/A07-10976.jpg",
+    "paletizador-nivel-inferior-columbia-fl3000": "/img/productos/fl3000.jpg",
+    "paletizador-alto-nivel-columbia-hl7200": "/img/productos/hl7200.jpg",
+    "celda-paletizado-robotico-columbia-ai1800": "/img/productos/ai1800.jpg",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/productos/fl1000sw.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -353,8 +357,12 @@
 
   function resolveProductImage(p) {
     if (!p) return PRODUCT_FALLBACKS[0];
+    var mapped = PRODUCT_IMAGES[p.slug];
+    if (mapped && (!p.image_url || /p-6ffb39180d4af541|p-f65d2c9f90c7de1a|p-822eb15cf1463d95|p-f2f7618440e07dfc/i.test(p.image_url))) {
+      return toSitePath(mapped);
+    }
     if (p.image_url) return toSitePath(p.image_url);
-    if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
+    if (mapped) return mapped;
     var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
     return PRODUCT_FALLBACKS[idx];
   }
@@ -496,10 +504,64 @@
     document.getElementById("imageDialog").showModal();
   }
 
+  var SPECS_HEADER = "Especificaciones técnicas:";
+  var FICHA_PREFIX = "Ficha técnica:";
+
+  function parseProductFicha(raw) {
+    var text = String(raw || "").replace(/\r\n/g, "\n").trim();
+    var specs = [];
+    var datasheet = "";
+    var detail = text;
+    var fichaIdx = text.lastIndexOf(FICHA_PREFIX);
+    if (fichaIdx >= 0) {
+      datasheet = text.slice(fichaIdx + FICHA_PREFIX.length).trim().split("\n")[0].trim();
+      text = text.slice(0, fichaIdx).trim();
+    }
+    var specsIdx = text.indexOf(SPECS_HEADER);
+    if (specsIdx >= 0) {
+      detail = text.slice(0, specsIdx).trim();
+      text.slice(specsIdx + SPECS_HEADER.length)
+        .split("\n")
+        .forEach(function (line) {
+          var cleaned = line.replace(/^[•\-\*]\s*/, "").trim();
+          if (!cleaned) return;
+          var parts = cleaned.split(":");
+          if (parts.length < 2) return;
+          specs.push(parts[0].trim() + ": " + parts.slice(1).join(":").trim());
+        });
+    } else {
+      detail = text;
+    }
+    return { detail: detail, specs: specs, datasheet: datasheet };
+  }
+
+  function composeProductDescription(detail, specsText, datasheet) {
+    var parts = [String(detail || "").trim()];
+    var specs = String(specsText || "")
+      .split("\n")
+      .map(function (line) {
+        return line.replace(/^[•\-\*]\s*/, "").trim();
+      })
+      .filter(Boolean);
+    if (specs.length) {
+      parts.push("");
+      parts.push(SPECS_HEADER);
+      specs.forEach(function (line) {
+        parts.push("• " + line);
+      });
+    }
+    if (datasheet) {
+      parts.push("");
+      parts.push(FICHA_PREFIX + " " + datasheet);
+    }
+    return parts.join("\n").trim();
+  }
+
   function openProductDialog(product) {
     var form = document.getElementById("productForm");
     form.reset();
     form.id.value = product && product.id ? product.id : "";
+    var ficha = parseProductFicha(product && product.description);
     if (product) {
       form.name.value = product.name || "";
       form.slug.value = product.slug || "";
@@ -508,7 +570,9 @@
       form.sale_mode.value = product.sale_mode || "quote";
       form.stock_status.value = product.stock_status || "on_request";
       form.price_clp.value = product.price_clp != null ? product.price_clp : "";
-      form.description.value = product.description || "";
+      form.description.value = ficha.detail || product.description || "";
+      form.specs.value = ficha.specs.join("\n");
+      form.datasheet_url.value = ficha.datasheet || "";
       if (product.image_url) {
         setFormImagePreview(product.image_url);
       } else {
@@ -520,6 +584,10 @@
       form.is_featured.checked = !!product.is_featured;
       form.is_active.checked = product.is_active !== false;
     } else {
+      form.sale_mode.value = "quote";
+      form.stock_status.value = "on_request";
+      form.specs.value = "";
+      form.datasheet_url.value = "";
       form.is_active.checked = true;
       setFormImagePreview("");
     }
@@ -534,6 +602,24 @@
         setFormImagePreview(url);
         return Promise.resolve();
       },
+    });
+  });
+
+  document.getElementById("productDatasheetFile").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var fd = new FormData();
+    fd.append("file", file);
+    api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        showToast((res.data && res.data.error) || "No se pudo subir el PDF");
+        return;
+      }
+      var url = res.data && res.data.url;
+      if (url) {
+        document.getElementById("productDatasheetUrl").value = url;
+        showToast("Ficha PDF subida");
+      }
     });
   });
 
@@ -613,12 +699,17 @@
       sale_mode: form.sale_mode.value,
       stock_status: form.stock_status.value,
       price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
-      description: form.description.value,
+      description: composeProductDescription(
+        form.description.value,
+        form.specs.value,
+        form.datasheet_url.value.trim()
+      ),
       image_url: form.image_url.value.trim(),
       seo_title: form.seo_title.value.trim(),
       seo_description: form.seo_description.value.trim(),
       is_featured: form.is_featured.checked,
       is_active: form.is_active.checked,
+      tipo: form.sale_mode.value === "buy" ? "repuesto" : "equipo",
     };
     var id = form.id.value;
     var req = id
@@ -687,6 +778,8 @@
     isodur: "/img/brand/isodur.png",
     combi: "/img/brand/combi.png",
     haida: "/img/brand/haida.png",
+    "columbia-machine": "/img/brand/columbia-machine.png",
+    "columbia-okura": "/img/brand/columbia-machine.png",
   };
 
   function resolveBrandLogo(b) {

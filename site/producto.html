@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=84">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -26,7 +26,9 @@
       <div>
         <div class="product-meta" id="productMeta"></div>
         <h1 id="productName"></h1>
+        <p id="productLead" class="product-lead" hidden></p>
         <p id="productDesc"></p>
+        <div class="product-specs" id="productSpecs" hidden></div>
         <p class="product-price" id="productPrice"></p>
         <div class="qty-row" role="group" aria-label="Cantidad">
           <button type="button" id="qtyMinus" aria-label="Quitar">−</button>
@@ -39,7 +41,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=22"></script>
+  <script src="js/site.js?v=25"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -81,7 +83,30 @@
         document.getElementById("productLoading").hidden = true;
         document.getElementById("productDetail").hidden = false;
         document.getElementById("productName").textContent = product.name;
-        document.getElementById("productDesc").textContent = product.description || "";
+        var ficha = Lpaez.parseProductFicha ? Lpaez.parseProductFicha(product.description) : { detail: product.description || "", specs: [], datasheet: "" };
+        var lead = document.getElementById("productLead");
+        if (product.seo_description) {
+          lead.hidden = false;
+          lead.textContent = product.seo_description;
+        } else {
+          lead.hidden = true;
+        }
+        document.getElementById("productDesc").textContent = ficha.detail || product.description || "";
+        var specsEl = document.getElementById("productSpecs");
+        if (ficha.specs && ficha.specs.length) {
+          specsEl.hidden = false;
+          specsEl.innerHTML =
+            "<h2>Especificaciones técnicas</h2><dl>" +
+            ficha.specs
+              .map(function (row) {
+                return "<div><dt>" + Lpaez.escapeHtml(row.label) + "</dt><dd>" + Lpaez.escapeHtml(row.value) + "</dd></div>";
+              })
+              .join("") +
+            "</dl>";
+        } else {
+          specsEl.hidden = true;
+          specsEl.innerHTML = "";
+        }
         document.getElementById("productPrice").textContent =
           product.sale_mode === "buy" && product.price_clp != null
             ? Lpaez.formatPrice(product.price_clp)
@@ -107,19 +132,33 @@
         crumb.hidden = false;
 
         if (product.image_url || Lpaez.resolveProductImage(product)) {
-          var src = Lpaez.resolveProductImage(product);
-          document.getElementById("productVisual").innerHTML =
-            '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
+          var fallbacks = Lpaez.productImageCandidates
+            ? Lpaez.productImageCandidates(product)
+            : [product.image_url, "img/products/A07-10015.jpg"];
+          var src = product.image_url && fallbacks.indexOf(product.image_url) !== -1
+            ? product.image_url
+            : (fallbacks[0] || Lpaez.resolveProductImage(product));
+          var imgHtml = Lpaez.imgTagHtml
+            ? Lpaez.imgTagHtml(src, product.name, "", fallbacks)
+            : '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
+          document.getElementById("productVisual").innerHTML = imgHtml;
         }
         var actions = document.getElementById("productActions");
+        var datasheetUrl = Lpaez.resolveDatasheetUrl ? Lpaez.resolveDatasheetUrl(product) : "";
+        var pdfBtn = datasheetUrl
+          ? '<a class="btn btn-outline" href="' + datasheetUrl + '" target="_blank" rel="noopener">Descargar ficha técnica PDF</a>'
+          : "";
         if (product.sale_mode === "buy") {
           actions.innerHTML =
             '<button type="button" class="btn btn-primary" id="btnBuy">Agregar al carrito</button>' +
-            '<button type="button" class="btn btn-outline" id="btnAlsoQuote">También a cotización</button>';
+            '<button type="button" class="btn btn-outline" id="btnAlsoQuote">También a cotización</button>' +
+            pdfBtn;
           document.getElementById("btnBuy").onclick = function () { Lpaez.addToCart(product, qty); };
           document.getElementById("btnAlsoQuote").onclick = function () { Lpaez.addToQuote(product, qty); };
         } else {
-          actions.innerHTML = '<button type="button" class="btn btn-primary" id="btnQuote">Agregar a cotización</button>';
+          actions.innerHTML =
+            '<button type="button" class="btn btn-primary" id="btnQuote">Solicitar cotización</button>' +
+            pdfBtn;
           document.getElementById("btnQuote").onclick = function () { Lpaez.addToQuote(product, qty); };
         }
         Lpaez.injectJsonLd({

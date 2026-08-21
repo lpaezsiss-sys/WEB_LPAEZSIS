@@ -141,6 +141,74 @@ const MOCK_PRODUCTS = [
     brand_name: "Sonic Air Systems",
     quote_url: "cotizacion.html?sku=tensor-correa-sonic-todos-los-modelos",
   },
+  {
+    id: 17,
+    slug: "paletizador-nivel-inferior-columbia-fl3000",
+    name: "Paletizador de Nivel Inferior Columbia FL3000",
+    sku: "FL3000",
+    description: "Paletizador automático a nivel de piso de velocidad media-alta (30-40 CPM), diseñado para el manejo seguro y eficiente de cajas, charolas y paquetes.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/fl3000.jpg",
+    image_webp: "",
+    category_slug: "paletizado-convencional",
+    category_name: "Paletizado Convencional / Final de Línea",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-nivel-inferior-columbia-fl3000",
+  },
+  {
+    id: 18,
+    slug: "paletizador-alto-nivel-columbia-hl7200",
+    name: "Paletizador de Alto Nivel Columbia HL7200",
+    sku: "HL7200",
+    description: "Paletizador de alta velocidad (hasta 120 CPM) de entrada superior, ideal para líneas masivas de embotellado, alimentos y consumo masivo.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/hl7200.jpg",
+    image_webp: "",
+    category_slug: "paletizado-alta-velocidad",
+    category_name: "Paletizado de Alta Velocidad / Final de Línea",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-alto-nivel-columbia-hl7200",
+  },
+  {
+    id: 19,
+    slug: "celda-paletizado-robotico-columbia-ai1800",
+    name: "Celda de Paletizado Robótico Columbia-Okura Ai1800",
+    sku: "AI1800",
+    description: "Robot industrial de paletizado de alta precisión para el manejo versátil de sacos, cajas, baldes y múltiples líneas simultáneas.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/ai1800.jpg",
+    image_webp: "",
+    category_slug: "paletizado-robotico",
+    category_name: "Paletizado Robótico / Células de Automatización",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=celda-paletizado-robotico-columbia-ai1800",
+  },
+  {
+    id: 20,
+    slug: "paletizador-compacto-envolvedora-columbia-fl1000sw",
+    name: "Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW",
+    sku: "FL1000-SW",
+    description: "Sistema híbrido que integra paletizado automático a nivel de piso y envoltura con película estirable (Stretch Wrap) en una sola huella reducida.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/fl1000sw.jpg",
+    image_webp: "",
+    category_slug: "paletizado-integrado",
+    category_name: "Paletizado Integrado / Soluciones Compactas",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -150,10 +218,15 @@ const MOCK_CATEGORIES = [
   { slug: "fin-de-linea", name: "Máquinas Fin de Línea" },
   { slug: "salas-limpias", name: "Salas Limpias y HEPA" },
   { slug: "cuchillos-aire", name: "Cuchillos de Aire" },
+  { slug: "paletizado-convencional", name: "Paletizado Convencional / Final de Línea" },
+  { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
+  { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
+  { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
+  { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
 ];
 
@@ -162,7 +235,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -301,22 +374,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     const desc = String(prod.description || "");
     const m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i);
     if (m) sku = m[1];
-    let image = prod.image_url || "";
+    let image = prod.image_url || prod.featured_image || prod.image || "";
     if (/wp-content\/uploads/i.test(image)) {
       const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
       if (file) image = "img/products/" + file[1];
     }
-    if (!image && window.Lpaez?.resolveProductImage) {
+    if (
+      (!image || /p-6ffb39180d4af541|p-f65d2c9f90c7de1a|p-822eb15cf1463d95|p-f2f7618440e07dfc/i.test(image)) &&
+      window.Lpaez?.resolveProductImage
+    ) {
       try {
-        image = Lpaez.resolveProductImage(prod);
+        image = Lpaez.resolveProductImage(prod) || image;
       } catch (_) {
-        image = "img/products/A07-10015.jpg";
+        /* keep API image */
       }
     }
     if (!image) image = "img/products/A07-10015.jpg";
-    const webp = /\.(jpe?g|png)$/i.test(image)
+    const knownWebp =
+      /\.(jpe?g|png)$/i.test(image) &&
+      !/\/img\/uploads\//i.test(image) &&
+      !/\/img\/productos\//i.test(image);
+    const webp = knownWebp && !/columbia/i.test(image)
       ? image.replace(/\.(jpe?g|png)$/i, ".webp")
-      : prod.image_webp || "";
+      : "";
     return {
       id: prod.id,
       slug,
@@ -385,12 +465,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const quote =
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
-    const picture = webp
-      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480"></picture>`
-      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
+    const imgTag = webp
+      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'"></picture>`
+      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'">`;
     return (
       `<article class="product-card catalog-card reveal">` +
-      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${picture}</a>` +
+      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${imgTag}</a>` +
       `<div class="product-card-body">` +
       `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>` +
       `<span class="badge-mode ${sale === "buy" ? "badge-buy" : "badge-quote"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span></div>` +
@@ -590,11 +670,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const slug = btn.getAttribute("data-datasheet") || "";
       const name = btn.getAttribute("data-datasheet-name") || "Producto";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      const datasheetHref =
+        (window.Lpaez && window.Lpaez.resolveDatasheetUrl && window.Lpaez.resolveDatasheetUrl({ slug: slug, description: prod && prod.description })) ||
+        "img/fichas/" + encodeURIComponent(slug) + ".pdf";
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
         `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
-        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
+        `<div class="empty-actions"><a class="btn btn-primary" href="${escapeAttr(datasheetHref)}" target="_blank" rel="noopener">Descargar PDF</a>` +
         `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
       if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
       else datasheetDialog.setAttribute("open", "");
