@@ -77,7 +77,7 @@ final class PublicApi
             return;
         }
 
-        Response::error('Ruta no encontrada', 404, ['path' => $path]);
+        Response::error('Ruta no encontrada', 404, ['route' => $path]);
     }
 
     private static function pdo(): PDO

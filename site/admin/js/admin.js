@@ -60,7 +60,7 @@
    * @property {string} [slug]
    * @property {Brand} [brand]
    * @property {string} [url]
-   * @property {{id?: number, slug?: string, brand?: Brand, brands?: Brand[], url?: string}} [data]
+   * @property {{id?: number, slug?: string, brand?: Brand, brands?: Brand[], url?: string, route?: string, debug?: string}} [data]
    * @property {string} [error]
    */
 

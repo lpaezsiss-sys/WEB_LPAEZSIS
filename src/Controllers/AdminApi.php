@@ -180,7 +180,7 @@ final class AdminApi
             return;
         }
 
-        Response::error('Ruta admin no encontrada', 404, ['path' => $sub]);
+        Response::error('Ruta admin no encontrada', 404, ['route' => '/api/admin' . $sub]);
     }
 
     private static function pdo(): PDO
@@ -242,12 +242,12 @@ final class AdminApi
             $file = $_FILES['file'];
         }
         if (!$file) {
-            Response::error('Archivo requerido');
+            Response::error('Archivo requerido', 400, ['route' => '/api/admin/upload']);
             return;
         }
         $result = Upload::store($file, 'auto');
         if (!$result['ok']) {
-            Response::error((string) $result['error']);
+            Response::error((string) $result['error'], 400, ['route' => '/api/admin/upload']);
             return;
         }
         Response::ok([
@@ -491,9 +491,12 @@ final class AdminApi
         Response::json(BrandSeo::envelope(['id' => $id]));
     }
 
-    private static function brandFail(string $message, int $status = 400): void
+    private static function brandFail(string $message, int $status = 400, array $data = []): void
     {
-        Response::json(BrandSeo::failResult($message), $status);
+        if (!isset($data['route'])) {
+            $data['route'] = '/api/admin/brands';
+        }
+        Response::json(BrandSeo::failResult($message, $data), $status);
     }
 
     private static function createProduct(): void

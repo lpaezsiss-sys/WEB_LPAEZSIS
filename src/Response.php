@@ -38,6 +38,18 @@ final class Response
             'error' => $message,
         ];
         if ($extra !== []) {
+            if (isset($extra['path']) && !array_key_exists('route', $extra)) {
+                $extra['route'] = $extra['path'];
+                unset($extra['path']);
+            }
+            if (!array_key_exists('debug', $extra) && (isset($extra['detail']) || isset($extra['file']))) {
+                $detail = (string) ($extra['detail'] ?? '');
+                $file = (string) ($extra['file'] ?? '');
+                $line = $extra['line'] ?? '';
+                unset($extra['detail'], $extra['file'], $extra['line']);
+                $loc = $file !== '' ? $file . ($line !== '' && $line !== null ? ':' . $line : '') : '';
+                $extra['debug'] = trim($detail . ($loc !== '' ? ' @ ' . $loc : ''));
+            }
             $payload['data'] = $extra;
         }
         self::json($payload, $status);

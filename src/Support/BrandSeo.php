@@ -51,7 +51,10 @@ use PDO;
  *   slug?: string,
  *   brand?: Brand,
  *   url?: string,
- *   data?: array{id?: int, slug?: string, brand?: Brand, brands?: list<Brand>, url?: string},
+ *   data?: array{
+ *     id?: int, slug?: string, brand?: Brand, brands?: list<Brand>, url?: string,
+ *     route?: string, debug?: string
+ *   },
  *   error?: string
  * }
  */
@@ -294,15 +297,26 @@ final class BrandSeo
     }
 
     /**
-     * @return array{success: false, ok: false, error: string}
+     * Error cerrado: raíz solo success/ok/error. `data.route` y `data.debug` son opcionales.
+     *
+     * @param array<string, mixed> $data
+     * @return array{success: false, ok: false, error: string, data?: array<string, mixed>}
      */
-    public static function failResult(string $message): array
+    public static function failResult(string $message, array $data = []): array
     {
-        return [
+        $payload = [
             'success' => false,
             'ok' => false,
             'error' => $message,
         ];
+        if (isset($data['path']) && !array_key_exists('route', $data)) {
+            $data['route'] = $data['path'];
+            unset($data['path']);
+        }
+        if ($data !== []) {
+            $payload['data'] = $data;
+        }
+        return $payload;
     }
 
     public static function ensureColumns(PDO $pdo): void
