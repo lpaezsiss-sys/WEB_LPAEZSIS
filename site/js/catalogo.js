@@ -209,6 +209,23 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 21,
+    slug: "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc",
+    name: "Fabricación e Integración de Cintas y Sistemas Transportadores LYC",
+    sku: "LYC-TX",
+    description: "Sistemas de transporte industrial a la medida (unilineales, acumulación, elevadores, banda modular, cadenas y pallets) diseñados para áreas estándar o asépticas.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/lyc-transportadores.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "lyc",
+    brand_name: "LYC",
+    quote_url: "cotizacion.html?sku=fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +239,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "lyc", name: "LYC" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -235,7 +254,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -465,9 +484,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const quote =
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
+    const imgFallback =
+      prod?.brand_slug === "lyc" || /lyc/i.test(slug)
+        ? "/img/productos/lyc-transportadores.jpg"
+        : "img/products/A07-10015.jpg";
     const imgTag = webp
-      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'"></picture>`
-      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'">`;
+      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'"></picture>`
+      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'">`;
     return (
       `<article class="product-card catalog-card reveal">` +
       `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${imgTag}</a>` +

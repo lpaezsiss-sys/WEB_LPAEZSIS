@@ -262,10 +262,8 @@
     var visual = img
       ? imgTagHtml(
           img,
-          p.name,
-          'title="' +
-            escapeAttr(p.name) +
-            '" loading="lazy" decoding="async" width="480" height="480"',
+          p.name || p.nombre || "",
+          'loading="lazy" decoding="async" width="480" height="480"',
           productImageCandidates(p)
         )
       : "LPAEZ";
@@ -355,6 +353,7 @@
     "paletizador-alto-nivel-columbia-hl7200": "img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/productos/lyc-transportadores.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -378,6 +377,7 @@
     "paletizado-alta-velocidad": "img/productos/hl7200.jpg",
     "paletizado-robotico": "img/productos/ai1800.jpg",
     "paletizado-integrado": "img/productos/fl1000sw.jpg",
+    "transportadores-manejo-materiales": "img/productos/lyc-transportadores.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 
@@ -386,6 +386,7 @@
     "paletizador-alto-nivel-columbia-hl7200": "img/fichas/ficha_tecnica_hl7200_columbia.pdf",
     "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/fichas/PRESENTACION_L&C_Ltda_Tx.pdf",
   };
 
   function parseProductFicha(raw) {
@@ -480,30 +481,27 @@
 
   function imgTagHtml(src, alt, extra, fallbacks) {
     extra = extra || "";
-    var chain = [];
-    function add(url) {
+    src = publicImageUrl(src);
+    var fb = "";
+    (fallbacks || []).forEach(function (url) {
       url = publicImageUrl(url);
-      if (url && chain.indexOf(url) === -1) chain.push(url);
-    }
-    add(src);
-    (fallbacks || []).forEach(add);
-    add(PRODUCT_FALLBACKS[0]);
-    var first = chain[0] || PRODUCT_FALLBACKS[0];
-    var rest = chain.slice(1);
-    var onerror = rest.length
-      ? ' data-fallbacks="' +
-        escapeAttr(JSON.stringify(rest)) +
-        '" onerror="(function(el){var n=+el.dataset.fi||0;var list=[];try{list=JSON.parse(el.getAttribute(\'data-fallbacks\')||\'[]\');}catch(e){}if(n<list.length){el.dataset.fi=String(n+1);el.src=list[n];}else{el.onerror=null;}})(this)"'
-      : "";
+      if (!fb && url && url !== src) fb = url;
+    });
+    if (!fb) fb = PRODUCT_FALLBACKS[0];
+    if (!src) src = fb;
+    var onerror =
+      ' onerror="this.onerror=null;this.src=\'' +
+      escapeAttr(fb).replace(/'/g, "\\'") +
+      '\';"';
     return (
       '<img src="' +
-      escapeAttr(first) +
+      escapeAttr(src) +
       '" alt="' +
       escapeAttr(alt || "") +
       '" ' +
       extra +
       onerror +
-      " >"
+      ">"
     );
   }
 

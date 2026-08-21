@@ -330,6 +330,7 @@
     "paletizador-alto-nivel-columbia-hl7200": "/img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "/img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/productos/fl1000sw.jpg",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "/img/productos/lyc-transportadores.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
