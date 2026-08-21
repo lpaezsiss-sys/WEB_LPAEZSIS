@@ -1,6 +1,6 @@
 /**
- * propuesta-search.js — borrador aislado (index-propuesta-search.html)
- * Inserta buscador predictivo en el header sin tocar layout.js de producción.
+ * propuesta-search.js — buscador predictivo del header (Home y resto del sitio).
+ * Compatible con markup en layout.js o plantilla #headerSearchTemplate (borrador).
  */
 (function () {
   "use strict";
@@ -30,17 +30,38 @@
       .replace(/[\u0300-\u036f]/g, "");
   }
 
+  function searchMarkupHtml() {
+    return (
+      '<div class="header-search-container">' +
+      '<form id="globalSearchForm" class="search-form" onsubmit="return false;">' +
+      '<input type="text" id="globalSearchInput" placeholder="Buscar equipo, repuesto o marca..." autocomplete="off" aria-label="Buscar productos o repuestos" aria-autocomplete="list" aria-controls="searchResultsDropdown" aria-expanded="false">' +
+      '<button type="button" class="search-btn" aria-label="Buscar">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<circle cx="11" cy="11" r="8"></circle>' +
+      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+      "</svg></button></form>" +
+      '<div id="searchResultsDropdown" class="search-results-dropdown" style="display: none;" role="listbox" aria-label="Resultados de búsqueda"></div>' +
+      "</div>"
+    );
+  }
+
   function injectSearchIntoHeader() {
-    var tpl = document.getElementById("headerSearchTemplate");
-    var nav = document.getElementById("mainNav");
-    var cta = nav && nav.querySelector(".nav-cta");
-    if (!tpl || !nav || !cta) return null;
     if (document.getElementById("globalSearchInput")) {
       return document.querySelector(".header-search-container");
     }
 
-    var node = tpl.content.cloneNode(true);
-    nav.insertBefore(node, cta);
+    var nav = document.getElementById("mainNav");
+    var cta = nav && nav.querySelector(".nav-cta");
+    if (!nav || !cta) return null;
+
+    var tpl = document.getElementById("headerSearchTemplate");
+    if (tpl && tpl.content) {
+      nav.insertBefore(tpl.content.cloneNode(true), cta);
+    } else {
+      var wrap = document.createElement("div");
+      wrap.innerHTML = searchMarkupHtml();
+      nav.insertBefore(wrap.firstChild, cta);
+    }
     return document.querySelector(".header-search-container");
   }
 

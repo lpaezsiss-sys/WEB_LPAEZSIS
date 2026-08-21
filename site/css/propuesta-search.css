@@ -186,13 +186,10 @@
 }
 
 /* Ajuste del nav para acomodar el buscador */
+.site-header .nav,
 .prop-search-draft .nav {
   align-items: center;
   flex-wrap: wrap;
-}
-
-.prop-search-draft .site-header {
-  /* banner de borrador encima */
 }
 
 @media (max-width: 980px) {
@@ -205,12 +202,5 @@
 
   .search-results-dropdown {
     min-width: 100%;
-  }
-}
-
-@media (max-width: 720px) {
-  .prop-search-draft .nav.is-open .header-search-container,
-  .prop-search-draft #mainNav .header-search-container {
-    display: block;
   }
 }
