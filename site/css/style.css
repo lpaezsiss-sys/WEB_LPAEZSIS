@@ -3393,3 +3393,79 @@ body.nav-open {
   margin: 0;
   color: #334155;
 }
+
+/* Línea Blueline® Movex (equivalente visual a grid Tailwind: object-cover / rounded-xl / shadow-md) */
+.blueline-kicker {
+  margin: 0 0 0.35rem;
+  color: #0a5ea8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blueline-hero {
+  margin: 1rem 0 1.35rem;
+}
+
+.brand-catalog-body .blueline-hero__img,
+.blueline-hero__img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: min(420px, 58vw);
+  object-fit: cover;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(10, 46, 92, 0.18);
+  border: 0;
+  margin: 0;
+}
+
+.blueline-hero figcaption {
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.blueline-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.blueline-card,
+.blueline-innov__card {
+  background: #f3f8fc;
+  border: 1px solid #d4e4f2;
+  border-radius: 0.75rem;
+  padding: 1.05rem 1.15rem;
+  box-shadow: 0 4px 14px rgba(10, 46, 92, 0.06);
+}
+
+.blueline-card h4,
+.blueline-innov__card h4 {
+  margin: 0 0 0.45rem;
+  color: #0a2f5c;
+  font-size: 1.02rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.blueline-card p,
+.blueline-innov__card p {
+  margin: 0;
+}
+
+.blueline-innov {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+@media (max-width: 800px) {
+  .blueline-grid,
+  .blueline-innov {
+    grid-template-columns: 1fr;
+  }
+}

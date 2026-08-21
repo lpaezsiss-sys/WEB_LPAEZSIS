@@ -17,6 +17,8 @@ Thumbs.db
 !data/columbia_machine_catalog.json
 !data/lyc_transportadores_catalog.json
 !data/cmc_klebetechnik_catalog.json
+!data/2026-08-21_movex_blueline.sql
+!data/movex_blueline_catalog.json
 !data/lpaezsis.sqlite
 
 # Local / secrets

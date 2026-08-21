@@ -1,0 +1,114 @@
+{
+  "brand": {
+    "name": "MOVEX",
+    "slug": "movex",
+    "origin_country": "Italia",
+    "subtitle": "Blueline® · Bandas modulares higiénicas",
+    "short_description": "Línea Blueline® de bandas modulares plásticas para higiene alimentaria, con bisagras autolimpiantes, material BluLub® de baja fricción y transferencia activa Zero ATP® Pro.",
+    "long_description": "<section class=\"brand-section blueline-line\">\n<p class=\"blueline-kicker\">Movex · Fabricado en Italia</p>\n<h3>Línea Blueline® de Movex</h3>\n<p>Después de consolidarse en beverage, Movex desarrolló <strong>Blueline®</strong>: bandas modulares plásticas y sprockets para sectores con alto estándar higiénico. El concepto combina <strong>higiene alimentaria</strong>, <strong>durabilidad</strong> y un <strong>sistema de bisagras autolimpiantes</strong> que limpia el espacio entre módulos en cada rotación, con intercambiabilidad frente a los principales fabricantes de bandas food.</p>\n<figure class=\"blueline-hero\">\n<img class=\"blueline-hero__img\" src=\"/img/productos/movex-blueline.jpg\" data-fallback=\"https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80\" alt=\"Banda modular plástica azul Blueline operando en una línea industrial de procesamiento y empaque\" width=\"1600\" height=\"900\" loading=\"lazy\" decoding=\"async\">\n<figcaption>Aplicación tipo Blueline® en línea de proceso/empaque. Si la imagen local no carga, se usa Unsplash (industrial conveyor / food processing).</figcaption>\n</figure>\n<div class=\"blueline-grid\">\n<article class=\"blueline-card\">\n<h4>Procesamiento de alimentos</h4>\n<p>Carnes, aves y pescado: superficies abiertas, drenaje y ciclos de lavado más cortos gracias a la bisagra autolimpiante y materiales de contacto alimentario.</p>\n</article>\n<article class=\"blueline-card\">\n<h4>Panadería, repostería y frutas/verduras</h4>\n<p>Masas, horneados, blanqueado y líneas de lavado: perfiles non-stick, nub top y accesorios (flights, guiados) según el producto húmedo o pegajoso.</p>\n</article>\n<article class=\"blueline-card\">\n<h4>Empaque, logística y automotriz</h4>\n<p>Manejo de materiales, packaging y automoción: la misma plataforma modular con sprockets, curvas y transferencias compactas para integrar en líneas existentes.</p>\n</article>\n</div>\n<div class=\"blueline-innov\">\n<article class=\"blueline-innov__card\">\n<h4>Material BluLub®</h4>\n<p>UHMW-PE de alto desempeño con lubricante sólido integrado. Baja fricción y ruido, menor consumo energético y vida útil extendida bajo carga y alta velocidad, en guías y componentes de transporte.</p>\n</article>\n<article class=\"blueline-innov__card\">\n<h4>Zero ATP® Pro</h4>\n<p>Placa de transferencia activa más compacta del mercado (micropitch 7870 / 510). Libre de mantenimiento y tensado, con mini-motor o eje chavetero. Sustituye transferencias tradicionales con mínimo trabajo estructural.</p>\n</article>\n</div>\n</section>\n<section class=\"brand-section\">\n<h3>Otras soluciones Movex</h3>\n<p><strong>ZERO Contacto</strong> — transportador curvo de banda modular con eslabones cortos, transferencias reducidas y radio interior compacto para packs y envases termorretráctiles.</p>\n<p><strong>553 Flex Top</strong> — banda recta con esferas autobloqueantes para rotar, desviar o acelerar paquetes ligeros (cartón, latas, botellas y bolsas) con precisión.</p>\n</section>",
+    "description": "Línea Blueline® de bandas modulares plásticas para higiene alimentaria, con bisagras autolimpiantes, material BluLub® de baja fricción y transferencia activa Zero ATP® Pro.",
+    "content_html": "<section class=\"brand-section blueline-line\">\n<p class=\"blueline-kicker\">Movex · Fabricado en Italia</p>\n<h3>Línea Blueline® de Movex</h3>\n<p>Después de consolidarse en beverage, Movex desarrolló <strong>Blueline®</strong>: bandas modulares plásticas y sprockets para sectores con alto estándar higiénico. El concepto combina <strong>higiene alimentaria</strong>, <strong>durabilidad</strong> y un <strong>sistema de bisagras autolimpiantes</strong> que limpia el espacio entre módulos en cada rotación, con intercambiabilidad frente a los principales fabricantes de bandas food.</p>\n<figure class=\"blueline-hero\">\n<img class=\"blueline-hero__img\" src=\"/img/productos/movex-blueline.jpg\" data-fallback=\"https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=80\" alt=\"Banda modular plástica azul Blueline operando en una línea industrial de procesamiento y empaque\" width=\"1600\" height=\"900\" loading=\"lazy\" decoding=\"async\">\n<figcaption>Aplicación tipo Blueline® en línea de proceso/empaque. Si la imagen local no carga, se usa Unsplash (industrial conveyor / food processing).</figcaption>\n</figure>\n<div class=\"blueline-grid\">\n<article class=\"blueline-card\">\n<h4>Procesamiento de alimentos</h4>\n<p>Carnes, aves y pescado: superficies abiertas, drenaje y ciclos de lavado más cortos gracias a la bisagra autolimpiante y materiales de contacto alimentario.</p>\n</article>\n<article class=\"blueline-card\">\n<h4>Panadería, repostería y frutas/verduras</h4>\n<p>Masas, horneados, blanqueado y líneas de lavado: perfiles non-stick, nub top y accesorios (flights, guiados) según el producto húmedo o pegajoso.</p>\n</article>\n<article class=\"blueline-card\">\n<h4>Empaque, logística y automotriz</h4>\n<p>Manejo de materiales, packaging y automoción: la misma plataforma modular con sprockets, curvas y transferencias compactas para integrar en líneas existentes.</p>\n</article>\n</div>\n<div class=\"blueline-innov\">\n<article class=\"blueline-innov__card\">\n<h4>Material BluLub®</h4>\n<p>UHMW-PE de alto desempeño con lubricante sólido integrado. Baja fricción y ruido, menor consumo energético y vida útil extendida bajo carga y alta velocidad, en guías y componentes de transporte.</p>\n</article>\n<article class=\"blueline-innov__card\">\n<h4>Zero ATP® Pro</h4>\n<p>Placa de transferencia activa más compacta del mercado (micropitch 7870 / 510). Libre de mantenimiento y tensado, con mini-motor o eje chavetero. Sustituye transferencias tradicionales con mínimo trabajo estructural.</p>\n</article>\n</div>\n</section>\n<section class=\"brand-section\">\n<h3>Otras soluciones Movex</h3>\n<p><strong>ZERO Contacto</strong> — transportador curvo de banda modular con eslabones cortos, transferencias reducidas y radio interior compacto para packs y envases termorretráctiles.</p>\n<p><strong>553 Flex Top</strong> — banda recta con esferas autobloqueantes para rotar, desviar o acelerar paquetes ligeros (cartón, latas, botellas y bolsas) con precisión.</p>\n</section>",
+    "seo_title": "MOVEX Blueline® Chile | Bandas Modulares Higiénicas - LPAEZSIS",
+    "seo_description": "Distribución Movex Blueline® en Chile: bandas modulares para carne, panadería y empaque, BluLub® y Zero ATP® Pro. Cotiza con LPAEZSIS.",
+    "seo_keywords": "Movex, Blueline, bandas modulares, higiene alimentaria, BluLub, Zero ATP Pro, bisagras autolimpiantes, LPAEZSIS",
+    "canonical_url": "/marcas.html?slug=movex",
+    "logo_url": "/img/brand/movex.png",
+    "datasheet_url": null,
+    "website_url": "https://www.movexii.com/",
+    "sort_order": 30,
+    "is_active": true,
+    "schema_json_ld": {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Brand",
+          "@id": "https://prueba1.lpaezsis.cl/marcas.html?slug=movex#brand",
+          "name": "MOVEX",
+          "alternateName": "Blueline® · Bandas modulares higiénicas",
+          "slogan": "Blueline® · Bandas modulares higiénicas",
+          "url": "https://prueba1.lpaezsis.cl/marcas.html?slug=movex",
+          "description": "Distribución Movex Blueline® en Chile: bandas modulares para carne, panadería y empaque, BluLub® y Zero ATP® Pro. Cotiza con LPAEZSIS.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://prueba1.lpaezsis.cl/img/brand/movex.png"
+          },
+          "sameAs": [
+            "https://www.movexii.com/"
+          ],
+          "additionalProperty": {
+            "@type": "PropertyValue",
+            "name": "País de origen",
+            "value": "Italia"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://prueba1.lpaezsis.cl/#organization",
+          "name": "LPAEZ SOLUCIONES INDUSTRIALES SPA",
+          "alternateName": "LPAEZSIS",
+          "url": "https://prueba1.lpaezsis.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://prueba1.lpaezsis.cl/img/brand/logo.png"
+          },
+          "brand": {
+            "@id": "https://prueba1.lpaezsis.cl/marcas.html?slug=movex#brand"
+          }
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "name": "Bandas Modulares / Higiene Alimentaria",
+      "slug": "bandas-modulares-higiene",
+      "description": "Bandas modulares plásticas Blueline® para proceso de alimentos, panadería, empaque y transferencias higiénicas.",
+      "seo_title": "Bandas modulares Blueline Movex | LPAEZsis",
+      "seo_description": "Bandas modulares higiénicas Movex Blueline® con bisagra autolimpiante, BluLub® y Zero ATP® Pro.",
+      "sort_order": 58
+    }
+  ],
+  "products": [
+    {
+      "name": "Línea Blueline® Movex — Bandas Modulares Higiénicas",
+      "slug": "linea-blueline-movex-bandas-modulares",
+      "brand_slug": "movex",
+      "category_slug": "bandas-modulares-higiene",
+      "sku": "MOVEX-BLUELINE",
+      "summary": "Bandas modulares plásticas Blueline® para higiene alimentaria, con bisagras autolimpiantes, material BluLub® y transferencia Zero ATP® Pro.",
+      "detail": "Plataforma Blueline® de Movex (Italia) para proceso de alimentos, panadería, frutas/verduras, empaque, logística y automotriz. Bisagra autolimpiante, intercambiabilidad con principales productores food y accesorios (flights, guiados, sprockets).",
+      "especificaciones_json": {
+        "higiene": "Bisagra autolimpiante (self-cleaning hinge)",
+        "material_blulub": "UHMW-PE BluLub® con lubricante sólido integrado",
+        "transferencia": "Zero ATP® Pro micropitch 7870 / 510, sin tensado",
+        "sectores": "Carne, aves, pescado, panadería, frutas/verduras, empaque, logística, automotriz",
+        "origen": "Italia"
+      },
+      "specs": [
+        [
+          "Higiene",
+          "Bisagra autolimpiante (self-cleaning hinge)"
+        ],
+        [
+          "Material BluLub®",
+          "UHMW-PE con lubricante sólido integrado"
+        ],
+        [
+          "Transferencia",
+          "Zero ATP® Pro micropitch 7870 / 510, sin tensado"
+        ],
+        [
+          "Sectores",
+          "Carne, aves, pescado, panadería, frutas/verduras, empaque, logística, automotriz"
+        ],
+        [
+          "Origen",
+          "Italia"
+        ]
+      ],
+      "datasheet": "/img/productos/movex-blueline.jpg",
+      "image_url": "/img/productos/movex-blueline.jpg",
+      "sort_order": 14
+    }
+  ]
+}

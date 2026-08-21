@@ -243,6 +243,23 @@ const MOCK_PRODUCTS = [
     brand_name: "CMC Klebetechnik GmbH",
     quote_url: "cotizacion.html?sku=cinta-doble-contacto-cmc-10730",
   },
+  {
+    id: 23,
+    slug: "linea-blueline-movex-bandas-modulares",
+    name: "Línea Blueline® Movex — Bandas Modulares Higiénicas",
+    sku: "MOVEX-BLUELINE",
+    description: "Bandas modulares plásticas Blueline® para higiene alimentaria, con bisagras autolimpiantes, material BluLub® y transferencia Zero ATP® Pro.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/movex-blueline.jpg",
+    image_webp: "",
+    category_slug: "bandas-modulares-higiene",
+    category_name: "Bandas Modulares / Higiene Alimentaria",
+    brand_slug: "movex",
+    brand_name: "MOVEX",
+    quote_url: "cotizacion.html?sku=linea-blueline-movex-bandas-modulares",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -258,6 +275,7 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
   { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
   { slug: "cintas-adhesivas-tecnicas", name: "Cintas Adhesivas Técnicas / Empalme Siliconado" },
+  { slug: "bandas-modulares-higiene", name: "Bandas Modulares / Higiene Alimentaria" },
 ];
 
 const MOCK_BRANDS = [
@@ -266,14 +284,15 @@ const MOCK_BRANDS = [
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
   { slug: "lyc", name: "LYC" },
   { slug: "cmc-klebetechnik", name: "CMC Klebetechnik GmbH" },
+  { slug: "movex", name: "MOVEX" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
 const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
-  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales", "cintas-adhesivas-tecnicas"] },
+  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado", "bandas-modulares-higiene"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales", "cintas-adhesivas-tecnicas", "bandas-modulares-higiene"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -504,7 +523,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
     const imgFallback =
-      prod?.brand_slug === "cmc-klebetechnik" || /cmc-10730/i.test(slug)
+      prod?.brand_slug === "movex" || /blueline/i.test(slug)
+        ? "/img/productos/movex-blueline.jpg"
+        : prod?.brand_slug === "cmc-klebetechnik" || /cmc-10730/i.test(slug)
         ? "/img/productos/cmc-10730.jpg"
         : prod?.brand_slug === "lyc" || /lyc/i.test(slug)
           ? "/img/productos/lyc-transportadores.jpg"

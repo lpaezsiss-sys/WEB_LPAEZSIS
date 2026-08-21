@@ -237,6 +237,7 @@
     lyc: "Logistics & Conveyors",
     "columbia-machine": "Columbia-Okura LLC",
     "cmc-klebetechnik": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
+    movex: "Blueline® · Bandas modulares higiénicas",
   };
 
   function pageOrigin() {
@@ -495,6 +496,7 @@
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
     "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/productos/lyc-transportadores.jpg",
     "cinta-doble-contacto-cmc-10730": "img/productos/cmc-10730.jpg",
+    "linea-blueline-movex-bandas-modulares": "img/productos/movex-blueline.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -520,6 +522,7 @@
     "paletizado-integrado": "img/productos/fl1000sw.jpg",
     "transportadores-manejo-materiales": "img/productos/lyc-transportadores.jpg",
     "cintas-adhesivas-tecnicas": "img/productos/cmc-10730.jpg",
+    "bandas-modulares-higiene": "img/productos/movex-blueline.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 

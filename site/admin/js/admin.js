@@ -533,6 +533,7 @@
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "/img/productos/fl1000sw.jpg",
     "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "/img/productos/lyc-transportadores.jpg",
     "cinta-doble-contacto-cmc-10730": "/img/productos/cmc-10730.jpg",
+    "linea-blueline-movex-bandas-modulares": "/img/productos/movex-blueline.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
