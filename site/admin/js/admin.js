@@ -1590,6 +1590,19 @@
       form.slug.classList.add("is-invalid");
       return;
     }
+    if (kind === "brands") {
+      var slugVal = form.slug.value.trim() || slugifyBrand(name);
+      var currentId = form.id.value;
+      var slugTaken = brandsCache.some(function (b) {
+        return b.slug === slugVal && String(b.id) !== String(currentId || "");
+      });
+      if (slugTaken) {
+        err.hidden = false;
+        err.textContent = "El slug de marca ya existe";
+        form.slug.classList.add("is-invalid");
+        return;
+      }
+    }
     var body = {
       name: name,
       slug: form.slug.value.trim() || undefined,

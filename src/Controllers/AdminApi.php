@@ -447,8 +447,11 @@ final class AdminApi
             return (bool) $st->fetchColumn();
         };
         $slugInput = trim((string) ($b['slug'] ?? ''));
-        $base = $slugInput !== '' ? $slugInput : Slug::makeBrand($name);
-        $slug = Slug::unique($base, $slugExists);
+        $slug = $slugInput !== '' ? Slug::make($slugInput) : Slug::makeBrand($name);
+        if ($slugExists($slug)) {
+            self::brandFail('El slug de marca ya existe', 409);
+            return null;
+        }
 
         $seoTitle = trim((string) ($b['seo_title'] ?? ''));
         if ($seoTitle === '') {
@@ -529,9 +532,11 @@ final class AdminApi
 
     private static function brandException(\Throwable $e, string $userMessage): void
     {
-        $status = ($e instanceof \PDOException && (string) $e->getCode() === '23000') ? 409 : 500;
-        $error = $status === 409 ? 'El slug de marca ya existe' : $userMessage;
-        self::brandFail($error, $status, [
+        if ($e instanceof \PDOException && (string) $e->getCode() === '23000') {
+            self::brandFail('El slug de marca ya existe', 409);
+            return;
+        }
+        self::brandFail($userMessage, 500, [
             'debug' => BrandSeo::exceptionDebug($e),
         ]);
     }
