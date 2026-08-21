@@ -431,7 +431,7 @@ final class AdminApi
     {
         $name = trim((string) ($b['name'] ?? ''));
         if ($name === '') {
-            self::brandFail('Nombre requerido');
+            self::brandFail('El nombre de la marca es requerido');
             return null;
         }
         $excludeId = (int) ($b['id'] ?? 0);

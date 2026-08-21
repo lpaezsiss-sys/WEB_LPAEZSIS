@@ -1579,7 +1579,7 @@
     var name = form.name.value.trim();
     if (!name) {
       err.hidden = false;
-      err.textContent = "El nombre es obligatorio.";
+      err.textContent = "El nombre de la marca es requerido";
       form.name.classList.add("is-invalid");
       return;
     }
