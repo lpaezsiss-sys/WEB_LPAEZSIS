@@ -7,7 +7,17 @@ SET
   `description` = 'Línea Blueline® de bandas modulares plásticas para higiene alimentaria, con bisagras autolimpiantes, material BluLub® de baja fricción y transferencia activa Zero ATP® Pro.',
   `logo_url` = '/img/brand/movex.png',
   `website_url` = 'https://www.movexii.com/',
-  `content_html` = '<section class="brand-section blueline-line">
+  `content_html` = '<style>
+.blueline-kicker{margin:0 0 .35rem;color:#0a5ea8;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.blueline-hero{margin:1rem 0 1.35rem}
+.blueline-hero__img{display:block;width:100%;max-width:100%;height:min(420px,58vw);object-fit:cover;border-radius:.75rem;box-shadow:0 8px 24px rgba(10,46,92,.18);border:0;margin:0}
+.blueline-hero figcaption{margin-top:.45rem;font-size:.82rem;color:#5f5f5f}
+.blueline-grid,.blueline-innov{display:flex;flex-wrap:wrap;gap:1rem}
+.blueline-card,.blueline-innov__card{flex:1 1 240px;background:#f3f8fc;border:1px solid #d4e4f2;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(10,46,92,.06)}
+.blueline-card h4,.blueline-innov__card h4{margin:0 0 .45rem;color:#0a2f5c;font-size:1.02rem;font-weight:800}
+.blueline-card p,.blueline-innov__card p{margin:0}
+</style>
+<section class="brand-section blueline-line">
 <p class="blueline-kicker">Movex · Fabricado en Italia</p>
 <h3>Línea Blueline® de Movex</h3>
 <p>Después de consolidarse en beverage, Movex desarrolló <strong>Blueline®</strong>: bandas modulares plásticas y sprockets para sectores con alto estándar higiénico. El concepto combina <strong>higiene alimentaria</strong>, <strong>durabilidad</strong> y un <strong>sistema de bisagras autolimpiantes</strong> que limpia el espacio entre módulos en cada rotación, con intercambiabilidad frente a los principales fabricantes de bandas food.</p>
@@ -50,7 +60,17 @@ SET
   `subtitle` = 'Blueline® · Bandas modulares higiénicas',
   `origin_country` = 'Italia',
   `short_description` = 'Línea Blueline® de bandas modulares plásticas para higiene alimentaria, con bisagras autolimpiantes, material BluLub® de baja fricción y transferencia activa Zero ATP® Pro.',
-  `long_description` = '<section class="brand-section blueline-line">
+  `long_description` = '<style>
+.blueline-kicker{margin:0 0 .35rem;color:#0a5ea8;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.blueline-hero{margin:1rem 0 1.35rem}
+.blueline-hero__img{display:block;width:100%;max-width:100%;height:min(420px,58vw);object-fit:cover;border-radius:.75rem;box-shadow:0 8px 24px rgba(10,46,92,.18);border:0;margin:0}
+.blueline-hero figcaption{margin-top:.45rem;font-size:.82rem;color:#5f5f5f}
+.blueline-grid,.blueline-innov{display:flex;flex-wrap:wrap;gap:1rem}
+.blueline-card,.blueline-innov__card{flex:1 1 240px;background:#f3f8fc;border:1px solid #d4e4f2;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(10,46,92,.06)}
+.blueline-card h4,.blueline-innov__card h4{margin:0 0 .45rem;color:#0a2f5c;font-size:1.02rem;font-weight:800}
+.blueline-card p,.blueline-innov__card p{margin:0}
+</style>
+<section class="brand-section blueline-line">
 <p class="blueline-kicker">Movex · Fabricado en Italia</p>
 <h3>Línea Blueline® de Movex</h3>
 <p>Después de consolidarse en beverage, Movex desarrolló <strong>Blueline®</strong>: bandas modulares plásticas y sprockets para sectores con alto estándar higiénico. El concepto combina <strong>higiene alimentaria</strong>, <strong>durabilidad</strong> y un <strong>sistema de bisagras autolimpiantes</strong> que limpia el espacio entre módulos en cada rotación, con intercambiabilidad frente a los principales fabricantes de bandas food.</p>
@@ -162,7 +182,7 @@ Ficha técnica: /img/productos/movex-blueline.jpg',
 FROM `categories` c
 JOIN `brands` b ON b.slug = 'movex'
 WHERE c.slug = 'bandas-modulares-higiene'
-  AND NOT EXISTS (SELECT 1 FROM `products` pr WHERE pr.slug = 'linea-blueline-movex-bandas-modulares');
+  AND NOT EXISTS (SELECT 1 FROM `products` p2 WHERE p2.slug = 'linea-blueline-movex-bandas-modulares');
 
 UPDATE `products`
 SET
