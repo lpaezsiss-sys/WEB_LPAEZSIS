@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LPAEZsis | Secadores, turbinas y fin de línea industrial</title>
-  <meta name="description" content="Distribuidores oficiales Sonic Air Systems en Chile. Secadores de botellas, turbinas de soplado, cuchillos de aire, repuestos y máquinas de fin de línea.">
+  <meta name="description" content="Soluciones industriales para optimizar tu línea de producción en Chile. Secado, soplado, limpieza, packaging y fin de línea con soporte técnico local.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" id="canonicalLink" href="https://prueba1.lpaezsis.cl/">
   <meta property="og:type" content="website">
@@ -23,7 +23,9 @@
   <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=122">
+  <link rel="stylesheet" href="css/propuesta-home.css?v=3">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=4">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -90,13 +92,14 @@
   }
   </script>
 </head>
-<body>
+<body class="prop-home">
   <a class="skip-link" href="#main">Saltar al contenido</a>
   <div id="site-header-mount"></div>
   <main id="main">
-    <section class="hero" aria-label="Inicio">
+    <!-- Hero: posicionamiento LPAEZsis (Propuesta A) -->
+    <section class="hero hero-banner prop-hero" aria-label="Inicio">
       <div class="hero-media" aria-hidden="true">
-        <picture class="hero-media__slide">
+        <picture class="hero-media__slide is-active">
           <source type="image/webp" srcset="img/hero/line.webp">
           <img
             src="img/hero/line.jpg"
@@ -114,68 +117,72 @@
             src="img/hero/3piece_cans.jpg"
             alt=""
             title="Envases industriales"
-            width="467"
-            height="350"
+            width="1920"
+            height="1440"
             loading="lazy"
             decoding="async">
         </picture>
       </div>
       <div class="hero-scrim" aria-hidden="true"></div>
       <div class="hero-inner">
-        <p class="hero-brand">
-          <span class="hero-brand__name">LPAEZ</span>
-          <span class="hero-brand__tag">Soluciones Industriales</span>
-        </p>
-        <h1 class="hero-title">
-          <span class="hero-title__line">Ingeniería industrial para</span>
-          <span class="hero-title__line hero-title__line--accent">packaging y fin de línea</span>
-        </h1>
-        <p class="hero-lead">Cotiza equipos Sonic y compra repuestos con soporte local en Chile.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary btn-lg btn-cta-primary" href="cotizacion.html">Pedir cotización</a>
-          <a class="btn btn-ghost btn-lg btn-cta-secondary" href="#soluciones">Soluciones</a>
+        <p class="prop-hero__brand">LPAEZsis</p>
+        <h1 class="prop-hero__title">Soluciones industriales para optimizar tu línea de producción</h1>
+        <p class="prop-hero__subtitle">Secado · Soplado · Limpieza · Packaging · Fin de línea</p>
+        <p class="prop-hero__lead">Tecnología especializada, ingeniería y soporte técnico local en Chile.</p>
+        <div class="hero-cta-group">
+          <a class="btn btn-primary btn-lg btn-cta-primary" href="contacto.html?motivo=cotizacion">PEDIR COTIZACIÓN</a>
+          <button type="button" class="btn-secondary-outline" id="propAsesoriaBtn" aria-haspopup="dialog" aria-controls="propAsesoriaModal">
+            EVALUAR MI APLICACIÓN
+          </button>
         </div>
-        <div class="trust-inline" aria-label="Distribuidor oficial Sonic Air Systems">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems — distribuidor oficial en Chile"
-              width="120"
-              height="48"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p><strong>Distribuidores oficiales Sonic Air Systems</strong></p>
-        </div>
-      </div>
-      <div class="trust-band trust-band--in-hero">
-        <div class="trust-band-inner">
-          <picture>
-            <source type="image/webp" srcset="img/brand/sonic-air.webp">
-            <img
-              src="img/brand/sonic-air.png"
-              alt="Logo Sonic Air Systems"
-              title="Sonic Air Systems"
-              width="150"
-              height="60"
-              loading="lazy"
-              decoding="async">
-          </picture>
-          <p>Distribuidores oficiales <strong>Sonic Air Systems</strong> en Chile.</p>
-        </div>
+        <p class="prop-hero__micro">Representantes e integradores de tecnologías industriales especializadas</p>
       </div>
     </section>
 
-    <section class="section-band reveal" id="soluciones" aria-labelledby="soluciones-title">
-      <div class="section">
-        <div class="section-head">
-          <h2 id="soluciones-title">Soluciones para <span class="accent">tu planta</span></h2>
-          <p>Consumibles listos para comprar y equipos Sonic para cotizar según tu línea.</p>
+    <!-- Resuelve por Aplicación / Necesidad -->
+    <section class="home-solutions-section reveal" id="soluciones" aria-labelledby="prop-solutions-title">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 id="prop-solutions-title">¿Qué necesidad tiene tu línea de proceso?</h2>
+          <p>Selecciona el desafío de tu planta para ver las tecnologías recomendadas.</p>
         </div>
-        <div class="solutions-tabs" id="solutionsTabs" role="tablist" aria-label="Categorías de solución"></div>
-        <div class="solutions-panels" id="solutionsPanels"></div>
+
+        <div class="solutions-grid">
+          <a href="catalogo.html?aplicacion=secado" class="solution-card">
+            <div class="solution-card__icon" aria-hidden="true">💧</div>
+            <h3>Secado de Envases</h3>
+            <p>Elimina agua residual antes de etiquetado, codificado o embalaje.</p>
+            <span class="solution-link">Ver soluciones →</span>
+          </a>
+
+          <a href="catalogo.html?aplicacion=soplado" class="solution-card">
+            <div class="solution-card__icon" aria-hidden="true">💨</div>
+            <h3>Soplado Industrial</h3>
+            <p>Remoción de polvo, partículas y optimización de consumo de aire.</p>
+            <span class="solution-link">Ver soluciones →</span>
+          </a>
+
+          <a href="catalogo.html?aplicacion=limpieza" class="solution-card">
+            <div class="solution-card__icon" aria-hidden="true">🧼</div>
+            <h3>Limpieza e Higiene</h3>
+            <p>Sistemas para líneas donde la limpieza superficial es crítica.</p>
+            <span class="solution-link">Ver soluciones →</span>
+          </a>
+
+          <a href="catalogo.html?aplicacion=fin-de-linea" class="solution-card">
+            <div class="solution-card__icon" aria-hidden="true">📦</div>
+            <h3>Packaging &amp; Fin de Línea</h3>
+            <p>Automatización y optimización en el manejo de envases.</p>
+            <span class="solution-link">Ver soluciones →</span>
+          </a>
+
+          <a href="catalogo.html?tipo=repuesto" class="solution-card">
+            <div class="solution-card__icon" aria-hidden="true">🔧</div>
+            <h3>Mantención y Repuestos</h3>
+            <p>Consumibles, repuestos en stock y soporte técnico preventivo.</p>
+            <span class="solution-link">Ver repuestos →</span>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -282,26 +289,53 @@
       </div>
     </section>
 
-    <section class="section reveal brands-compact" aria-labelledby="marcas-title">
-      <div class="section-head is-left">
-        <h2 id="marcas-title">Representaciones y Distribución</h2>
-        <p><a href="marcas.html">Ver todas →</a></p>
+    <section class="section reveal pm-brands-section" aria-labelledby="marcas-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="marcas-title">Representaciones y Distribución</h2>
+          <a href="marcas.html">Ver todas →</a>
+        </div>
+        <div class="brands-industrial-grid" id="brandsGridContainer" role="list"></div>
       </div>
-      <div class="brand-strip" id="homeBrands"></div>
+    </section>
+
+    <!-- Sección Clientes en la Home -->
+    <section class="home-clients-section reveal" id="clientes" aria-labelledby="clientes-title">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 id="clientes-title">Empresas que confían en nuestras soluciones</h2>
+          <p>Soplado, secado y fin de línea en las principales plantas de Chile</p>
+        </div>
+        <div class="clients-industrial-grid" id="clientsGridContainer" role="list"></div>
+      </div>
     </section>
 
     <section class="cta-band reveal" aria-labelledby="cta-title">
       <h2 id="cta-title">¿Listo para optimizar tu línea?</h2>
-      <p>Cuéntanos tu proceso: te armamos una cotización o te guiamos a los repuestos correctos.</p>
+      <p>Cuéntanos tu proceso: te armamos una cotización o evaluamos tu aplicación en planta.</p>
       <div class="actions-row">
-        <a class="btn btn-primary btn-lg btn-cta-primary" href="cotizacion.html">Pedir cotización</a>
-        <a class="btn btn-ghost btn-cta-secondary" href="novedades.html">Ver artículos y un video</a>
+        <a class="btn btn-primary btn-lg btn-cta-primary" href="contacto.html?motivo=cotizacion">PEDIR COTIZACIÓN</a>
+        <a class="btn btn-ghost btn-cta-secondary" href="contacto.html?motivo=asesoria">EVALUAR MI APLICACIÓN</a>
       </div>
     </section>
   </main>
+
+  <div class="prop-modal" id="propAsesoriaModal" hidden role="dialog" aria-modal="true" aria-labelledby="propAsesoriaTitle">
+    <div class="prop-modal__backdrop" data-prop-close></div>
+    <div class="prop-modal__dialog">
+      <button type="button" class="prop-modal__close" data-prop-close aria-label="Cerrar">×</button>
+      <h2 id="propAsesoriaTitle">Evaluar mi aplicación</h2>
+      <p>Cuéntanos el desafío de tu línea (secado, soplado, higiene o fin de línea) y te orientamos con ingeniería local.</p>
+      <div class="prop-modal__actions">
+        <a class="btn btn-primary" href="contacto.html?motivo=asesoria">Continuar a contacto</a>
+        <button type="button" class="btn btn-outline" data-prop-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=23"></script>
+  <script src="js/layout.js?v=37"></script>
+  <script src="js/site.js?v=25"></script>
   <script>
     (function () {
       var origin = window.__LPAEZ_ORIGIN__ || window.location.origin;
@@ -314,140 +348,114 @@
         } catch (e) { /* keep static JSON-LD */ }
       }
 
-      function solutionBlurb(slug) {
-        var map = {
-          secadores: ["Secado de botellas y envases", "Túneles y cabinas de soplado", "Sistemas food & beverage"],
-          "turbinas-soplado": ["Sopladores centrífugos Sonic", "Portátiles y fijos", "Repuestos de transmisión"],
-          "cuchillos-aire": ["Air knives industriales", "Manifolds y toberas", "Control de recubrimiento"],
-          repuestos: ["Correas y filtros", "Silenciadores y HEPA", "Piezas de mantención"],
-          "fin-de-linea": ["Integración en conveyor", "Soplado post-llenado", "Soluciones a medida"],
-          "salas-limpias": ["Aire filtrado", "Aplicaciones sanitarias", "Sistemas de bajo particulado"]
-        };
-        return map[slug] || ["Equipos industriales", "Accesorios y repuestos", "Soporte de aplicación"];
+      var PLACEHOLDER = "img/placeholder-logo.png";
+      var LOGO_BY_SLUG = {
+        "sonic-air-systems": "img/brand/sonic-air.png",
+        sonic: "img/brand/sonic-air.png",
+        lyc: "img/brand/lyc.png",
+        movex: "img/brand/movex.png",
+        isodur: "img/brand/isodur.png",
+        combi: "img/brand/combi.png",
+        haida: "img/brand/haida.png"
+      };
+
+      function normalizeLogoUrl(raw, slug) {
+        var src = String(raw || "").trim();
+        if (src.charAt(0) === "/") src = src.slice(1);
+        if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
+        if (!src && slug) {
+          src = "img/brand/" + String(slug).replace(/-systems$/i, "").replace(/_/g, "-") + ".png";
+        }
+        if (!src) src = PLACEHOLDER;
+        return src;
       }
 
-      function categoryPicture(srcJpg, alt) {
-        var webp = String(srcJpg || "").replace(/\.(jpe?g|png)$/i, ".webp");
-        return (
-          '<picture>' +
-          '<source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">' +
-          '<img src="' + Lpaez.escapeHtml(srcJpg) + '" alt="' + Lpaez.escapeHtml(alt) +
-          '" title="' + Lpaez.escapeHtml(alt) +
-          '" loading="lazy" decoding="async" width="720" height="480">' +
-          "</picture>"
-        );
-      }
-
-      function renderSolutions(cats) {
-        var tabs = document.getElementById("solutionsTabs");
-        var panels = document.getElementById("solutionsPanels");
-        if (!cats.length) {
-          tabs.innerHTML = "";
-          panels.innerHTML = "<p class='empty-state'>Pronto publicaremos las soluciones.</p>";
+      function renderBrandLogos(brands) {
+        var container = document.getElementById("brandsGridContainer");
+        if (!container) return;
+        if (!brands || !brands.length) {
+          container.innerHTML = '<p class="pm-empty-hint">No hay marcas activas para mostrar.</p>';
           return;
         }
-        tabs.innerHTML = cats.map(function (c, i) {
-          var id = "sol-tab-" + c.slug;
-          var panelId = "sol-panel-" + c.slug;
-          return (
-            '<button type="button" class="solutions-tab' + (i === 0 ? " is-active" : "") +
-            '" role="tab" id="' + id + '" aria-controls="' + panelId +
-            '" aria-selected="' + (i === 0 ? "true" : "false") +
-            '" tabindex="' + (i === 0 ? "0" : "-1") +
-            '" data-tab="' + Lpaez.escapeHtml(c.slug) + '">' +
-            Lpaez.escapeHtml(c.name) +
-            "</button>"
-          );
-        }).join("");
-        panels.innerHTML = cats.map(function (c, i) {
-          var bg = Lpaez.resolveCategoryImage(c.slug);
-          var items = solutionBlurb(c.slug).map(function (t) {
-            return "<li><span class='bullet' aria-hidden='true'>→</span><span>" + Lpaez.escapeHtml(t) + "</span></li>";
-          }).join("");
-          var active = i === 0;
-          return (
-            '<div class="solutions-panel' + (active ? " is-active" : "") +
-            '" role="tabpanel" id="sol-panel-' + Lpaez.escapeHtml(c.slug) +
-            '" aria-labelledby="sol-tab-' + Lpaez.escapeHtml(c.slug) +
-            '" data-panel="' + Lpaez.escapeHtml(c.slug) + '"' +
-            (active ? "" : " hidden") + ">" +
-            '<div class="solutions-media">' + categoryPicture(bg, c.name) + "</div>" +
-            '<div class="solutions-body"><h3>' + Lpaez.escapeHtml(c.name) + "</h3>" +
-            "<p>" + Lpaez.escapeHtml((c.description || "Soluciones industriales para tu planta.").slice(0, 160)) + "</p>" +
-            '<ul class="solutions-list">' + items + "</ul>" +
-            '<a class="btn btn-primary" href="catalogo.html?category=' + encodeURIComponent(c.slug) + '">Ver productos</a>' +
-            "</div></div>"
-          );
-        }).join("");
-
-        function activateSolution(slug) {
-          tabs.querySelectorAll(".solutions-tab").forEach(function (el) {
-            var on = el.getAttribute("data-tab") === slug;
-            el.classList.toggle("is-active", on);
-            el.setAttribute("aria-selected", on ? "true" : "false");
-            el.tabIndex = on ? 0 : -1;
-          });
-          panels.querySelectorAll(".solutions-panel").forEach(function (panel) {
-            var on = panel.getAttribute("data-panel") === slug;
-            panel.classList.toggle("is-active", on);
-            if (on) panel.removeAttribute("hidden");
-            else panel.setAttribute("hidden", "");
-          });
-        }
-
-        tabs.addEventListener("click", function (e) {
-          var btn = e.target.closest(".solutions-tab");
-          if (!btn) return;
-          activateSolution(btn.getAttribute("data-tab"));
-          if (typeof btn.blur === "function") btn.blur();
-        });
-
-        tabs.addEventListener("keydown", function (e) {
-          var tabsList = Array.prototype.slice.call(tabs.querySelectorAll(".solutions-tab"));
-          var current = document.activeElement;
-          var idx = tabsList.indexOf(current);
-          if (idx < 0) return;
-          var next = -1;
-          if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (idx + 1) % tabsList.length;
-          if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (idx - 1 + tabsList.length) % tabsList.length;
-          if (e.key === "Home") next = 0;
-          if (e.key === "End") next = tabsList.length - 1;
-          if (next < 0) return;
-          e.preventDefault();
-          tabsList[next].focus();
-          activateSolution(tabsList[next].getAttribute("data-tab"));
-        });
+        container.innerHTML = brands
+          .map(function (b) {
+            var slug = b.slug || "";
+            var nombre = b.nombre || b.name || slug || "Marca";
+            var src = normalizeLogoUrl(b.logo_url || b.imagen, slug);
+            return (
+              '<a href="marcas.html?slug=' +
+              encodeURIComponent(slug) +
+              '" class="industrial-brand-card" role="listitem" title="' +
+              Lpaez.escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              Lpaez.escapeHtml(src) +
+              '" alt="' +
+              Lpaez.escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</a>"
+            );
+          })
+          .join("");
       }
 
-      function brandPillHtml(b) {
-        var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
-        var label = Lpaez.escapeHtml(b.name);
-        if (b.logo_url || b.slug === "sonic-air-systems") {
-          var src = b.logo_url || "img/brand/sonic-air.png";
-          var webp =
-            b.slug === "sonic-air-systems" && !b.logo_url
-              ? "img/brand/sonic-air.webp"
-              : String(src).replace(/\.(jpe?g|png)$/i, ".webp");
-          var useWebp = /\.(jpe?g|png)$/i.test(src) || b.slug === "sonic-air-systems";
-          return (
-            '<a class="brand-pill" href="' + href + '" title="' + label + '">' +
-            (useWebp
-              ? '<picture><source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">'
-              : "") +
-            '<img src="' + Lpaez.escapeHtml(src) + '" alt="' + label +
-            '" title="' + label + '" width="120" height="48" loading="lazy" decoding="async">' +
-            (useWebp ? "</picture>" : "") +
-            "</a>"
-          );
+      function renderClients(clients) {
+        var container = document.getElementById("clientsGridContainer");
+        if (!container) return;
+
+        if (!clients || clients.length === 0) {
+          container.innerHTML =
+            '<p class="text-muted text-center pm-empty-hint">Pronto publicaremos nuestros clientes principales.</p>';
+          return;
         }
-        return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
+
+        container.innerHTML = clients
+          .map(function (client) {
+            var nombre = client.nombre || client.name || "Cliente";
+            var src = normalizeLogoUrl(
+              client.logo_url || client.logo || client.imagen,
+              client.slug || ""
+            );
+            return (
+              '<div class="industrial-client-card" role="listitem" title="' +
+              Lpaez.escapeHtml(nombre) +
+              '">' +
+              '<img src="' +
+              Lpaez.escapeHtml(src) +
+              '" alt="' +
+              Lpaez.escapeHtml(nombre) +
+              '" loading="lazy" decoding="async" ' +
+              'onerror="this.onerror=null;this.src=\'' +
+              PLACEHOLDER +
+              '\';">' +
+              "</div>"
+            );
+          })
+          .join("");
       }
 
-      // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
+      function loadClients() {
+        return fetch("api/clientes.php?v=2", { credentials: "same-origin", cache: "no-store" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            var clients = Array.isArray(data) ? data : data.clientes || [];
+            renderClients(clients);
+          })
+          .catch(function () {
+            renderClients([]);
+          });
+      }
+
       var sectores = document.getElementById("sectores");
       if (sectores) {
         sectores.addEventListener("keydown", function (e) {
-          var tile = e.target.closest(".industry-tile");
+          var tile = e.target.closest(".industry-tile, .industry-card");
           if (!tile) return;
           if (e.key === " " || e.key === "Enter") {
             e.preventDefault();
@@ -456,25 +464,71 @@
         });
       }
 
+      function initHeroCarousel() {
+        var slides = document.querySelectorAll(".prop-hero .hero-media__slide");
+        if (slides.length <= 1) return;
+        var currentIndex = 0;
+        setInterval(function () {
+          slides[currentIndex].classList.remove("is-active");
+          currentIndex = (currentIndex + 1) % slides.length;
+          slides[currentIndex].classList.add("is-active");
+        }, 5000);
+      }
+
+      function initAsesoriaModal() {
+        var modal = document.getElementById("propAsesoriaModal");
+        var openBtn = document.getElementById("propAsesoriaBtn");
+        if (!modal || !openBtn) return;
+
+        function openModal() {
+          modal.hidden = false;
+          document.body.style.overflow = "hidden";
+        }
+        function closeModal() {
+          modal.hidden = true;
+          document.body.style.overflow = "";
+          openBtn.focus();
+        }
+
+        openBtn.addEventListener("click", openModal);
+        modal.querySelectorAll("[data-prop-close]").forEach(function (el) {
+          el.addEventListener("click", closeModal);
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !modal.hidden) closeModal();
+        });
+      }
+
       Promise.all([
         Lpaez.api("/api/brands"),
-        Lpaez.api("/api/categories"),
         Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
         var brands = (results[0].data && results[0].data.brands) || [];
-        var cats = (results[1].data && results[1].data.categories) || [];
-        var products = (results[2].data && results[2].data.products) || [];
-        document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
-        renderSolutions(cats);
-        document.getElementById("homeProducts").innerHTML =
-          products.map(function (p) {
-            return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
-          }).join("") ||
-          '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+        var products = (results[1].data && results[1].data.products) || [];
+        renderBrandLogos(brands);
+        var productsEl = document.getElementById("homeProducts");
+        if (productsEl) {
+          productsEl.innerHTML =
+            products.map(function (p) {
+              return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
+            }).join("") ||
+            '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+        }
         Lpaez.observeReveals();
       }).catch(function () {
-        document.getElementById("homeProducts").innerHTML =
-          '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
+        renderBrandLogos([]);
+        var productsEl = document.getElementById("homeProducts");
+        if (productsEl) {
+          productsEl.innerHTML =
+            '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
+        }
+        Lpaez.observeReveals();
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initHeroCarousel();
+        initAsesoriaModal();
+        loadClients();
         Lpaez.observeReveals();
       });
     })();
