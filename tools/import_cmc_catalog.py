@@ -321,7 +321,21 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
             res = client.request("POST", "/api/admin/products", payload)
             print("product create", prod["slug"], res)
 
-    print(json.dumps({"ok": True, "success": True, "brand": brand["slug"]}, ensure_ascii=False))
+    brands = index_by_slug(envelope_rows(client.request("GET", "/api/admin/brands"), "brands"))
+    saved = brands.get(brand["slug"]) or {}
+    seo_ok = bool(saved.get("seo_title") and saved.get("schema_json_ld"))
+    if not seo_ok:
+        print(
+            "warn: la API live aún no hidrata campos SEO (BrandSeo). "
+            "Tras desplegar esta rama, volver a ejecutar el importador."
+        )
+    print(json.dumps({
+        "ok": True,
+        "success": True,
+        "brand": brand["slug"],
+        "brand_id": brand_id,
+        "seo_persisted": seo_ok,
+    }, ensure_ascii=False))
 
 
 def main() -> None:
