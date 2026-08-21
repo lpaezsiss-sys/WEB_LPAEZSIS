@@ -25,6 +25,182 @@
     return escapeHtml(str);
   }
 
+  /**
+   * @typedef {Object} Brand
+   * @property {number} [id]
+   * @property {string} name
+   * @property {string} slug
+   * @property {string} [subtitle]
+   * @property {string} [origin_country]
+   * @property {string} [description]
+   * @property {string} [logo_url]
+   * @property {string} [datasheet_url]
+   * @property {string} [website_url]
+   * @property {string} [content_html]
+   * @property {number} [sort_order]
+   * @property {boolean|number} [is_active]
+   */
+
+  /**
+   * @typedef {Object} SEOData
+   * @property {string} seo_title
+   * @property {string} seo_description
+   * @property {string} seo_keywords
+   * @property {string} canonical_url
+   * @property {string} schema_json_ld
+   */
+
+  var BRAND_SEO_TITLE_SUFFIX = " Chile | Soluciones Industriales - LPAEZSIS";
+  var brandSeoDirty = {
+    slug: false,
+    title: false,
+    canonical: false,
+    schema: false,
+    desc: false,
+  };
+
+  function slugifyBrand(name) {
+    var t = String(name || "").toLowerCase();
+    t = t.replace(/\b(gmbh|ltda\.?|ltd\.?|llc|inc\.?|spa|s\.?p\.?a\.?|s\.?a\.?|srl|s\.r\.l\.?|ag|kg|co\.|company)\b/g, " ");
+    if (t.normalize) t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    t = t.replace(/ñ/g, "n").replace(/ç/g, "c");
+    t = t.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return t || "marca";
+  }
+
+  function suggestBrandSeoTitle(name) {
+    var n = String(name || "").trim();
+    return (n || "Marcas") + BRAND_SEO_TITLE_SUFFIX;
+  }
+
+  function suggestBrandCanonical(slug) {
+    var s = String(slug || "").trim();
+    return s ? "/marcas.html?slug=" + encodeURIComponent(s) : "/marcas.html";
+  }
+
+  function clipSeoDesc(text, maxLen) {
+    maxLen = maxLen || 160;
+    var raw = String(text || "").replace(/\s+/g, " ").trim();
+    if (raw.length <= maxLen) return raw;
+    var cut = raw.slice(0, maxLen);
+    var sp = cut.lastIndexOf(" ");
+    if (sp > 110) cut = cut.slice(0, sp);
+    return cut.replace(/[.,;:\s]+$/, "") + "…";
+  }
+
+  function buildBrandSchemaJson(brand) {
+    var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
+    var name = String((brand && brand.name) || "").trim() || "Marca";
+    var slug = String((brand && brand.slug) || "").trim();
+    var path = suggestBrandCanonical(slug);
+    var url = origin + path;
+    var logo = String((brand && brand.logo_url) || "").trim();
+    if (logo && !/^https?:\/\//i.test(logo)) {
+      logo = origin + (logo.charAt(0) === "/" ? logo : "/" + logo);
+    }
+    var desc = String((brand && (brand.seo_description || brand.description)) || "").trim();
+    var brandNode = {
+      "@type": "Brand",
+      "@id": url + "#brand",
+      name: name,
+      url: url,
+    };
+    if (desc) brandNode.description = desc;
+    if (brand && brand.subtitle) brandNode.alternateName = brand.subtitle;
+    if (logo) brandNode.logo = logo;
+    if (brand && brand.origin_country) {
+      brandNode.countryOfOrigin = { "@type": "Country", name: brand.origin_country };
+    }
+    if (brand && brand.website_url) brandNode.sameAs = [brand.website_url];
+    var graph = {
+      "@context": "https://schema.org",
+      "@graph": [
+        brandNode,
+        {
+          "@type": "Organization",
+          "@id": origin + "/#organization",
+          name: "LPAEZ SOLUCIONES INDUSTRIALES SPA",
+          alternateName: "LPAEZSIS",
+          url: origin + "/",
+          brand: { "@id": url + "#brand" },
+        },
+      ],
+    };
+    return JSON.stringify(graph, null, 2);
+  }
+
+  function readBrandFormSeo() {
+    var form = document.getElementById("simpleForm");
+    return {
+      name: form.name.value.trim(),
+      slug: form.slug.value.trim(),
+      subtitle: form.subtitle ? form.subtitle.value.trim() : "",
+      origin_country: form.origin_country ? form.origin_country.value.trim() : "",
+      description: form.description.value.trim(),
+      seo_description: form.seo_description.value.trim(),
+      logo_url: (document.getElementById("brandLogoUrl") || {}).value || "",
+      website_url: form.website_url ? form.website_url.value.trim() : "",
+    };
+  }
+
+  function updateBrandSeoUi() {
+    var form = document.getElementById("simpleForm");
+    if (!form || form.kind.value !== "brands") return;
+    var title = form.seo_title.value.trim() || suggestBrandSeoTitle(form.name.value);
+    var desc = form.seo_description.value.trim();
+    var slug = form.slug.value.trim() || slugifyBrand(form.name.value);
+    var canon = (form.canonical_url && form.canonical_url.value.trim()) || suggestBrandCanonical(slug);
+    var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
+    var abs = /^https?:\/\//i.test(canon) ? canon : origin + (canon.charAt(0) === "/" ? canon : "/" + canon);
+    var crumb = abs.replace(/^https?:\/\//, "").replace(/\?slug=/, " › ");
+    document.getElementById("snippetTitle").textContent = title.slice(0, 70);
+    document.getElementById("snippetUrl").textContent = crumb;
+    document.getElementById("snippetDesc").textContent = clipSeoDesc(desc || form.description.value, 160);
+
+    var tLen = title.length;
+    var tEl = document.getElementById("seoTitleCount");
+    tEl.textContent = tLen + "/60 · recomendado ≤ 60";
+    tEl.className = "char-count" + (tLen > 70 ? " is-over" : tLen > 60 ? " is-warn" : tLen ? " is-ok" : "");
+
+    var dLen = desc.length;
+    var dEl = document.getElementById("seoDescCount");
+    var dNote = "ideal 155–160";
+    dEl.textContent = dLen + "/160 · " + dNote;
+    dEl.className = "char-count";
+    if (dLen > 160) dEl.classList.add("is-over");
+    else if (dLen >= 155) dEl.classList.add("is-ok");
+    else if (dLen >= 120) dEl.classList.add("is-warn");
+
+    form.seo_title.classList.toggle("is-invalid", tLen > 70);
+    form.seo_description.classList.toggle("is-invalid", dLen > 160);
+    var slugOk = !form.slug.value.trim() || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.value.trim());
+    form.slug.classList.toggle("is-invalid", !slugOk);
+  }
+
+  function autofillBrandSeo(force) {
+    var form = document.getElementById("simpleForm");
+    if (!form || form.kind.value !== "brands") return;
+    var name = form.name.value.trim();
+    if (!brandSeoDirty.slug || force) {
+      form.slug.value = name ? slugifyBrand(name) : "";
+    }
+    if (!brandSeoDirty.title || force) {
+      form.seo_title.value = name ? suggestBrandSeoTitle(name) : "";
+    }
+    if (!brandSeoDirty.canonical || force) {
+      form.canonical_url.value = suggestBrandCanonical(form.slug.value.trim() || slugifyBrand(name));
+    }
+    if (!brandSeoDirty.desc || force) {
+      if (!form.seo_description.value.trim() || force) {
+        form.seo_description.value = clipSeoDesc(form.description.value, 160);
+      }
+    }
+    if (!brandSeoDirty.schema || force) {
+      form.schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+    }
+    updateBrandSeoUi();
+  }
+
   function getToken() {
     return sessionStorage.getItem(TOKEN_KEY);
   }
@@ -644,7 +820,11 @@
       var url = res.data && res.data.url;
       document.getElementById("imageUrlField").value = url || "";
       setDialogImagePreview(url || "");
-      showToast("Imagen subida — pulsa «Usar imagen»");
+      showToast(
+        res.data && res.data.converted
+          ? "Imagen convertida a WebP — pulsa «Usar imagen»"
+          : "Imagen subida — pulsa «Usar imagen»"
+      );
       // If picker was opened to save logo directly, apply immediately.
       if (url && imagePickerContext && imagePickerContext.autoApply) {
         var apply = imagePickerContext.onApply;
@@ -752,6 +932,9 @@
             '<div class="meta"><span>' +
             escapeHtml(b.slug) +
             "</span>" +
+            (b.origin_country
+              ? "<span>" + escapeHtml(b.origin_country) + "</span>"
+              : "") +
             '<span class="chip ' +
             (b.is_active ? "chip-on" : "chip-off") +
             '">' +
@@ -1070,6 +1253,17 @@
     document.getElementById("brandContentHtml").value = html || "";
   }
 
+  function setBrandDatasheet(url) {
+    var field = document.getElementById("brandDatasheetUrl");
+    var hint = document.getElementById("brandDatasheetHint");
+    if (field) field.value = url || "";
+    if (hint) {
+      hint.textContent = url
+        ? "PDF listo: " + url
+        : "PDF de catálogo o ficha de la marca (máx. 12 MB).";
+    }
+  }
+
   function openSimpleDialog(kind, item) {
     var form = document.getElementById("simpleForm");
     form.reset();
@@ -1081,16 +1275,38 @@
     form.seo_title.value = (item && item.seo_title) || "";
     form.seo_description.value = (item && item.seo_description) || "";
     form.sort_order.value = (item && item.sort_order) || 0;
-    form.is_active.checked = !item || item.is_active !== false;
+    form.is_active.checked = !item || !(item.is_active === false || item.is_active === 0 || item.is_active === "0");
+    var err = document.getElementById("simpleFormError");
+    err.hidden = true;
+    err.textContent = "";
     var logoField = document.getElementById("simpleLogoField");
     var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
+    var generalExtra = document.getElementById("brandGeneralFields");
+    var datasheetField = document.getElementById("brandDatasheetField");
+    var seoExtras = document.getElementById("brandSeoExtras");
+    var snippet = document.getElementById("brandGoogleSnippet");
     var dialog = document.getElementById("simpleDialog");
+    document.getElementById("simpleName").placeholder =
+      kind === "brands" ? "CMC Klebetechnik GmbH" : "";
     if (kind === "brands") {
       logoField.hidden = false;
       contentField.hidden = false;
-      seoFields.hidden = true;
+      seoFields.hidden = false;
+      generalExtra.hidden = false;
+      datasheetField.hidden = false;
+      seoExtras.hidden = false;
+      snippet.hidden = false;
       dialog.classList.add("dialog--wide");
+      document.getElementById("simpleNameLabel").textContent = "Nombre de la marca";
+      document.getElementById("simpleDescLabel").textContent = "Descripción corta";
+      form.subtitle.value = (item && item.subtitle) || "";
+      form.origin_country.value = (item && item.origin_country) || "";
+      form.website_url.value = (item && item.website_url) || "";
+      form.seo_keywords.value = (item && item.seo_keywords) || "";
+      form.canonical_url.value = (item && item.canonical_url) || "";
+      form.schema_json_ld.value = (item && item.schema_json_ld) || "";
+      setBrandDatasheet((item && item.datasheet_url) || "");
       resetBrandSections((item && item.content_html) || "");
       if (item && item.logo_url) {
         setBrandLogoPreview(item.logo_url);
@@ -1100,14 +1316,36 @@
       } else {
         setBrandLogoPreview("");
       }
+      brandSeoDirty = {
+        slug: !!(item && item.slug),
+        title: !!(item && item.seo_title),
+        canonical: !!(item && item.canonical_url),
+        schema: !!(item && item.schema_json_ld),
+        desc: !!(item && item.seo_description),
+      };
+      if (!item) {
+        autofillBrandSeo(false);
+      } else {
+        if (!form.seo_title.value) form.seo_title.value = suggestBrandSeoTitle(form.name.value);
+        if (!form.canonical_url.value) form.canonical_url.value = suggestBrandCanonical(form.slug.value);
+        if (!form.schema_json_ld.value) form.schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+        updateBrandSeoUi();
+      }
     } else {
       logoField.hidden = true;
       contentField.hidden = true;
       seoFields.hidden = false;
+      generalExtra.hidden = true;
+      datasheetField.hidden = true;
+      seoExtras.hidden = true;
+      snippet.hidden = true;
       dialog.classList.remove("dialog--wide");
+      document.getElementById("simpleNameLabel").textContent = "Nombre";
+      document.getElementById("simpleDescLabel").textContent = "Descripción";
       destroyBrandQuills();
       brandSectionsState = [];
       setBrandLogoPreview("");
+      setBrandDatasheet("");
       document.getElementById("brandContentHtml").value = "";
       var sectionsEl = document.getElementById("brandSections");
       if (sectionsEl) sectionsEl.innerHTML = "";
@@ -1122,9 +1360,87 @@
       currentUrl: document.getElementById("brandLogoUrl").value || "",
       onApply: function (url) {
         setBrandLogoPreview(url);
+        if (!brandSeoDirty.schema) {
+          document.getElementById("simpleForm").schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+        }
+        updateBrandSeoUi();
         return Promise.resolve();
       },
     });
+  });
+
+  document.getElementById("brandDatasheetFile").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var fd = new FormData();
+    fd.append("file", file);
+    api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        showToast((res.data && res.data.error) || "No se pudo subir el PDF");
+        return;
+      }
+      var url = res.data && res.data.url;
+      if (url) {
+        setBrandDatasheet(url);
+        showToast("Ficha PDF subida");
+      }
+    });
+  });
+
+  document.getElementById("simpleName").addEventListener("input", function () {
+    var form = document.getElementById("simpleForm");
+    if (form.kind.value !== "brands") return;
+    autofillBrandSeo(false);
+  });
+  document.getElementById("simpleSlug").addEventListener("input", function () {
+    brandSeoDirty.slug = true;
+    var form = document.getElementById("simpleForm");
+    if (form.kind.value !== "brands") return;
+    if (!brandSeoDirty.canonical) {
+      form.canonical_url.value = suggestBrandCanonical(form.slug.value.trim());
+    }
+    if (!brandSeoDirty.schema) {
+      form.schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+    }
+    updateBrandSeoUi();
+  });
+  document.getElementById("simpleDescription").addEventListener("input", function () {
+    var form = document.getElementById("simpleForm");
+    if (form.kind.value !== "brands") return;
+    if (!brandSeoDirty.desc) {
+      form.seo_description.value = clipSeoDesc(form.description.value, 160);
+    }
+    if (!brandSeoDirty.schema) {
+      form.schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+    }
+    updateBrandSeoUi();
+  });
+  ["simpleSeoTitle", "simpleSeoDescription", "simpleCanonical", "simpleSchema"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", function () {
+      if (id === "simpleSeoTitle") brandSeoDirty.title = true;
+      if (id === "simpleSeoDescription") brandSeoDirty.desc = true;
+      if (id === "simpleCanonical") brandSeoDirty.canonical = true;
+      if (id === "simpleSchema") brandSeoDirty.schema = true;
+      updateBrandSeoUi();
+    });
+  });
+  ["subtitle", "origin_country", "website_url"].forEach(function (name) {
+    var form = document.getElementById("simpleForm");
+    form[name].addEventListener("input", function () {
+      if (!brandSeoDirty.schema) {
+        form.schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+      }
+      updateBrandSeoUi();
+    });
+  });
+  document.getElementById("regenSchemaBtn").addEventListener("click", function () {
+    brandSeoDirty.schema = false;
+    document.getElementById("simpleForm").schema_json_ld.value = buildBrandSchemaJson(readBrandFormSeo());
+    brandSeoDirty.schema = true;
+    updateBrandSeoUi();
+    showToast("Schema JSON-LD regenerado");
   });
 
   document.getElementById("addSectionBtn").addEventListener("click", function () {
@@ -1233,8 +1549,24 @@
     e.preventDefault();
     var form = e.target;
     var kind = form.kind.value;
+    var err = document.getElementById("simpleFormError");
+    err.hidden = true;
+    var name = form.name.value.trim();
+    if (!name) {
+      err.hidden = false;
+      err.textContent = "El nombre es obligatorio.";
+      form.name.classList.add("is-invalid");
+      return;
+    }
+    form.name.classList.remove("is-invalid");
+    if (kind === "brands" && form.slug.value.trim() && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.value.trim())) {
+      err.hidden = false;
+      err.textContent = "El slug solo admite minúsculas, números y guiones.";
+      form.slug.classList.add("is-invalid");
+      return;
+    }
     var body = {
-      name: form.name.value.trim(),
+      name: name,
       slug: form.slug.value.trim() || undefined,
       description: form.description.value,
       seo_title: form.seo_title.value.trim(),
@@ -1244,6 +1576,24 @@
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
+      body.subtitle = form.subtitle.value.trim() || null;
+      body.origin_country = form.origin_country.value.trim() || null;
+      body.website_url = form.website_url.value.trim() || null;
+      body.datasheet_url = (document.getElementById("brandDatasheetUrl").value || "").trim() || null;
+      body.seo_keywords = form.seo_keywords.value.trim() || null;
+      body.canonical_url = form.canonical_url.value.trim() || null;
+      body.schema_json_ld = form.schema_json_ld.value.trim() || null;
+      if (body.schema_json_ld) {
+        try {
+          JSON.parse(body.schema_json_ld);
+        } catch (ex) {
+          err.hidden = false;
+          err.textContent = "El JSON-LD no es JSON válido. Usa «Regenerar schema» o corrige el texto.";
+          form.schema_json_ld.classList.add("is-invalid");
+          return;
+        }
+        form.schema_json_ld.classList.remove("is-invalid");
+      }
       var serialized = serializeBrandSections();
       document.getElementById("brandContentHtml").value = serialized;
       body.content_html = serialized;
@@ -1254,7 +1604,9 @@
       : api("/" + kind, { method: "POST", body: body });
     req.then(function (res) {
       if (!res.ok) {
-        showToast((res.data && res.data.error) || "Error");
+        err.hidden = false;
+        err.textContent = (res.data && res.data.error) || "Error al guardar";
+        showToast(err.textContent);
         return;
       }
       document.getElementById("simpleDialog").close();

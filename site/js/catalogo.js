@@ -585,11 +585,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Catálogo B2B LPAEZsis: secadores, turbinas, paletizado Columbia, transportadores LYC y repuestos Sonic Air. Filtra por industria y marca.";
     let canonical = origin + "/catalogo.html";
     if (brand) {
-      title = subtitle
-        ? brand.name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
-        : "Productos " + brand.name + " | Soluciones Industriales LPAEZsis";
+      title =
+        (brand.seo_title && String(brand.seo_title).trim()) ||
+        (subtitle
+          ? brand.name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
+          : "Productos " + brand.name + " | Soluciones Industriales LPAEZsis");
       desc = clip(
-        brand.description ||
+        brand.seo_description ||
+          brand.description ||
           "Catálogo de equipos y soluciones " +
             brand.name +
             " representados por LPAEZsis en Chile.",

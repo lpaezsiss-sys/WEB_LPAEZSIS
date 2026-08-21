@@ -5,6 +5,7 @@ namespace Lpaezsis\Controllers;
 
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\BrandSeo;
 use PDO;
 
 final class PublicApi
@@ -107,15 +108,16 @@ final class PublicApi
 
     private static function brands(): void
     {
+        BrandSeo::ensureColumns(self::pdo());
         $rows = self::pdo()->query(
-            'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
-             FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            'SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
     }
 
     private static function brandDetail(string $slug): void
     {
+        BrandSeo::ensureColumns(self::pdo());
         $stmt = self::pdo()->prepare(
             'SELECT * FROM brands WHERE slug = ? AND is_active = 1 LIMIT 1'
         );

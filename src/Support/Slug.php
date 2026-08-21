@@ -22,6 +22,18 @@ final class Slug
         return $text !== '' ? $text : 'item';
     }
 
+    /** Slug de marca: quita sufijos legales (GmbH, Ltda, SPA…) — p.ej. "CMC Klebetechnik GmbH" → cmc-klebetechnik. */
+    public static function makeBrand(string $name): string
+    {
+        $text = trim($name);
+        $text = preg_replace(
+            '/\b(gmbh|ltda\.?|ltd\.?|llc|inc\.?|spa|s\.?p\.?a\.?|s\.?a\.?|srl|s\.r\.l\.?|ag|kg|co\.|company)\b/iu',
+            ' ',
+            $text
+        ) ?? $text;
+        return self::make($text);
+    }
+
     public static function unique(string $base, callable $exists): string
     {
         $slug = self::make($base);

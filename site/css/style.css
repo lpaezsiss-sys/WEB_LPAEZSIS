@@ -1158,6 +1158,15 @@ body.nav-open {
   color: var(--muted);
   max-width: 60ch;
 }
+.brand-origin {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.35rem !important;
+}
+}
 
 .brand-catalog-body {
   color: var(--ink-soft);

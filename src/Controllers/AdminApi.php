@@ -6,6 +6,7 @@ namespace Lpaezsis\Controllers;
 use Lpaezsis\Auth;
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\BrandSeo;
 use Lpaezsis\Support\Slug;
 use Lpaezsis\Support\Upload;
 use PDO;
@@ -68,6 +69,7 @@ final class AdminApi
         }
 
         if ($method === 'GET' && $sub === '/brands') {
+            BrandSeo::ensureColumns(self::pdo());
             $rows = self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll();
             Response::json(['brands' => $rows]);
             return;
@@ -230,7 +232,12 @@ final class AdminApi
             Response::error((string) $result['error']);
             return;
         }
-        Response::json(['url' => $result['url'], 'type' => $result['type'] ?? 'file']);
+        Response::json([
+            'ok' => true,
+            'url' => $result['url'],
+            'type' => $result['type'] ?? 'file',
+            'converted' => !empty($result['converted']),
+        ]);
     }
 
     private static function saveSettings(): void
@@ -302,42 +309,135 @@ final class AdminApi
 
     private static function createBrand(): void
     {
+        BrandSeo::ensureColumns(self::pdo());
         $b = self::body();
-        $name = trim((string) ($b['name'] ?? ''));
-        if ($name === '') {
-            Response::error('Nombre requerido');
+        $row = self::normalizeBrandPayload($b, true);
+        if ($row === null) {
             return;
         }
-        $slug = trim((string) ($b['slug'] ?? '')) ?: Slug::unique($name, function (string $s): bool {
-            $st = self::pdo()->prepare('SELECT 1 FROM brands WHERE slug = ?');
-            $st->execute([$s]);
-            return (bool) $st->fetchColumn();
-        });
+        $existing = BrandSeo::existingColumns(self::pdo());
+        $cols = [];
+        $placeholders = [];
+        $vals = [];
+        foreach ($row as $key => $val) {
+            if (!isset($existing[$key])) {
+                continue;
+            }
+            $cols[] = '`' . $key . '`';
+            $placeholders[] = '?';
+            $vals[] = $val;
+        }
         self::pdo()->prepare(
-            'INSERT INTO brands (slug, name, description, logo_url, website_url, content_html, gallery_json, sort_order, is_active)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-        )->execute([
-            $slug,
-            $name,
-            $b['description'] ?? null,
-            $b['logo_url'] ?? null,
-            $b['website_url'] ?? null,
-            $b['content_html'] ?? null,
-            isset($b['gallery']) ? json_encode($b['gallery']) : ($b['gallery_json'] ?? null),
-            (int) ($b['sort_order'] ?? 100),
-            !empty($b['is_active']) || !array_key_exists('is_active', $b) ? 1 : 0,
+            'INSERT INTO brands (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $placeholders) . ')'
+        )->execute($vals);
+        Response::json([
+            'ok' => true,
+            'id' => (int) self::pdo()->lastInsertId(),
+            'slug' => (string) $row['slug'],
         ]);
-        Response::json(['id' => (int) self::pdo()->lastInsertId(), 'slug' => $slug]);
     }
 
     private static function updateBrand(int $id): void
     {
+        BrandSeo::ensureColumns(self::pdo());
         $b = self::body();
         if (isset($b['gallery']) && is_array($b['gallery'])) {
             $b['gallery_json'] = json_encode($b['gallery']);
         }
-        $fields = ['slug', 'name', 'description', 'logo_url', 'website_url', 'content_html', 'gallery_json', 'sort_order', 'is_active'];
-        self::patch('brands', $id, $b, $fields);
+        $existing = BrandSeo::existingColumns(self::pdo());
+        $writable = [
+            'slug', 'name', 'description', 'logo_url', 'website_url', 'content_html',
+            'gallery_json', 'sort_order', 'is_active',
+            'subtitle', 'origin_country', 'seo_title', 'seo_description', 'seo_keywords',
+            'canonical_url', 'schema_json_ld', 'datasheet_url',
+        ];
+        $writable = array_values(array_filter($writable, static function (string $f) use ($existing): bool {
+            return isset($existing[$f]);
+        }));
+        if (!array_key_exists('name', $b)) {
+            self::patch('brands', $id, $b, $writable);
+            return;
+        }
+        $b['id'] = $id;
+        $row = self::normalizeBrandPayload($b, false);
+        if ($row === null) {
+            return;
+        }
+        self::patch('brands', $id, $row, $writable);
+    }
+
+    /** @return array<string, mixed>|null */
+    private static function normalizeBrandPayload(array $b, bool $creating): ?array
+    {
+        $name = trim((string) ($b['name'] ?? ''));
+        if ($name === '') {
+            Response::error('Nombre requerido');
+            return null;
+        }
+        $excludeId = (int) ($b['id'] ?? 0);
+        $slugExists = static function (string $s) use ($excludeId): bool {
+            $sql = 'SELECT 1 FROM brands WHERE slug = ?';
+            $args = [$s];
+            if ($excludeId > 0) {
+                $sql .= ' AND id <> ?';
+                $args[] = $excludeId;
+            }
+            $st = self::pdo()->prepare($sql);
+            $st->execute($args);
+            return (bool) $st->fetchColumn();
+        };
+        $slugInput = trim((string) ($b['slug'] ?? ''));
+        $base = $slugInput !== '' ? $slugInput : Slug::makeBrand($name);
+        $slug = Slug::unique($base, $slugExists);
+
+        $seoTitle = trim((string) ($b['seo_title'] ?? ''));
+        if ($seoTitle === '') {
+            $seoTitle = BrandSeo::suggestTitle($name);
+        }
+        $canonical = trim((string) ($b['canonical_url'] ?? ''));
+        if ($canonical === '') {
+            $canonical = BrandSeo::defaultCanonical($slug);
+        }
+        $row = [
+            'name' => $name,
+            'slug' => $slug,
+            'description' => self::nullableString($b, 'description'),
+            'logo_url' => self::nullableString($b, 'logo_url'),
+            'website_url' => self::nullableString($b, 'website_url'),
+            'content_html' => array_key_exists('content_html', $b) ? (trim((string) $b['content_html']) ?: null) : null,
+            'gallery_json' => isset($b['gallery'])
+                ? json_encode($b['gallery'])
+                : (array_key_exists('gallery_json', $b) ? $b['gallery_json'] : null),
+            'sort_order' => array_key_exists('sort_order', $b) ? (int) $b['sort_order'] : 100,
+            'is_active' => !empty($b['is_active']) || !array_key_exists('is_active', $b) ? 1 : 0,
+            'subtitle' => self::nullableString($b, 'subtitle'),
+            'origin_country' => self::nullableString($b, 'origin_country'),
+            'seo_title' => $seoTitle,
+            'seo_description' => self::nullableString($b, 'seo_description'),
+            'seo_keywords' => self::nullableString($b, 'seo_keywords'),
+            'canonical_url' => $canonical,
+            'datasheet_url' => self::nullableString($b, 'datasheet_url'),
+        ];
+        if (!array_key_exists('content_html', $b) && !$creating) {
+            unset($row['content_html']);
+        }
+        if (!array_key_exists('gallery_json', $b) && !isset($b['gallery'])) {
+            unset($row['gallery_json']);
+        }
+        $schema = trim((string) ($b['schema_json_ld'] ?? ''));
+        $row['schema_json_ld'] = $schema === ''
+            ? BrandSeo::buildJson($row)
+            : BrandSeo::normalizeJsonLd($schema);
+        return $row;
+    }
+
+    private static function nullableString(array $b, string $key): ?string
+    {
+        if (!array_key_exists($key, $b) || $b[$key] === null) {
+            return null;
+        }
+        $v = trim((string) $b[$key]);
+        return $v === '' ? null : $v;
     }
 
     private static function deleteBrand(int $id): void

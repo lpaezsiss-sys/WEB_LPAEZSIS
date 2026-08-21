@@ -324,6 +324,42 @@
     return raw;
   }
 
+  function brandCanonicalUrl(brand) {
+    var origin = pageOrigin();
+    var custom = brand && brand.canonical_url ? String(brand.canonical_url).trim() : "";
+    if (custom) {
+      if (/^https?:\/\//i.test(custom)) return custom;
+      return absoluteUrl(custom);
+    }
+    if (brand && brand.slug) {
+      return origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug);
+    }
+    return origin + "/marcas.html";
+  }
+
+  function rewriteJsonLdOrigin(data, origin) {
+    try {
+      var text = JSON.stringify(data).split("https://prueba1.lpaezsis.cl").join(origin);
+      return JSON.parse(text);
+    } catch (e) {
+      return data;
+    }
+  }
+
+  function parseBrandJsonLd(raw, origin) {
+    if (!raw) return null;
+    var parsed = raw;
+    if (typeof raw === "string") {
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+    if (!parsed || typeof parsed !== "object") return null;
+    return rewriteJsonLdOrigin(parsed, origin || pageOrigin());
+  }
+
   function productPayload(p) {
     return encodeURIComponent(
       JSON.stringify({
@@ -755,6 +791,8 @@
     setHeadMeta: setHeadMeta,
     setCanonical: setCanonical,
     brandSubtitle: brandSubtitle,
+    brandCanonicalUrl: brandCanonicalUrl,
+    parseBrandJsonLd: parseBrandJsonLd,
     updateBadges: updateBadges,
     getSettings: function () {
       return siteSettings;

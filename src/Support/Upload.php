@@ -69,11 +69,61 @@ final class Upload
             return ['ok' => false, 'error' => 'Error al guardar el archivo'];
         }
 
+        $converted = false;
+        if ($isImage) {
+            $webp = self::convertImageToWebp($dest, $mime);
+            if ($webp !== null) {
+                @unlink($dest);
+                $dest = $webp;
+                $name = basename($webp);
+                $converted = true;
+            }
+        }
+
         $prefix = rtrim((string) Config::get('UPLOAD_URL_PREFIX', '/img/uploads'), '/');
         return [
             'ok' => true,
             'url' => $prefix . '/' . $name,
             'type' => $isPdf ? 'pdf' : 'image',
+            'converted' => $converted,
         ];
+    }
+
+    /** Convierte JPEG/PNG a WebP (calidad 82). GIF animado y WebP nativo se dejan igual. */
+    private static function convertImageToWebp(string $path, string $mime): ?string
+    {
+        if (!function_exists('imagewebp')) {
+            return null;
+        }
+        if ($mime === 'image/webp' || $mime === 'image/gif') {
+            return null;
+        }
+        $im = null;
+        if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
+            $im = @imagecreatefromjpeg($path);
+        } elseif ($mime === 'image/png' && function_exists('imagecreatefrompng')) {
+            $im = @imagecreatefrompng($path);
+            if ($im) {
+                if (function_exists('imagepalettetotruecolor')) {
+                    @imagepalettetotruecolor($im);
+                }
+                imagealphablending($im, true);
+                imagesavealpha($im, true);
+            }
+        }
+        if (!$im) {
+            return null;
+        }
+        $webpPath = (string) preg_replace('/\.(jpe?g|png)$/i', '.webp', $path);
+        if ($webpPath === '' || $webpPath === $path) {
+            $webpPath = $path . '.webp';
+        }
+        $ok = @imagewebp($im, $webpPath, 82);
+        imagedestroy($im);
+        if (!$ok || !is_file($webpPath) || filesize($webpPath) < 32) {
+            @unlink($webpPath);
+            return null;
+        }
+        return $webpPath;
     }
 }

@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Representaciones y Distribución | Soluciones Industriales LPAEZsis">
   <meta name="twitter:description" content="Marcas representadas por LPAEZsis en Chile.">
   <script type="application/ld+json" id="brandJsonLd">{}</script>
-  <link rel="stylesheet" href="css/style.css?v=83">
+  <link rel="stylesheet" href="css/style.css?v=84">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -54,6 +54,7 @@
         <div class="brand-catalog-head">
           <img id="brandLogo" class="brand-catalog-logo" alt="" width="220" height="80" hidden>
           <div>
+            <p id="brandOrigin" class="brand-origin" hidden></p>
             <p id="brandDesc"></p>
           </div>
         </div>
@@ -70,13 +71,14 @@
         <div class="section-actions is-start">
           <a class="btn btn-primary" id="brandQuoteCta" href="cotizacion.html">Pedir cotización de esta marca</a>
           <a class="btn btn-outline" id="brandCatalogCta" href="catalogo.html">Ver todos los productos</a>
+          <a class="btn btn-outline" id="brandDatasheetCta" href="#" target="_blank" rel="noopener" hidden>Ficha técnica (PDF)</a>
         </div>
       </div>
     </section>
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=37"></script>
-  <script src="js/site.js?v=27"></script>
+  <script src="js/site.js?v=28"></script>
   <script>
     var slug = Lpaez.queryParam("slug");
     var origin = Lpaez.pageOrigin();
@@ -135,16 +137,20 @@
     function applyBrandSeo(brand, products) {
       var name = brand.name || brand.nombre || "Marca";
       var subtitle = Lpaez.brandSubtitle(brand);
-      var title = subtitle
-        ? name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
-        : name + " | Soluciones Industriales LPAEZsis";
+      var title =
+        (brand.seo_title && String(brand.seo_title).trim()) ||
+        (subtitle
+          ? name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
+          : name + " | Soluciones Industriales LPAEZsis");
       var descSource =
         brand.seo_description ||
         brand.description ||
         brand.descripcion_corta ||
         ("Equipos y soluciones " + name + " representados por LPAEZsis en Chile.");
       var desc = Lpaez.clipMetaDescription(descSource, 160);
-      var url = origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug);
+      var url =
+        (Lpaez.brandCanonicalUrl && Lpaez.brandCanonicalUrl(brand)) ||
+        origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug);
       var logo = Lpaez.absoluteUrl(brand.logo_url || "/img/brand/logo.png");
       var thin =
         !(products && products.length) &&
@@ -154,6 +160,7 @@
       document.title = title;
       Lpaez.setHeadMeta("description", desc);
       Lpaez.setHeadMeta("robots", thin ? "noindex,follow" : "index,follow");
+      if (brand.seo_keywords) Lpaez.setHeadMeta("keywords", brand.seo_keywords);
       Lpaez.setCanonical(url);
       Lpaez.setHeadMeta("og:title", title, "property");
       Lpaez.setHeadMeta("og:description", desc, "property");
@@ -163,7 +170,9 @@
       Lpaez.setHeadMeta("twitter:description", desc);
       Lpaez.setHeadMeta("twitter:image", logo);
 
-      var schema = {
+      var stored =
+        Lpaez.parseBrandJsonLd && Lpaez.parseBrandJsonLd(brand.schema_json_ld, origin);
+      var schema = stored || {
         "@context": "https://schema.org",
         "@type": "Brand",
         name: name,
@@ -171,9 +180,9 @@
         logo: logo,
         description: desc
       };
-      if (subtitle) schema.alternateName = subtitle;
+      if (!stored && subtitle) schema.alternateName = subtitle;
       if (products && products.length) {
-        schema.makesOffer = products.map(function (prod) {
+        var offers = products.map(function (prod) {
           var img = Lpaez.absoluteUrl(
             prod.image_url || prod.featured_image || prod.image || ""
           );
@@ -195,6 +204,13 @@
             itemOffered: item
           };
         });
+        if (schema["@graph"] && schema["@graph"].length) {
+          schema["@graph"].forEach(function (node) {
+            if (node && node["@type"] === "Brand") node.makesOffer = offers;
+          });
+        } else {
+          schema.makesOffer = offers;
+        }
       }
       Lpaez.upsertJsonLd("brandJsonLd", schema);
     }
@@ -251,6 +267,14 @@
           : brand.name;
         document.getElementById("brandsLead").textContent = brand.description || "";
         document.getElementById("brandDetail").hidden = false;
+        var originEl = document.getElementById("brandOrigin");
+        if (brand.origin_country) {
+          originEl.hidden = false;
+          originEl.textContent = "Origen: " + brand.origin_country;
+        } else {
+          originEl.hidden = true;
+          originEl.textContent = "";
+        }
         document.getElementById("brandDesc").textContent =
           brand.description || "Productos e información de la representación.";
 
@@ -307,6 +331,14 @@
           "catalogo.html?brand=" + encodeURIComponent(brand.slug);
         document.getElementById("brandQuoteCta").href =
           "cotizacion.html?marca=" + encodeURIComponent(brand.slug);
+        var ds = document.getElementById("brandDatasheetCta");
+        if (brand.datasheet_url) {
+          ds.hidden = false;
+          ds.href = brand.datasheet_url;
+        } else {
+          ds.hidden = true;
+          ds.removeAttribute("href");
+        }
         document.getElementById("brandProducts").innerHTML = products.length
           ? products.map(function (producto) {
               return Lpaez.productCardHtml(producto);
