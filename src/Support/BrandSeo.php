@@ -96,6 +96,32 @@ final class BrandSeo
     }
 
     /**
+     * `site/` es el document root: `/site/img/foo.webp` → `/img/foo.webp`.
+     */
+    public static function publicPath(?string $url): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+        $url = trim(str_replace('\\', '/', $url));
+        if ($url === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $url)) {
+            return $url;
+        }
+        if (strpos($url, '/site/') === 0) {
+            $url = substr($url, 5);
+        } elseif (stripos($url, 'site/') === 0) {
+            $url = '/' . substr($url, 5);
+        }
+        if ($url !== '' && $url[0] !== '/') {
+            $url = '/' . ltrim($url, '/');
+        }
+        return $url !== '' ? $url : null;
+    }
+
+    /**
      * Acepta short_description / long_description y alias legacy description / content_html.
      *
      * @param array<string, mixed> $input
@@ -114,6 +140,13 @@ final class BrandSeo
         }
         if (!array_key_exists('long_description', $input) && array_key_exists('content_html', $input)) {
             $input['long_description'] = $input['content_html'];
+        }
+        foreach (['logo_url', 'datasheet_url'] as $key) {
+            if (!array_key_exists($key, $input) || !is_string($input[$key])) {
+                continue;
+            }
+            $norm = self::publicPath($input[$key]);
+            $input[$key] = $norm === null ? '' : $norm;
         }
         return $input;
     }
@@ -135,6 +168,12 @@ final class BrandSeo
         $slug = trim((string) ($row['slug'] ?? ''));
         if (trim((string) ($row['canonical_url'] ?? '')) === '' && $slug !== '') {
             $row['canonical_url'] = self::defaultCanonical($slug);
+        }
+        if (array_key_exists('logo_url', $row)) {
+            $row['logo_url'] = self::publicPath(isset($row['logo_url']) ? (string) $row['logo_url'] : null);
+        }
+        if (array_key_exists('datasheet_url', $row)) {
+            $row['datasheet_url'] = self::publicPath(isset($row['datasheet_url']) ? (string) $row['datasheet_url'] : null);
         }
         return $row;
     }
@@ -170,7 +209,7 @@ final class BrandSeo
             $path = $customCanon !== '' ? $customCanon : self::defaultCanonical($slug);
             $url = $origin . (strpos($path, '/') === 0 ? $path : '/' . $path);
         }
-        $logo = trim((string) ($brand['logo_url'] ?? ''));
+        $logo = self::publicPath((string) ($brand['logo_url'] ?? '')) ?? '';
         if ($logo !== '' && !preg_match('#^https?://#i', $logo)) {
             $logo = $origin . '/' . ltrim($logo, '/');
         }

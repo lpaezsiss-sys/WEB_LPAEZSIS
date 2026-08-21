@@ -12,7 +12,7 @@
     "seo_description": "Distribución autorizada de cintas adhesivas técnicas CMC Klebetechnik en Chile. Soluciones para empalme de etiquetas siliconadas y aislamiento eléctrico.",
     "seo_keywords": "CMC Klebetechnik, cintas adhesivas industriales, empalme de etiquetas, release liner, aislantes electricos, CMC 10730, LPAEZSIS",
     "canonical_url": "/marcas.html?slug=cmc-klebetechnik",
-    "logo_url": "/img/brand/cmc-klebetechnik.png",
+    "logo_url": "/img/logo-cmc-klebetechnik.webp",
     "datasheet_url": "/img/fichas/Cinta_Doble_Contacto_Union_Etiquetas_Siliconadas_CMC_LPAEZSIS.pdf",
     "website_url": "https://www.cmc.de/",
     "sort_order": 25,
@@ -30,7 +30,7 @@
           "slogan": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://prueba1.lpaezsis.cl/img/brand/cmc-klebetechnik.png"
+            "url": "https://prueba1.lpaezsis.cl/img/logo-cmc-klebetechnik.webp"
           },
           "sameAs": ["https://www.cmc.de/"],
           "additionalProperty": {

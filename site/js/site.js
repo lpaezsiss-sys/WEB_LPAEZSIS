@@ -245,10 +245,22 @@
     return "https://prueba1.lpaezsis.cl";
   }
 
+  function publicPath(path) {
+    if (!path) return "";
+    path = String(path).trim().replace(/\\/g, "/");
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.indexOf("/site/") === 0) path = path.slice(5);
+    else if (/^site\//i.test(path)) path = "/" + path.slice(5);
+    if (path.charAt(0) !== "/") path = "/" + path.replace(/^\.\//, "");
+    return path;
+  }
+
   function absoluteUrl(path) {
     if (!path) return "";
     path = String(path).trim();
     if (/^https?:\/\//i.test(path)) return path;
+    path = publicPath(path);
     return pageOrigin() + (path.charAt(0) === "/" ? path : "/" + path);
   }
 
@@ -790,6 +802,7 @@
     injectJsonLd: injectJsonLd,
     upsertJsonLd: upsertJsonLd,
     pageOrigin: pageOrigin,
+    publicPath: publicPath,
     absoluteUrl: absoluteUrl,
     clipMetaDescription: clipMetaDescription,
     setHeadMeta: setHeadMeta,

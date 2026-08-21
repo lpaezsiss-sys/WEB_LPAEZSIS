@@ -554,6 +554,8 @@
     var wp = url.match(/\/wp-content\/uploads\/[^?\s]*\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
     if (wp) return "/img/products/" + wp[1];
     if (/^https?:\/\//i.test(url)) return url;
+    if (url.indexOf("/site/") === 0) url = url.slice(5);
+    else if (/^site\//i.test(url)) url = "/" + url.slice(5);
     if (url.charAt(0) === "/") return url;
     return "/" + url.replace(/^\.\//, "");
   }
@@ -990,7 +992,7 @@
     haida: "/img/brand/haida.png",
     "columbia-machine": "/img/brand/columbia-machine.png",
     "columbia-okura": "/img/brand/columbia-machine.png",
-    "cmc-klebetechnik": "/img/brand/cmc-klebetechnik.png",
+    "cmc-klebetechnik": "/img/logo-cmc-klebetechnik.webp",
   };
 
   function resolveBrandLogo(b) {

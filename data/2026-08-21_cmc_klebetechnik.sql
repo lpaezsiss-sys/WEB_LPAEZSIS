@@ -14,7 +14,7 @@ SELECT
   'cmc-klebetechnik',
   'CMC Klebetechnik GmbH',
   'Fabricante especialista en recubrimientos de películas, cintas adhesivas técnicas de alta precisión, piezas troqueladas y aislantes eléctricos para la industria global.',
-  '/img/brand/cmc-klebetechnik.png',
+  '/img/logo-cmc-klebetechnik.webp',
   'https://www.cmc.de/',
   '<section class="brand-section"><h3>CMC Klebetechnik GmbH</h3><p><strong>Cintas Adhesivas Técnicas y Aislantes Eléctricos</strong></p><p>CMC Klebetechnik GmbH (Frankenthal, Alemania) cuenta con certificaciones ISO 9001 e ISO 14001, cumpliendo con estándares UL, IEC, RoHS e IMDS. A través de LPAEZSIS, ponemos a disposición del mercado nacional la línea completa de cintas técnicas para aplicaciones eléctricas, electrónicas, automotrices y conversión de etiquetas (empalmes siliconados).</p></section>',
   25,
@@ -40,7 +40,7 @@ SELECT
       "slogan": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://prueba1.lpaezsis.cl/img/brand/cmc-klebetechnik.png"
+        "url": "https://prueba1.lpaezsis.cl/img/logo-cmc-klebetechnik.webp"
       },
       "sameAs": [
         "https://www.cmc.de/"
@@ -76,7 +76,7 @@ UPDATE `brands`
 SET
   `name` = 'CMC Klebetechnik GmbH',
   `description` = 'Fabricante especialista en recubrimientos de películas, cintas adhesivas técnicas de alta precisión, piezas troqueladas y aislantes eléctricos para la industria global.',
-  `logo_url` = '/img/brand/cmc-klebetechnik.png',
+  `logo_url` = '/img/logo-cmc-klebetechnik.webp',
   `website_url` = 'https://www.cmc.de/',
   `content_html` = '<section class="brand-section"><h3>CMC Klebetechnik GmbH</h3><p><strong>Cintas Adhesivas Técnicas y Aislantes Eléctricos</strong></p><p>CMC Klebetechnik GmbH (Frankenthal, Alemania) cuenta con certificaciones ISO 9001 e ISO 14001, cumpliendo con estándares UL, IEC, RoHS e IMDS. A través de LPAEZSIS, ponemos a disposición del mercado nacional la línea completa de cintas técnicas para aplicaciones eléctricas, electrónicas, automotrices y conversión de etiquetas (empalmes siliconados).</p></section>',
   `sort_order` = 25,
@@ -102,7 +102,7 @@ SET
       "slogan": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://prueba1.lpaezsis.cl/img/brand/cmc-klebetechnik.png"
+        "url": "https://prueba1.lpaezsis.cl/img/logo-cmc-klebetechnik.webp"
       },
       "sameAs": [
         "https://www.cmc.de/"
