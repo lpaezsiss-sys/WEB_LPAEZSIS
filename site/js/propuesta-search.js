@@ -1,18 +1,16 @@
 /**
- * propuesta-search.js — buscador predictivo del header (Home y resto del sitio).
- * Compatible con markup en layout.js o plantilla #headerSearchTemplate (borrador).
+ * propuesta-search.js — buscador predictivo del header.
+ * Usa GET api/search.php?q= (productos + marcas). Fallback client-side si la API falla.
  */
 (function () {
   "use strict";
 
   var DEBOUNCE_MS = 180;
   var MIN_CHARS = 2;
-  var MAX_PRODUCTS = 6;
-  var MAX_BRANDS = 4;
-
-  var cache = { products: null, brands: null, loading: null };
+  var abortController = null;
   var debounceTimer = null;
   var activeIndex = -1;
+  var fallbackCache = { products: null, brands: null, loading: null };
 
   function escapeHtml(str) {
     if (window.Lpaez && Lpaez.escapeHtml) return Lpaez.escapeHtml(str);
@@ -65,20 +63,57 @@
     return document.querySelector(".header-search-container");
   }
 
-  function loadCatalog() {
-    if (cache.products && cache.brands) {
-      return Promise.resolve(cache);
+  function tipoLabel(tipo) {
+    if (tipo === "equipo") return "Equipo";
+    if (tipo === "repuesto") return "Repuesto";
+    if (tipo === "marca") return "Marca";
+    return tipo || "Producto";
+  }
+
+  function splitApiResults(rows) {
+    var products = [];
+    var brands = [];
+    (rows || []).forEach(function (row) {
+      var cat = String(row.categoria || "").toLowerCase();
+      if (cat === "marca" || row.tipo === "marca") brands.push(row);
+      else products.push(row);
+    });
+    return { products: products, brands: brands };
+  }
+
+  function fetchSearchApi(query) {
+    if (abortController) {
+      try {
+        abortController.abort();
+      } catch (e) { /* ignore */ }
     }
-    if (cache.loading) return cache.loading;
+    abortController = typeof AbortController !== "undefined" ? new AbortController() : null;
+
+    var url = "api/search.php?q=" + encodeURIComponent(query);
+    var opts = { credentials: "same-origin", cache: "no-store" };
+    if (abortController) opts.signal = abortController.signal;
+
+    return fetch(url, opts).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    }).then(function (data) {
+      if (!Array.isArray(data)) throw new Error("bad payload");
+      return splitApiResults(data);
+    });
+  }
+
+  function loadFallbackCatalog() {
+    if (fallbackCache.products && fallbackCache.brands) {
+      return Promise.resolve(fallbackCache);
+    }
+    if (fallbackCache.loading) return fallbackCache.loading;
 
     var productsP = window.Lpaez && Lpaez.api
       ? Lpaez.api("/api/products").then(function (res) {
           return (res.data && res.data.products) || [];
         })
       : fetch("api/productos.php", { credentials: "same-origin" })
-          .then(function (r) {
-            return r.json();
-          })
+          .then(function (r) { return r.json(); })
           .then(function (data) {
             return Array.isArray(data) ? data : data.products || data.productos || [];
           });
@@ -88,28 +123,26 @@
           return (res.data && res.data.brands) || [];
         })
       : fetch("api/marcas.php", { credentials: "same-origin" })
-          .then(function (r) {
-            return r.json();
-          })
+          .then(function (r) { return r.json(); })
           .then(function (data) {
             return Array.isArray(data) ? data : data.brands || data.marcas || [];
           });
 
-    cache.loading = Promise.all([productsP, brandsP])
+    fallbackCache.loading = Promise.all([productsP, brandsP])
       .then(function (pair) {
-        cache.products = pair[0] || [];
-        cache.brands = pair[1] || [];
-        cache.loading = null;
-        return cache;
+        fallbackCache.products = pair[0] || [];
+        fallbackCache.brands = pair[1] || [];
+        fallbackCache.loading = null;
+        return fallbackCache;
       })
       .catch(function () {
-        cache.products = cache.products || [];
-        cache.brands = cache.brands || [];
-        cache.loading = null;
-        return cache;
+        fallbackCache.products = fallbackCache.products || [];
+        fallbackCache.brands = fallbackCache.brands || [];
+        fallbackCache.loading = null;
+        return fallbackCache;
       });
 
-    return cache.loading;
+    return fallbackCache.loading;
   }
 
   function matchScore(haystack, needle) {
@@ -119,62 +152,56 @@
     if (h === n) return 100;
     if (h.indexOf(n) === 0) return 80;
     if (h.indexOf(n) !== -1) return 60;
-    var parts = n.split(/\s+/).filter(Boolean);
-    var hits = parts.filter(function (p) {
-      return h.indexOf(p) !== -1;
-    }).length;
-    return hits ? 40 + hits * 5 : 0;
+    return 0;
   }
 
-  function searchItems(query) {
+  function fallbackSearch(query) {
     var q = String(query || "").trim();
-    if (q.length < MIN_CHARS) return { products: [], brands: [] };
-
-    var products = (cache.products || [])
+    var products = (fallbackCache.products || [])
       .map(function (p) {
-        var score =
-          matchScore(p.name, q) * 2 +
-          matchScore(p.brand_name || p.marca, q) +
-          matchScore(p.tipo, q) +
-          matchScore(p.slug, q) +
-          matchScore(p.category_name, q);
-        return { item: p, score: score };
+        return {
+          item: {
+            id: p.id,
+            titulo: p.name,
+            slug: p.slug,
+            tipo: p.tipo || "producto",
+            imagen: p.image_url,
+            categoria: "producto",
+            brand_name: p.brand_name
+          },
+          score:
+            matchScore(p.name, q) * 2 +
+            matchScore(p.brand_name, q) +
+            matchScore(p.tipo, q) +
+            matchScore(p.slug, q)
+        };
       })
-      .filter(function (x) {
-        return x.score > 0;
-      })
-      .sort(function (a, b) {
-        return b.score - a.score;
-      })
-      .slice(0, MAX_PRODUCTS)
-      .map(function (x) {
-        return x.item;
-      });
+      .filter(function (x) { return x.score > 0; })
+      .sort(function (a, b) { return b.score - a.score; })
+      .slice(0, 6)
+      .map(function (x) { return x.item; });
 
-    var brands = (cache.brands || [])
+    var brands = (fallbackCache.brands || [])
       .map(function (b) {
-        var score =
-          matchScore(b.name || b.nombre, q) * 2 + matchScore(b.slug, q);
-        return { item: b, score: score };
+        var nombre = b.name || b.nombre || "";
+        return {
+          item: {
+            id: b.id,
+            titulo: nombre,
+            slug: b.slug,
+            tipo: "marca",
+            imagen: b.logo_url,
+            categoria: "marca"
+          },
+          score: matchScore(nombre, q) * 2 + matchScore(b.slug, q)
+        };
       })
-      .filter(function (x) {
-        return x.score > 0;
-      })
-      .sort(function (a, b) {
-        return b.score - a.score;
-      })
-      .slice(0, MAX_BRANDS)
-      .map(function (x) {
-        return x.item;
-      });
+      .filter(function (x) { return x.score > 0; })
+      .sort(function (a, b) { return b.score - a.score; })
+      .slice(0, 4)
+      .map(function (x) { return x.item; });
 
     return { products: products, brands: brands };
-  }
-
-  function tipoLabel(tipo) {
-    if (tipo === "equipo") return "Equipo";
-    if (tipo === "repuesto") return "Repuesto";
-    return tipo || "Producto";
   }
 
   function renderDropdown(results, query) {
@@ -205,6 +232,7 @@
       html += '<div class="search-group-label">Productos</div>';
       products.forEach(function (p, i) {
         var href = "producto.html?slug=" + encodeURIComponent(p.slug || "");
+        var title = p.titulo || p.name || "";
         var meta = [tipoLabel(p.tipo), p.brand_name].filter(Boolean).join(" · ");
         html +=
           '<a class="search-result-item" role="option" data-index="' +
@@ -214,7 +242,7 @@
           '">' +
           '<span class="search-result-item__main">' +
           '<span class="search-result-item__title">' +
-          escapeHtml(p.name || "") +
+          escapeHtml(title) +
           "</span>" +
           (meta
             ? '<span class="search-result-item__meta">' + escapeHtml(meta) + "</span>"
@@ -231,7 +259,7 @@
       html += '<div class="search-group-label">Marcas</div>';
       brands.forEach(function (b, i) {
         var slug = b.slug || "";
-        var nombre = b.name || b.nombre || slug;
+        var nombre = b.titulo || b.name || b.nombre || slug;
         var href = "marcas.html?slug=" + encodeURIComponent(slug);
         var idx = products.length + i;
         html +=
@@ -307,9 +335,22 @@
   }
 
   function runSearch(query) {
-    loadCatalog().then(function () {
-      renderDropdown(searchItems(query), query);
-    });
+    var q = String(query || "").trim();
+    if (q.length < MIN_CHARS) {
+      hideDropdown();
+      return;
+    }
+
+    fetchSearchApi(q)
+      .then(function (results) {
+        renderDropdown(results, q);
+      })
+      .catch(function (err) {
+        if (err && err.name === "AbortError") return;
+        loadFallbackCatalog().then(function () {
+          renderDropdown(fallbackSearch(q), q);
+        });
+      });
   }
 
   function bindEvents(container) {
@@ -319,7 +360,6 @@
     if (!input) return;
 
     input.addEventListener("focus", function () {
-      loadCatalog();
       if (input.value.trim().length >= MIN_CHARS) runSearch(input.value);
     });
 

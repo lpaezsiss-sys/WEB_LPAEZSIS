@@ -78,7 +78,7 @@
     if (!document.querySelector('link[href*="propuesta-search.css"]')) {
       var searchCss = document.createElement("link");
       searchCss.rel = "stylesheet";
-      searchCss.href = "css/propuesta-search.css?v=2";
+      searchCss.href = "css/propuesta-search.css?v=3";
       document.head.appendChild(searchCss);
     }
   }
@@ -86,7 +86,7 @@
   function loadSearchRuntime() {
     if (document.querySelector('script[src*="propuesta-search.js"]')) return;
     var searchJs = document.createElement("script");
-    searchJs.src = "js/propuesta-search.js?v=2";
+    searchJs.src = "js/propuesta-search.js?v=3";
     (document.body || document.documentElement).appendChild(searchJs);
   }
 
