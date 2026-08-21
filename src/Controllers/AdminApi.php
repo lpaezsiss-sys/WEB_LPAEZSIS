@@ -76,11 +76,7 @@ final class AdminApi
             $rows = BrandSeo::presentMany(
                 self::pdo()->query('SELECT * FROM brands ORDER BY sort_order, name')->fetchAll()
             );
-            Response::json([
-                'success' => true,
-                'brands' => $rows,
-                'data' => ['brands' => $rows],
-            ]);
+            Response::json(BrandSeo::listResult($rows));
             return;
         }
         if ($method === 'POST' && $sub === '/brands') {
@@ -255,10 +251,16 @@ final class AdminApi
             return;
         }
         Response::json([
+            'success' => true,
             'ok' => true,
             'url' => $result['url'],
             'type' => $result['type'] ?? 'file',
             'converted' => !empty($result['converted']),
+            'data' => [
+                'url' => $result['url'],
+                'type' => $result['type'] ?? 'file',
+                'converted' => !empty($result['converted']),
+            ],
         ]);
     }
 
@@ -493,7 +495,7 @@ final class AdminApi
     private static function deleteBrand(int $id): void
     {
         self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
-        Response::json(['success' => true, 'ok' => true, 'data' => ['id' => $id]]);
+        Response::json(['success' => true, 'ok' => true, 'id' => $id, 'data' => ['id' => $id]]);
     }
 
     private static function createProduct(): void

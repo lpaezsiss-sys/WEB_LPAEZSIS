@@ -15,6 +15,6 @@ final class Response
 
     public static function error(string $message, int $status = 400, array $extra = []): void
     {
-        self::json(array_merge(['success' => false, 'error' => $message], $extra), $status);
+        self::json(array_merge(['success' => false, 'ok' => false, 'error' => $message], $extra), $status);
     }
 }

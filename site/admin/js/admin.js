@@ -55,7 +55,7 @@
   /**
    * @typedef {Object} BrandActionResult
    * @property {boolean} success
-   * @property {boolean} [ok]
+   * @property {boolean} ok
    * @property {number} [id]
    * @property {string} [slug]
    * @property {Brand} [brand]
@@ -266,7 +266,7 @@
           setToken(null);
           showLogin();
         }
-        return { ok: res.ok, status: res.status, data: data };
+        return { ok: res.ok && data.success !== false, status: res.status, data: data };
       });
     });
   }

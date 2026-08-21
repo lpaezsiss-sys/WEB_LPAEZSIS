@@ -46,7 +46,7 @@ use PDO;
  * }
  * @phpstan-type BrandActionResult array{
  *   success: bool,
- *   ok?: bool,
+ *   ok: bool,
  *   id?: int,
  *   slug?: string,
  *   brand?: Brand,
@@ -271,6 +271,32 @@ final class BrandSeo
                 'slug' => $slug,
                 'brand' => $brand,
             ],
+        ];
+    }
+
+    /**
+     * @param list<Brand> $brands
+     * @return array{success: true, ok: true, brands: list<Brand>, data: array{brands: list<Brand>}}
+     */
+    public static function listResult(array $brands): array
+    {
+        return [
+            'success' => true,
+            'ok' => true,
+            'brands' => $brands,
+            'data' => ['brands' => $brands],
+        ];
+    }
+
+    /**
+     * @return array{success: false, ok: false, error: string}
+     */
+    public static function failResult(string $message): array
+    {
+        return [
+            'success' => false,
+            'ok' => false,
+            'error' => $message,
         ];
     }
 

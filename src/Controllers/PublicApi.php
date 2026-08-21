@@ -114,7 +114,7 @@ final class PublicApi
                 'SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
             )->fetchAll()
         );
-        Response::json(['success' => true, 'brands' => $rows, 'data' => ['brands' => $rows]]);
+        Response::json(BrandSeo::listResult($rows));
     }
 
     private static function brandDetail(string $slug): void
@@ -152,6 +152,7 @@ final class PublicApi
         $products = $p->fetchAll();
         Response::json([
             'success' => true,
+            'ok' => true,
             'brand' => $brand,
             'products' => $products,
             'data' => ['brand' => $brand, 'products' => $products],
