@@ -345,6 +345,10 @@
     "turbina-soplado-sonic-100": "img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "img/products/A07-10976.jpg",
+    "paletizador-nivel-inferior-columbia-fl3000": "img/products/columbia-fl3000.png",
+    "paletizador-alto-nivel-columbia-hl7200": "img/products/columbia-hl7200.png",
+    "celda-paletizado-robotico-columbia-ai1800": "img/products/columbia-ai1800.png",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/products/columbia-fl1000sw.png",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -364,8 +368,56 @@
     "cuchillos-aire": "img/hero/conserves.jpg",
     repuestos: "img/products/A07-10015.jpg",
     "fin-de-linea": "img/hero/line.jpg",
+    "paletizado-convencional": "img/products/columbia-fl3000.png",
+    "paletizado-alta-velocidad": "img/products/columbia-hl7200.png",
+    "paletizado-robotico": "img/products/columbia-ai1800.png",
+    "paletizado-integrado": "img/products/columbia-fl1000sw.png",
     "salas-limpias": "img/hero/plant.jpg",
   };
+
+  var DATASHEET_FILES = {
+    "paletizador-nivel-inferior-columbia-fl3000": "img/fichas/ficha_tecnica_fl3000_columbia.pdf",
+    "paletizador-alto-nivel-columbia-hl7200": "img/fichas/ficha_tecnica_hl7200_columbia.pdf",
+    "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
+  };
+
+  function parseProductFicha(raw) {
+    var text = String(raw || "").replace(/\r\n/g, "\n").trim();
+    var specs = [];
+    var datasheet = "";
+    var detail = text;
+    var fichaIdx = text.lastIndexOf("Ficha técnica:");
+    if (fichaIdx >= 0) {
+      datasheet = text.slice(fichaIdx + "Ficha técnica:".length).trim().split("\n")[0].trim();
+      text = text.slice(0, fichaIdx).trim();
+    }
+    var specsIdx = text.indexOf("Especificaciones técnicas:");
+    if (specsIdx >= 0) {
+      detail = text.slice(0, specsIdx).trim();
+      text.slice(specsIdx + "Especificaciones técnicas:".length)
+        .split("\n")
+        .forEach(function (line) {
+          var cleaned = line.replace(/^[•\-\*]\s*/, "").trim();
+          if (!cleaned) return;
+          var parts = cleaned.split(":");
+          if (parts.length < 2) return;
+          specs.push({ label: parts[0].trim(), value: parts.slice(1).join(":").trim() });
+        });
+    } else {
+      detail = text;
+    }
+    return { detail: detail, specs: specs, datasheet: datasheet };
+  }
+
+  function resolveDatasheetUrl(product) {
+    if (!product) return "";
+    var parsed = parseProductFicha(product.description);
+    if (parsed.datasheet) return parsed.datasheet.replace(/^\//, "");
+    if (DATASHEET_FILES[product.slug]) return DATASHEET_FILES[product.slug];
+    if (product.slug) return "img/fichas/" + product.slug + ".pdf";
+    return "";
+  }
 
   function resolveProductImage(p) {
     if (!p) return PRODUCT_FALLBACKS[0];
@@ -517,6 +569,8 @@
     clearQuote: clearQuote,
     showToast: showToast,
     productCardHtml: productCardHtml,
+    parseProductFicha: parseProductFicha,
+    resolveDatasheetUrl: resolveDatasheetUrl,
     resolveProductImage: resolveProductImage,
     resolveCategoryImage: resolveCategoryImage,
     observeReveals: observeReveals,

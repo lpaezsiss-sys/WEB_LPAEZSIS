@@ -225,12 +225,12 @@ final class AdminApi
             Response::error('Archivo requerido');
             return;
         }
-        $result = Upload::storeImage($file);
+        $result = Upload::store($file, 'auto');
         if (!$result['ok']) {
             Response::error((string) $result['error']);
             return;
         }
-        Response::json(['url' => $result['url']]);
+        Response::json(['url' => $result['url'], 'type' => $result['type'] ?? 'file']);
     }
 
     private static function saveSettings(): void

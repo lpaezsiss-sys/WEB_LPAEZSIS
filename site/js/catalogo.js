@@ -141,6 +141,74 @@ const MOCK_PRODUCTS = [
     brand_name: "Sonic Air Systems",
     quote_url: "cotizacion.html?sku=tensor-correa-sonic-todos-los-modelos",
   },
+  {
+    id: 17,
+    slug: "paletizador-nivel-inferior-columbia-fl3000",
+    name: "Paletizador de Nivel Inferior Columbia FL3000",
+    sku: "FL3000",
+    description: "Paletizador automático a nivel de piso de velocidad media-alta (30-40 CPM), diseñado para el manejo seguro y eficiente de cajas, charolas y paquetes.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/products/columbia-fl3000.png",
+    image_webp: "",
+    category_slug: "paletizado-convencional",
+    category_name: "Paletizado Convencional / Final de Línea",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-nivel-inferior-columbia-fl3000",
+  },
+  {
+    id: 18,
+    slug: "paletizador-alto-nivel-columbia-hl7200",
+    name: "Paletizador de Alto Nivel Columbia HL7200",
+    sku: "HL7200",
+    description: "Paletizador de alta velocidad (hasta 120 CPM) de entrada superior, ideal para líneas masivas de embotellado, alimentos y consumo masivo.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/products/columbia-hl7200.png",
+    image_webp: "",
+    category_slug: "paletizado-alta-velocidad",
+    category_name: "Paletizado de Alta Velocidad / Final de Línea",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-alto-nivel-columbia-hl7200",
+  },
+  {
+    id: 19,
+    slug: "celda-paletizado-robotico-columbia-ai1800",
+    name: "Celda de Paletizado Robótico Columbia-Okura Ai1800",
+    sku: "AI1800",
+    description: "Robot industrial de paletizado de alta precisión para el manejo versátil de sacos, cajas, baldes y múltiples líneas simultáneas.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/products/columbia-ai1800.png",
+    image_webp: "",
+    category_slug: "paletizado-robotico",
+    category_name: "Paletizado Robótico / Células de Automatización",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=celda-paletizado-robotico-columbia-ai1800",
+  },
+  {
+    id: 20,
+    slug: "paletizador-compacto-envolvedora-columbia-fl1000sw",
+    name: "Paletizador Compacto con Envolvedora Integrada Columbia FL1000-SW",
+    sku: "FL1000-SW",
+    description: "Sistema híbrido que integra paletizado automático a nivel de piso y envoltura con película estirable (Stretch Wrap) en una sola huella reducida.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/products/columbia-fl1000sw.png",
+    image_webp: "",
+    category_slug: "paletizado-integrado",
+    category_name: "Paletizado Integrado / Soluciones Compactas",
+    brand_slug: "columbia-machine",
+    brand_name: "Columbia Machine",
+    quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -150,10 +218,15 @@ const MOCK_CATEGORIES = [
   { slug: "fin-de-linea", name: "Máquinas Fin de Línea" },
   { slug: "salas-limpias", name: "Salas Limpias y HEPA" },
   { slug: "cuchillos-aire", name: "Cuchillos de Aire" },
+  { slug: "paletizado-convencional", name: "Paletizado Convencional / Final de Línea" },
+  { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
+  { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
+  { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
+  { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
 ];
 
@@ -162,7 +235,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -590,11 +663,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const slug = btn.getAttribute("data-datasheet") || "";
       const name = btn.getAttribute("data-datasheet-name") || "Producto";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      const datasheetHref =
+        (window.Lpaez && window.Lpaez.resolveDatasheetUrl && window.Lpaez.resolveDatasheetUrl({ slug: slug, description: prod && prod.description })) ||
+        "img/fichas/" + encodeURIComponent(slug) + ".pdf";
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
         `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
-        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
+        `<div class="empty-actions"><a class="btn btn-primary" href="${escapeAttr(datasheetHref)}" target="_blank" rel="noopener">Descargar PDF</a>` +
         `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
       if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
       else datasheetDialog.setAttribute("open", "");
