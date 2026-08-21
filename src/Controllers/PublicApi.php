@@ -170,7 +170,8 @@ final class PublicApi
 
         try {
             $like = '%' . $q . '%';
-            $stmt = self::pdo()->prepare(
+            // Cupos separados para no saturar el LIMIT con solo productos.
+            $prodStmt = self::pdo()->prepare(
                 "SELECT p.id, p.name AS titulo, p.slug,
                         COALESCE(NULLIF(p.tipo, ''), 'producto') AS tipo,
                         p.image_url AS imagen, 'producto' AS categoria
@@ -182,8 +183,14 @@ final class PublicApi
                      OR IFNULL(p.tipo, '') LIKE ?
                      OR p.slug LIKE ?
                    )
-                 UNION ALL
-                 SELECT b.id, b.name AS titulo, b.slug, 'marca' AS tipo,
+                 ORDER BY p.name ASC
+                 LIMIT 6"
+            );
+            $prodStmt->execute([$like, $like, $like, $like]);
+            $products = $prodStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $brandStmt = self::pdo()->prepare(
+                "SELECT b.id, b.name AS titulo, b.slug, 'marca' AS tipo,
                         b.logo_url AS imagen, 'marca' AS categoria
                  FROM brands b
                  WHERE b.is_active = 1
@@ -192,10 +199,13 @@ final class PublicApi
                      OR IFNULL(b.description, '') LIKE ?
                      OR b.slug LIKE ?
                    )
-                 LIMIT 8"
+                 ORDER BY b.name ASC
+                 LIMIT 2"
             );
-            $stmt->execute([$like, $like, $like, $like, $like, $like, $like]);
-            Response::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+            $brandStmt->execute([$like, $like, $like]);
+            $brands = $brandStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            Response::json(array_merge($products, $brands));
         } catch (\Throwable $e) {
             Response::error('Error en la búsqueda: ' . $e->getMessage(), 500);
         }
