@@ -32,6 +32,14 @@ final class Response
 
     public static function error(string $message, int $status = 400, array $extra = []): void
     {
-        self::json(array_merge(['success' => false, 'ok' => false, 'error' => $message], $extra), $status);
+        $payload = [
+            'success' => false,
+            'ok' => false,
+            'error' => $message,
+        ];
+        if ($extra !== []) {
+            $payload['data'] = $extra;
+        }
+        self::json($payload, $status);
     }
 }

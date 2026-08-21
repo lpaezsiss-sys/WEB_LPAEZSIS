@@ -86,7 +86,7 @@ final class AdminApi
         if ($method === 'PUT' && $sub === '/brands') {
             $id = (int) (self::body()['id'] ?? 0);
             if ($id <= 0) {
-                Response::error('id requerido');
+                self::brandFail('id requerido');
                 return;
             }
             self::updateBrand($id);
@@ -371,7 +371,7 @@ final class AdminApi
         if (!array_key_exists('name', $b)) {
             $row = self::patch('brands', $id, $b, $writable, false);
             if ($row === null) {
-                Response::error('Sin cambios');
+                self::brandFail('Sin cambios');
                 return;
             }
             self::respondBrand($id);
@@ -384,7 +384,7 @@ final class AdminApi
         }
         $saved = self::patch('brands', $id, $row, $writable, false);
         if ($saved === null) {
-            Response::error('Sin cambios');
+            self::brandFail('Sin cambios');
             return;
         }
         self::respondBrand($id);
@@ -407,7 +407,7 @@ final class AdminApi
     {
         $name = trim((string) ($b['name'] ?? ''));
         if ($name === '') {
-            Response::error('Nombre requerido');
+            self::brandFail('Nombre requerido');
             return null;
         }
         $excludeId = (int) ($b['id'] ?? 0);
@@ -489,6 +489,11 @@ final class AdminApi
     {
         self::pdo()->prepare('DELETE FROM brands WHERE id = ?')->execute([$id]);
         Response::json(BrandSeo::envelope(['id' => $id]));
+    }
+
+    private static function brandFail(string $message, int $status = 400): void
+    {
+        Response::json(BrandSeo::failResult($message), $status);
     }
 
     private static function createProduct(): void
