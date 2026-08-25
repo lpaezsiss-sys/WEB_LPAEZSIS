@@ -214,27 +214,69 @@ function renderBrandSelector(brands, activeSlug) {
 
 function updateBrandHero(brand) {
   var titleEl = document.getElementById("brandTitle");
-  var descEl = document.getElementById("brandDescription");
+  var descEl =
+    document.getElementById("brandShortDesc") ||
+    document.getElementById("brandDescription");
+  var logoEl = document.getElementById("brandHeroLogo");
   var nombre = brand.nombre || brand.name || "";
   var desc = brand.descripcion || brand.description || "";
+  var slug = brand.slug || "";
 
-  if (titleEl) titleEl.textContent = nombre;
+  if (titleEl) titleEl.textContent = nombre || "Representaciones y Distribución";
   if (descEl) descEl.textContent = desc;
+  var legacyDesc = document.getElementById("brandDescription");
+  if (legacyDesc && legacyDesc !== descEl) legacyDesc.textContent = desc;
   document.title = (nombre || "Marca") + " | LPAEZsis";
 
+  if (logoEl) {
+    var LOGO_BY_SLUG = {
+      "sonic-air-systems": "img/brand/sonic-air.png",
+      sonic: "img/brand/sonic-air.png",
+      lyc: "img/brand/lyc.png",
+      movex: "img/brand/movex.png",
+      isodur: "img/brand/isodur.png",
+      combi: "img/brand/combi.png",
+      haida: "img/brand/haida.png",
+      "columbia-machine": "img/uploads/p-57c09a0440925f86.png",
+      "cmc-klebetechnik": "img/uploads/p-4123e04f38ce02ea.png",
+    };
+    var src = String(brand.logo_url || brand.imagen || brand.logo || "").trim();
+    if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
+    if (!src && slug) {
+      var guess = String(slug).toLowerCase().replace(/-systems$/i, "");
+      if (LOGO_BY_SLUG[guess]) src = LOGO_BY_SLUG[guess];
+    }
+    if (src) {
+      logoEl.onerror = function () {
+        this.onerror = null;
+        this.style.display = "none";
+        this.hidden = true;
+      };
+      logoEl.src = src;
+      logoEl.alt = "Logo " + (nombre || slug || "marca");
+      logoEl.hidden = false;
+      logoEl.style.display = "";
+    } else {
+      logoEl.removeAttribute("src");
+      logoEl.alt = "";
+      logoEl.hidden = true;
+      logoEl.style.display = "none";
+    }
+  }
+
   var canonical = document.getElementById("brandCanonical");
-  if (canonical && brand.slug) {
+  if (canonical && slug) {
     var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
     canonical.setAttribute(
       "href",
-      origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug)
+      origin + "/marcas.html?slug=" + encodeURIComponent(slug)
     );
   }
   var quoteCta = document.getElementById("brandQuoteCta");
-  if (quoteCta && brand.slug) {
+  if (quoteCta && slug) {
     quoteCta.href =
       "contacto.html?empresa=" +
-      encodeURIComponent(nombre || brand.slug) +
+      encodeURIComponent(nombre || slug) +
       "&motivo=cotizacion";
   }
 

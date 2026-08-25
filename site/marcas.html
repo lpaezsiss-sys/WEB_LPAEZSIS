@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=128">
+  <link rel="stylesheet" href="css/style.css?v=129">
   <link rel="stylesheet" href="css/propuesta-marcas.css?v=7">
 </head>
 <body>
@@ -20,11 +20,27 @@
 
   <!-- Zona superior: hero + ficha de marca sin interrupciones -->
   <section class="brand-hero" aria-labelledby="brandTitle">
-    <div class="brand-hero__inner container">
-      <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
-      <p class="brand-hero__description" id="brandDescription">
-        Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
-      </p>
+    <div class="container brand-hero-flex">
+      <div class="brand-hero-text">
+        <span class="badge-representacion">Representación Oficial en Chile</span>
+        <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
+        <p class="brand-hero__description" id="brandShortDesc">
+          Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
+        </p>
+        <!-- alias id for legacy JS selectors -->
+        <span id="brandDescription" hidden></span>
+      </div>
+      <div class="brand-hero-logo-box">
+        <img
+          id="brandHeroLogo"
+          src=""
+          alt=""
+          width="220"
+          height="120"
+          decoding="async"
+          hidden
+          onerror="this.onerror=null;this.style.display='none';this.hidden=true;">
+      </div>
     </div>
   </section>
 
@@ -77,6 +93,6 @@
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=39"></script>
   <script src="js/site.js?v=26"></script>
-  <script src="js/marcas.js?v=122"></script>
+  <script src="js/marcas.js?v=123"></script>
 </body>
 </html>
