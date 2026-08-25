@@ -113,7 +113,8 @@
       "</a>" +
       '<button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav">☰</button>' +
       '<nav class="nav" id="mainNav" aria-label="Principal">' +
-      '<a href="catalogo.html">Productos</a>' +
+      '<a href="catalogo.html?tipo=equipo">Productos</a>' +
+      '<a href="repuestos.html">Repuestos</a>' +
       '<div class="nav-dropdown" id="navBrands">' +
       '<button type="button" class="nav-dropdown__toggle" id="navBrandsToggle" aria-expanded="false" aria-controls="navBrandsMenu">' +
       '<span>Representaciones y Distribución</span>' +
