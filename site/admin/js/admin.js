@@ -5,8 +5,10 @@
   var TOKEN_KEY = "lpaezsis_admin_token";
   var categoriesCache = [];
   var brandsCache = [];
+  var industriasCache = [];
   var productsCache = [];
   var selectedCategoryId = null;
+  var productListTipo = "equipo"; // equipo | repuesto
 
   var loginView = document.getElementById("loginView");
   var appView = document.getElementById("appView");
@@ -19,6 +21,32 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function isActiveFlag(value) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return true;
+    }
+    return Boolean(Number(value));
+  }
+
+  function coerceBool(value, defaultValue) {
+    if (value === false || value === 0 || value === "0" || value === "false" || value === null) {
+      return false;
+    }
+    if (value === true || value === 1 || value === "1") {
+      return true;
+    }
+    if (value === undefined || value === "") {
+      return !!defaultValue;
+    }
+    return Boolean(Number(value));
   }
 
   function escapeAttr(str) {
@@ -79,19 +107,29 @@
   function showApp() {
     loginView.hidden = true;
     appView.hidden = false;
-    showTab("products");
+    showTab("equipos");
   }
 
   function showTab(tab) {
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["products", "brands", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["equipos", "repuestos", "brands", "clientes", "soluciones", "sectores", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
-    if (tab === "products") loadProducts();
+    if (tab === "equipos") {
+      productListTipo = "equipo";
+      loadProducts();
+    }
+    if (tab === "repuestos") {
+      productListTipo = "repuesto";
+      loadProducts();
+    }
     if (tab === "brands") loadBrands();
+    if (tab === "clientes") loadClientes();
+    if (tab === "soluciones") loadSoluciones();
+    if (tab === "sectores") loadSectores();
     if (tab === "orders") loadOrders();
     if (tab === "quotes") loadQuotes();
     if (tab === "contacts") loadContacts();
@@ -129,8 +167,19 @@
     return "Bajo pedido";
   }
 
-  function countProductsInCategory(catId) {
+  function productTipoOf(p) {
+    if (p && (p.tipo === "repuesto" || p.tipo === "equipo")) return p.tipo;
+    return p && p.sale_mode === "buy" ? "repuesto" : "equipo";
+  }
+
+  function productsOfCurrentTipo() {
     return productsCache.filter(function (p) {
+      return productTipoOf(p) === productListTipo;
+    });
+  }
+
+  function countProductsInCategory(catId) {
+    return productsOfCurrentTipo().filter(function (p) {
       return String(p.category_id) === String(catId);
     }).length;
   }
@@ -145,9 +194,12 @@
   }
 
   function renderCatSidebar() {
-    var list = document.getElementById("catSidebarList");
+    var listId = productListTipo === "repuesto" ? "catSidebarListRepuestos" : "catSidebarList";
+    var list = document.getElementById(listId);
     if (!list) return;
-    var allCount = productsCache.length;
+    var scoped = productsOfCurrentTipo();
+    var allCount = scoped.length;
+    var label = productListTipo === "repuesto" ? "repuestos" : "equipos";
     var html =
       '<button type="button" class="cat-item' +
       (selectedCategoryId == null ? " is-active" : "") +
@@ -155,7 +207,9 @@
       '<span class="cat-item__name">Todas</span>' +
       '<span class="cat-item__count">' +
       allCount +
-      " productos</span></button>";
+      " " +
+      label +
+      "</span></button>";
     html += categoriesCache
       .map(function (c) {
         var n = countProductsInCategory(c.id);
@@ -170,8 +224,8 @@
           "</span>" +
           '<span class="cat-item__count">' +
           n +
-          " producto" +
-          (n === 1 ? "" : "s") +
+          " " +
+          (n === 1 ? label.replace(/s$/, "") : label) +
           "</span></button>"
         );
       })
@@ -180,36 +234,45 @@
   }
 
   function renderCatalogHead() {
-    var cat = selectedCategory();
-    var title = document.getElementById("catalogTitle");
-    var meta = document.getElementById("catalogMeta");
+    var isRep = productListTipo === "repuesto";
+    var title = document.getElementById(isRep ? "catalogTitleRepuestos" : "catalogTitle");
+    var meta = document.getElementById(isRep ? "catalogMetaRepuestos" : "catalogMeta");
     var editBtn = document.getElementById("editCategoryBtn");
+    if (!title || !meta) return;
+    var cat = selectedCategory();
+    var scoped = productsOfCurrentTipo();
+    var noun = isRep ? "repuestos" : "equipos";
     if (cat) {
       title.textContent = cat.name;
       meta.textContent =
         "Slug: " +
         (cat.slug || "—") +
-        " · Orden: " +
-        (cat.sort_order != null ? cat.sort_order : 0) +
         " · " +
         countProductsInCategory(cat.id) +
-        " productos";
-      editBtn.hidden = false;
+        " " +
+        noun;
+      if (editBtn) editBtn.hidden = isRep;
     } else {
-      title.textContent = "Todos los productos";
-      meta.textContent = productsCache.length + " productos en catálogo";
-      editBtn.hidden = true;
+      title.textContent = isRep ? "Todos los repuestos" : "Todos los equipos";
+      meta.textContent = scoped.length + " " + noun + " en catálogo";
+      if (editBtn) editBtn.hidden = true;
     }
   }
 
   function renderProductRows() {
-    var list = document.getElementById("productsList");
-    var rows = productsCache.filter(function (p) {
+    var list = document.getElementById(
+      productListTipo === "repuesto" ? "repuestosList" : "productsList"
+    );
+    if (!list) return;
+    var rows = productsOfCurrentTipo().filter(function (p) {
       if (selectedCategoryId == null) return true;
       return String(p.category_id) === String(selectedCategoryId);
     });
     if (!rows.length) {
-      list.innerHTML = '<p class="empty-hint">No hay productos en esta categoría.</p>';
+      list.innerHTML =
+        '<p class="empty-hint">No hay ' +
+        (productListTipo === "repuesto" ? "repuestos" : "equipos") +
+        " en esta categoría.</p>";
       return;
     }
     list.innerHTML = rows
@@ -276,10 +339,11 @@
   }
 
   function loadProducts() {
-    return Promise.all([api("/categories"), api("/brands"), api("/products")]).then(function (results) {
+    return Promise.all([api("/categories"), api("/brands"), api("/industrias"), api("/products")]).then(function (results) {
       categoriesCache = (results[0].data && results[0].data.categories) || [];
       brandsCache = (results[1].data && results[1].data.brands) || [];
-      productsCache = (results[2].data && results[2].data.products) || [];
+      industriasCache = (results[2].data && results[2].data.industrias) || [];
+      productsCache = (results[3].data && results[3].data.products) || [];
       fillSelectsFromCache();
       if (
         selectedCategoryId != null &&
@@ -298,6 +362,7 @@
   function fillSelectsFromCache() {
     var catSel = document.getElementById("productCategory");
     var brandSel = document.getElementById("productBrand");
+    var indSel = document.getElementById("productoIndustria");
     if (!catSel || !brandSel) return;
     catSel.innerHTML = categoriesCache
       .map(function (c) {
@@ -311,12 +376,28 @@
           return '<option value="' + escapeAttr(b.id) + '">' + escapeHtml(b.name) + "</option>";
         })
         .join("");
+    if (indSel) {
+      indSel.innerHTML =
+        '<option value="">-- Seleccionar Industria --</option>' +
+        industriasCache
+          .map(function (i) {
+            return (
+              '<option value="' +
+              escapeAttr(i.id) +
+              '">' +
+              escapeHtml(i.nombre || i.name || i.slug) +
+              "</option>"
+            );
+          })
+          .join("");
+    }
   }
 
   function fillSelects() {
-    return Promise.all([api("/categories"), api("/brands")]).then(function (results) {
+    return Promise.all([api("/categories"), api("/brands"), api("/industrias")]).then(function (results) {
       categoriesCache = (results[0].data && results[0].data.categories) || [];
       brandsCache = (results[1].data && results[1].data.brands) || [];
+      industriasCache = (results[2].data && results[2].data.industrias) || [];
       fillSelectsFromCache();
     });
   }
@@ -359,7 +440,7 @@
     return PRODUCT_FALLBACKS[idx];
   }
 
-  document.getElementById("catSidebarList").addEventListener("click", function (e) {
+  function onCatSidebarClick(e) {
     var btn = e.target.closest("[data-cat-id]");
     if (!btn) return;
     var id = btn.getAttribute("data-cat-id");
@@ -367,14 +448,17 @@
     renderCatSidebar();
     renderCatalogHead();
     renderProductRows();
-  });
+  }
+  document.getElementById("catSidebarList").addEventListener("click", onCatSidebarClick);
+  var catSidebarRepuestos = document.getElementById("catSidebarListRepuestos");
+  if (catSidebarRepuestos) catSidebarRepuestos.addEventListener("click", onCatSidebarClick);
 
   document.getElementById("editCategoryBtn").addEventListener("click", function () {
     var cat = selectedCategory();
     if (cat) openSimpleDialog("categories", cat);
   });
 
-  document.getElementById("productsList").addEventListener("click", function (e) {
+  function onProductListClick(e) {
     var pick = e.target.getAttribute("data-pick-image");
     var edit = e.target.getAttribute("data-edit-product");
     var del = e.target.getAttribute("data-del-product");
@@ -407,9 +491,9 @@
       });
       return;
     }
-    if (del && confirm("¿Eliminar producto?")) {
+    if (del && confirm(productListTipo === "repuesto" ? "¿Eliminar repuesto?" : "¿Eliminar equipo?")) {
       api("/products/" + del, { method: "DELETE" }).then(function () {
-        showToast("Producto eliminado");
+        showToast(productListTipo === "repuesto" ? "Repuesto eliminado" : "Equipo eliminado");
         loadProducts();
       });
       return;
@@ -427,7 +511,7 @@
           showToast((res.data && res.data.error) || "Error");
           return;
         }
-        showToast(pActive.is_active ? "Producto oculto" : "Producto visible");
+        showToast(pActive.is_active ? "Ítem oculto" : "Ítem visible");
         loadProducts();
       });
       return;
@@ -450,7 +534,10 @@
         loadProducts();
       });
     }
-  });
+  }
+  document.getElementById("productsList").addEventListener("click", onProductListClick);
+  var repuestosListEl = document.getElementById("repuestosList");
+  if (repuestosListEl) repuestosListEl.addEventListener("click", onProductListClick);
 
   function setFormImagePreview(url) {
     var img = document.getElementById("productImagePreview");
@@ -483,6 +570,7 @@
   }
 
   var imagePickerContext = null;
+  var videoPickerContext = null;
 
   function openImagePicker(ctx) {
     imagePickerContext = ctx || {};
@@ -496,6 +584,209 @@
     document.getElementById("imageDialog").showModal();
   }
 
+  function normalizeVideoUrl(url) {
+    var u = String(url || "").trim();
+    if (!u) return u;
+    if (/^https?:\/\//i.test(u) || u.indexOf("//") === 0) return u;
+    // Rutas relativas sin "/" se resolverían bajo <base href="/admin/"> → forzar raíz del sitio
+    if (u.charAt(0) !== "/") {
+      u = "/" + u.replace(/^\.\//, "");
+    }
+    return u;
+  }
+
+  function toVideoEmbedUrl(raw) {
+    var url = normalizeVideoUrl(String(raw || "").trim());
+    if (!url) return null;
+    var yt =
+      url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i) ||
+      url.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
+    if (yt) {
+      return { type: "embed", src: "https://www.youtube.com/embed/" + yt[1] };
+    }
+    var vim = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vim) {
+      return { type: "embed", src: "https://player.vimeo.com/video/" + vim[1] };
+    }
+    if (/\.(mp4|webm)(\?|#|$)/i.test(url) || /\/img\/uploads\//i.test(url)) {
+      return { type: "file", src: url };
+    }
+    if (/^https?:\/\//i.test(url) || url.charAt(0) === "/") {
+      return { type: "file", src: url };
+    }
+    return null;
+  }
+
+  function setVideoApplyLoading(loading) {
+    var btn = document.getElementById("videoApply");
+    if (!btn) return;
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent || "Insertar video";
+    btn.disabled = !!loading;
+    btn.setAttribute("aria-busy", loading ? "true" : "false");
+    btn.textContent = loading ? "Insertando…" : btn.dataset.label;
+  }
+
+  function closeVideoModal() {
+    setVideoApplyLoading(false);
+    var dlg = document.getElementById("videoDialog");
+    if (dlg && typeof dlg.close === "function") {
+      try {
+        if (dlg.open) dlg.close();
+      } catch (closeErr) {
+        console.error("[VIDEO ERROR]", closeErr);
+      }
+    }
+  }
+
+  function openVideoPicker(ctx) {
+    var quill = ctx && ctx.quill;
+    var savedIndex = 0;
+    if (quill) {
+      try {
+        var sel = quill.getSelection(true);
+        savedIndex = sel && typeof sel.index === "number" ? sel.index : quill.getLength();
+      } catch (e) {
+        savedIndex = quill.getLength();
+      }
+    }
+    videoPickerContext = {
+      quill: quill,
+      index: savedIndex,
+    };
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("videoFileInput").value = "";
+    document.getElementById("videoUrlField").value = (ctx && ctx.currentUrl) || "";
+    setVideoApplyLoading(false);
+    document.getElementById("videoDialog").showModal();
+  }
+
+  /**
+   * Whitelist <video> en Quill vía BlockEmbed (evita que el sanitizer borre el HTML).
+   * Debe ejecutarse ANTES de `new Quill(...)`.
+   */
+  function registerHTML5VideoBlot() {
+    if (typeof Quill === "undefined" || Quill.__lpaezHtml5Video) return;
+    var BlockEmbed = Quill.import("blots/block/embed");
+
+    class HTML5Video extends BlockEmbed {
+      static create(value) {
+        var node = super.create();
+        var src = normalizeVideoUrl(typeof value === "string" ? value : (value && value.src) || "");
+        node.setAttribute("controls", "true");
+        node.setAttribute("controlslist", "nodownload");
+        node.setAttribute("width", "100%");
+        node.setAttribute("preload", "metadata");
+        node.setAttribute("src", src);
+        node.setAttribute("playsinline", "true");
+        node.style.maxWidth = "100%";
+        node.style.height = "auto";
+        node.style.display = "block";
+        node.style.margin = "10px 0";
+        return node;
+      }
+
+      static value(node) {
+        return node.getAttribute("src") || "";
+      }
+    }
+
+    HTML5Video.blotName = "html5video";
+    HTML5Video.tagName = "video";
+    HTML5Video.className = "ql-html5video";
+    Quill.register(HTML5Video, true);
+    Quill.__lpaezHtml5Video = true;
+    console.log("[VIDEO] HTML5Video blot registered");
+  }
+
+  function insertVideoIntoQuill(activeQuillInstance, parsed) {
+    if (!activeQuillInstance) {
+      throw new Error("Editor Quill activo no disponible");
+    }
+    if (!parsed || !parsed.src) {
+      throw new Error("URL de video vacía");
+    }
+    registerHTML5VideoBlot();
+
+    var url = normalizeVideoUrl(String(parsed.src));
+    var index =
+      videoPickerContext && typeof videoPickerContext.index === "number"
+        ? videoPickerContext.index
+        : null;
+    if (index == null) {
+      try {
+        var range = activeQuillInstance.getSelection(true);
+        index = range && typeof range.index === "number" ? range.index : activeQuillInstance.getLength();
+      } catch (e) {
+        index = activeQuillInstance.getLength();
+      }
+    }
+
+    var mime = /\.webm(\?|#|$)/i.test(url) ? "video/webm" : "video/mp4";
+    var videoHtml =
+      '<p><video class="ql-html5video" controls width="100%" style="max-width:100%; height:auto;" src="' +
+      escapeAttr(url) +
+      '"><source src="' +
+      escapeAttr(url) +
+      '" type="' +
+      mime +
+      '"></video></p>';
+    console.log("HTML inyectado:", videoHtml);
+
+    // Cerrar modal y devolver foco al editor ANTES de insertar (evita rangos inválidos
+    // con <dialog> anidados — síntoma: addRange() / video no visible).
+    closeVideoModal();
+    try {
+      activeQuillInstance.focus();
+    } catch (focusErr) {
+      console.error("[VIDEO ERROR]", focusErr);
+    }
+
+    if (parsed.type === "embed") {
+      activeQuillInstance.insertEmbed(index, "video", url, "user");
+    } else {
+      try {
+        activeQuillInstance.insertEmbed(index, "html5video", url, "user");
+      } catch (embedErr) {
+        console.error("[VIDEO ERROR]", embedErr);
+        // Fallback: pegar HTML con matcher de VIDEO → html5video
+        activeQuillInstance.clipboard.dangerouslyPasteHTML(index, videoHtml, "user");
+      }
+    }
+
+    if (typeof activeQuillInstance.update === "function") {
+      activeQuillInstance.update("user");
+    }
+
+    var videos = activeQuillInstance.root.querySelectorAll("video");
+    console.log("[VIDEO] videos en editor tras insert:", videos.length, activeQuillInstance.root.innerHTML.slice(0, 500));
+    if (parsed.type !== "embed" && !videos.length) {
+      // Último recurso: inyectar en el DOM del editor (se serializa vía root.innerHTML al guardar)
+      activeQuillInstance.root.insertAdjacentHTML("beforeend", videoHtml);
+      videos = activeQuillInstance.root.querySelectorAll("video");
+      console.log("[VIDEO] fallback DOM videos:", videos.length);
+    }
+    if (parsed.type !== "embed" && !videos.length) {
+      throw new Error("El video no se pudo mostrar en el editor");
+    }
+
+    try {
+      activeQuillInstance.setSelection(
+        Math.min(index + 1, activeQuillInstance.getLength()),
+        0,
+        "silent"
+      );
+    } catch (selErr) {
+      /* ignore invalid selection after nested dialogs */
+    }
+  }
+
+  // Registrar blot lo antes posible (Quill ya está cargado en esta página).
+  if (typeof Quill !== "undefined") {
+    registerHTML5VideoBlot();
+  }
+
   function openProductDialog(product) {
     var form = document.getElementById("productForm");
     form.reset();
@@ -505,7 +796,11 @@
       form.slug.value = product.slug || "";
       form.category_id.value = product.category_id || "";
       form.brand_id.value = product.brand_id || "";
-      form.sale_mode.value = product.sale_mode || "quote";
+      if (form.industria_id) {
+        form.industria_id.value = product.industria_id || "";
+      }
+      form.sale_mode.value = product.sale_mode || (productListTipo === "repuesto" ? "buy" : "quote");
+      form.tipo.value = product.tipo || productListTipo;
       form.stock_status.value = product.stock_status || "on_request";
       form.price_clp.value = product.price_clp != null ? product.price_clp : "";
       form.description.value = product.description || "";
@@ -517,13 +812,22 @@
       }
       form.seo_title.value = product.seo_title || "";
       form.seo_description.value = product.seo_description || "";
-      form.is_featured.checked = !!product.is_featured;
-      form.is_active.checked = product.is_active !== false;
+      form.is_featured.checked = coerceBool(product.is_featured, false);
+      form.is_active.checked = coerceBool(product.is_active, true);
     } else {
       form.is_active.checked = true;
+      form.tipo.value = productListTipo;
+      form.sale_mode.value = productListTipo === "repuesto" ? "buy" : "quote";
+      if (form.industria_id) form.industria_id.value = "";
       setFormImagePreview("");
     }
-    document.getElementById("productDialogTitle").textContent = product ? "Editar producto" : "Nuevo producto";
+    document.getElementById("productDialogTitle").textContent = product
+      ? productListTipo === "repuesto"
+        ? "Editar repuesto"
+        : "Editar equipo"
+      : productListTipo === "repuesto"
+        ? "Nuevo repuesto"
+        : "Nuevo equipo";
     document.getElementById("productDialog").showModal();
   }
 
@@ -590,14 +894,110 @@
     });
   });
 
+  document.getElementById("videoCancel").addEventListener("click", function () {
+    closeVideoModal();
+  });
+
+  document.getElementById("videoFileInput").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("videoError");
+    err.hidden = true;
+    if (!file) return;
+    // Si el campo URL ya tiene valor (p. ej. subida previa), no re-subir automáticamente
+    // solo cuando el usuario elige un archivo nuevo.
+    if (file.size > 50 * 1024 * 1024) {
+      err.hidden = false;
+      err.textContent = "El video supera 50 MB";
+      return;
+    }
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "video");
+    setVideoApplyLoading(true);
+    showToast("Subiendo video…");
+    api("/upload", { method: "POST", formData: fd })
+      .then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo subir el video";
+          return;
+        }
+        var url = res.data && res.data.url;
+        // Deja la URL lista (normalizada a ruta absoluta del sitio).
+        document.getElementById("videoUrlField").value = normalizeVideoUrl(url || "");
+        document.getElementById("videoFileInput").value = "";
+        showToast("Video subido — pulsa «Insertar video»");
+      })
+      .catch(function (uploadErr) {
+        console.error("[VIDEO ERROR]", uploadErr);
+        err.hidden = false;
+        err.textContent = "Error de red al subir el video";
+      })
+      .then(function () {
+        setVideoApplyLoading(false);
+      });
+  });
+
+  document.getElementById("videoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var errEl = document.getElementById("videoError");
+    errEl.hidden = true;
+    errEl.textContent = "";
+    setVideoApplyLoading(true);
+    try {
+      // URL del input (subida previa o enlace externo) — nunca re-subir aquí.
+      var raw = document.getElementById("videoUrlField").value.trim();
+      if (!raw) {
+        throw new Error("Sube un archivo o indica una URL de YouTube/Vimeo");
+      }
+      var parsed = toVideoEmbedUrl(raw);
+      if (!parsed || !parsed.src) {
+        throw new Error("URL no válida. Usa YouTube, Vimeo, MP4/WEBM o /img/uploads/…");
+      }
+      var quill = videoPickerContext && videoPickerContext.quill;
+      if (!quill) {
+        throw new Error("Editor Quill activo no disponible");
+      }
+      // insertVideoIntoQuill cierra el modal antes de insertar (foco/selección).
+      insertVideoIntoQuill(quill, parsed);
+      showToast("Video insertado");
+    } catch (err) {
+      console.error("[VIDEO ERROR]", err);
+      setVideoApplyLoading(false);
+      errEl.hidden = false;
+      errEl.textContent = (err && err.message) || "No se pudo insertar el video";
+      showToast((err && err.message) || "Error al insertar video");
+      // Si el modal ya se cerró en el intento de insert, reabrir no es necesario;
+      // el toast informa el fallo.
+    }
+  });
+
+  document.getElementById("videoDialog").addEventListener("cancel", function () {
+    setVideoApplyLoading(false);
+  });
+
   document.getElementById("addProductBtn").addEventListener("click", function () {
     fillSelects().then(function () {
+      productListTipo = "equipo";
       openProductDialog(null);
       if (selectedCategoryId != null) {
         document.getElementById("productForm").category_id.value = selectedCategoryId;
       }
     });
   });
+  var addRepuestoBtn = document.getElementById("addRepuestoBtn");
+  if (addRepuestoBtn) {
+    addRepuestoBtn.addEventListener("click", function () {
+      fillSelects().then(function () {
+        productListTipo = "repuesto";
+        openProductDialog(null);
+        if (selectedCategoryId != null) {
+          document.getElementById("productForm").category_id.value = selectedCategoryId;
+        }
+      });
+    });
+  }
   document.getElementById("productCancel").addEventListener("click", function () {
     document.getElementById("productDialog").close();
   });
@@ -610,7 +1010,9 @@
       slug: form.slug.value.trim() || undefined,
       category_id: Number(form.category_id.value),
       brand_id: form.brand_id.value ? Number(form.brand_id.value) : null,
+      industria_id: form.industria_id && form.industria_id.value ? Number(form.industria_id.value) : null,
       sale_mode: form.sale_mode.value,
+      tipo: form.tipo.value,
       stock_status: form.stock_status.value,
       price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
       description: form.description.value,
@@ -661,9 +1063,9 @@
             escapeHtml(b.slug) +
             "</span>" +
             '<span class="chip ' +
-            (b.is_active ? "chip-on" : "chip-off") +
+            (isActiveFlag(b.is_active) ? "chip-on" : "chip-off") +
             '">' +
-            (b.is_active ? "Activa" : "Off") +
+            (isActiveFlag(b.is_active) ? "Activa" : "Off") +
             "</span></div>" +
             (desc ? '<p class="product-row__desc">' + escapeHtml(desc) + "</p>" : "") +
             "</div>" +
@@ -677,6 +1079,560 @@
           );
         })
         .join("") || '<p class="empty-hint">No hay marcas.</p>';
+    });
+  }
+
+  var clientesCache = [];
+
+  function setClienteLogoPreview(url) {
+    var wrap = document.getElementById("clienteLogoPreviewWrap");
+    var img = document.getElementById("clienteLogoPreview");
+    var field = document.getElementById("clienteLogoUrl");
+    if (field) field.value = url || "";
+    if (url) {
+      wrap.hidden = false;
+      img.src = url;
+    } else {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+    }
+  }
+
+  function resetClienteForm() {
+    var form = document.getElementById("formCliente");
+    if (!form) return;
+    form.reset();
+    document.getElementById("clienteId").value = "";
+    document.getElementById("clienteOrden").value = "0";
+    document.getElementById("clienteActivo").checked = true;
+    document.getElementById("clienteLogo").value = "";
+    setClienteLogoPreview("");
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("clienteSaveBtn").textContent = "Guardar Cliente";
+  }
+
+  function loadClientes() {
+    api("/clientes").then(function (res) {
+      var tbody = document.getElementById("adminClientesList");
+      if (!tbody) return;
+      var items = (res.data && res.data.clientes) || [];
+      clientesCache = items;
+      if (!items.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty-hint">No hay clientes registrados.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (c) {
+          var active = coerceBool(c.activo, true);
+          var logo = c.logo_url || "/img/brand/logo-mark.png";
+          return (
+            "<tr data-cliente-id=\"" +
+            escapeAttr(c.id) +
+            '">' +
+            '<td><img class="admin-table__logo" src="' +
+            escapeAttr(logo) +
+            '" alt="" width="72" height="36" loading="lazy"></td>' +
+            "<td>" +
+            escapeHtml(c.nombre) +
+            "</td>" +
+            "<td>" +
+            escapeHtml(c.orden != null ? c.orden : 0) +
+            "</td>" +
+            '<td><span class="chip ' +
+            (active ? "chip-on" : "chip-off") +
+            '">' +
+            (active ? "Activo" : "Off") +
+            "</span></td>" +
+            '<td class="admin-table__actions">' +
+            '<button type="button" data-edit-cliente="' +
+            escapeAttr(c.id) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-cliente="' +
+            escapeAttr(c.id) +
+            '">' +
+            (active ? "Ocultar" : "Mostrar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-cliente="' +
+            escapeAttr(c.id) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  function uploadClienteLogo(file) {
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "image");
+    return api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        return Promise.reject((res.data && res.data.error) || "No se pudo subir el logo");
+      }
+      return (res.data && res.data.url) || "";
+    });
+  }
+
+  document.getElementById("clienteResetBtn").addEventListener("click", function () {
+    resetClienteForm();
+  });
+
+  document.getElementById("clienteLogo").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    if (!file) return;
+    uploadClienteLogo(file)
+      .then(function (url) {
+        setClienteLogoPreview(url);
+        showToast("Logo subido");
+      })
+      .catch(function (msg) {
+        err.hidden = false;
+        err.textContent = msg;
+        showToast(msg);
+      });
+  });
+
+  document.getElementById("formCliente").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("clienteFormError");
+    err.hidden = true;
+    var id = document.getElementById("clienteId").value.trim();
+    var nombre = document.getElementById("clienteNombre").value.trim();
+    var orden = Number(document.getElementById("clienteOrden").value) || 0;
+    var activo = document.getElementById("clienteActivo").checked;
+    var logoUrl = document.getElementById("clienteLogoUrl").value.trim();
+    var fileInput = document.getElementById("clienteLogo");
+    var file = fileInput.files && fileInput.files[0];
+
+    function save(logo) {
+      if (!logo) {
+        err.hidden = false;
+        err.textContent = "Sube un logo (PNG, WEBP, SVG o JPG)";
+        return Promise.reject();
+      }
+      var body = { nombre: nombre, logo_url: logo, orden: orden, activo: activo };
+      var req = id
+        ? api("/clientes/" + id, { method: "PUT", body: body })
+        : api("/clientes", { method: "POST", body: body });
+      return req.then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo guardar";
+          return Promise.reject();
+        }
+        showToast(id ? "Cliente actualizado" : "Cliente creado");
+        resetClienteForm();
+        loadClientes();
+      });
+    }
+
+    var chain = Promise.resolve(logoUrl);
+    if (file && !logoUrl) {
+      chain = uploadClienteLogo(file);
+    } else if (file && logoUrl) {
+      // Ya se subió en change; si el usuario cambió de nuevo sin esperar, re-subir
+      chain = uploadClienteLogo(file);
+    }
+
+    chain
+      .then(function (url) {
+        return save(url || logoUrl);
+      })
+      .catch(function (msg) {
+        if (typeof msg === "string") {
+          err.hidden = false;
+          err.textContent = msg;
+        }
+      });
+  });
+
+  document.getElementById("adminClientesList").addEventListener("click", function (e) {
+    var editId = e.target.getAttribute("data-edit-cliente");
+    var delId = e.target.getAttribute("data-del-cliente");
+    var toggleId = e.target.getAttribute("data-toggle-cliente");
+    if (editId) {
+      var item = clientesCache.find(function (c) {
+        return String(c.id) === String(editId);
+      });
+      if (!item) return;
+      document.getElementById("clienteId").value = item.id;
+      document.getElementById("clienteNombre").value = item.nombre || "";
+      document.getElementById("clienteOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("clienteActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("clienteLogo").value = "";
+      setClienteLogoPreview(item.logo_url || "");
+      document.getElementById("clienteSaveBtn").textContent = "Actualizar Cliente";
+      document.getElementById("formCliente").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (toggleId) {
+      var row = clientesCache.find(function (c) {
+        return String(c.id) === String(toggleId);
+      });
+      if (!row) return;
+      var next = !coerceBool(row.activo, true);
+      api("/clientes/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo actualizar");
+          return;
+        }
+        showToast(next ? "Cliente visible" : "Cliente oculto");
+        loadClientes();
+      });
+      return;
+    }
+    if (delId && confirm("¿Eliminar este cliente?")) {
+      api("/clientes/" + delId, { method: "DELETE" }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo eliminar");
+          return;
+        }
+        showToast("Cliente eliminado");
+        if (document.getElementById("clienteId").value === String(delId)) resetClienteForm();
+        loadClientes();
+      });
+    }
+  });
+
+  var solucionesCache = [];
+
+  function setSolucionImagenPreview(url) {
+    var wrap = document.getElementById("solucionImagenPreviewWrap");
+    var img = document.getElementById("solucionImagenPreview");
+    var field = document.getElementById("solucionImagenUrl");
+    if (field) field.value = url || "";
+    if (!wrap || !img) return;
+    if (url) {
+      wrap.hidden = false;
+      img.src = url;
+    } else {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+    }
+  }
+
+  function resetSolucionForm() {
+    var form = document.getElementById("formSolucion");
+    if (!form) return;
+    form.reset();
+    document.getElementById("solucionId").value = "";
+    document.getElementById("solucionOrden").value = "0";
+    document.getElementById("solucionActivo").checked = true;
+    document.getElementById("solucionImagen").value = "";
+    setSolucionImagenPreview("");
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    err.textContent = "";
+    document.getElementById("solucionSaveBtn").textContent = "Guardar Solución";
+  }
+
+  function loadSoluciones() {
+    api("/soluciones").then(function (res) {
+      var tbody = document.getElementById("adminSolucionesList");
+      if (!tbody) return;
+      var items = (res.data && res.data.soluciones) || [];
+      solucionesCache = items;
+      if (!items.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="empty-hint">No hay soluciones registradas.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (s) {
+          var active = coerceBool(s.activo, true);
+          var img = s.imagen_url || "/img/brand/logo-mark.png";
+          return (
+            '<tr data-solucion-id="' +
+            escapeAttr(s.id) +
+            '">' +
+            '<td><img class="admin-table__logo" src="' +
+            escapeAttr(img) +
+            '" alt="" width="72" height="36" loading="lazy"></td>' +
+            "<td>" +
+            escapeHtml(s.titulo) +
+            "</td>" +
+            "<td><code>" +
+            escapeHtml(s.slug) +
+            "</code></td>" +
+            "<td>" +
+            escapeHtml(s.orden != null ? s.orden : 0) +
+            "</td>" +
+            '<td><span class="chip ' +
+            (active ? "chip-on" : "chip-off") +
+            '">' +
+            (active ? "Activo" : "Off") +
+            "</span></td>" +
+            '<td class="admin-table__actions">' +
+            '<button type="button" data-edit-solucion="' +
+            escapeAttr(s.id) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-solucion="' +
+            escapeAttr(s.id) +
+            '">' +
+            (active ? "Ocultar" : "Mostrar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-solucion="' +
+            escapeAttr(s.id) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  function uploadSolucionImagen(file) {
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", "image");
+    return api("/upload", { method: "POST", formData: fd }).then(function (res) {
+      if (!res.ok) {
+        return Promise.reject((res.data && res.data.error) || "No se pudo subir la imagen");
+      }
+      return (res.data && res.data.url) || "";
+    });
+  }
+
+  document.getElementById("solucionResetBtn").addEventListener("click", function () {
+    resetSolucionForm();
+  });
+
+  document.getElementById("solucionImagen").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    if (!file) return;
+    uploadSolucionImagen(file)
+      .then(function (url) {
+        setSolucionImagenPreview(url);
+        showToast("Imagen subida");
+      })
+      .catch(function (msg) {
+        err.hidden = false;
+        err.textContent = msg;
+        showToast(msg);
+      });
+  });
+
+  document.getElementById("formSolucion").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("solucionFormError");
+    err.hidden = true;
+    var id = document.getElementById("solucionId").value.trim();
+    var body = {
+      titulo: document.getElementById("solucionTitulo").value.trim(),
+      slug: document.getElementById("solucionSlug").value.trim(),
+      bullet_1: document.getElementById("solucionBullet1").value.trim(),
+      bullet_2: document.getElementById("solucionBullet2").value.trim(),
+      bullet_3: document.getElementById("solucionBullet3").value.trim(),
+      cta_texto: document.getElementById("solucionCtaTexto").value.trim(),
+      cta_url: document.getElementById("solucionCtaUrl").value.trim(),
+      orden: Number(document.getElementById("solucionOrden").value) || 0,
+      activo: document.getElementById("solucionActivo").checked,
+      imagen_url: document.getElementById("solucionImagenUrl").value.trim(),
+    };
+    var fileInput = document.getElementById("solucionImagen");
+    var file = fileInput.files && fileInput.files[0];
+
+    function save(imagen) {
+      body.imagen_url = imagen || body.imagen_url || null;
+      var req = id
+        ? api("/soluciones/" + id, { method: "PUT", body: body })
+        : api("/soluciones", { method: "POST", body: body });
+      return req.then(function (res) {
+        if (!res.ok) {
+          err.hidden = false;
+          err.textContent = (res.data && res.data.error) || "No se pudo guardar";
+          return Promise.reject();
+        }
+        showToast(id ? "Solución actualizada" : "Solución creada");
+        resetSolucionForm();
+        loadSoluciones();
+      });
+    }
+
+    var chain = Promise.resolve(body.imagen_url);
+    if (file) {
+      chain = uploadSolucionImagen(file);
+    }
+
+    chain
+      .then(function (url) {
+        return save(url || body.imagen_url);
+      })
+      .catch(function (msg) {
+        if (typeof msg === "string") {
+          err.hidden = false;
+          err.textContent = msg;
+        }
+      });
+  });
+
+  document.getElementById("adminSolucionesList").addEventListener("click", function (e) {
+    var editId = e.target.getAttribute("data-edit-solucion");
+    var delId = e.target.getAttribute("data-del-solucion");
+    var toggleId = e.target.getAttribute("data-toggle-solucion");
+    if (editId) {
+      var item = solucionesCache.find(function (s) {
+        return String(s.id) === String(editId);
+      });
+      if (!item) return;
+      document.getElementById("solucionId").value = item.id;
+      document.getElementById("solucionTitulo").value = item.titulo || "";
+      document.getElementById("solucionSlug").value = item.slug || "";
+      document.getElementById("solucionBullet1").value = item.bullet_1 || "";
+      document.getElementById("solucionBullet2").value = item.bullet_2 || "";
+      document.getElementById("solucionBullet3").value = item.bullet_3 || "";
+      document.getElementById("solucionCtaTexto").value = item.cta_texto || "";
+      document.getElementById("solucionCtaUrl").value = item.cta_url || "";
+      document.getElementById("solucionOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("solucionActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("solucionImagen").value = "";
+      setSolucionImagenPreview(item.imagen_url || "");
+      document.getElementById("solucionSaveBtn").textContent = "Actualizar Solución";
+      document.getElementById("formSolucion").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (toggleId) {
+      var row = solucionesCache.find(function (s) {
+        return String(s.id) === String(toggleId);
+      });
+      if (!row) return;
+      var next = !coerceBool(row.activo, true);
+      api("/soluciones/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo actualizar");
+          return;
+        }
+        showToast(next ? "Solución visible" : "Solución oculta");
+        loadSoluciones();
+      });
+      return;
+    }
+    if (delId && confirm("¿Eliminar esta solución?")) {
+      api("/soluciones/" + delId, { method: "DELETE" }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo eliminar");
+          return;
+        }
+        showToast("Solución eliminada");
+        if (document.getElementById("solucionId").value === String(delId)) resetSolucionForm();
+        loadSoluciones();
+      });
+    }
+  });
+
+  /* —— Sectores (home) —— */
+  var sectoresCache = [];
+
+  function sectorImgSrc(url) {
+    var u = String(url || "").trim();
+    if (!u) return "";
+    if (/^https?:\/\//i.test(u) || u.charAt(0) === "/") return u;
+    return "/" + u.replace(/^\.\//, "");
+  }
+
+  function loadSectores() {
+    var wrap = document.getElementById("sectoresCards");
+    var err = document.getElementById("sectoresFormError");
+    if (err) {
+      err.hidden = true;
+      err.textContent = "";
+    }
+    api("/sectores").then(function (res) {
+      if (!wrap) return;
+      if (!res.ok) {
+        wrap.innerHTML =
+          '<p class="empty-hint">' +
+          ((res.data && res.data.error) || "No se pudieron cargar los sectores") +
+          "</p>";
+        return;
+      }
+      var items = (res.data && res.data.sectores) || [];
+      sectoresCache = items;
+      if (!items.length) {
+        wrap.innerHTML = '<p class="empty-hint">No hay sectores. La API creará el seed al primer GET público.</p>';
+        return;
+      }
+      wrap.innerHTML = items
+        .map(function (s) {
+          var id = String(s.id || "");
+          var img = sectorImgSrc(s.imagen_url);
+          return (
+            '<form class="card admin-form sector-admin-card" data-sector-id="' +
+            id +
+            '">' +
+            '<div class="sector-admin-preview">' +
+            (img
+              ? '<img src="' +
+                escapeHtml(img) +
+                '" alt="' +
+                escapeHtml(s.nombre || "") +
+                '">'
+              : '<span class="empty-hint">Sin imagen</span>') +
+            "</div>" +
+            '<div class="form-group"><label>Nombre del Sector</label>' +
+            '<input type="text" name="nombre" value="' +
+            escapeAttr(s.nombre || "") +
+            '" required maxlength="150"></div>' +
+            '<div class="form-group"><label>Enlace de Destino</label>' +
+            '<input type="text" name="link_url" value="' +
+            escapeAttr(s.link_url || "") +
+            '" placeholder="catalogo.html?category=…" maxlength="500"></div>' +
+            '<div class="form-group"><label>Nueva imagen</label>' +
+            '<input type="file" name="imagen" accept="image/*">' +
+            '<p class="hint-text">Si no eliges archivo, se conserva la imagen actual.</p></div>' +
+            '<input type="hidden" name="slug" value="' +
+            escapeAttr(s.slug || "") +
+            '">' +
+            '<input type="hidden" name="orden" value="' +
+            escapeAttr(String(s.orden != null ? s.orden : 0)) +
+            '">' +
+            '<div class="dialog-actions" style="justify-content:flex-start;margin-top:0.5rem">' +
+            '<button type="submit" class="btn btn-primary">Guardar Cambios</button>' +
+            "</div>" +
+            "</form>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  var sectoresCardsEl = document.getElementById("sectoresCards");
+  if (sectoresCardsEl) {
+    sectoresCardsEl.addEventListener("submit", function (e) {
+      var form = e.target.closest("form[data-sector-id]");
+      if (!form) return;
+      e.preventDefault();
+      var id = form.getAttribute("data-sector-id");
+      var err = document.getElementById("sectoresFormError");
+      if (err) {
+        err.hidden = true;
+        err.textContent = "";
+      }
+      var fd = new FormData(form);
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      api("/sectores/" + id, { method: "POST", formData: fd }).then(function (res) {
+        if (btn) btn.disabled = false;
+        if (!res.ok) {
+          var msg = (res.data && res.data.error) || "No se pudo guardar";
+          if (err) {
+            err.hidden = false;
+            err.textContent = msg;
+          }
+          showToast(msg);
+          return;
+        }
+        showToast("Sector actualizado");
+        loadSectores();
+      });
     });
   }
 
@@ -859,6 +1815,7 @@
         "</textarea>";
       return null;
     }
+    registerHTML5VideoBlot();
     var quill = new Quill(editorEl, {
       theme: "snow",
       placeholder: "Escribe el contenido de esta sección…",
@@ -884,12 +1841,27 @@
                 },
               });
             },
+            video: function () {
+              var q = this.quill;
+              openVideoPicker({
+                quill: q,
+              });
+            },
           },
         },
       },
     });
+    var Delta = Quill.import("delta");
+    quill.clipboard.addMatcher("VIDEO", function (node) {
+      var source = node.querySelector("source");
+      var src = normalizeVideoUrl(
+        node.getAttribute("src") || (source && source.getAttribute("src")) || ""
+      );
+      if (!src) return new Delta();
+      return new Delta().insert({ html5video: src });
+    });
     if (initialHtml) {
-      quill.root.innerHTML = initialHtml;
+      quill.clipboard.dangerouslyPasteHTML(0, initialHtml, "silent");
     }
     brandQuills[sectionId] = quill;
     return quill;
@@ -987,7 +1959,7 @@
     form.seo_title.value = (item && item.seo_title) || "";
     form.seo_description.value = (item && item.seo_description) || "";
     form.sort_order.value = (item && item.sort_order) || 0;
-    form.is_active.checked = !item || item.is_active !== false;
+    form.is_active.checked = item ? coerceBool(item.is_active, true) : true;
     var logoField = document.getElementById("simpleLogoField");
     var contentField = document.getElementById("simpleContentField");
     var seoFields = document.getElementById("simpleSeoFields");
@@ -1146,7 +2118,7 @@
       seo_title: form.seo_title.value.trim(),
       seo_description: form.seo_description.value.trim(),
       sort_order: Number(form.sort_order.value) || 0,
-      is_active: form.is_active.checked,
+      is_active: !!form.is_active.checked,
     };
     if (kind === "brands") {
       body.logo_url = document.getElementById("brandLogoUrl").value.trim() || null;
