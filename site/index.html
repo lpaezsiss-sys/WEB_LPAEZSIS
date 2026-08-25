@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/style.css?v=128">
   <link rel="stylesheet" href="css/propuesta-home.css?v=5">
   <link rel="stylesheet" href="css/propuesta-marcas.css?v=6">
+  <link rel="stylesheet" href="css/featured-carousel.css?v=1">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -257,14 +258,24 @@
       </div>
     </section>
 
-    <section class="section-band reveal" id="destacados" aria-labelledby="destacados-title">
-      <div class="section">
-        <div class="section-head">
-          <h2 id="destacados-title">Productos <span class="accent">destacados</span></h2>
-          <p>Repuestos para compra directa y equipos para cotizar. Fichas técnicas PDF en el detalle.</p>
+    <section class="section-featured-products reveal" id="destacados" aria-labelledby="destacados-title">
+      <div class="container">
+        <div class="section-header-flex">
+          <div>
+            <span class="kicker">Catálogo Técnico</span>
+            <h2 class="section-title" id="destacados-title">Equipos y Tecnologías Destacadas</h2>
+          </div>
+          <div class="carousel-controls">
+            <button type="button" class="btn-carousel-prev" id="featuredPrev" aria-label="Anterior" aria-controls="featuredProductsTrack">&lsaquo;</button>
+            <button type="button" class="btn-carousel-next" id="featuredNext" aria-label="Siguiente" aria-controls="featuredProductsTrack">&rsaquo;</button>
+          </div>
         </div>
-        <div class="product-grid" id="homeProducts"></div>
-        <div class="section-actions">
+
+        <div class="products-carousel-wrapper">
+          <div class="products-carousel-track" id="featuredProductsTrack" tabindex="0" aria-label="Productos destacados"></div>
+        </div>
+
+        <div class="section-actions featured-products-actions">
           <a class="btn btn-primary btn-cta-primary" href="catalogo.html?tipo=equipo">Ver todos los productos</a>
           <a class="btn btn-outline btn-cta-secondary" href="contacto.html">Pedir cotización</a>
         </div>
@@ -303,6 +314,7 @@
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=39"></script>
   <script src="js/site.js?v=26"></script>
+  <script src="js/index.js?v=1"></script>
   <script>
     (function () {
       var origin = window.__LPAEZ_ORIGIN__ || window.location.origin;
@@ -562,25 +574,46 @@
         var brands = (results[0].data && results[0].data.brands) || results[0].brands || [];
         var cats = (results[1].data && results[1].data.categories) || results[1].categories || [];
         var products = (results[2].data && results[2].data.products) || results[2].products || [];
+        function paintFeatured(list) {
+          var hp = document.getElementById("featuredProductsTrack");
+          if (!hp) return;
+          hp.innerHTML =
+            (list || []).map(function (p) {
+              return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
+            }).join("") ||
+            '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+          if (typeof window.__lpaezFeaturedCarouselRefresh === "function") {
+            window.__lpaezFeaturedCarouselRefresh();
+          }
+        }
         renderBrandCarousel(brands);
         if (document.getElementById("solutionsTabs") && document.getElementById("solutionsPanels")) {
           renderSolutions(cats);
         }
-        var hp = document.getElementById("homeProducts");
-        if (hp) {
-          hp.innerHTML =
-            products.map(function (p) {
-              return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
-            }).join("") ||
-            '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+        if (products.length) {
+          paintFeatured(products);
+          return loadClients();
         }
-        return loadClients();
+        // Fallback: listado equipos si featured vacío
+        return fetch("api/productos.php?tipo=equipo", { credentials: "same-origin", cache: "no-store" })
+          .then(function (res) { return res.ok ? res.json() : []; })
+          .then(function (data) {
+            var list = Array.isArray(data) ? data : (data.products || []);
+            list = list.filter(function (p) { return String(p.is_featured) === "1" || p.is_featured === true; });
+            if (!list.length && Array.isArray(data)) list = data.slice(0, 8);
+            paintFeatured(list);
+            return loadClients();
+          })
+          .catch(function () {
+            paintFeatured([]);
+            return loadClients();
+          });
       }).then(function () {
         Lpaez.observeReveals();
       }).catch(function () {
         renderBrandCarousel([]);
         renderClientCarousel([]);
-        var hp = document.getElementById("homeProducts");
+        var hp = document.getElementById("featuredProductsTrack");
         if (hp) {
           hp.innerHTML =
             '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
