@@ -3336,3 +3336,152 @@ body.nav-open {
     letter-spacing: 0.04em;
   }
 }
+
+
+/* ——— Repuestos B2B ——— */
+.badge-type {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-type--repuesto {
+  background: #15803d;
+  color: #ffffff;
+}
+
+.page-hero--repuestos.has-media {
+  min-height: 300px;
+  align-items: end;
+}
+
+.repuesto-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+  max-width: 44rem;
+}
+
+.repuesto-search input {
+  flex: 1 1 16rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  font: inherit;
+}
+
+.repuesto-search input:focus {
+  outline: 3px solid rgba(220, 38, 38, 0.45);
+  outline-offset: 1px;
+}
+
+.repuesto-search .btn {
+  min-height: 2.75rem;
+  white-space: nowrap;
+}
+
+.repuestos-toolbar .repuestos-filters {
+  max-width: var(--max);
+  margin: 0 auto 0.5rem;
+  width: calc(100% - 2.5rem);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.repuesto-compat {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 0.86rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.repuesto-compat__label {
+  font-weight: 700;
+  color: var(--ink-soft, #334155);
+}
+
+.repuesto-stock {
+  display: inline-block;
+  margin: 0 0 0.85rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.repuesto-stock.is-stock {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.repuesto-stock.is-request {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.repuesto-help {
+  padding-top: 0.5rem;
+}
+
+.repuesto-help-card {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 1.35rem 1.4rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.repuesto-help-card__copy {
+  flex: 1 1 18rem;
+}
+
+.repuesto-help-card h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  font-weight: 800;
+}
+
+.repuesto-help-card p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 52ch;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .repuestos-toolbar .repuestos-filters {
+    grid-template-columns: 1fr;
+    width: calc(100% - 2rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .repuesto-search {
+    flex-direction: column;
+  }
+
+  .repuesto-search .btn,
+  .repuesto-help-card .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
