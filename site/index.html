@@ -595,7 +595,7 @@
           return loadClients();
         }
         // Fallback: listado equipos si featured vacío
-        return fetch("api/productos.php?tipo=equipo", { credentials: "same-origin", cache: "no-store" })
+        return fetch("/api/productos?tipo=equipo", { credentials: "same-origin", cache: "no-store" })
           .then(function (res) { return res.ok ? res.json() : []; })
           .then(function (data) {
             var list = Array.isArray(data) ? data : (data.products || []);
