@@ -229,6 +229,9 @@ function updateBrandHero(brand) {
   document.title = (nombre || "Marca") + " | LPAEZsis";
 
   if (logoEl) {
+    var logoBox = logoEl.closest
+      ? logoEl.closest(".brand-hero-logo-box")
+      : logoEl.parentElement;
     var LOGO_BY_SLUG = {
       "sonic-air-systems": "img/brand/sonic-air.png",
       sonic: "img/brand/sonic-air.png",
@@ -246,22 +249,26 @@ function updateBrandHero(brand) {
       var guess = String(slug).toLowerCase().replace(/-systems$/i, "");
       if (LOGO_BY_SLUG[guess]) src = LOGO_BY_SLUG[guess];
     }
-    if (src) {
-      logoEl.onerror = function () {
-        this.onerror = null;
-        this.style.display = "none";
-        this.hidden = true;
-      };
-      logoEl.src = src;
-      logoEl.alt = "Logo " + (nombre || slug || "marca");
-      logoEl.hidden = false;
-      logoEl.style.display = "";
-    } else {
+    function hideHeroLogo() {
+      logoEl.onerror = null;
       logoEl.removeAttribute("src");
       logoEl.alt = "";
       logoEl.hidden = true;
       logoEl.style.display = "none";
+      if (logoBox) logoBox.hidden = true;
     }
+    function showHeroLogo(url) {
+      logoEl.onerror = function () {
+        hideHeroLogo();
+      };
+      logoEl.src = url;
+      logoEl.alt = "Logo " + (nombre || slug || "marca");
+      logoEl.hidden = false;
+      logoEl.style.display = "";
+      if (logoBox) logoBox.hidden = false;
+    }
+    if (src) showHeroLogo(src);
+    else hideHeroLogo();
   }
 
   var canonical = document.getElementById("brandCanonical");
