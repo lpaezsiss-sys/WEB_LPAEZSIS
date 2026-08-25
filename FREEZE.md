@@ -4,7 +4,7 @@
 **Tag:** `freeze-prueba1-2026-08-25`  
 **Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260825-5af8`  
 **Rama de trabajo al momento del freeze:** `cursor/destacados-carrusel-5af8`  
-**Commit:** *(ver tip de rama/tag tras el push)*  
+**Commit:** `6984ec5`
 **PRs recientes incluidas en staging:** #28–#32 (cards CTAs, nosotros/contacto, home B2B, logos carrusel, destacados carrusel)
 
 Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **19** productos (9 equipos / 10 repuestos), **8** marcas, **8** clientes, **5** soluciones activas.
