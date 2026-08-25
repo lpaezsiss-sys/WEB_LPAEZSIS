@@ -74,6 +74,20 @@
       }
       robots.setAttribute("content", "noindex,nofollow");
     }
+
+    if (!document.querySelector('link[href*="propuesta-search.css"]')) {
+      var searchCss = document.createElement("link");
+      searchCss.rel = "stylesheet";
+      searchCss.href = "css/propuesta-search.css?v=4";
+      document.head.appendChild(searchCss);
+    }
+  }
+
+  function loadSearchRuntime() {
+    if (document.querySelector('script[src*="propuesta-search.js"]')) return;
+    var searchJs = document.createElement("script");
+    searchJs.src = "js/propuesta-search.js?v=4";
+    (document.body || document.documentElement).appendChild(searchJs);
   }
 
   function navIcon(paths) {
@@ -117,6 +131,16 @@
       '<a href="nosotros.html">Nosotros</a>' +
       '<a href="novedades.html">Novedades</a>' +
       '<a href="contacto.html">Contacto</a>' +
+      '<div class="header-search-container">' +
+      '<form id="globalSearchForm" class="search-form" onsubmit="return false;">' +
+      '<input type="text" id="globalSearchInput" placeholder="Buscar equipo, repuesto o marca..." autocomplete="off" aria-label="Buscar productos o repuestos" aria-autocomplete="list" aria-controls="searchResultsDropdown" aria-expanded="false">' +
+      '<button type="button" class="search-btn" aria-label="Buscar">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<circle cx="11" cy="11" r="8"></circle>' +
+      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+      "</svg></button></form>" +
+      '<div id="searchResultsDropdown" class="search-results-dropdown" style="display: none;" role="listbox" aria-label="Resultados de búsqueda"></div>' +
+      "</div>" +
       '<div class="nav-cta">' +
       '<a class="icon-count" href="carrito.html" aria-label="Carrito" title="Carrito">' +
       navIcon(icoCart) +
@@ -143,7 +167,8 @@
       '<li><a data-wa href="#">WhatsApp</a></li>' +
       "</ul></div>" +
       "<div><h3>Explorar</h3><ul>" +
-      '<li><a href="catalogo.html">Productos</a></li>' +
+      '<li><a href="catalogo.html?tipo=equipo">Productos</a></li>' +
+      '<li><a href="repuestos.html">Repuestos</a></li>' +
       '<li><a href="nosotros.html">Nosotros</a></li>' +
       '<li><a href="novedades.html">Novedades</a></li>' +
       '<li><a href="cotizacion.html">Pedir cotización</a></li>' +
@@ -168,11 +193,28 @@
   var mountFooter = document.getElementById("site-footer-mount");
   if (mountHeader) mountHeader.outerHTML = headerHtml();
   if (mountFooter) mountFooter.outerHTML = footerHtml();
+  loadSearchRuntime();
 
   var path = location.pathname.split("/").pop() || "index.html";
+  var tipo = "";
+  try {
+    tipo = new URLSearchParams(location.search).get("tipo") || "";
+  } catch (_) {
+    tipo = "";
+  }
   document.querySelectorAll(".nav > a").forEach(function (a) {
-    var href = a.getAttribute("href");
-    if (href === path) a.classList.add("is-active");
+    var href = a.getAttribute("href") || "";
+    var hrefPath = href.split("?")[0];
+    if (hrefPath === "repuestos.html" && path === "repuestos.html") {
+      a.classList.add("is-active");
+      return;
+    }
+    if (hrefPath === "catalogo.html" && path === "catalogo.html") {
+      // Productos = equipos (o catálogo general sin tipo=repuesto)
+      if (tipo !== "repuesto") a.classList.add("is-active");
+      return;
+    }
+    if (hrefPath === path) a.classList.add("is-active");
   });
   if (path === "marcas.html") {
     var brandsToggle = document.getElementById("navBrandsToggle");
