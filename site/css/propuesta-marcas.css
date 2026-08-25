@@ -1,5 +1,5 @@
 /**
- * propuesta-marcas.css — marcas + clientes en home (carrusel 1 fila)
+ * propuesta-marcas.css — marcas + clientes (carrusel 1 fila)
  */
 
 :root {
@@ -12,86 +12,47 @@
   --pm-max: 1100px;
 }
 
-.pm-brands-section {
-  background: linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 48%);
-  padding: clamp(2.5rem, 5vw, 3.75rem) 0;
+.section-brands,
+.section-clients {
+  padding: clamp(2.25rem, 4.5vw, 3.25rem) 0;
 }
 
-.pm-brands-section .container,
-.home-clients-section .container {
+.section-brands {
+  background: linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 55%);
+}
+
+.section-clients {
+  background-color: #f1f5f9;
+  border-top: 1px solid var(--pm-line);
+}
+
+.section-brands .container,
+.section-clients .container {
   max-width: var(--pm-max);
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
-.pm-brands-section .section-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem 1.5rem;
-  margin-bottom: 1.25rem;
-  border: 0;
-  padding: 0;
-}
-
-.pm-brands-section .section-header h2 {
-  margin: 0;
-  font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+.section-subtitle-sm {
+  margin: 0 0 1.15rem;
+  font-size: clamp(0.78rem, 1.4vw, 0.88rem);
   font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--pm-ink);
-}
-
-.pm-brands-section .section-header a {
-  font-size: 0.9rem;
-  font-weight: 750;
-  color: var(--pm-red);
-  text-decoration: none;
-}
-
-.pm-brands-section .section-header a:hover {
-  text-decoration: underline;
-}
-
-.home-clients-section {
-  padding: 3.5rem 0;
-  background-color: #f1f5f9;
-  border-top: 1px solid #e2e8f0;
-}
-
-.home-clients-section .section-header {
-  margin-bottom: 1.25rem;
-  border: 0;
-  padding: 0;
   text-align: center;
 }
 
-.home-clients-section .section-header h2 {
-  margin: 0 0 0.45rem;
-  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
-  font-weight: 800;
-  color: var(--pm-ink);
-}
-
-.home-clients-section .section-header p {
-  margin: 0 auto;
-  max-width: 48ch;
-  color: var(--pm-muted);
-  font-size: 0.98rem;
-  line-height: 1.45;
-}
-
 /* ——— Carrusel continuo 1 fila ——— */
-.logo-carousel {
+.logo-carousel-container {
   position: relative;
   overflow: hidden;
   width: 100%;
-  margin-top: 0.5rem;
   mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
-.logo-carousel__track {
+.logo-carousel-track {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -101,13 +62,13 @@
   will-change: transform;
 }
 
-.logo-carousel--clients .logo-carousel__track {
+.logo-carousel-track.track-clientes {
   animation-duration: 48s;
   animation-direction: reverse;
 }
 
-.logo-carousel:hover .logo-carousel__track,
-.logo-carousel:focus-within .logo-carousel__track {
+.logo-carousel-container:hover .logo-carousel-track,
+.logo-carousel-container:focus-within .logo-carousel-track {
   animation-play-state: paused;
 }
 
@@ -121,13 +82,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-carousel__track {
+  .logo-carousel-track {
     animation: none;
     flex-wrap: wrap;
     width: 100%;
     justify-content: center;
-    max-width: var(--pm-max);
-    margin: 0 auto;
   }
 }
 
@@ -169,15 +128,6 @@
   opacity: 1 !important;
 }
 
-.industrial-brand-card__name,
-.industrial-client-card__name {
-  font-size: 0.78rem;
-  font-weight: 750;
-  color: var(--pm-ink);
-  text-align: center;
-  line-height: 1.25;
-}
-
 .pm-empty-hint {
   margin: 1rem 0 0;
   text-align: center;
@@ -192,7 +142,7 @@
     height: 78px;
   }
 
-  .logo-carousel__track {
+  .logo-carousel-track {
     animation-duration: 32s;
   }
 }
