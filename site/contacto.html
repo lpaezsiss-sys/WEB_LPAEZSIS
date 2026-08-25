@@ -1,102 +1,170 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contacto | LPAEZsis</title>
-  <meta name="description" content="Contacta a LPAEZsis: ventas@lpaezsis.cl, +56 9 6823 2745. Cotizaciones y soporte técnico en Chile.">
+  <title>Contacto y Asesoría Técnica | LPAEZsis Chile</title>
+  <meta name="description" content="Contacta a ingenieros de aplicaciones LPAEZsis en Chile. Evaluación de línea, cotización y soporte técnico. WhatsApp +56 9 6823 2745 · ventas@lpaezsis.cl">
+  <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://lpaezsis.cl/contacto.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Contacto | LPAEZsis">
-  <meta property="og:description" content="Escríbenos o contáctanos por WhatsApp para cotizar equipos industriales.">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:title" content="Contacto y Asesoría Técnica | LPAEZsis Chile">
+  <meta property="og:description" content="Evaluamos los requerimientos de tu línea de producción. Conversa con ingenieros de aplicaciones en Chile.">
   <meta property="og:url" content="https://lpaezsis.cl/contacto.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/hero/line.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="icon" href="img/icons/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="css/style.css?v=125">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "LPAEZsis - Soluciones Industriales SpA",
+    "url": "https://lpaezsis.cl",
+    "logo": "https://lpaezsis.cl/img/brand/logo.png",
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "telephone": "+56-9-6823-2745",
+        "contactType": "sales",
+        "areaServed": "CL",
+        "availableLanguage": ["Spanish"]
+      },
+      {
+        "@type": "ContactPoint",
+        "telephone": "+56-9-4185-7051",
+        "contactType": "technical support",
+        "areaServed": "CL",
+        "availableLanguage": ["Spanish"]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
   <div id="site-header-mount"></div>
   <main id="main">
-    <div class="page-hero page-hero--compact">
+    <div class="page-hero page-hero--compact page-hero--contact">
       <div class="page-hero-inner">
-        <h1>Contacto</h1>
-        <p>Respuesta en horario laboral. WhatsApp es el camino más rápido.</p>
+        <h1>Contacto y Asesoría Técnica</h1>
+        <p class="hero-description">
+          Evaluamos los requerimientos de tu línea de producción. Conversa directamente con nuestros ingenieros de aplicaciones en Chile.
+        </p>
+        <p class="contact-sla-banner">
+          Respuesta garantizada en menos de 2 horas hábiles (Lun-Vie 8:30 a 18:00 hrs).
+        </p>
       </div>
     </div>
-    <section class="section quote-layout">
+
+    <section class="section quote-layout contact-layout" aria-label="Canales y formulario de contacto">
       <div class="panel contact-fast">
-        <h2>Habla con ventas</h2>
-        <p class="contact-sla">Respondemos en horario laboral Chile · Lun–Vie</p>
-        <a class="btn btn-primary btn-lg btn-block" data-wa href="https://wa.me/56968232745">Escribir por WhatsApp</a>
+        <h2>Canales directos</h2>
+        <p class="contact-sla">Habla con el equipo técnico-comercial sin formularios intermedios.</p>
+        <a
+          class="btn btn-primary btn-lg btn-block btn-whatsapp"
+          href="https://wa.me/56968232745"
+          target="_blank"
+          rel="noopener">
+          Escribir por WhatsApp
+        </a>
         <ul class="contact-direct">
-          <li><a data-email href="mailto:ventas@lpaezsis.cl">ventas@lpaezsis.cl</a></li>
-          <li><a data-phone href="tel:+56968232745">+56 9 6823 2745</a></li>
-          <li><a data-phone2 href="tel:+56941857051">+56 9 4185 7051</a></li>
+          <li>
+            <span class="contact-direct__label">Email Corporativo</span>
+            <a data-email href="mailto:ventas@lpaezsis.cl">ventas@lpaezsis.cl</a>
+          </li>
+          <li>
+            <span class="contact-direct__label">Ventas &amp; Proyectos</span>
+            <a data-phone href="tel:+56968232745">+56 9 6823 2745</a>
+          </li>
+          <li>
+            <span class="contact-direct__label">Soporte Técnico &amp; Repuestos</span>
+            <a data-phone2 href="tel:+56941857051">+56 9 4185 7051</a>
+          </li>
+          <li>
+            <span class="contact-direct__label">Ubicación</span>
+            <span class="contact-direct__value">Santiago, Chile (Atención y cobertura a plantas en todo el país).</span>
+          </li>
         </ul>
-        <p><a href="cotizacion.html">O arma una cotización con productos →</a></p>
+        <a href="catalogo.html?tipo=equipo" class="link-catalogo">¿Prefieres revisar equipos primero? Ir al Catálogo →</a>
       </div>
-      <div class="panel">
-        <h2>Mensaje corto</h2>
-        <form id="contactForm">
+
+      <div class="panel contact-form-panel">
+        <h2>Solicitar Evaluación o Cotización</h2>
+        <form id="contactForm" novalidate>
           <div class="honeypot" aria-hidden="true">
             <label>Website<input type="text" name="website" id="contactWebsite" tabindex="-1" autocomplete="off"></label>
           </div>
-          <div class="form-field"><label for="contactName">Nombre *</label><input id="contactName" required maxlength="200" autocomplete="name"></div>
-          <div class="form-field"><label for="contactEmail">Email *</label><input id="contactEmail" type="email" required autocomplete="email"></div>
-          <div class="form-field"><label for="contactCompany">Empresa</label><input id="contactCompany" maxlength="200" autocomplete="organization"></div>
-          <div class="form-field"><label for="contactMessage">Necesidad *</label><textarea id="contactMessage" rows="4" required maxlength="2000" placeholder="Ej: secado de botellas 600 ml, 18.000 bph…"></textarea></div>
-          <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Enviar</button>
+          <div class="form-field">
+            <label for="contactName">Nombre Completo *</label>
+            <input id="contactName" name="name" type="text" required maxlength="200" autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="contactEmail">Email Corporativo *</label>
+            <input id="contactEmail" name="email" type="email" required maxlength="200" autocomplete="email">
+          </div>
+          <div class="form-field">
+            <label for="contactPhone">Teléfono / WhatsApp *</label>
+            <input id="contactPhone" name="phone" type="tel" required maxlength="40" autocomplete="tel" inputmode="tel">
+          </div>
+          <div class="form-field">
+            <label for="contactCompany">Empresa / Planta *</label>
+            <input id="contactCompany" name="company" type="text" required maxlength="200" autocomplete="organization">
+          </div>
+          <div class="form-field">
+            <label for="contactRole">Cargo / Área</label>
+            <select id="contactRole" name="role" autocomplete="organization-title">
+              <option value="">Selecciona una opción</option>
+              <option value="Operaciones/Planta">Operaciones/Planta</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Proyectos">Proyectos</option>
+              <option value="Compras/Adquisiciones">Compras/Adquisiciones</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="contactMessage">Requerimiento o Desafío de Planta *</label>
+            <textarea
+              id="contactMessage"
+              name="message"
+              rows="5"
+              required
+              maxlength="2000"
+              placeholder="Ej: secado de botellas 600 ml, 18.000 bph, problema de condensación en etiquetado..."></textarea>
+          </div>
+          <small class="text-muted contact-privacy">
+            🔒 Tus datos se utilizan exclusivamente para responder tu consulta técnica y no serán compartidos con terceros.
+          </small>
+          <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Enviar Requerimiento Técnico</button>
           <p class="form-msg" id="contactMsg" hidden></p>
         </form>
       </div>
     </section>
+
+    <section class="section contact-trust" aria-label="Pilares de respaldo">
+      <div class="contact-trust-grid">
+        <article class="contact-trust-card">
+          <p class="contact-trust-card__icon" aria-hidden="true">🛠️</p>
+          <h3>Asesoría en Terreno</h3>
+          <p>Evaluación e ingeniería aplicada directamente en tu planta.</p>
+        </article>
+        <article class="contact-trust-card">
+          <p class="contact-trust-card__icon" aria-hidden="true">⚡</p>
+          <h3>Marcas Representadas</h3>
+          <p>Distribución e integración oficial de tecnología como Sonic Air Systems.</p>
+        </article>
+        <article class="contact-trust-card">
+          <p class="contact-trust-card__icon" aria-hidden="true">🇨🇱</p>
+          <h3>Soporte Local en Chile</h3>
+          <p>Disponibilidad de repuestos, fichas técnicas y respuesta continua.</p>
+        </article>
+      </div>
+    </section>
   </main>
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=22"></script>
-  <script>
-    Lpaez.injectJsonLd({
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      name: "LPAEZsis",
-      email: "ventas@lpaezsis.cl",
-      telephone: "+56 9 6823 2745",
-      url: "https://lpaezsis.cl/",
-      areaServed: "CL"
-    });
-    document.getElementById("contactForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var msg = document.getElementById("contactMsg");
-      var btn = document.getElementById("contactSubmit");
-      var company = document.getElementById("contactCompany").value.trim();
-      btn.disabled = true;
-      btn.textContent = "Enviando…";
-      msg.hidden = true;
-      Lpaez.api("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          website: document.getElementById("contactWebsite").value,
-          name: document.getElementById("contactName").value.trim(),
-          email: document.getElementById("contactEmail").value.trim(),
-          phone: "",
-          subject: company ? "Empresa: " + company : "Contacto web",
-          message: document.getElementById("contactMessage").value.trim()
-        })
-      }).then(function (res) {
-        msg.hidden = false;
-        msg.textContent = (res.data && res.data.message) || (res.ok ? "Mensaje enviado." : "No se pudo enviar.");
-        msg.className = "form-msg " + (res.ok ? "is-ok" : "is-error");
-        if (res.ok) e.target.reset();
-      }).catch(function () {
-        msg.hidden = false;
-        msg.textContent = "Error de conexión.";
-        msg.className = "form-msg is-error";
-      }).then(function () {
-        btn.disabled = false;
-        btn.textContent = "Enviar";
-      });
-    });
-  </script>
+  <script src="js/layout.js?v=37"></script>
+  <script src="js/site.js?v=26"></script>
+  <script src="js/contacto.js?v=1"></script>
 </body>
 </html>

@@ -1723,11 +1723,160 @@ body.nav-open {
   margin: 1.25rem 0;
   padding: 0;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.75rem;
 }
 
 .contact-direct a {
   font-weight: 650;
+}
+
+.contact-direct li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.contact-direct__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.contact-direct__value {
+  font-weight: 550;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.contact-direct a[href^="tel:"],
+.contact-direct a[href^="mailto:"] {
+  color: var(--ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.contact-direct a[href^="tel:"]:hover,
+.contact-direct a[href^="mailto:"]:hover {
+  color: var(--sonic-red);
+  text-decoration: underline;
+}
+
+.btn-whatsapp {
+  background: #128c7e;
+  border-color: #128c7e;
+  color: #ffffff;
+}
+
+.btn-whatsapp:hover {
+  background: #0e6f64;
+  border-color: #0e6f64;
+  color: #ffffff;
+}
+
+.link-catalogo {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--sonic-red);
+  text-decoration: none;
+}
+
+.link-catalogo:hover {
+  text-decoration: underline;
+}
+
+.page-hero--contact .contact-sla-banner {
+  margin: 0.85rem 0 0;
+  max-width: 52ch;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.page-hero--contact:not(.has-media) {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+  color: #ffffff;
+}
+
+.page-hero--contact:not(.has-media) h1,
+.page-hero--contact:not(.has-media) .hero-description {
+  color: #ffffff;
+}
+
+.page-hero--contact:not(.has-media) .hero-description {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.contact-privacy,
+.text-muted.contact-privacy {
+  display: block;
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.contact-form-panel h2 {
+  margin-top: 0;
+}
+
+.contact-trust {
+  padding-top: 0.25rem;
+}
+
+.contact-trust-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.contact-trust-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.15rem 1.2rem;
+}
+
+.contact-trust-card__icon {
+  margin: 0 0 0.45rem;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.contact-trust-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.contact-trust-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .contact-layout.quote-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-trust-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .btn-whatsapp,
+  .contact-form-panel .btn-block {
+    min-height: 3rem;
+  }
+
+  .contact-direct a[href^="tel:"] {
+    font-size: 1.05rem;
+  }
 }
 
 /* ——— About / news ——— */
@@ -1757,6 +1906,177 @@ body.nav-open {
 .about-grid h2 .accent,
 .section-head h2 .accent {
   color: var(--sonic-red);
+}
+
+/* --- Ficha técnica / Nosotros B2B --- */
+.company-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.company-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1rem;
+  border-bottom: 2px solid #dc2626;
+  padding-bottom: 0.4rem;
+  display: inline-block;
+}
+
+.company-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.company-card__list li {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.9fr) minmax(0, 1.4fr);
+  gap: 0.65rem 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 0.85rem;
+  align-items: start;
+}
+
+.company-card__list label {
+  font-weight: 700;
+  color: #475569;
+  cursor: default;
+}
+
+.company-card__list span,
+.company-card__list a {
+  color: #0f172a;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.company-card__list a:hover {
+  color: #dc2626;
+  text-decoration: underline;
+}
+
+.link-linkedin-secondary {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.link-linkedin-secondary:hover {
+  color: #0a66c2;
+}
+
+.link-linkedin-secondary--on-dark {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.link-linkedin-secondary--on-dark:hover {
+  color: #ffffff;
+}
+
+.page-hero--about.has-media {
+  min-height: 280px;
+  align-items: end;
+}
+
+.page-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.page-hero-actions .btn {
+  min-height: 2.6rem;
+}
+
+.page-hero-actions__outline {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+}
+
+.page-hero-actions__outline:hover {
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.about-cta-section {
+  background-color: #0d0d0d;
+  color: #ffffff;
+  padding: 3rem 1.5rem;
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.about-cta-section .container {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.about-cta-section .text-center {
+  text-align: center;
+}
+
+.about-cta-section h2 {
+  font-size: clamp(1.35rem, 2.8vw, 1.7rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.about-cta-section p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin: 0 auto 1.5rem;
+  max-width: 48ch;
+}
+
+.about-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.about-cta-section .btn-outline {
+  border-color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
+}
+
+.about-cta-section .btn-outline:hover {
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.about-cta-secondary {
+  margin: 1.25rem 0 0 !important;
+}
+
+@media (max-width: 560px) {
+  .company-card__list li {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .company-card__list span,
+  .company-card__list a {
+    text-align: left;
+  }
+
+  .page-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .about-card {
