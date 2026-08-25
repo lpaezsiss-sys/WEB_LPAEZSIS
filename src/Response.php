@@ -13,8 +13,45 @@ final class Response
         echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
+    /**
+     * Éxito con espejo raíz + data (contrato admin: success/ok y claves brand|brands|url).
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public static function success(array $payload): array
+    {
+        return array_merge(['success' => true, 'ok' => true, 'data' => $payload], $payload);
+    }
+
+    /** @param array<string, mixed> $payload */
+    public static function ok(array $payload, int $status = 200): void
+    {
+        self::json(self::success($payload), $status);
+    }
+
     public static function error(string $message, int $status = 400, array $extra = []): void
     {
-        self::json(array_merge(['error' => $message], $extra), $status);
+        $payload = [
+            'success' => false,
+            'ok' => false,
+            'error' => $message,
+        ];
+        if ($extra !== []) {
+            if (isset($extra['path']) && !array_key_exists('route', $extra)) {
+                $extra['route'] = $extra['path'];
+                unset($extra['path']);
+            }
+            if (!array_key_exists('debug', $extra) && (isset($extra['detail']) || isset($extra['file']))) {
+                $detail = (string) ($extra['detail'] ?? '');
+                $file = (string) ($extra['file'] ?? '');
+                $line = $extra['line'] ?? '';
+                unset($extra['detail'], $extra['file'], $extra['line']);
+                $loc = $file !== '' ? $file . ($line !== '' && $line !== null ? ':' . $line : '') : '';
+                $extra['debug'] = trim($detail . ($loc !== '' ? ' @ ' . $loc : ''));
+            }
+            $payload['data'] = $extra;
+        }
+        self::json($payload, $status);
     }
 }

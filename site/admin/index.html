@@ -7,7 +7,7 @@
   <title>Admin | LPAEZsis</title>
   <base href="/admin/">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
-  <link rel="stylesheet" href="css/admin.css?v=8">
+  <link rel="stylesheet" href="css/admin.css?v=9">
 </head>
 <body>
   <div id="loginView" class="login-view">
@@ -158,37 +158,95 @@
   </dialog>
 
   <dialog id="simpleDialog">
-    <form method="dialog" class="dialog-body" id="simpleForm">
+    <form method="dialog" class="dialog-body" id="simpleForm" novalidate>
       <h3 id="simpleDialogTitle">Item</h3>
       <input type="hidden" name="id">
       <input type="hidden" name="kind">
-      <label>Nombre</label><input name="name" required>
-      <label>Slug</label><input name="slug">
-      <label>Descripción</label><textarea name="description" rows="3"></textarea>
+      <p class="field-error" id="simpleFormError" hidden></p>
+
+      <fieldset class="form-section" id="brandGeneralSection">
+        <legend>Información general</legend>
+        <label id="simpleNameLabel">Nombre</label>
+        <input name="name" id="simpleName" required maxlength="200" placeholder="CMC Klebetechnik GmbH" autocomplete="off">
+        <label>Slug <span class="label-hint" id="slugHint">se genera del nombre</span></label>
+        <input name="slug" id="simpleSlug" maxlength="120" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="cmc-klebetechnik">
+        <div id="brandGeneralFields" hidden>
+          <div class="form-grid">
+            <div>
+              <label>Subtítulo / razón social</label>
+              <input name="subtitle" maxlength="200" placeholder="Logistics &amp; Conveyors">
+            </div>
+            <div>
+              <label>País de origen</label>
+              <input name="origin_country" maxlength="80" placeholder="Alemania">
+            </div>
+          </div>
+          <label>Sitio web de la marca</label>
+          <input name="website_url" maxlength="500" placeholder="https://www.ejemplo.com">
+        </div>
+        <label id="simpleDescLabel">Descripción</label>
+        <textarea name="description" id="simpleDescription" rows="3" placeholder="Resumen comercial de la marca"></textarea>
+      </fieldset>
+
       <div id="simpleLogoField" hidden>
-        <label>Logo</label>
+        <label>Logo (se convierte a WebP)</label>
         <button type="button" class="image-pick" id="brandLogoPick" title="Elegir logo">
           <img id="brandLogoPreview" alt="" hidden>
           <span class="image-pick__hint" id="brandLogoHint">Pincha para elegir logo</span>
         </button>
         <input type="hidden" name="logo_url" id="brandLogoUrl">
       </div>
+      <div id="brandDatasheetField" hidden>
+        <label for="brandDatasheetUrl">Ficha técnica / catálogo (PDF)</label>
+        <div class="file-row">
+          <input type="text" name="datasheet_url" id="brandDatasheetUrl" placeholder="/img/fichas/… o URL">
+          <label class="btn-file">
+            Subir PDF
+            <input type="file" id="brandDatasheetFile" accept="application/pdf,.pdf" hidden>
+          </label>
+        </div>
+        <p class="meta" id="brandDatasheetHint">PDF de catálogo o ficha de la marca (máx. 12 MB).</p>
+      </div>
       <div id="simpleContentField" hidden>
         <div class="sections-head">
           <div>
-            <label class="sections-head__label">Contenido de la ficha</label>
+            <label class="sections-head__label">Descripción larga</label>
             <p class="sections-head__hint">Secciones con título y texto enriquecido (imágenes, video, formato).</p>
           </div>
           <button type="button" class="ghost" id="addSectionBtn">+ Agregar Sección</button>
         </div>
         <div id="brandSections" class="brand-sections" aria-live="polite"></div>
-        <!-- Serializado al guardar: &lt;section class="brand-section"&gt;&lt;h3&gt;…&lt;/h3&gt;…&lt;/section&gt; -->
         <textarea name="content_html" id="brandContentHtml" hidden aria-hidden="true"></textarea>
       </div>
-      <div id="simpleSeoFields">
-        <label>SEO title</label><input name="seo_title">
-        <label>SEO description</label><textarea name="seo_description" rows="2"></textarea>
-      </div>
+      <fieldset class="form-section" id="simpleSeoFields">
+        <legend>Optimización SEO</legend>
+        <div class="seo-snippet" id="brandGoogleSnippet" hidden>
+          <p class="seo-snippet__kicker">Vista previa de Google</p>
+          <div class="seo-snippet__url" id="snippetUrl"></div>
+          <div class="seo-snippet__title" id="snippetTitle"></div>
+          <div class="seo-snippet__desc" id="snippetDesc"></div>
+        </div>
+        <label>Meta title</label>
+        <input name="seo_title" id="simpleSeoTitle" maxlength="200" placeholder="CMC Klebetechnik GmbH Chile | Soluciones Industriales - LPAEZSIS">
+        <p class="char-count" id="seoTitleCount"></p>
+        <label>Meta description</label>
+        <textarea name="seo_description" id="simpleSeoDescription" rows="3" maxlength="320"></textarea>
+        <p class="char-count" id="seoDescCount">0/160 · ideal 155–160 caracteres</p>
+        <div id="brandSeoExtras" hidden>
+          <label>Keywords</label>
+          <input name="seo_keywords" id="simpleSeoKeywords" maxlength="500" placeholder="cintas adhesivas, etiquetas siliconadas, CMC, Chile">
+          <label>URL canónica</label>
+          <input name="canonical_url" id="simpleCanonical" maxlength="500" placeholder="/marcas.html?slug=cmc-klebetechnik">
+          <div class="sections-head">
+            <div>
+              <label class="sections-head__label">JSON-LD (Brand + Organization)</label>
+              <p class="sections-head__hint">Se genera solo; puedes personalizarlo antes de guardar.</p>
+            </div>
+            <button type="button" class="ghost" id="regenSchemaBtn">Regenerar schema</button>
+          </div>
+          <textarea name="schema_json_ld" id="simpleSchema" rows="10" class="schema-editor" spellcheck="false"></textarea>
+        </div>
+      </fieldset>
       <label>Orden</label><input name="sort_order" type="number" value="0">
       <label><input type="checkbox" name="is_active" checked> Activo</label>
       <div class="dialog-actions">
@@ -206,7 +264,7 @@
         <img id="imageDialogPreview" alt="" hidden>
         <span class="image-pick__hint" id="imageDialogHint">Sin imagen</span>
       </div>
-      <label for="imageFileInput">Archivo local (JPG, PNG, WEBP, GIF · máx. 5 MB)</label>
+      <label for="imageFileInput">Archivo local (JPG, PNG, WEBP, GIF · se convierte a WebP · máx. 5 MB)</label>
       <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp,image/gif">
       <label for="imageUrlField">O URL</label>
       <!-- type=text: permite rutas relativas /img/uploads/... (type=url las rechaza) -->
@@ -221,6 +279,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=16"></script>
+  <script src="js/admin.js?v=25"></script>
 </body>
 </html>

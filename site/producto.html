@@ -40,8 +40,8 @@
     </div>
   </main>
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=25"></script>
+  <script src="js/layout.js?v=38"></script>
+  <script src="js/site.js?v=32"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -146,7 +146,9 @@
         var actions = document.getElementById("productActions");
         var datasheetUrl = Lpaez.resolveDatasheetUrl ? Lpaez.resolveDatasheetUrl(product) : "";
         var pdfBtn = datasheetUrl
-          ? '<a class="btn btn-outline" href="' + datasheetUrl + '" target="_blank" rel="noopener">Descargar ficha técnica PDF</a>'
+          ? '<a class="btn btn-outline" href="' +
+            encodeURI(datasheetUrl).replace(/&/g, "%26") +
+            '" target="_blank" rel="noopener">Descargar ficha técnica PDF</a>'
           : "";
         if (product.sale_mode === "buy") {
           actions.innerHTML =

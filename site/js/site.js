@@ -233,6 +233,147 @@
     document.head.appendChild(script);
   }
 
+  var BRAND_SUBTITLES = {
+    lyc: "Logistics & Conveyors",
+    "columbia-machine": "Columbia-Okura LLC",
+    "cmc-klebetechnik": "Cintas Adhesivas Técnicas y Aislantes Eléctricos",
+    movex: "Blueline® · Bandas modulares higiénicas",
+  };
+
+  function pageOrigin() {
+    var origin = window.location.origin || "";
+    if (/^https?:\/\//i.test(origin)) return origin.replace(/\/$/, "");
+    return "https://prueba1.lpaezsis.cl";
+  }
+
+  function publicPath(path) {
+    if (!path) return "";
+    path = String(path).trim().replace(/\\/g, "/");
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.indexOf("/site/") === 0) path = path.slice(5);
+    else if (/^site\//i.test(path)) path = "/" + path.slice(5);
+    if (path.charAt(0) !== "/") path = "/" + path.replace(/^\.\//, "");
+    return path;
+  }
+
+  function absoluteUrl(path) {
+    if (!path) return "";
+    path = String(path).trim();
+    if (/^https?:\/\//i.test(path)) return path;
+    path = publicPath(path);
+    return pageOrigin() + (path.charAt(0) === "/" ? path : "/" + path);
+  }
+
+  function clipMetaDescription(text, maxLen) {
+    maxLen = maxLen || 160;
+    var raw = String(text || "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (raw.length <= maxLen) return raw;
+    var cut = raw.slice(0, maxLen);
+    var sp = cut.lastIndexOf(" ");
+    if (sp > 110) cut = cut.slice(0, sp);
+    return cut.replace(/[.,;:\s]+$/, "") + "…";
+  }
+
+  function setHeadMeta(key, content, attr) {
+    attr = attr || "name";
+    var sel =
+      attr === "property"
+        ? 'meta[property="' + key + '"]'
+        : 'meta[name="' + key + '"]';
+    var el = document.querySelector(sel);
+    if (!el) {
+      el = document.createElement("meta");
+      el.setAttribute(attr, key);
+      document.head.appendChild(el);
+    }
+    el.setAttribute("content", content == null ? "" : String(content));
+    return el;
+  }
+
+  function setCanonical(url) {
+    var el =
+      document.getElementById("canonicalLink") ||
+      document.querySelector('link[rel="canonical"]');
+    if (!el) {
+      el = document.createElement("link");
+      el.rel = "canonical";
+      el.id = "canonicalLink";
+      document.head.appendChild(el);
+    } else if (!el.id) {
+      el.id = "canonicalLink";
+    }
+    el.setAttribute("href", url);
+    var alt = document.querySelector('link[rel="alternate"][hreflang="es-CL"]');
+    if (alt) alt.setAttribute("href", url);
+    return el;
+  }
+
+  function upsertJsonLd(id, data) {
+    var el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement("script");
+      el.type = "application/ld+json";
+      el.id = id;
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(data);
+    return el;
+  }
+
+  function brandSubtitle(brand) {
+    if (!brand) return "";
+    var raw =
+      brand.subtitle ||
+      brand.razon_social ||
+      brand.alternate_name ||
+      BRAND_SUBTITLES[brand.slug] ||
+      "";
+    raw = String(raw).replace(/\s+/g, " ").trim();
+    if (!raw) return "";
+    if (String(brand.name || "").toLowerCase() === raw.toLowerCase()) return "";
+    return raw;
+  }
+
+  function brandCanonicalUrl(brand) {
+    var origin = pageOrigin();
+    var custom = brand && brand.canonical_url ? String(brand.canonical_url).trim() : "";
+    if (custom) {
+      if (/^https?:\/\//i.test(custom)) return custom;
+      return absoluteUrl(custom);
+    }
+    if (brand && brand.slug) {
+      return origin + "/marcas.html?slug=" + encodeURIComponent(brand.slug);
+    }
+    return origin + "/marcas.html";
+  }
+
+  function rewriteJsonLdOrigin(data, origin) {
+    try {
+      var text = JSON.stringify(data).split("https://prueba1.lpaezsis.cl").join(origin);
+      return JSON.parse(text);
+    } catch (e) {
+      return data;
+    }
+  }
+
+  function parseBrandJsonLd(raw, origin) {
+    if (!raw) return null;
+    var parsed = raw;
+    if (typeof raw === "string") {
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+    if (!parsed || typeof parsed !== "object") return null;
+    return rewriteJsonLdOrigin(parsed, origin || pageOrigin());
+  }
+
   function productPayload(p) {
     return encodeURIComponent(
       JSON.stringify({
@@ -262,10 +403,8 @@
     var visual = img
       ? imgTagHtml(
           img,
-          p.name,
-          'title="' +
-            escapeAttr(p.name) +
-            '" loading="lazy" decoding="async" width="480" height="480"',
+          p.name || p.nombre || "",
+          'loading="lazy" decoding="async" width="480" height="480"',
           productImageCandidates(p)
         )
       : "LPAEZ";
@@ -355,6 +494,9 @@
     "paletizador-alto-nivel-columbia-hl7200": "img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/productos/lyc-transportadores.jpg",
+    "cinta-doble-contacto-cmc-10730": "img/productos/cmc-10730.jpg",
+    "linea-blueline-movex-bandas-modulares": "img/productos/movex-blueline.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -378,6 +520,9 @@
     "paletizado-alta-velocidad": "img/productos/hl7200.jpg",
     "paletizado-robotico": "img/productos/ai1800.jpg",
     "paletizado-integrado": "img/productos/fl1000sw.jpg",
+    "transportadores-manejo-materiales": "img/productos/lyc-transportadores.jpg",
+    "cintas-adhesivas-tecnicas": "img/productos/cmc-10730.jpg",
+    "bandas-modulares-higiene": "img/productos/movex-blueline.jpg",
     "salas-limpias": "img/hero/plant.jpg",
   };
 
@@ -386,6 +531,8 @@
     "paletizador-alto-nivel-columbia-hl7200": "img/fichas/ficha_tecnica_hl7200_columbia.pdf",
     "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/fichas/PRESENTACION_L&C_Ltda_Tx.pdf",
+    "cinta-doble-contacto-cmc-10730": "img/fichas/Cinta_Doble_Contacto_Union_Etiquetas_Siliconadas_CMC_LPAEZSIS.pdf",
   };
 
   function parseProductFicha(raw) {
@@ -480,30 +627,27 @@
 
   function imgTagHtml(src, alt, extra, fallbacks) {
     extra = extra || "";
-    var chain = [];
-    function add(url) {
+    src = publicImageUrl(src);
+    var fb = "";
+    (fallbacks || []).forEach(function (url) {
       url = publicImageUrl(url);
-      if (url && chain.indexOf(url) === -1) chain.push(url);
-    }
-    add(src);
-    (fallbacks || []).forEach(add);
-    add(PRODUCT_FALLBACKS[0]);
-    var first = chain[0] || PRODUCT_FALLBACKS[0];
-    var rest = chain.slice(1);
-    var onerror = rest.length
-      ? ' data-fallbacks="' +
-        escapeAttr(JSON.stringify(rest)) +
-        '" onerror="(function(el){var n=+el.dataset.fi||0;var list=[];try{list=JSON.parse(el.getAttribute(\'data-fallbacks\')||\'[]\');}catch(e){}if(n<list.length){el.dataset.fi=String(n+1);el.src=list[n];}else{el.onerror=null;}})(this)"'
-      : "";
+      if (!fb && url && url !== src) fb = url;
+    });
+    if (!fb) fb = PRODUCT_FALLBACKS[0];
+    if (!src) src = fb;
+    var onerror =
+      ' onerror="this.onerror=null;this.src=\'' +
+      escapeAttr(fb).replace(/'/g, "\\'") +
+      '\';"';
     return (
       '<img src="' +
-      escapeAttr(first) +
+      escapeAttr(src) +
       '" alt="' +
       escapeAttr(alt || "") +
       '" ' +
       extra +
       onerror +
-      " >"
+      ">"
     );
   }
 
@@ -659,6 +803,16 @@
     queryParam: queryParam,
     escapeHtml: escapeHtml,
     injectJsonLd: injectJsonLd,
+    upsertJsonLd: upsertJsonLd,
+    pageOrigin: pageOrigin,
+    publicPath: publicPath,
+    absoluteUrl: absoluteUrl,
+    clipMetaDescription: clipMetaDescription,
+    setHeadMeta: setHeadMeta,
+    setCanonical: setCanonical,
+    brandSubtitle: brandSubtitle,
+    brandCanonicalUrl: brandCanonicalUrl,
+    parseBrandJsonLd: parseBrandJsonLd,
     updateBadges: updateBadges,
     getSettings: function () {
       return siteSettings;

@@ -28,13 +28,12 @@ final class Router
         } catch (\Throwable $e) {
             if (Config::bool('APP_DEBUG')) {
                 Response::error('Error interno', 500, [
-                    'detail' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
+                    'route' => $path,
+                    'debug' => $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine(),
                 ]);
                 return;
             }
-            Response::error('Error interno del servidor', 500);
+            Response::error('Error interno del servidor', 500, ['route' => $path]);
         }
     }
 }

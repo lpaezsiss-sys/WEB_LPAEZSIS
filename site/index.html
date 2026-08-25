@@ -300,8 +300,8 @@
     </section>
   </main>
   <div id="site-footer-mount"></div>
-  <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=25"></script>
+  <script src="js/layout.js?v=38"></script>
+  <script src="js/site.js?v=32"></script>
   <script>
     (function () {
       var origin = window.__LPAEZ_ORIGIN__ || window.location.origin;
@@ -423,7 +423,7 @@
         var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
         var label = Lpaez.escapeHtml(b.name);
         if (b.logo_url || b.slug === "sonic-air-systems") {
-          var src = b.logo_url || "img/brand/sonic-air.png";
+          var src = (Lpaez.publicPath ? Lpaez.publicPath(b.logo_url) : b.logo_url) || "img/brand/sonic-air.png";
           var webp =
             b.slug === "sonic-air-systems" && !b.logo_url
               ? "img/brand/sonic-air.webp"

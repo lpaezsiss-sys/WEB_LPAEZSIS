@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 21,
+    slug: "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc",
+    name: "Fabricación e Integración de Cintas y Sistemas Transportadores LYC",
+    sku: "LYC-TX",
+    description: "Sistemas de transporte industrial a la medida (unilineales, acumulación, elevadores, banda modular, cadenas y pallets) diseñados para áreas estándar o asépticas.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/lyc-transportadores.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "lyc",
+    brand_name: "LYC",
+    quote_url: "cotizacion.html?sku=fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc",
+  },
+  {
+    id: 22,
+    slug: "cinta-doble-contacto-cmc-10730",
+    name: "Cinta Doble Contacto CMC 10730",
+    sku: "CMC-10730",
+    description: "Cinta adhesiva de doble contacto con soporte de poliéster (PET) y adhesivo de polisiloxano (silicona) en ambas caras. Especialmente concebida para el empalme superpuesto (splicing) de materiales siliconados y release liners.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/cmc-10730.jpg",
+    image_webp: "",
+    category_slug: "cintas-adhesivas-tecnicas",
+    category_name: "Cintas Adhesivas Técnicas / Empalme Siliconado",
+    brand_slug: "cmc-klebetechnik",
+    brand_name: "CMC Klebetechnik GmbH",
+    quote_url: "cotizacion.html?sku=cinta-doble-contacto-cmc-10730",
+  },
+  {
+    id: 23,
+    slug: "linea-blueline-movex-bandas-modulares",
+    name: "Línea Blueline® Movex — Bandas Modulares Higiénicas",
+    sku: "MOVEX-BLUELINE",
+    description: "Bandas modulares plásticas Blueline® para higiene alimentaria, con bisagras autolimpiantes, material BluLub® y transferencia Zero ATP® Pro.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/movex-blueline.jpg",
+    image_webp: "",
+    category_slug: "bandas-modulares-higiene",
+    category_name: "Bandas Modulares / Higiene Alimentaria",
+    brand_slug: "movex",
+    brand_name: "MOVEX",
+    quote_url: "cotizacion.html?sku=linea-blueline-movex-bandas-modulares",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,20 +273,26 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
+  { slug: "cintas-adhesivas-tecnicas", name: "Cintas Adhesivas Técnicas / Empalme Siliconado" },
+  { slug: "bandas-modulares-higiene", name: "Bandas Modulares / Higiene Alimentaria" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "lyc", name: "LYC" },
+  { slug: "cmc-klebetechnik", name: "CMC Klebetechnik GmbH" },
+  { slug: "movex", name: "MOVEX" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
 const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
-  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado", "bandas-modulares-higiene"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales", "cintas-adhesivas-tecnicas", "bandas-modulares-higiene"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
@@ -465,9 +522,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const quote =
       prod?.quote_url ||
       "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
+    const imgFallback =
+      prod?.brand_slug === "movex" || /blueline/i.test(slug)
+        ? "/img/productos/movex-blueline.jpg"
+        : prod?.brand_slug === "cmc-klebetechnik" || /cmc-10730/i.test(slug)
+        ? "/img/productos/cmc-10730.jpg"
+        : prod?.brand_slug === "lyc" || /lyc/i.test(slug)
+          ? "/img/productos/lyc-transportadores.jpg"
+          : "img/products/A07-10015.jpg";
     const imgTag = webp
-      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'"></picture>`
-      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='img/products/A07-10015.jpg'">`;
+      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'"></picture>`
+      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src='${imgFallback}'">`;
     return (
       `<article class="product-card catalog-card reveal">` +
       `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${imgTag}</a>` +
@@ -541,13 +606,103 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function applyCatalogSeo(filteredList, pageItems) {
+    const origin =
+      (window.Lpaez && Lpaez.pageOrigin && Lpaez.pageOrigin()) ||
+      window.location.origin ||
+      "https://prueba1.lpaezsis.cl";
+    const brand = allBrands.find((b) => b.slug === state.brand);
+    const h1 = document.getElementById("catalogTitle");
+    const clip =
+      (window.Lpaez && Lpaez.clipMetaDescription) ||
+      ((t) => String(t || "").slice(0, 160));
+    const setMeta = window.Lpaez && Lpaez.setHeadMeta;
+    const setCanon = window.Lpaez && Lpaez.setCanonical;
+    const subtitle =
+      brand && window.Lpaez && Lpaez.brandSubtitle
+        ? Lpaez.brandSubtitle(brand)
+        : "";
+    let title = "Productos industriales | Soluciones Industriales LPAEZsis";
+    let desc =
+      "Catálogo B2B LPAEZsis: secadores, turbinas, paletizado Columbia, transportadores LYC y repuestos Sonic Air. Filtra por industria y marca.";
+    let canonical = origin + "/catalogo.html";
+    if (brand) {
+      title =
+        (brand.seo_title && String(brand.seo_title).trim()) ||
+        (subtitle
+          ? brand.name + " (" + subtitle + ") | Soluciones Industriales LPAEZsis"
+          : "Productos " + brand.name + " | Soluciones Industriales LPAEZsis");
+      desc = clip(
+        brand.seo_description ||
+          brand.short_description ||
+          brand.description ||
+          "Catálogo de equipos y soluciones " +
+            brand.name +
+            " representados por LPAEZsis en Chile.",
+        160
+      );
+      canonical = origin + "/catalogo.html?brand=" + encodeURIComponent(brand.slug);
+      if (h1) h1.textContent = "Catálogo de Equipos y Soluciones " + brand.name;
+    } else if (h1) {
+      h1.textContent = "Productos";
+    }
+    const thin = !filteredList || !filteredList.length;
+    document.title = title;
+    if (setMeta) {
+      setMeta("description", desc);
+      setMeta("robots", thin ? "noindex,follow" : "index,follow");
+      setMeta("og:title", title, "property");
+      setMeta("og:description", desc, "property");
+      setMeta("og:url", canonical, "property");
+      setMeta("twitter:title", title);
+      setMeta("twitter:description", desc);
+    }
+    if (setCanon) setCanon(canonical);
+    const ou = document.getElementById("ogUrl");
+    if (ou) ou.setAttribute("content", canonical);
+    if (brand && window.Lpaez?.upsertJsonLd) {
+      const logo = window.Lpaez.absoluteUrl
+        ? Lpaez.absoluteUrl(brand.logo_url || "/img/brand/logo.png")
+        : origin + "/img/brand/logo.png";
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "Brand",
+        name: brand.name,
+        url: canonical,
+        logo,
+        description: desc,
+      };
+      if (subtitle) schema.alternateName = subtitle;
+      if (pageItems && pageItems.length) {
+        schema.makesOffer = pageItems.map((prod) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: prod.name,
+            image:
+              (prod.image_url || "").indexOf("http") === 0
+                ? prod.image_url
+                : origin + "/" + String(prod.image_url || "").replace(/^\//, ""),
+            description: clip(prod.description || prod.seo_description || "", 160),
+            category: prod.category_name || "",
+            url: origin + "/producto.html?slug=" + encodeURIComponent(prod.slug || ""),
+          },
+        }));
+      }
+      Lpaez.upsertJsonLd("brandJsonLd", schema);
+    }
+  }
+
   function injectJsonLd(products) {
     const origin = window.location.origin || "https://prueba1.lpaezsis.cl";
     const list = Array.isArray(products) ? products : [];
+    const brandRow = allBrands.find((b) => b.slug === state.brand);
     const graph = {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      name: "Catálogo de productos LPAEZsis",
+      name: brandRow
+        ? "Catálogo de Equipos y Soluciones " + brandRow.name
+        : "Catálogo de productos LPAEZsis",
       numberOfItems: list.length,
       itemListElement: list.map((p, i) => ({
         "@type": "ListItem",
@@ -616,6 +771,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       renderPager(0, 1, 1);
       injectJsonLd([]);
+      applyCatalogSeo([], []);
       console.log("[CATALOGO JS] Productos renderizados exitosamente:", 0);
       return;
     }
@@ -623,6 +779,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = pageItems.map(cardHtml).join("");
     renderPager(products.length, state.page, pages);
     injectJsonLd(pageItems);
+    applyCatalogSeo(products, pageItems);
     window.Lpaez?.observeReveals?.();
     console.log("[CATALOGO JS] Productos renderizados exitosamente:", pageItems.length);
   }

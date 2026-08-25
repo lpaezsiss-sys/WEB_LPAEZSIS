@@ -5,6 +5,7 @@ namespace Lpaezsis\Controllers;
 
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\BrandSeo;
 use PDO;
 
 final class PublicApi
@@ -76,7 +77,7 @@ final class PublicApi
             return;
         }
 
-        Response::error('Ruta no encontrada', 404, ['path' => $path]);
+        Response::error('Ruta no encontrada', 404, ['route' => $path]);
     }
 
     private static function pdo(): PDO
@@ -107,15 +108,18 @@ final class PublicApi
 
     private static function brands(): void
     {
-        $rows = self::pdo()->query(
-            'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
-             FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
-        )->fetchAll();
-        Response::json(['brands' => $rows]);
+        BrandSeo::ensureColumns(self::pdo());
+        $rows = BrandSeo::presentMany(
+            self::pdo()->query(
+                'SELECT * FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            )->fetchAll()
+        );
+        Response::json(BrandSeo::listResult($rows));
     }
 
     private static function brandDetail(string $slug): void
     {
+        BrandSeo::ensureColumns(self::pdo());
         $stmt = self::pdo()->prepare(
             'SELECT * FROM brands WHERE slug = ? AND is_active = 1 LIMIT 1'
         );
@@ -133,6 +137,7 @@ final class PublicApi
             }
         }
         $brand['gallery'] = $gallery;
+        $brand = BrandSeo::present($brand);
 
         $p = self::pdo()->prepare(
             'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -144,7 +149,13 @@ final class PublicApi
              ORDER BY p.sort_order, p.name'
         );
         $p->execute([(int) $brand['id']]);
-        Response::json(['brand' => $brand, 'products' => $p->fetchAll()]);
+        $products = $p->fetchAll();
+        $url = trim((string) ($brand['canonical_url'] ?? ''));
+        Response::json(BrandSeo::envelope([
+            'brand' => $brand,
+            'products' => $products,
+            'url' => $url !== '' ? $url : BrandSeo::defaultCanonical((string) ($brand['slug'] ?? '')),
+        ]));
     }
 
     private static function products(): void
