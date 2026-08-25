@@ -1223,18 +1223,9 @@ body.nav-open {
   min-width: 0;
 }
 
-.badge-representacion {
-  display: inline-block;
-  margin: 0 0 0.75rem;
-  padding: 0.28rem 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fecaca;
-  background: rgba(220, 38, 38, 0.18);
+/* Badge de representación oficial: oculto en ficha de marca */
+.brand-hero .badge-representacion {
+  display: none !important;
 }
 
 .brand-hero__title {
