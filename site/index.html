@@ -24,7 +24,8 @@
   <link rel="preload" as="image" href="img/hero/line.webp" type="image/webp" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero/line.jpg" fetchpriority="high">
   <link rel="stylesheet" href="css/style.css?v=128">
-  <link rel="stylesheet" href="css/propuesta-home.css?v=4">
+  <link rel="stylesheet" href="css/propuesta-home.css?v=5">
+  <link rel="stylesheet" href="css/propuesta-marcas.css?v=5">
   <script>
     (function () {
       var origin = window.location.origin || "https://prueba1.lpaezsis.cl";
@@ -270,12 +271,28 @@
       </div>
     </section>
 
-    <section class="section reveal brands-compact" aria-labelledby="marcas-title">
-      <div class="section-head is-left">
-        <h2 id="marcas-title">Representaciones y Distribución</h2>
-        <p><a href="marcas.html">Ver todas →</a></p>
+    <section class="section reveal pm-brands-section" aria-labelledby="marcas-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="marcas-title">Representaciones y Distribución</h2>
+          <a href="marcas.html">Ver todas →</a>
+        </div>
+        <div class="logo-carousel" aria-label="Marcas representadas">
+          <div class="logo-carousel__track" id="brandsCarouselTrack" role="list"></div>
+        </div>
       </div>
-      <div class="brand-strip" id="homeBrands"></div>
+    </section>
+
+    <section class="home-clients-section reveal" id="clientes" aria-labelledby="clientes-title">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 id="clientes-title">Empresas que confían en nuestras soluciones</h2>
+          <p>Soplado, secado y fin de línea en las principales plantas de Chile</p>
+        </div>
+        <div class="logo-carousel logo-carousel--clients" aria-label="Clientes">
+          <div class="logo-carousel__track" id="clientsCarouselTrack" role="list"></div>
+        </div>
+      </div>
     </section>
 
     <section class="cta-band reveal" aria-labelledby="cta-title">
@@ -407,30 +424,115 @@
         });
       }
 
-      function brandPillHtml(b) {
-        var href = "marcas.html?slug=" + encodeURIComponent(b.slug);
-        var label = Lpaez.escapeHtml(b.name);
-        if (b.logo_url || b.slug === "sonic-air-systems") {
-          var src = b.logo_url || "img/brand/sonic-air.png";
-          var webp =
-            b.slug === "sonic-air-systems" && !b.logo_url
-              ? "img/brand/sonic-air.webp"
-              : String(src).replace(/\.(jpe?g|png)$/i, ".webp");
-          var useWebp = /\.(jpe?g|png)$/i.test(src) || b.slug === "sonic-air-systems";
-          return (
-            '<a class="brand-pill" href="' + href + '" title="' + label + '">' +
-            (useWebp
-              ? '<picture><source type="image/webp" srcset="' + Lpaez.escapeHtml(webp) + '">'
-              : "") +
-            '<img src="' + Lpaez.escapeHtml(src) + '" alt="' + label +
-            '" title="' + label + '" width="120" height="48" loading="lazy" decoding="async">' +
-            (useWebp ? "</picture>" : "") +
-            "</a>"
-          );
+      var PLACEHOLDER = "img/placeholder-logo.png";
+      var LOGO_BY_SLUG = {
+        "sonic-air-systems": "img/brand/sonic-air.png",
+        sonic: "img/brand/sonic-air.png",
+        lyc: "img/brand/lyc.png",
+        movex: "img/brand/movex.png",
+        isodur: "img/brand/isodur.png",
+        combi: "img/brand/combi.png",
+        haida: "img/brand/haida.png",
+        "columbia-machine": "img/uploads/p-57c09a0440925f86.png",
+        "cmc-klebetechnik": "img/uploads/p-4123e04f38ce02ea.png"
+      };
+
+      function normalizeLogoUrl(raw, slug) {
+        var src = String(raw || "").trim();
+        if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
+        if (!src && slug) {
+          var guess = String(slug).toLowerCase().replace(/-systems$/i, "").replace(/_/g, "-");
+          if (LOGO_BY_SLUG[guess]) src = LOGO_BY_SLUG[guess];
+          else src = "img/brand/" + guess + ".png";
         }
-        return '<a class="brand-pill" href="' + href + '" title="' + label + '">' + label + "</a>";
+        if (!src) src = PLACEHOLDER;
+        // Absolute site paths: keep leading slash; strip accidental host-relative doubles
+        if (/^https?:\/\//i.test(src)) return src;
+        if (src.charAt(0) === "/") return src;
+        return src;
       }
 
+      function logoImgHtml(src, alt) {
+        var safeSrc = Lpaez.escapeHtml(src);
+        var safeAlt = Lpaez.escapeHtml(alt || "Logo");
+        return (
+          '<img src="' + safeSrc + '" alt="' + safeAlt +
+          '" loading="lazy" decoding="async" width="140" height="60" ' +
+          'onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src=\'' + PLACEHOLDER +
+          '\';}else{this.style.display=\'none\';}">'
+        );
+      }
+
+
+      function brandCardHtml(b) {
+        var slug = b.slug || "";
+        var nombre = b.nombre || b.name || slug || "Marca";
+        var src = normalizeLogoUrl(b.logo_url || b.imagen || b.logo, slug);
+        return (
+          '<a href="marcas.html?slug=' + encodeURIComponent(slug) +
+          '" class="industrial-brand-card" role="listitem" title="' + Lpaez.escapeHtml(nombre) + '">' +
+          logoImgHtml(src, nombre) +
+          "</a>"
+        );
+      }
+
+      function clientCardHtml(client) {
+        var nombre = client.nombre || client.name || "Cliente";
+        var src = normalizeLogoUrl(
+          client.logo_url || client.logo || client.imagen,
+          client.slug || ""
+        );
+        return (
+          '<div class="industrial-client-card" role="listitem" title="' +
+          Lpaez.escapeHtml(nombre) + '">' +
+          logoImgHtml(src, nombre) +
+          "</div>"
+        );
+      }
+
+      function fillCarousel(trackId, itemsHtml) {
+        var track = document.getElementById(trackId);
+        if (!track) return;
+        if (!itemsHtml || !itemsHtml.length) {
+          track.innerHTML = '<p class="pm-empty-hint">Pronto publicaremos esta sección.</p>';
+          track.style.animation = "none";
+          return;
+        }
+        // Duplicar secuencia para loop continuo seamless
+        var seq = itemsHtml.join("");
+        track.innerHTML = seq + seq;
+      }
+
+      function renderBrandCarousel(brands) {
+        if (!brands || !brands.length) {
+          fillCarousel("brandsCarouselTrack", []);
+          return;
+        }
+        fillCarousel("brandsCarouselTrack", brands.map(brandCardHtml));
+      }
+
+      function renderClientCarousel(clients) {
+        if (!clients || !clients.length) {
+          fillCarousel("clientsCarouselTrack", []);
+          return;
+        }
+        fillCarousel("clientsCarouselTrack", clients.map(clientCardHtml));
+      }
+
+      function loadClients() {
+        return fetch("api/clientes.php?v=2", { credentials: "same-origin", cache: "no-store" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            var clients = Array.isArray(data) ? data : data.clientes || data.data || [];
+            renderClientCarousel(clients);
+          })
+          .catch(function () {
+            renderClientCarousel([]);
+          });
+      }
 
       // Hero media rotation (prop-hero)
       (function () {
@@ -444,7 +546,6 @@
         }, 6500);
       })();
 
-      // Sectores: teclado + focus-visible (enlaces nativos; refuerzo Enter/Space ya cubierto por <a>)
       var sectores = document.getElementById("sectores");
       if (sectores) {
         sectores.addEventListener("keydown", function (e) {
@@ -462,22 +563,32 @@
         Lpaez.api("/api/categories"),
         Lpaez.api("/api/products?featured=1")
       ]).then(function (results) {
-        var brands = (results[0].data && results[0].data.brands) || [];
-        var cats = (results[1].data && results[1].data.categories) || [];
-        var products = (results[2].data && results[2].data.products) || [];
-        document.getElementById("homeBrands").innerHTML = brands.map(brandPillHtml).join("");
+        var brands = (results[0].data && results[0].data.brands) || results[0].brands || [];
+        var cats = (results[1].data && results[1].data.categories) || results[1].categories || [];
+        var products = (results[2].data && results[2].data.products) || results[2].products || [];
+        renderBrandCarousel(brands);
         if (document.getElementById("solutionsTabs") && document.getElementById("solutionsPanels")) {
           renderSolutions(cats);
         }
-        document.getElementById("homeProducts").innerHTML =
-          products.map(function (p) {
-            return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
-          }).join("") ||
-          '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+        var hp = document.getElementById("homeProducts");
+        if (hp) {
+          hp.innerHTML =
+            products.map(function (p) {
+              return Lpaez.productCardHtml(p, { showDatasheetBadge: true });
+            }).join("") ||
+            '<p class="empty-state">Pronto publicaremos productos destacados.</p>';
+        }
+        return loadClients();
+      }).then(function () {
         Lpaez.observeReveals();
       }).catch(function () {
-        document.getElementById("homeProducts").innerHTML =
-          '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
+        renderBrandCarousel([]);
+        renderClientCarousel([]);
+        var hp = document.getElementById("homeProducts");
+        if (hp) {
+          hp.innerHTML =
+            '<p class="empty-state">No se pudieron cargar los productos. Revisa que la API esté en línea.</p>';
+        }
         Lpaez.observeReveals();
       });
     })();

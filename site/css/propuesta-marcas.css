@@ -1,0 +1,198 @@
+/**
+ * propuesta-marcas.css — marcas + clientes en home (carrusel 1 fila)
+ */
+
+:root {
+  --pm-ink: #0f172a;
+  --pm-muted: #64748b;
+  --pm-line: #e2e8f0;
+  --pm-surface: #f1f5f9;
+  --pm-white: #ffffff;
+  --pm-red: #dc2626;
+  --pm-max: 1100px;
+}
+
+.pm-brands-section {
+  background: linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 48%);
+  padding: clamp(2.5rem, 5vw, 3.75rem) 0;
+}
+
+.pm-brands-section .container,
+.home-clients-section .container {
+  max-width: var(--pm-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.pm-brands-section .section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+  border: 0;
+  padding: 0;
+}
+
+.pm-brands-section .section-header h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+  font-weight: 800;
+  color: var(--pm-ink);
+}
+
+.pm-brands-section .section-header a {
+  font-size: 0.9rem;
+  font-weight: 750;
+  color: var(--pm-red);
+  text-decoration: none;
+}
+
+.pm-brands-section .section-header a:hover {
+  text-decoration: underline;
+}
+
+.home-clients-section {
+  padding: 3.5rem 0;
+  background-color: #f1f5f9;
+  border-top: 1px solid #e2e8f0;
+}
+
+.home-clients-section .section-header {
+  margin-bottom: 1.25rem;
+  border: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.home-clients-section .section-header h2 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 800;
+  color: var(--pm-ink);
+}
+
+.home-clients-section .section-header p {
+  margin: 0 auto;
+  max-width: 48ch;
+  color: var(--pm-muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+/* ——— Carrusel continuo 1 fila ——— */
+.logo-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 0.5rem;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.logo-carousel__track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1rem;
+  width: max-content;
+  animation: logo-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.logo-carousel--clients .logo-carousel__track {
+  animation-duration: 48s;
+  animation-direction: reverse;
+}
+
+.logo-carousel:hover .logo-carousel__track,
+.logo-carousel:focus-within .logo-carousel__track {
+  animation-play-state: paused;
+}
+
+@keyframes logo-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-carousel__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    max-width: var(--pm-max);
+    margin: 0 auto;
+  }
+}
+
+.industrial-brand-card,
+.industrial-client-card {
+  flex: 0 0 auto;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  width: 168px;
+  height: 88px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.industrial-brand-card:hover,
+.industrial-client-card:hover {
+  transform: translateY(-2px);
+  border-color: #0f172a;
+  border-left-color: #dc2626;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.industrial-brand-card img,
+.industrial-client-card img {
+  max-width: 92%;
+  max-height: 62px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.industrial-brand-card__name,
+.industrial-client-card__name {
+  font-size: 0.78rem;
+  font-weight: 750;
+  color: var(--pm-ink);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pm-empty-hint {
+  margin: 1rem 0 0;
+  text-align: center;
+  color: var(--pm-muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .industrial-brand-card,
+  .industrial-client-card {
+    width: 140px;
+    height: 78px;
+  }
+
+  .logo-carousel__track {
+    animation-duration: 32s;
+  }
+}
