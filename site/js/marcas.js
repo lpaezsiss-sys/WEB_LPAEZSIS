@@ -155,35 +155,50 @@ async function initMarcasPage() {
 function renderBrandSelector(brands, activeSlug) {
   var container =
     document.getElementById("brandSelectorGrid") ||
+    document.querySelector(".logo-carousel-track.track-marcas-detail") ||
     document.querySelector(".brand-selector");
   if (!container) return;
 
-  container.className = "brand-selector-grid";
-  if (!brands.length) {
+  var PLACEHOLDER = "img/placeholder-logo.png";
+  var list = (brands || []).filter(function (b) {
+    var slug = b.slug || "";
+    // "Otras marcas": excluir la marca activa de la vista de detalle
+    return slug && slug !== activeSlug;
+  });
+  // Si por algún motivo queda vacío, mostrar todas
+  if (!list.length) list = brands || [];
+
+  if (!list.length) {
     container.innerHTML =
-      '<p class="empty-state">No hay marcas activas por ahora.</p>';
+      '<p class="empty-state pm-empty-hint">No hay marcas activas por ahora.</p>';
+    container.style.animation = "none";
     return;
   }
 
-  container.innerHTML = brands
+  var cards = list
     .map(function (b) {
       var slug = b.slug || "";
       var nombre = b.nombre || b.name || slug;
       var logo = b.logo_url || b.imagen || "";
-      var active = slug && slug === activeSlug ? " is-active" : "";
+      if (logo && logo.charAt(0) === "/" && logo.indexOf("//") !== 0) {
+        /* keep absolute site path */
+      }
       var img = logo
         ? '<img src="' +
           escapeAttr(logo) +
           '" alt="' +
           escapeAttr(nombre) +
-          '" loading="lazy">'
-        : escapeHtml(nombre);
+          '" loading="lazy" decoding="async" width="140" height="60" ' +
+          'onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src=\'' +
+          PLACEHOLDER +
+          '\';}else{this.style.display=\'none\';}">'
+        : '<span class="industrial-brand-card__name">' +
+          escapeHtml(nombre) +
+          "</span>";
       return (
         '<a href="marcas.html?slug=' +
         encodeURIComponent(slug) +
-        '" class="brand-card-item' +
-        active +
-        '" title="' +
+        '" class="industrial-brand-card" role="listitem" title="' +
         escapeAttr(nombre) +
         '">' +
         img +
@@ -191,6 +206,10 @@ function renderBrandSelector(brands, activeSlug) {
       );
     })
     .join("");
+
+  // Duplicar secuencia para carrusel continuo seamless
+  container.innerHTML = cards + cards;
+  container.style.animation = "";
 }
 
 function updateBrandHero(brand) {
@@ -213,7 +232,10 @@ function updateBrandHero(brand) {
   }
   var quoteCta = document.getElementById("brandQuoteCta");
   if (quoteCta && brand.slug) {
-    quoteCta.href = "cotizacion.html?brand=" + encodeURIComponent(brand.slug);
+    quoteCta.href =
+      "contacto.html?empresa=" +
+      encodeURIComponent(nombre || brand.slug) +
+      "&motivo=cotizacion";
   }
 
   updateSectionTitles(nombre);
