@@ -1212,14 +1212,14 @@ body.nav-open {
 
 .brand-hero-flex {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem 2rem;
+  gap: 40px;
+  padding: 40px 0;
 }
 
 .brand-hero-text {
-  flex: 1 1 18rem;
+  flex: 1;
   min-width: 0;
 }
 
@@ -1245,39 +1245,44 @@ body.nav-open {
   margin: 0;
 }
 
+/* Caja del Logo en el Hero */
 .brand-hero-logo-box {
-  flex: 0 0 auto;
-  width: min(240px, 100%);
-  min-height: 112px;
-  padding: 1rem 1.15rem;
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  max-width: 280px;
+  width: 100%;
+  flex: 0 0 auto;
 }
 
 .brand-hero-logo-box img,
 #brandHeroLogo {
+  max-height: 90px;
   max-width: 100%;
-  max-height: 96px;
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .brand-hero-flex {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1.75rem 0;
+  }
+
+  .brand-hero__description {
+    margin-inline: auto;
   }
 
   .brand-hero-logo-box {
-    width: min(200px, 70%);
-    align-self: flex-start;
+    margin: 0 auto;
   }
 }
 
