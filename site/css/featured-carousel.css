@@ -78,36 +78,65 @@
 }
 
 .products-carousel-wrapper {
-  overflow: hidden;
+  --featured-card-basis: calc((100% - 40px) / 3); /* 3 tarjetas en escritorio (gap 20px × 2) */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0 20px 0;
   width: 100%;
-  margin: 0 -0.15rem;
-  padding: 0.15rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+/* Ocultar barra de scroll estética */
+.products-carousel-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .products-carousel-track {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 1.15rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.35rem 0.15rem 0.85rem;
-  scrollbar-width: none;
+  gap: 20px;
+  width: max-content;
+  min-width: 100%;
 }
 
-.products-carousel-track::-webkit-scrollbar {
-  display: none;
-}
-
-.products-carousel-track > .product-card,
-.products-carousel-track > article {
-  flex: 0 0 min(280px, 78vw);
-  width: min(280px, 78vw);
-  max-width: 280px;
+/* Tamaño de las tarjetas en el carrusel */
+.products-carousel-track .product-card {
+  flex: 0 0 var(--featured-card-basis);
+  width: var(--featured-card-basis);
+  max-width: none;
+  box-sizing: border-box;
   scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
   height: auto;
   min-height: 100%;
+}
+
+/* Adaptación Responsive */
+@media (max-width: 992px) {
+  .products-carousel-wrapper {
+    --featured-card-basis: calc(50% - 10px); /* 2 tarjetas en tablet */
+  }
+}
+
+@media (max-width: 576px) {
+  .products-carousel-wrapper {
+    --featured-card-basis: 85%; /* 1 tarjeta + pista de la siguiente en móvil */
+  }
+}
+
+/* Mantener alineación de botones al fondo */
+.products-carousel-track .product-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.products-carousel-track .product-card-actions,
+.products-carousel-track .btn-cotizar {
+  margin-top: auto;
+  width: 100%;
 }
 
 .featured-products-actions {
@@ -117,17 +146,8 @@
   margin-top: 1.25rem;
 }
 
-@media (min-width: 900px) {
-  .products-carousel-track > .product-card,
-  .products-carousel-track > article {
-    flex-basis: 260px;
-    width: 260px;
-    max-width: 260px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .products-carousel-track {
+  .products-carousel-wrapper {
     scroll-behavior: auto;
   }
 }

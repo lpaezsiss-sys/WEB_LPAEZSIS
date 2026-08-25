@@ -8,18 +8,29 @@
     return document.getElementById(id);
   }
 
-  function updateButtons(track, prev, next) {
-    if (!track || !prev || !next) return;
-    var max = Math.max(0, track.scrollWidth - track.clientWidth - 2);
-    prev.disabled = track.scrollLeft <= 2;
-    next.disabled = track.scrollLeft >= max;
+  function getScroller() {
+    var track = $("featuredProductsTrack");
+    if (!track) return null;
+    var wrapper = track.closest(".products-carousel-wrapper");
+    return wrapper || track;
   }
 
-  function cardStep(track) {
-    var card = track.querySelector(".product-card, article");
-    if (!card) return Math.max(240, Math.floor(track.clientWidth * 0.85));
-    var style = window.getComputedStyle(track);
-    var gap = parseFloat(style.columnGap || style.gap || "0") || 0;
+  function updateButtons(scroller, prev, next) {
+    if (!scroller || !prev || !next) return;
+    var max = Math.max(0, scroller.scrollWidth - scroller.clientWidth - 2);
+    prev.disabled = scroller.scrollLeft <= 2;
+    next.disabled = scroller.scrollLeft >= max;
+  }
+
+  function cardStep(scroller) {
+    var track = $("featuredProductsTrack");
+    var card = track && track.querySelector(".product-card, article");
+    if (!card) return Math.max(240, Math.floor(scroller.clientWidth * 0.85));
+    var gap = 20;
+    if (track) {
+      var style = window.getComputedStyle(track);
+      gap = parseFloat(style.columnGap || style.gap || "20") || 20;
+    }
     return card.getBoundingClientRect().width + gap;
   }
 
@@ -27,20 +38,21 @@
     var track = $("featuredProductsTrack");
     var prev = $("featuredPrev");
     var next = $("featuredNext");
-    if (!track || !prev || !next) return;
+    var scroller = getScroller();
+    if (!track || !prev || !next || !scroller) return;
 
     function refresh() {
-      updateButtons(track, prev, next);
+      updateButtons(scroller, prev, next);
     }
 
     prev.addEventListener("click", function () {
-      track.scrollBy({ left: -cardStep(track), behavior: "smooth" });
+      scroller.scrollBy({ left: -cardStep(scroller), behavior: "smooth" });
     });
     next.addEventListener("click", function () {
-      track.scrollBy({ left: cardStep(track), behavior: "smooth" });
+      scroller.scrollBy({ left: cardStep(scroller), behavior: "smooth" });
     });
 
-    track.addEventListener("scroll", refresh, { passive: true });
+    scroller.addEventListener("scroll", refresh, { passive: true });
     window.addEventListener("resize", refresh);
 
     track.addEventListener("keydown", function (e) {
@@ -53,7 +65,6 @@
       }
     });
 
-    // Expose refresh for after dynamic inject
     window.__lpaezFeaturedCarouselRefresh = refresh;
     refresh();
   }
