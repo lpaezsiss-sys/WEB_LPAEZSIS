@@ -254,6 +254,10 @@
         ? formatPrice(p.price_clp)
         : "Cotización";
     var img = resolveProductImage(p);
+    var slugImage = (p && (p.slug_image || p.slug)) || "";
+    var imgFallback = slugImage
+      ? "/img/productos/" + String(slugImage).replace(/'/g, "") + ".jpg"
+      : "img/products/A07-10015.jpg";
     var visual = img
       ? '<img src="' +
         img +
@@ -261,7 +265,9 @@
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" loading="lazy" decoding="async" width="480" height="480">'
+        '" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src=\'' +
+        imgFallback.replace(/'/g, "\\'") +
+        '\'">'
       : "LPAEZ";
     var payload = productPayload(p);
     var primaryCta =

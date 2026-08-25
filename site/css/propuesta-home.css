@@ -33,22 +33,22 @@
 
 .prop-hero__brand {
   margin: 0;
-  font-size: clamp(1.35rem, 3.2vw, 2.15rem);
+  font-size: clamp(1.75rem, 4vw, 2.65rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: #ffffff;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
-  line-height: 1.15;
+  line-height: 1.05;
 }
 
 .prop-hero__title {
   margin: 0;
-  max-width: 28ch;
-  font-size: clamp(1.45rem, 3.2vw, 2.05rem);
-  font-weight: 750;
-  font-style: normal;
-  line-height: 1.22;
+  max-width: 22ch;
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.25;
   color: #ffffff;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
 }
@@ -282,33 +282,4 @@
   .solutions-grid {
     grid-template-columns: 1fr;
   }
-}
-
-
-/* CTA outline sobre hero oscuro */
-.prop-hero .hero-cta-group .btn {
-  min-height: 2.85rem;
-  padding: 0.75rem 1.35rem;
-  font-weight: 700;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.prop-hero .btn-outline {
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  background: transparent;
-}
-
-.prop-hero .btn-outline:hover,
-.prop-hero .btn-outline:focus-visible {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
-.solution-card {
-  /* sin iconos emoji: tipografía primero */
 }
