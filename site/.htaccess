@@ -1,10 +1,22 @@
 RewriteEngine On
 
+# Prefer static HTML when both index.html and index.php exist.
+DirectoryIndex index.html index.php
+
 # SEO endpoints (pretty URLs)
 RewriteRule ^robots\.txt$ api/index.php?__path=/robots.txt [L]
 RewriteRule ^sitemap\.xml$ api/index.php?__path=/api/sitemap.xml [L]
 
-# API front-controller
+# API front-controller (real flat files like api/marcas.php still win via !-f)
 RewriteCond %{REQUEST_URI} ^/api/(.*)$ [NC]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^api/(.*)$ api/index.php?__path=/api/$1 [QSA,L]
+
+# Do not rewrite existing files/directories.
+# Explicitly keep /admin/ and /api/ out of any site-wide fallback.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/admin/ [NC]
+RewriteCond %{REQUEST_URI} !^/api/ [NC]
+RewriteCond %{REQUEST_URI} !^/img/ [NC]
+RewriteRule ^ index.html [L]
