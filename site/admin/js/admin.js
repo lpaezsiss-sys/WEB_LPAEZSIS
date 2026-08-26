@@ -1776,7 +1776,7 @@
             "<td>" +
             (active ? '<span class="badge-on">Activo</span>' : '<span class="badge-off">Inactivo</span>') +
             "</td>" +
-            "<td class="table-actions">" +
+            '<td class="table-actions">' +
             '<button type="button" data-edit-banner="' +
             escapeAttr(String(b.id)) +
             '">Editar</button> ' +
