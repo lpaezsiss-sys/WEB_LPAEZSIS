@@ -892,40 +892,24 @@
   if (productFichaPdfInput) {
     productFichaPdfInput.addEventListener("change", function () {
       var file = this.files && this.files[0];
-      if (!file) return;
-      var form = document.getElementById("productForm");
-      var slug = (form && form.slug && form.slug.value.trim()) || "";
-      if (!slug && form && form.name) {
-        slug = String(form.name.value || "")
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-|-$/g, "");
+      var hint = document.getElementById("productFichaPdfHint");
+      if (!file) {
+        if (hint) hint.textContent = "Opcional. Al guardar se sube a img/fichas/.";
+        return;
       }
-      var fd = new FormData();
-      fd.append("file", file);
-      fd.append("kind", "pdf");
-      if (slug) fd.append("slug", slug);
-      api("/upload", { method: "POST", formData: fd }).then(function (res) {
-        if (!res.ok) {
-          showToast((res.data && res.data.error) || "No se pudo subir el PDF");
-          return;
-        }
-        var url = res.data && res.data.url;
-        if (!url) {
-          showToast("Respuesta de upload inválida");
-          return;
-        }
-        setProductFichaPdf(url);
-        showToast("Ficha PDF subida");
-      });
+      if (hint) {
+        hint.textContent = "PDF listo para subir al Guardar: " + file.name;
+      }
     });
   }
   var productFichaPdfClear = document.getElementById("productFichaPdfClear");
   if (productFichaPdfClear) {
     productFichaPdfClear.addEventListener("click", function () {
       setProductFichaPdf("");
+      var input = document.getElementById("productFichaPdf");
+      if (input) input.value = "";
+      var hint = document.getElementById("productFichaPdfHint");
+      if (hint) hint.textContent = "Opcional. Al guardar se sube a img/fichas/.";
     });
   }
 
@@ -1093,37 +1077,108 @@
   document.getElementById("productForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var form = e.target;
-    var body = {
-      name: form.name.value.trim(),
-      slug: form.slug.value.trim() || undefined,
-      category_id: Number(form.category_id.value),
-      brand_id: form.brand_id.value ? Number(form.brand_id.value) : null,
-      industria_id: form.industria_id && form.industria_id.value ? Number(form.industria_id.value) : null,
-      sale_mode: form.sale_mode.value,
-      tipo: form.tipo.value,
-      stock_status: form.stock_status.value,
-      price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
-      description: form.description.value,
-      image_url: form.image_url.value.trim(),
-      ficha_pdf_url: (document.getElementById("productFichaPdfUrl").value || "").trim(),
-      seo_title: form.seo_title.value.trim(),
-      seo_description: form.seo_description.value.trim(),
-      is_featured: form.is_featured.checked,
-      is_active: form.is_active.checked,
-    };
-    var id = form.id.value;
-    var req = id
-      ? api("/products/" + id, { method: "PUT", body: body })
-      : api("/products", { method: "POST", body: body });
-    req.then(function (res) {
-      if (!res.ok) {
-        showToast((res.data && res.data.error) || "Error");
-        return;
-      }
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    function productSlugHint() {
+      var slug = (form.slug && form.slug.value.trim()) || "";
+      if (slug) return slug;
+      return String(form.name.value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    function buildBody(fichaUrl) {
+      var url =
+        fichaUrl != null
+          ? String(fichaUrl).trim()
+          : (document.getElementById("productFichaPdfUrl").value || "").trim();
+      return {
+        name: form.name.value.trim(),
+        slug: form.slug.value.trim() || undefined,
+        category_id: Number(form.category_id.value),
+        brand_id: form.brand_id.value ? Number(form.brand_id.value) : null,
+        industria_id: form.industria_id && form.industria_id.value ? Number(form.industria_id.value) : null,
+        sale_mode: form.sale_mode.value,
+        tipo: form.tipo.value,
+        stock_status: form.stock_status.value,
+        price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
+        description: form.description.value,
+        image_url: form.image_url.value.trim(),
+        ficha_pdf_url: url,
+        seo_title: form.seo_title.value.trim(),
+        seo_description: form.seo_description.value.trim(),
+        is_featured: form.is_featured.checked,
+        is_active: form.is_active.checked,
+      };
+    }
+
+    function finishOk(msg) {
+      if (submitBtn) submitBtn.disabled = false;
       document.getElementById("productDialog").close();
-      showToast("Producto guardado");
+      showToast(msg || "Producto guardado");
       loadProducts();
-    });
+    }
+
+    function finishErr(msg) {
+      if (submitBtn) submitBtn.disabled = false;
+      showToast(msg || "Error al guardar");
+    }
+
+    /** Sube PDF con FormData (campo ficha_pdf) a /products/{id}/ficha */
+    function uploadFichaPdf(productId) {
+      var pdfInput = document.getElementById("productFichaPdf");
+      var file = pdfInput && pdfInput.files && pdfInput.files[0];
+      if (!file) return Promise.resolve(null);
+
+      var formData = new FormData();
+      formData.append("ficha_pdf", file);
+      formData.append("file", file);
+      formData.append("kind", "pdf");
+      var slugHint = productSlugHint();
+      if (slugHint) formData.append("slug", slugHint);
+
+      return api("/products/" + productId + "/ficha", {
+        method: "POST",
+        formData: formData,
+      }).then(function (res) {
+        if (!res.ok) {
+          throw new Error((res.data && res.data.error) || "No se pudo subir la ficha PDF");
+        }
+        var url = (res.data && (res.data.ficha_pdf_url || res.data.url)) || "";
+        if (url) setProductFichaPdf(url);
+        return url;
+      });
+    }
+
+    var id = form.id.value;
+    var saveReq = id
+      ? api("/products/" + id, { method: "PUT", body: buildBody() })
+      : api("/products", { method: "POST", body: buildBody() });
+
+    saveReq
+      .then(function (res) {
+        if (!res.ok) {
+          throw new Error((res.data && res.data.error) || "Error al guardar producto");
+        }
+        var productId = id || (res.data && res.data.id);
+        if (!productId) {
+          finishOk("Producto guardado");
+          return null;
+        }
+        if (!id && res.data && res.data.id) {
+          form.id.value = String(res.data.id);
+        }
+        return uploadFichaPdf(productId).then(function (url) {
+          finishOk(url ? "Producto y ficha PDF guardados" : "Producto guardado");
+        });
+      })
+      .catch(function (err) {
+        finishErr((err && err.message) || "Error al guardar");
+      });
   });
 
   function loadBrands() {

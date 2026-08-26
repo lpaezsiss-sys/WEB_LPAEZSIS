@@ -240,6 +240,11 @@ final class AdminApi
             self::updateProduct((int) $m[1]);
             return;
         }
+        // Multipart: subir/actualizar ficha PDF del producto
+        if ($method === 'POST' && preg_match('#^/products/(\d+)/ficha$#', $sub, $m)) {
+            self::uploadProductFicha((int) $m[1]);
+            return;
+        }
         if ($method === 'DELETE' && preg_match('#^/products/(\d+)$#', $sub, $m)) {
             self::pdo()->prepare('DELETE FROM products WHERE id = ?')->execute([(int) $m[1]]);
             Response::json(['ok' => true]);
@@ -340,8 +345,8 @@ final class AdminApi
     private static function upload(): void
     {
         if (empty($_FILES['file']) || !is_array($_FILES['file'])) {
-            // Some clients use "image"
-            $file = $_FILES['image'] ?? null;
+            // Some clients use "image" / "ficha_pdf"
+            $file = $_FILES['ficha_pdf'] ?? $_FILES['image'] ?? null;
         } else {
             $file = $_FILES['file'];
         }
@@ -1173,6 +1178,44 @@ final class AdminApi
         $stmt = self::pdo()->prepare('SELECT * FROM products WHERE id = ?');
         $stmt->execute([$id]);
         Response::json($stmt->fetch() ?: ['ok' => true]);
+    }
+
+    /** POST multipart /products/{id}/ficha — campo file|ficha_pdf → img/fichas/ + ficha_pdf_url */
+    private static function uploadProductFicha(int $id): void
+    {
+        self::ensureProductFichaColumn();
+        $stmt = self::pdo()->prepare('SELECT id, slug, ficha_pdf_url FROM products WHERE id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            Response::error('Producto no encontrado', 404);
+            return;
+        }
+
+        $file = $_FILES['ficha_pdf'] ?? $_FILES['file'] ?? $_FILES['pdf'] ?? null;
+        if (!$file || !is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            Response::error('Archivo PDF requerido (campo ficha_pdf)');
+            return;
+        }
+
+        $preferred = trim((string) ($_POST['slug'] ?? $row['slug'] ?? ''));
+        $uploaded = Upload::storePdf($file, $preferred);
+        if (!$uploaded['ok']) {
+            Response::error((string) $uploaded['error']);
+            return;
+        }
+        $url = (string) $uploaded['url'];
+        self::pdo()->prepare('UPDATE products SET ficha_pdf_url = ?, updated_at = NOW() WHERE id = ?')
+            ->execute([$url, $id]);
+
+        $out = self::pdo()->prepare('SELECT * FROM products WHERE id = ?');
+        $out->execute([$id]);
+        Response::json([
+            'ok' => true,
+            'url' => $url,
+            'ficha_pdf_url' => $url,
+            'product' => $out->fetch() ?: null,
+        ]);
     }
 
     private static function patch(string $table, int $id, array $body, array $fields): void

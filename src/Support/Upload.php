@@ -35,8 +35,10 @@ final class Upload
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($tmp) ?: '';
         $origName = strtolower((string) ($file['name'] ?? ''));
-        $isPdf = ($mime === 'application/pdf') || (bool) preg_match('/\.pdf$/i', $origName);
-        if (!$isPdf) {
+        $isPdfExt = (bool) preg_match('/\.pdf$/i', $origName);
+        $isPdfMime = in_array($mime, ['application/pdf', 'application/x-pdf'], true)
+            || ($isPdfExt && in_array($mime, ['application/octet-stream', 'binary/octet-stream', ''], true));
+        if (!$isPdfExt && !$isPdfMime) {
             return ['ok' => false, 'error' => 'Solo se permiten archivos PDF'];
         }
         if (($file['size'] ?? 0) > 15 * 1024 * 1024) {
