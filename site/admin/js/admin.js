@@ -897,6 +897,12 @@
         if (hint) hint.textContent = "Opcional. Al guardar se sube a img/fichas/.";
         return;
       }
+      if (file.size > 15 * 1024 * 1024) {
+        window.alert("El archivo PDF es demasiado pesado. El límite máximo es de 15 MB.");
+        this.value = "";
+        if (hint) hint.textContent = "Opcional. Al guardar se sube a img/fichas/.";
+        return;
+      }
       if (hint) {
         hint.textContent = "PDF listo para subir al Guardar: " + file.name;
       }
@@ -1077,6 +1083,12 @@
   document.getElementById("productForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var form = e.target;
+    var pdfInput = document.getElementById("productFichaPdf");
+    var selectedPdf = pdfInput && pdfInput.files && pdfInput.files[0] ? pdfInput.files[0] : null;
+    if (selectedPdf && selectedPdf.size > 15 * 1024 * 1024) {
+      window.alert("El archivo PDF es demasiado pesado. El límite máximo es de 15 MB.");
+      return;
+    }
     var submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
 
@@ -1146,7 +1158,10 @@
         formData: formData,
       }).then(function (res) {
         if (!res.ok) {
-          throw new Error((res.data && res.data.error) || "No se pudo subir la ficha PDF");
+          throw new Error(
+            (res.data && (res.data.message || res.data.error)) ||
+              "No se pudo subir la ficha PDF"
+          );
         }
         var url = (res.data && (res.data.ficha_pdf_url || res.data.url)) || "";
         if (url) setProductFichaPdf(url);

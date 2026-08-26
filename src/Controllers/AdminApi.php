@@ -1193,8 +1193,35 @@ final class AdminApi
         }
 
         $file = $_FILES['ficha_pdf'] ?? $_FILES['file'] ?? $_FILES['pdf'] ?? null;
-        if (!$file || !is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        if (!$file || !is_array($file)) {
             Response::error('Archivo PDF requerido (campo ficha_pdf)');
+            return;
+        }
+
+        $uploadError = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+        if ($uploadError === UPLOAD_ERR_INI_SIZE || $uploadError === UPLOAD_ERR_FORM_SIZE) {
+            Response::json([
+                'status' => 'error',
+                'message' => 'El archivo excede el tamaño máximo permitido por el servidor.',
+                'error' => 'El archivo excede el tamaño máximo permitido por el servidor.',
+            ], 400);
+            return;
+        }
+        if ($uploadError === UPLOAD_ERR_NO_FILE) {
+            Response::error('Archivo PDF requerido (campo ficha_pdf)');
+            return;
+        }
+        if ($uploadError !== UPLOAD_ERR_OK) {
+            Response::error('No se pudo subir el archivo PDF (código ' . $uploadError . ')');
+            return;
+        }
+
+        if ((int) ($file['size'] ?? 0) > 15 * 1024 * 1024) {
+            Response::json([
+                'status' => 'error',
+                'message' => 'El archivo PDF es demasiado pesado. El límite máximo es de 15 MB.',
+                'error' => 'El archivo PDF es demasiado pesado. El límite máximo es de 15 MB.',
+            ], 400);
             return;
         }
 
