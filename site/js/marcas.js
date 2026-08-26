@@ -109,7 +109,9 @@ async function initMarcasPage() {
         selectorContainer.innerHTML =
           '<p class="text-muted empty-state">No hay marcas disponibles actualmente.</p>';
       }
-      var eqGridEmpty = document.getElementById("brandEquiposGrid");
+      var eqGridEmpty =
+        document.getElementById("brandProductsGrid") ||
+        document.getElementById("brandEquiposGrid");
       if (eqGridEmpty) {
         eqGridEmpty.innerHTML =
           '<p class="no-products">No hay marcas activas por ahora.</p>';
@@ -128,7 +130,9 @@ async function initMarcasPage() {
         currentBrand.nombre || currentBrand.name || currentBrand
       );
     } else {
-      var eqGrid = document.getElementById("brandEquiposGrid");
+      var eqGrid =
+        document.getElementById("brandProductsGrid") ||
+        document.getElementById("brandEquiposGrid");
       var rpSec = document.getElementById("brandRepuestosSection");
       if (eqGrid) {
         eqGrid.innerHTML =
@@ -142,7 +146,9 @@ async function initMarcasPage() {
       selectorContainer.innerHTML =
         '<p class="text-muted">No se pudieron cargar las marcas. Intenta recargar la página.</p>';
     }
-    var eqGridErr = document.getElementById("brandEquiposGrid");
+    var eqGridErr =
+      document.getElementById("brandProductsGrid") ||
+      document.getElementById("brandEquiposGrid");
     var rpSecErr = document.getElementById("brandRepuestosSection");
     if (eqGridErr) {
       eqGridErr.innerHTML =
@@ -219,7 +225,12 @@ function updateBrandHero(brand) {
     document.getElementById("brandDescription");
   var logoEl = document.getElementById("brandHeroLogo");
   var nombre = brand.nombre || brand.name || "";
-  var desc = brand.descripcion || brand.description || "";
+  var desc =
+    brand.descripcion_corta ||
+    brand.short_description ||
+    brand.descripcion ||
+    brand.description ||
+    "";
   var slug = brand.slug || "";
 
   if (titleEl) titleEl.textContent = nombre || "Representaciones y Distribución";
@@ -230,7 +241,8 @@ function updateBrandHero(brand) {
 
   if (logoEl) {
     var logoBox = logoEl.closest
-      ? logoEl.closest(".brand-hero-logo-box")
+      ? logoEl.closest(".brand-intro-logo") ||
+        logoEl.closest(".brand-hero-logo-box")
       : logoEl.parentElement;
     var LOGO_BY_SLUG = {
       "sonic-air-systems": "img/brand/sonic-air.png",
@@ -294,7 +306,9 @@ function updateSectionTitles(nombre) {
   var eqTitle = document.getElementById("brandEquiposTitle");
   var rpTitle = document.getElementById("brandRepuestosTitle");
   if (eqTitle) {
-    eqTitle.textContent = nombre ? "Equipos " + nombre : "Equipos";
+    eqTitle.textContent = nombre
+      ? "Equipos y Soluciones de " + nombre
+      : "Equipos y Soluciones";
   }
   if (rpTitle) {
     rpTitle.textContent = nombre
@@ -382,7 +396,9 @@ function renderProductCardHtml(p) {
 }
 
 async function loadBrandProducts(brandIdentifier, brandOrName) {
-  var equiposGrid = document.getElementById("brandEquiposGrid");
+  var equiposGrid =
+    document.getElementById("brandProductsGrid") ||
+    document.getElementById("brandEquiposGrid");
   var repuestosGrid = document.getElementById("brandRepuestosGrid");
   var equiposSection = document.getElementById("brandEquiposSection");
   var repuestosSection = document.getElementById("brandRepuestosSection");
@@ -431,7 +447,11 @@ async function loadBrandProducts(brandIdentifier, brandOrName) {
     var rpTitle = document.getElementById("brandRepuestosTitle");
     var eqCount = document.getElementById("equiposCount");
     var rpCount = document.getElementById("repuestosCount");
-    if (eqTitle) eqTitle.textContent = "Equipos " + brandName;
+    if (eqTitle) {
+      eqTitle.textContent = brandName
+        ? "Equipos y Soluciones de " + brandName
+        : "Equipos y Soluciones";
+    }
     if (rpTitle) rpTitle.textContent = "Repuestos y Consumibles " + brandName;
     if (eqCount) eqCount.textContent = equipos.length + " equipos";
     if (rpCount) rpCount.textContent = repuestos.length + " repuestos";

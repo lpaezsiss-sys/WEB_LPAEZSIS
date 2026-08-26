@@ -12,51 +12,52 @@
   <meta property="og:url" content="https://lpaezsis.cl/marcas.html">
   <meta property="og:image" content="https://lpaezsis.cl/img/brand/sonic-air.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="css/style.css?v=133">
+  <link rel="stylesheet" href="css/style.css?v=134">
   <link rel="stylesheet" href="css/propuesta-marcas.css?v=8">
 </head>
 <body>
   <div id="site-header-mount"></div>
 
-  <!-- Zona superior: hero + ficha de marca sin interrupciones -->
-  <section class="brand-hero" aria-labelledby="brandTitle">
-    <div class="container brand-hero-flex">
-      <div class="brand-hero-text">
-        <h1 class="brand-hero__title" id="brandTitle">Representaciones y Distribución</h1>
-        <p class="brand-hero__description" id="brandShortDesc">
-          Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
-        </p>
-        <!-- alias id for legacy JS selectors -->
-        <span id="brandDescription" hidden></span>
-      </div>
-      <div class="brand-hero-logo-box">
-        <img
-          id="brandHeroLogo"
-          src=""
-          alt=""
-          width="220"
-          height="120"
-          decoding="async"
-          hidden
-          onerror="this.onerror=null;this.style.display='none';this.hidden=true;">
-      </div>
-    </div>
-  </section>
-
-  <main class="brand-content-wrapper container" id="main">
+  <main class="container brand-page" id="main">
     <p id="brandLoadingText" class="text-muted" hidden>Cargando marca…</p>
 
-    <!-- Ficha enriquecida -->
-    <div class="brand-catalog-body" id="brandContent" hidden></div>
+    <!-- Intro limpia: logo + nombre / descripción -->
+    <section class="brand-intro mb-5" aria-labelledby="brandTitle">
+      <div class="brand-intro-row align-items-center">
+        <div class="brand-intro-logo text-center">
+          <img
+            id="brandHeroLogo"
+            class="img-fluid brand-logo mb-3"
+            src=""
+            alt=""
+            width="220"
+            height="120"
+            decoding="async"
+            hidden
+            onerror="this.onerror=null;this.style.display='none';this.hidden=true;">
+        </div>
+        <div class="brand-intro-text">
+          <h1 class="h2 font-weight-bold" id="brandTitle">Representaciones y Distribución</h1>
+          <p class="lead text-muted" id="brandShortDesc">
+            Socios tecnológicos para soplado, packaging, movimiento y control de calidad.
+          </p>
+          <!-- alias id for legacy JS selectors -->
+          <span id="brandDescription" hidden></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenido enriquecido de la marca -->
+    <div class="brand-content brand-catalog-body mb-5" id="brandContent" hidden></div>
     <div class="brand-gallery" id="brandGallery" hidden></div>
 
-    <!-- Equipos -->
-    <section class="brand-catalog-section" id="brandEquiposSection" aria-labelledby="brandEquiposTitle">
+    <!-- Equipos / soluciones -->
+    <section class="brand-products brand-catalog-section mt-5" id="brandEquiposSection" aria-labelledby="brandEquiposTitle">
       <div class="section-header">
-        <h2 id="brandEquiposTitle">Equipos</h2>
+        <h3 class="h4 mb-4" id="brandEquiposTitle">Equipos y Soluciones</h3>
         <span class="badge-count" id="equiposCount">0 equipos</span>
       </div>
-      <div class="catalog-grid product-grid" id="brandEquiposGrid">
+      <div class="catalog-grid product-grid brand-products-grid" id="brandProductsGrid">
         <p class="empty-state">Cargando equipos…</p>
       </div>
     </section>
@@ -64,7 +65,7 @@
     <!-- Repuestos -->
     <section class="brand-catalog-section" id="brandRepuestosSection" aria-labelledby="brandRepuestosTitle">
       <div class="section-header">
-        <h2 id="brandRepuestosTitle">Repuestos y Consumibles</h2>
+        <h3 class="h4" id="brandRepuestosTitle">Repuestos y Consumibles</h3>
         <span class="badge-count" id="repuestosCount">0 repuestos</span>
       </div>
       <div class="catalog-grid product-grid" id="brandRepuestosGrid">
@@ -79,7 +80,7 @@
     </div>
   </main>
 
-  <!-- Zona inferior: otras marcas, justo antes del footer -->
+  <!-- Otras marcas, antes del footer -->
   <section class="section-other-brands" aria-labelledby="otherBrandsTitle">
     <div class="container">
       <h3 class="section-subtitle-sm" id="otherBrandsTitle">OTRAS MARCAS REPRESENTADAS</h3>
@@ -92,6 +93,6 @@
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=39"></script>
   <script src="js/site.js?v=26"></script>
-  <script src="js/marcas.js?v=125"></script>
+  <script src="js/marcas.js?v=126"></script>
 </body>
 </html>
