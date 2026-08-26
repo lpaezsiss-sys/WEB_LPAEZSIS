@@ -1,0 +1,172 @@
+/**
+ * propuesta-marcas.css — marcas + clientes (carrusel 1 fila)
+ */
+
+:root {
+  --pm-ink: #0f172a;
+  --pm-muted: #64748b;
+  --pm-line: #e2e8f0;
+  --pm-surface: #f1f5f9;
+  --pm-white: #ffffff;
+  --pm-red: #dc2626;
+  --pm-max: 1100px;
+}
+
+.section-brands,
+.section-clients {
+  padding: clamp(2.25rem, 4.5vw, 3.25rem) 0;
+}
+
+.section-brands {
+  background: linear-gradient(180deg, #eef2f6 0%, var(--pm-white) 55%);
+}
+
+.section-clients {
+  background-color: #f1f5f9;
+  border-top: 1px solid var(--pm-line);
+}
+
+.section-brands .container,
+.section-clients .container {
+  max-width: var(--pm-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section-subtitle-sm {
+  margin: 0 0 1.15rem;
+  font-size: clamp(0.78rem, 1.4vw, 0.88rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pm-ink);
+  text-align: center;
+}
+
+/* ——— Carrusel continuo 1 fila ——— */
+.logo-carousel-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.logo-carousel-track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1rem;
+  width: max-content;
+  animation: logo-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.logo-carousel-track.track-clientes {
+  animation-duration: 48s;
+  animation-direction: reverse;
+}
+
+.logo-carousel-container:hover .logo-carousel-track,
+.logo-carousel-container:focus-within .logo-carousel-track {
+  animation-play-state: paused;
+}
+
+@keyframes logo-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-carousel-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.industrial-brand-card,
+.industrial-client-card {
+  flex: 0 0 auto;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  width: 168px;
+  height: 88px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.industrial-brand-card:hover,
+.industrial-client-card:hover {
+  transform: translateY(-2px);
+  border-color: #0f172a;
+  border-left-color: #dc2626;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.industrial-brand-card img,
+.industrial-client-card img {
+  max-width: 92%;
+  max-height: 62px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.pm-empty-hint {
+  margin: 1rem 0 0;
+  text-align: center;
+  color: var(--pm-muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .industrial-brand-card,
+  .industrial-client-card {
+    width: 140px;
+    height: 78px;
+  }
+
+  .logo-carousel-track {
+    animation-duration: 32s;
+  }
+}
+
+/* ——— Otras marcas en ficha de detalle ——— */
+.section-other-brands {
+  padding: clamp(2.25rem, 4.5vw, 3.25rem) 0;
+  background: linear-gradient(180deg, #ffffff 0%, #eef2f6 100%);
+  border-top: 1px solid var(--pm-line);
+}
+
+.section-other-brands .container {
+  max-width: var(--pm-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.logo-carousel-track.track-marcas-detail {
+  animation-duration: 40s;
+}
+
+.section-other-brands .pm-empty-hint,
+.section-other-brands .empty-state {
+  margin: 0.5rem auto;
+  text-align: center;
+  color: var(--pm-muted);
+}

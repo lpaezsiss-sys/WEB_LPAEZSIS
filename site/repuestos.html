@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repuestos Industriales y Insumos | LPAEZsis Chile</title>
+  <meta name="description" content="Catálogo de repuestos originales y compatibles para líneas de embotellado, packaging y secado industrial en Chile. Búsqueda por código OEM y marca.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://lpaezsis.cl/repuestos.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:title" content="Repuestos Industriales y Insumos | LPAEZsis Chile">
+  <meta property="og:description" content="Encuentra repuestos originales y compatibles por código de parte, marca o equipo. Despacho a plantas en todo Chile.">
+  <meta property="og:url" content="https://lpaezsis.cl/repuestos.html">
+  <meta property="og:image" content="https://lpaezsis.cl/img/hero/plant.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="img/icons/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="css/style.css?v=127">
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <div id="site-header-mount"></div>
+  <main id="main">
+    <div class="page-hero page-hero--compact page-hero--repuestos has-media">
+      <div class="page-hero-media" aria-hidden="true">
+        <picture>
+          <source type="image/webp" srcset="img/hero/plant.webp">
+          <img
+            src="img/hero/plant.jpg"
+            alt=""
+            title="Repuestos industriales LPAEZsis"
+            width="1600"
+            height="900"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async">
+        </picture>
+      </div>
+      <div class="page-hero-inner">
+        <h1>Repuestos y Insumos Industriales</h1>
+        <p class="hero-description">
+          Encuentra repuestos originales y compatibles por código de parte, marca o equipo. Despacho rápido a plantas en todo Chile.
+        </p>
+        <form class="repuesto-search" id="repuestoSearchForm" role="search" aria-label="Búsqueda de repuestos por código">
+          <label class="visually-hidden" for="repuestoSearchInput">Código de parte, OEM o modelo</label>
+          <input
+            type="text"
+            id="repuestoSearchInput"
+            name="q"
+            placeholder="Ingresa código de parte, número OEM o modelo..."
+            autocomplete="off"
+            enterkeyhint="search">
+          <button type="submit" class="btn btn-primary" id="repuestoSearchBtn">Buscar Repuesto</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="catalog-toolbar repuestos-toolbar">
+      <div class="catalog-filters repuestos-filters" role="search" aria-label="Filtros de repuestos">
+        <div class="filter-group">
+          <label for="repuestoBrandFilter">Filtrar por Marca</label>
+          <select id="repuestoBrandFilter" class="filter-select" aria-label="Filtrar por marca">
+            <option value="">Todas las marcas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="repuestoTipoFilter">Filtrar por Tipo de Insumo</label>
+          <select id="repuestoTipoFilter" class="filter-select" aria-label="Filtrar por tipo de insumo">
+            <option value="">Todos los tipos</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="repuestoEquipoFilter">Filtrar por Equipo Compatible</label>
+          <select id="repuestoEquipoFilter" class="filter-select" aria-label="Filtrar por equipo compatible">
+            <option value="">Todos los equipos</option>
+          </select>
+        </div>
+      </div>
+      <p class="catalog-count" id="repuestoCount" hidden></p>
+    </div>
+
+    <section class="section section--catalog" aria-labelledby="repuestoGridLabel">
+      <h2 id="repuestoGridLabel" class="visually-hidden">Grilla de repuestos</h2>
+      <div id="repuestoLoader" class="catalog-loader" role="status" aria-live="polite">
+        <p class="catalog-loading-label">Cargando repuestos…</p>
+      </div>
+      <div class="product-grid repuesto-grid" id="repuestoGrid" tabindex="-1" aria-busy="true"></div>
+    </section>
+
+    <section class="section repuesto-help" aria-labelledby="repuestoHelpTitle">
+      <div class="repuesto-help-card">
+        <div class="repuesto-help-card__copy">
+          <h2 id="repuestoHelpTitle">¿Buscas un repuesto específico o sin código?</h2>
+          <p>
+            Adjunta la foto de la placa de tu equipo o el código impreso en la pieza y te confirmamos compatibilidad en menos de 2 horas.
+          </p>
+        </div>
+        <a
+          class="btn btn-primary btn-whatsapp"
+          id="repuestoWhatsAppHelp"
+          href="https://wa.me/56968232745?text=Hola%2C%20necesito%20cotizar%20un%20repuesto..."
+          target="_blank"
+          rel="noopener">
+          Enviar foto de pieza por WhatsApp
+        </a>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer-mount"></div>
+  <script src="js/layout.js?v=38"></script>
+  <script src="js/site.js?v=26"></script>
+  <script src="js/repuestos.js?v=1"></script>
+</body>
+</html>

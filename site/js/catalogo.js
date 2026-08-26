@@ -12,6 +12,7 @@ const MOCK_PRODUCTS = [
     sku: "SAS-DRY-BOT",
     description: "Secado de botellas con turbinas y air knives Sonic. Cotización por línea.",
     sale_mode: "quote",
+    tipo: "equipo",
     stock_status: "on_request",
     price_clp: null,
     image_url: "img/hero/cans.jpg",
@@ -29,6 +30,7 @@ const MOCK_PRODUCTS = [
     sku: "SAS-VT-100",
     description: "Turbina de alto caudal para secado y limpieza industrial.",
     sale_mode: "quote",
+    tipo: "equipo",
     stock_status: "on_request",
     price_clp: null,
     image_url: "img/products/vt-sonic.jpg",
@@ -46,6 +48,7 @@ const MOCK_PRODUCTS = [
     sku: "13514",
     description: "Correa 16 GRV SONIC 70/85 (Cod 13514)",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-13474.jpg",
@@ -63,6 +66,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-10317",
     description: "Elemento filtro polyester lavable Sonic 75-85-100",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-10317.jpg",
@@ -80,6 +84,7 @@ const MOCK_PRODUCTS = [
     sku: "10976",
     description: "Filtro completo polyester lavable Sonic con indicador",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: 195000,
     image_url: "img/products/A07-10976.jpg",
@@ -97,6 +102,7 @@ const MOCK_PRODUCTS = [
     sku: "10015",
     description: "Impulsor soplador Sonic Air Models S70/S100",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-10015.jpg",
@@ -114,6 +120,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-14452",
     description: "Conjunto rodamientos sellado Sonic 100-150",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-14452.jpg",
@@ -131,6 +138,7 @@ const MOCK_PRODUCTS = [
     sku: "A07-13455",
     description: "Kit tensor correa Sonic todos los modelos",
     sale_mode: "buy",
+    tipo: "repuesto",
     stock_status: "in_stock",
     price_clp: null,
     image_url: "img/products/A07-13455.png",
@@ -164,7 +172,6 @@ const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
   { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
-  { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -176,15 +183,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const loader = document.getElementById("catalogLoader");
-  const industryTabs = document.getElementById("industryTabs");
-  const filterChips = document.getElementById("filterChips");
-  const modeChips = document.getElementById("modeChips");
+  const industrySelect = document.getElementById("industryFilter");
+  const categorySelect = document.getElementById("categoryFilter");
   const brandSelect = document.getElementById("brandFilter");
   const catalogCount = document.getElementById("catalogCount");
   const pager = document.getElementById("catalogPager");
   const ldScript = document.getElementById("catalogItemListLd");
   const datasheetDialog = document.getElementById("datasheetDialog");
   const datasheetBody = document.getElementById("datasheetBody");
+  const heroTitle = document.querySelector(".page-hero-inner h1");
+  const heroLead =
+    document.querySelector(".page-hero-inner .hero-description") ||
+    document.querySelector(".page-hero-inner p");
+  const catalogGridLabel = document.getElementById("catalogGridLabel");
+  // Remueve restos de depuración si quedaran en el DOM
+  document.querySelectorAll(".catalog-hint, .catalog-debug-info").forEach((el) => el.remove());
 
   const escapeHtml =
     window.Lpaez?.escapeHtml ||
@@ -207,13 +220,120 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
+  function normalizeTipo(raw) {
+    const t = String(raw || "").toLowerCase().trim();
+    if (t === "equipo" || t === "repuesto") return t;
+    return "";
+  }
+
+  // Compat: ?category=repuestos → tipo=repuesto. Sin tipo → equipos.
+  let tipoFromQuery = normalizeTipo(queryParam("tipo"));
+  if (!tipoFromQuery && queryParam("category") === "repuestos") {
+    tipoFromQuery = "repuesto";
+  }
+  if (!tipoFromQuery) tipoFromQuery = "equipo";
+
+  function cleanFilterValue(raw) {
+    let v = String(raw || "").trim();
+    if (!v) return "";
+    // Normaliza espacios / + a guiones para slugs, y colapsa whitespace
+    v = v.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
+    const lower = v.toLowerCase();
+    if (lower === "todas" || lower === "todas las marcas" || lower === "all") return "";
+    // Si parece un slug con espacios (ej. "bandas modulares higiene"), usar guiones
+    if (/^[a-z0-9]+(?:\s+[a-z0-9]+)+$/i.test(v) && !/[áéíóúñ]/i.test(v)) {
+      v = v.toLowerCase().replace(/\s+/g, "-");
+    }
+    return v;
+  }
+
+  function buildQueryString(overrides) {
+    const src = Object.assign(
+      {
+        tipo: state.tipo,
+        industria: state.industria,
+        industry: state.industry,
+        category: state.category,
+        brand: state.brand,
+        page: state.page,
+      },
+      overrides || {}
+    );
+    const params = new URLSearchParams();
+    Object.keys(src).forEach((key) => {
+      let val = cleanFilterValue(src[key]);
+      if (key === "page") {
+        const pageNum = Math.max(1, parseInt(String(src.page || "1"), 10) || 1);
+        if (pageNum > 1) params.set("page", String(pageNum));
+        return;
+      }
+      if (key === "tipo") {
+        val = normalizeTipo(val) || "";
+      }
+      if (!val || val === "Todas" || val === "todas") return;
+      params.set(key, val);
+    });
+    return params.toString();
+  }
+
   const state = {
-    category: queryParam("category") || "",
-    brand: queryParam("brand") || "",
-    industry: queryParam("industry") || "",
-    mode: queryParam("sale_mode") || queryParam("mode") || "",
+    tipo: tipoFromQuery,
+    category:
+      queryParam("category") === "repuestos" && tipoFromQuery === "repuesto"
+        ? ""
+        : cleanFilterValue(queryParam("category")),
+    brand: cleanFilterValue(queryParam("brand")),
+    industry: cleanFilterValue(queryParam("industry")),
+    industria: cleanFilterValue(queryParam("industria")),
     page: Math.max(1, parseInt(queryParam("page") || "1", 10) || 1),
   };
+
+  function applyHeroCopy() {
+    if (heroLead && !heroLead.classList.contains("hero-description")) {
+      heroLead.classList.add("hero-description");
+    }
+    if (state.tipo === "repuesto") {
+      if (heroTitle) heroTitle.textContent = "Repuestos";
+      if (heroLead) {
+        heroLead.textContent = "Repuestos y Consumibles";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de repuestos";
+      document.title = "Repuestos industriales | Catálogo B2B LPAEZsis";
+    } else if (state.tipo === "equipo") {
+      if (heroTitle) heroTitle.textContent = "Equipos";
+      if (heroLead) {
+        heroLead.textContent =
+          "Equipos industriales: filtra por industria o marca y solicita cotización con ficha técnica.";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de equipos";
+      document.title = "Equipos industriales | Catálogo B2B LPAEZsis";
+    } else {
+      if (heroTitle) heroTitle.textContent = "Productos";
+      if (heroLead) {
+        heroLead.textContent =
+          "Catálogo B2B: equipos y repuestos. Filtra por industria o marca.";
+      }
+      if (catalogGridLabel) catalogGridLabel.textContent = "Grilla de productos";
+    }
+  }
+  applyHeroCopy();
+
+  function applyRepuestoFilterVisibility() {
+    const isRepuesto = state.tipo === "repuesto";
+    const filterIndustria = document.getElementById("filterIndustriaGroup");
+    const filterCategoria = document.getElementById("filterCategoriaGroup");
+    const filtersBar = document.querySelector(".catalog-filters");
+    if (filterIndustria) filterIndustria.style.display = isRepuesto ? "none" : "";
+    if (filterCategoria) filterCategoria.style.display = isRepuesto ? "none" : "";
+    if (filtersBar) filtersBar.classList.toggle("filters-repuestos", isRepuesto);
+    if (isRepuesto) {
+      state.industry = "";
+      state.category = "";
+      if (industrySelect) industrySelect.value = "";
+      if (categorySelect) categorySelect.value = "";
+    }
+  }
+  applyRepuestoFilterVisibility();
 
   let allProducts = MOCK_PRODUCTS.slice();
   let allCategories = MOCK_CATEGORIES.slice();
@@ -240,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = Array.from({ length: 6 }, () => {
       return (
         '<article class="product-card catalog-card skeleton-card" aria-hidden="true">' +
-        '<div class="product-card-visual skeleton-block"></div>' +
+        '<div class="product-card__media skeleton-block"></div>' +
         '<div class="product-card-body">' +
         '<div class="skeleton-line short"></div>' +
         '<div class="skeleton-line"></div>' +
@@ -269,13 +389,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadProducts() {
     try {
+      const params = new URLSearchParams();
+      if (state.tipo === "equipo" || state.tipo === "repuesto") params.set("tipo", state.tipo);
+      if (state.industria) params.set("industria", state.industria);
+      const qs = params.toString();
+      const productsUrl = "/api/products" + (qs ? "?" + qs : "");
       const [catsRes, prodRes, brandRes] = await Promise.all([
         fetchJson("/api/categories"),
-        fetchJson("/api/products"),
+        fetchJson(productsUrl),
         fetchJson("/api/brands"),
       ]);
       const products = Array.isArray(prodRes?.products) ? prodRes.products : null;
-      if (!products || !products.length) throw new Error("empty products");
+      if (!products) throw new Error("empty products");
       allProducts = products.map(normalizeProduct);
       allCategories = Array.isArray(catsRes?.categories)
         ? catsRes.categories
@@ -286,11 +411,82 @@ document.addEventListener("DOMContentLoaded", async () => {
       return allProducts;
     } catch (err) {
       console.warn("[CATALOGO JS] API no disponible — usando MOCK_PRODUCTS", err);
-      allProducts = MOCK_PRODUCTS.slice();
+      allProducts = MOCK_PRODUCTS.slice().filter((p) => {
+        if (!state.tipo) return true;
+        return (p.tipo || (p.sale_mode === "buy" ? "repuesto" : "equipo")) === state.tipo;
+      });
       allCategories = MOCK_CATEGORIES.slice();
       allBrands = MOCK_BRANDS.slice();
       return allProducts;
     }
+  }
+
+  function productTipoOf(prod) {
+    if (prod && (prod.tipo === "repuesto" || prod.tipo === "equipo")) return prod.tipo;
+    return prod && prod.sale_mode === "buy" ? "repuesto" : "equipo";
+  }
+
+  /** Homologado con marcas/site.js: respeta image_url de la API (/img/uploads/...). */
+  function normalizeProductImage(prod) {
+    const raw = prod || {};
+    let image = String(raw.image_url || raw.image || "").trim();
+    if (/wp-content\/uploads/i.test(image)) {
+      const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+      if (file) image = "img/products/" + file[1];
+    }
+    // Rutas absolutas del sitio (/img/uploads/...) se mantienen; la API ya las entrega así.
+    if (!image && window.Lpaez?.resolveProductImage) {
+      try {
+        image = Lpaez.resolveProductImage(raw);
+      } catch (_) {
+        image = "";
+      }
+    }
+    if (!image) image = "img/products/A07-10015.jpg";
+    return image;
+  }
+
+  function slugImageOf(prod, imageUrl) {
+    const raw = prod || {};
+    if (raw.slug_image) return String(raw.slug_image).trim();
+    if (raw.slug) return String(raw.slug).trim();
+    const file = String(imageUrl || "").match(/\/([^\/?#]+)\.(jpe?g|png|webp|gif)$/i);
+    return file ? file[1] : "";
+  }
+
+  /** Solo usa webp si la API lo envía; no inventar .webp (rompe <picture> en uploads). */
+  function normalizeProductWebp(prod, imageUrl) {
+    const explicit = String((prod && prod.image_webp) || "").trim();
+    if (explicit) return explicit;
+    // Mocks locales con webp real junto a img/products|hero
+    if (/^img\/(products|hero)\//i.test(String(imageUrl || "")) && /\.(jpe?g|png)$/i.test(imageUrl)) {
+      return imageUrl.replace(/\.(jpe?g|png)$/i, ".webp");
+    }
+    return "";
+  }
+
+  function productImageHtml(prod) {
+    const name = (prod && prod.name) || "Producto";
+    const img = (prod && prod.image_url) || "img/products/A07-10015.jpg";
+    const webp = (prod && prod.image_webp) || "";
+    const slugImage = slugImageOf(prod, img);
+    const fallback = slugImage
+      ? "/img/productos/" + slugImage + ".jpg"
+      : "img/products/A07-10015.jpg";
+    const onerror =
+      "this.onerror=null;this.src='" + String(fallback).replace(/'/g, "\\'") + "';";
+    const imgTag =
+      `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}"` +
+      ` loading="lazy" decoding="async" width="480" height="480" onerror="${onerror}">`;
+    if (webp) {
+      return (
+        `<picture>` +
+        `<source type="image/webp" srcset="${escapeAttr(webp)}">` +
+        imgTag +
+        `</picture>`
+      );
+    }
+    return imgTag;
   }
 
   function normalizeProduct(p) {
@@ -301,57 +497,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     const desc = String(prod.description || "");
     const m = desc.match(/Cod(?:igo|igo|\.?)\s*([A-Z0-9\-./]+)/i);
     if (m) sku = m[1];
-    let image = prod.image_url || "";
-    if (/wp-content\/uploads/i.test(image)) {
-      const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
-      if (file) image = "img/products/" + file[1];
-    }
-    if (!image && window.Lpaez?.resolveProductImage) {
-      try {
-        image = Lpaez.resolveProductImage(prod);
-      } catch (_) {
-        image = "img/products/A07-10015.jpg";
-      }
-    }
-    if (!image) image = "img/products/A07-10015.jpg";
-    const webp = /\.(jpe?g|png)$/i.test(image)
-      ? image.replace(/\.(jpe?g|png)$/i, ".webp")
-      : prod.image_webp || "";
+    const image = normalizeProductImage(prod);
+    const webp = normalizeProductWebp(prod, image);
+    const sale = prod.sale_mode || "quote";
     return {
       id: prod.id,
       slug,
       name,
       sku,
       description: desc,
-      sale_mode: prod.sale_mode || "quote",
+      sale_mode: sale,
+      tipo: productTipoOf({ tipo: prod.tipo, sale_mode: sale }),
       stock_status: prod.stock_status || "on_request",
       price_clp: prod.price_clp ?? null,
       image_url: image,
       image_webp: webp,
+      slug_image: slugImageOf(prod, image),
       category_slug: prod.category_slug || "",
       category_name: prod.category_name || "",
       brand_slug: prod.brand_slug || "",
       brand_name: prod.brand_name || "Sonic Air Systems",
+      industria_slug: prod.industria_slug || "",
+      industria_nombre: prod.industria_nombre || "",
       quote_url:
         "cotizacion.html?sku=" +
         encodeURIComponent(slug) +
         "&asunto=" +
         encodeURIComponent("Cotización: " + name),
+      ficha_url:
+        prod.ficha_pdf_url || prod.ficha_url || prod.datasheet_url || "",
     };
   }
 
   function writeUrl() {
     try {
-      const params = new URLSearchParams();
-      if (state.industry) params.set("industry", state.industry);
-      if (state.category) params.set("category", state.category);
-      if (state.brand) params.set("brand", state.brand);
-      if (state.mode) params.set("sale_mode", state.mode);
-      if (state.page > 1) params.set("page", String(state.page));
-      const q = params.toString();
+      const q = buildQueryString();
       history.replaceState({}, "", "catalogo.html" + (q ? "?" + q : ""));
     } catch (_) {
       /* ignore */
+    }
+  }
+
+  function categoryBelongsToBrand(categorySlug, brandSlug) {
+    if (!categorySlug) return true;
+    if (!brandSlug) return true;
+    const list = Array.isArray(allProducts) ? allProducts : [];
+    return list.some((p) => {
+      if (!p) return false;
+      if (state.tipo && productTipoOf(p) !== state.tipo) return false;
+      return p.brand_slug === brandSlug && p.category_slug === categorySlug;
+    });
+  }
+
+  function syncCategoryAfterBrandChange() {
+    if (!state.brand) {
+      // "Todas las marcas": category puede quedarse, pero limpia brand
+      return;
+    }
+    if (!categoryBelongsToBrand(state.category, state.brand)) {
+      state.category = "";
+      if (categorySelect) categorySelect.value = "";
     }
   }
 
@@ -366,63 +571,103 @@ document.addEventListener("DOMContentLoaded", async () => {
       : null;
     return list.filter((p) => {
       if (!p) return false;
+      if (state.tipo && productTipoOf(p) !== state.tipo) return false;
+      if (state.industria && p.industria_slug !== state.industria) return false;
       if (state.category && p.category_slug !== state.category) return false;
       if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
-      if (state.mode && p.sale_mode !== state.mode) return false;
       return true;
     });
   }
 
   function cardHtml(prod) {
-    const name = prod?.name || "Producto";
+    const name = prod?.name || "Equipo";
     const slug = prod?.slug || "";
     const sku = prod?.sku || "N/A";
-    const cat = prod?.category_name || prod?.category_slug || "Producto";
-    const img = prod?.image_url || "img/products/A07-10015.jpg";
-    const webp = prod?.image_webp || "";
-    const sale = prod?.sale_mode === "buy" ? "buy" : "quote";
-    const quote =
-      prod?.quote_url ||
-      "cotizacion.html?sku=" + encodeURIComponent(slug || sku);
-    const picture = webp
-      ? `<picture><source type="image/webp" srcset="${escapeAttr(webp)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480"></picture>`
-      : `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}" loading="lazy" decoding="async" width="480" height="480">`;
+    const cat = prod?.category_name || prod?.category_slug || "Equipo";
+    const brand = prod?.brand_name || prod?.brand_slug || "";
+    const tipo = productTipoOf(prod);
+    const isRepuesto = tipo === "repuesto";
+    const picture = productImageHtml(prod);
+
+    const quoteHref =
+      "contacto.html?quote=" +
+      encodeURIComponent(prod.id || "") +
+      "&sku=" +
+      encodeURIComponent(slug) +
+      "&name=" +
+      encodeURIComponent(name);
+
+    let fichaUrl = String(
+      prod?.ficha_url || prod?.ficha_pdf_url || prod?.datasheet_url || ""
+    ).trim();
+    if (fichaUrl && !/^https?:/i.test(fichaUrl) && fichaUrl.charAt(0) !== "/") {
+      fichaUrl = "/" + fichaUrl.replace(/^\.\//, "");
+    }
+    const fichaHtml = fichaUrl
+      ? `<a href="${escapeAttr(fichaUrl)}" target="_blank" rel="noopener" class="btn btn-outline-spec">Ver Ficha (PDF)</a>`
+      : `<button type="button" class="btn btn-outline-spec" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}" data-datasheet-url="">Ver Ficha (PDF)</button>`;
+
+    let actionsHtml;
+    if (isRepuesto) {
+      const cartPayload = encodeURIComponent(
+        JSON.stringify({
+          id: prod.id,
+          slug,
+          name,
+          price_clp: prod.price_clp ?? null,
+          sale_mode: "buy",
+          tipo: "repuesto",
+        })
+      );
+      actionsHtml =
+        `<div class="product-card-actions catalog-card-actions">` +
+        `<div class="action-buttons-group">` +
+        `<button type="button" class="btn btn-buy" data-card-cart="${escapeAttr(cartPayload)}">COMPRAR</button>` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-secondary">Cotizar</a>` +
+        `</div>` +
+        fichaHtml +
+        `</div>`;
+    } else {
+      actionsHtml =
+        `<div class="product-card-actions catalog-card-actions">` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-primary">Cotizar</a>` +
+        fichaHtml +
+        `</div>`;
+    }
+
+    const brandHtml = brand
+      ? `<span class="badge-brand">${escapeHtml(brand)}</span>`
+      : "";
+
     return (
-      `<article class="product-card catalog-card reveal">` +
-      `<a class="product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">${picture}</a>` +
+      `<article class="product-card catalog-card reveal" data-tipo="${escapeAttr(tipo)}">` +
+      `<a class="product-card__media product-card-visual" href="producto.html?slug=${encodeURIComponent(slug)}" title="${escapeAttr(name)}">` +
+      `<span class="badge-type ${isRepuesto ? "badge-type--comprar" : "badge-type--cotizar"}">${isRepuesto ? "Comprar" : "Cotizar"}</span>` +
+      `${picture}</a>` +
       `<div class="product-card-body">` +
-      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>` +
-      `<span class="badge-mode ${sale === "buy" ? "badge-buy" : "badge-quote"}">${sale === "buy" ? "Comprar" : "Cotizar"}</span></div>` +
+      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>${brandHtml}</div>` +
       `<h3><a href="producto.html?slug=${encodeURIComponent(slug)}">${escapeHtml(name)}</a></h3>` +
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
-      `<div class="product-card-actions catalog-card-actions">` +
-      `<a class="btn btn-primary btn-sm" href="${escapeAttr(quote)}">Pedir cotización</a>` +
-      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">Descargar ficha técnica</button>` +
-      `</div></div></article>`
+      `${actionsHtml}` +
+      `</div></article>`
     );
   }
 
   function renderFilters() {
-    if (industryTabs) {
-      industryTabs.innerHTML =
-        `<button type="button" class="industry-tab${!state.industry ? " is-active" : ""}" data-industry="" aria-selected="${!state.industry}">Todas</button>` +
+    if (industrySelect) {
+      industrySelect.innerHTML =
+        `<option value="">Todas</option>` +
         INDUSTRIES.map((ind) => {
-          const on = state.industry === ind.id;
-          return `<button type="button" class="industry-tab${on ? " is-active" : ""}" data-industry="${escapeAttr(ind.id)}" aria-selected="${on}">${escapeHtml(ind.label)}</button>`;
+          return `<option value="${escapeAttr(ind.id)}"${state.industry === ind.id ? " selected" : ""}>${escapeHtml(ind.label)}</option>`;
         }).join("");
     }
-    if (filterChips) {
-      const used = {};
-      filtered().forEach((p) => {
-        if (p?.category_slug) used[p.category_slug] = true;
-      });
-      // show categories from all data for current industry/mode/brand context base list
+    if (categorySelect) {
       const base = Array.isArray(allProducts) ? allProducts : MOCK_PRODUCTS;
       const catsPresent = {};
       base.forEach((p) => {
         if (!p) return;
-        if (state.mode && p.sale_mode !== state.mode) return;
+        if (state.tipo && productTipoOf(p) !== state.tipo) return;
         if (state.brand && p.brand_slug !== state.brand) return;
         const ind = INDUSTRIES.find((i) => i.id === state.industry);
         if (ind && !ind.categories.includes(p.category_slug)) return;
@@ -432,12 +677,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
         name: catsPresent[slug],
       }));
-      filterChips.innerHTML =
-        `<button type="button" class="filter-chip${!state.category ? " is-active" : ""}" data-cat="" aria-pressed="${!state.category}">Todas</button>` +
+      categorySelect.innerHTML =
+        `<option value="">Todas</option>` +
         catList
           .map((c) => {
-            const on = state.category === c.slug;
-            return `<button type="button" class="filter-chip${on ? " is-active" : ""}" data-cat="${escapeAttr(c.slug)}" aria-pressed="${on}">${escapeHtml(c.name)}</button>`;
+            return `<option value="${escapeAttr(c.slug)}"${state.category === c.slug ? " selected" : ""}>${escapeHtml(c.name)}</option>`;
           })
           .join("");
     }
@@ -451,13 +695,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             return `<option value="${escapeAttr(slug)}"${state.brand === slug ? " selected" : ""}>${escapeHtml(name)}</option>`;
           })
           .join("");
-    }
-    if (modeChips) {
-      modeChips.querySelectorAll(".filter-chip").forEach((chip) => {
-        const on = chip.getAttribute("data-mode") === state.mode;
-        chip.classList.toggle("is-active", on);
-        chip.setAttribute("aria-pressed", on ? "true" : "false");
-      });
     }
   }
 
@@ -517,8 +754,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (catalogCount) {
       catalogCount.hidden = false;
-      catalogCount.textContent =
-        products.length === 1 ? "1 producto" : products.length + " productos";
+      const noun =
+        state.tipo === "repuesto"
+          ? products.length === 1
+            ? "repuesto"
+            : "repuestos"
+          : state.tipo === "equipo"
+            ? products.length === 1
+              ? "equipo"
+              : "equipos"
+            : products.length === 1
+              ? "producto"
+              : "productos";
+      catalogCount.textContent = products.length + " " + noun;
     }
 
     if (!pageItems.length) {
@@ -527,12 +775,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<p class="empty-actions"><button type="button" class="btn btn-primary btn-sm" id="clearCatalogFilters">Ver todos</button>` +
         `<a class="btn btn-outline btn-sm" href="cotizacion.html">Pedir cotización</a></p></div>`;
       document.getElementById("clearCatalogFilters")?.addEventListener("click", () => {
-        state.category = "";
-        state.brand = "";
-        state.industry = "";
-        state.mode = "";
-        state.page = 1;
-        renderGrid();
+        const tipo = state.tipo === "repuesto" ? "repuesto" : "equipo";
+        window.location.href = "catalogo.html?tipo=" + encodeURIComponent(tipo);
       });
       renderPager(0, 1, 1);
       injectJsonLd([]);
@@ -548,31 +792,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function bindUi() {
-    industryTabs?.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-industry]");
-      if (!btn) return;
-      state.industry = btn.getAttribute("data-industry") || "";
+    industrySelect?.addEventListener("change", () => {
+      state.industry = cleanFilterValue(industrySelect.value || "");
       state.category = "";
       state.page = 1;
       renderGrid();
     });
-    filterChips?.addEventListener("click", (e) => {
-      const chip = e.target.closest(".filter-chip");
-      if (!chip) return;
-      state.category = chip.getAttribute("data-cat") || "";
-      state.page = 1;
-      renderGrid();
-    });
-    modeChips?.addEventListener("click", (e) => {
-      const chip = e.target.closest(".filter-chip");
-      if (!chip) return;
-      state.mode = chip.getAttribute("data-mode") || "";
+    categorySelect?.addEventListener("change", () => {
+      state.category = cleanFilterValue(categorySelect.value || "");
       state.page = 1;
       renderGrid();
     });
     brandSelect?.addEventListener("change", () => {
-      state.brand = brandSelect.value || "";
+      state.brand = cleanFilterValue(brandSelect.value || "");
+      // Si elige "Todas las marcas", brand queda vacío y se limpia de la URL en writeUrl
+      syncCategoryAfterBrandChange();
       state.page = 1;
+      renderFilters();
       renderGrid();
     });
     pager?.addEventListener("click", (e) => {
@@ -588,14 +824,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = e.target.closest("[data-datasheet]");
       if (!btn || !datasheetDialog || !datasheetBody) return;
       const slug = btn.getAttribute("data-datasheet") || "";
-      const name = btn.getAttribute("data-datasheet-name") || "Producto";
+      const name = btn.getAttribute("data-datasheet-name") || "Equipo";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      let fromAttr = (btn.getAttribute("data-datasheet-url") || "").trim();
+      let pdfUrl =
+        fromAttr ||
+        (slug ? `img/fichas/${encodeURIComponent(slug)}.pdf` : "img/fichas/");
+      if (pdfUrl && !/^https?:/i.test(pdfUrl) && pdfUrl.charAt(0) !== "/") {
+        pdfUrl = "/" + pdfUrl.replace(/^\.\//, "");
+      }
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
         `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
-        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
-        `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
+        `<div class="empty-actions"><a class="btn btn-primary" href="${escapeAttr(pdfUrl)}" target="_blank" rel="noopener">Ver Ficha (PDF)</a>` +
+        `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Cotizar con ficha</a></div>`;
       if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
       else datasheetDialog.setAttribute("open", "");
     });
@@ -610,6 +853,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindUi();
   try {
     await loadProducts();
+    // Si la URL trae marca+categoría incompatibles, descarta la categoría
+    syncCategoryAfterBrandChange();
   } catch (err) {
     console.warn("[CATALOGO JS] fallback forzado a MOCK_PRODUCTS", err);
     allProducts = MOCK_PRODUCTS.slice();
