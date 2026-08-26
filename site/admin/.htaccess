@@ -1,11 +1,9 @@
-RewriteEngine On
-
 # Prefer the static admin SPA over any PHP entrypoint.
 DirectoryIndex index.html
 
 RewriteEngine On
 
-# Legacy bookmarks: /admin/index.php → /admin/
+# Legacy bookmarks /admin/index.php → /admin/ (no PHP file; avoids Imunify WAF)
 RewriteRule ^index\.php$ ./ [R=301,L]
 
 # If a request under /admin/ is not a real file, serve the SPA shell.
