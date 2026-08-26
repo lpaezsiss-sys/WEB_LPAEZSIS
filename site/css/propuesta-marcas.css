@@ -170,3 +170,25 @@
   text-align: center;
   color: var(--pm-muted);
 }
+
+/* Logo de marca → sitio oficial del fabricante */
+.brand-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  max-width: 100%;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.brand-logo-link:hover,
+.brand-logo-link:focus-visible {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.brand-logo-link .brand-logo,
+.brand-logo-link #brandHeroLogo {
+  margin-bottom: 0;
+}

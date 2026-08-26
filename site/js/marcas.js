@@ -255,18 +255,72 @@ function updateBrandHero(brand) {
       "columbia-machine": "img/uploads/p-57c09a0440925f86.png",
       "cmc-klebetechnik": "img/uploads/p-4123e04f38ce02ea.png",
     };
+    var WEBSITE_BY_SLUG = {
+      "sonic-air-systems": "https://www.sonicairsystems.com",
+      sonic: "https://www.sonicairsystems.com",
+    };
     var src = String(brand.logo_url || brand.imagen || brand.logo || "").trim();
     if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
     if (!src && slug) {
       var guess = String(slug).toLowerCase().replace(/-systems$/i, "");
       if (LOGO_BY_SLUG[guess]) src = LOGO_BY_SLUG[guess];
     }
+    var websiteUrl = String(
+      brand.website_url || brand.website || brand.url || ""
+    ).trim();
+    if (!websiteUrl && slug && WEBSITE_BY_SLUG[slug]) {
+      websiteUrl = WEBSITE_BY_SLUG[slug];
+    }
+    if (!websiteUrl && slug) {
+      var guessWeb = String(slug).toLowerCase().replace(/-systems$/i, "");
+      if (WEBSITE_BY_SLUG[guessWeb]) websiteUrl = WEBSITE_BY_SLUG[guessWeb];
+    }
+
+    function unwrapLogoLink() {
+      var parent = logoEl.parentElement;
+      if (
+        parent &&
+        parent.tagName === "A" &&
+        parent.classList.contains("brand-logo-link")
+      ) {
+        parent.parentNode.insertBefore(logoEl, parent);
+        parent.remove();
+      }
+    }
+
+    function ensureLogoLink(href) {
+      var parent = logoEl.parentElement;
+      var title =
+        "Visitar sitio oficial de " + (nombre || slug || "la marca");
+      if (
+        parent &&
+        parent.tagName === "A" &&
+        parent.classList.contains("brand-logo-link")
+      ) {
+        parent.href = href;
+        parent.target = "_blank";
+        parent.rel = "noopener noreferrer";
+        parent.title = title;
+        return parent;
+      }
+      var a = document.createElement("a");
+      a.className = "brand-logo-link";
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.title = title;
+      logoEl.parentNode.insertBefore(a, logoEl);
+      a.appendChild(logoEl);
+      return a;
+    }
+
     function hideHeroLogo() {
       logoEl.onerror = null;
       logoEl.removeAttribute("src");
       logoEl.alt = "";
       logoEl.hidden = true;
       logoEl.style.display = "none";
+      unwrapLogoLink();
       if (logoBox) logoBox.hidden = true;
     }
     function showHeroLogo(url) {
@@ -277,6 +331,8 @@ function updateBrandHero(brand) {
       logoEl.alt = "Logo " + (nombre || slug || "marca");
       logoEl.hidden = false;
       logoEl.style.display = "";
+      if (websiteUrl) ensureLogoLink(websiteUrl);
+      else unwrapLogoLink();
       if (logoBox) logoBox.hidden = false;
     }
     if (src) showHeroLogo(src);
