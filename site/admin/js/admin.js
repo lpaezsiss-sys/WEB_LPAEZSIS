@@ -140,15 +140,39 @@
   document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var err = document.getElementById("loginError");
-    api("/login", { method: "POST", body: { password: document.getElementById("password").value } }).then(function (res) {
-      if (!res.ok) {
-        err.hidden = false;
-        err.textContent = (res.data && res.data.error) || "Error";
-        return;
-      }
-      setToken(res.data.token);
-      showApp();
-    });
+    var btn = e.target.querySelector('button[type="submit"]');
+    if (err) {
+      err.hidden = true;
+      err.textContent = "";
+    }
+    if (btn) btn.disabled = true;
+    api("/login", { method: "POST", body: { password: document.getElementById("password").value } })
+      .then(function (res) {
+        if (btn) btn.disabled = false;
+        if (!res.ok) {
+          if (err) {
+            err.hidden = false;
+            err.textContent = (res.data && res.data.error) || "Contraseña incorrecta";
+          }
+          return;
+        }
+        if (!res.data || !res.data.token) {
+          if (err) {
+            err.hidden = false;
+            err.textContent = "Respuesta inválida del servidor";
+          }
+          return;
+        }
+        setToken(res.data.token);
+        showApp();
+      })
+      .catch(function () {
+        if (btn) btn.disabled = false;
+        if (err) {
+          err.hidden = false;
+          err.textContent = "No se pudo conectar con la API (/api/admin/login)";
+        }
+      });
   });
 
   document.getElementById("logoutBtn").addEventListener("click", function () {
