@@ -3,6 +3,18 @@ RewriteEngine On
 # Prefer static HTML when both index.html and index.php exist.
 DirectoryIndex index.html index.php
 
+# Caché y entrega directa de documentos estáticos (PDF)
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.pdf$">
+    Header set Content-Disposition "inline"
+  </FilesMatch>
+</IfModule>
+
 # SEO endpoints (pretty URLs)
 RewriteRule ^robots\.txt$ api/index.php?__path=/robots.txt [L]
 RewriteRule ^sitemap\.xml$ api/index.php?__path=/api/sitemap.xml [L]

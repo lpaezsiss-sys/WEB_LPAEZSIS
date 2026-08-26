@@ -360,6 +360,17 @@ final class AdminApi
         }
         $subdir = trim((string) ($_POST['subdir'] ?? ''));
         if ($kind === 'pdf') {
+            $origName = (string) ($file['name'] ?? '');
+            if (!preg_match('/\.pdf$/i', $origName)) {
+                Response::error('Solo se permiten archivos PDF');
+                return;
+            }
+            $sanitized = Upload::sanitizePdfFilename($origName);
+            if ($sanitized === '') {
+                Response::error('Nombre de archivo PDF inválido');
+                return;
+            }
+            $file['name'] = $sanitized;
             $preferred = trim((string) ($_POST['slug'] ?? $_POST['filename'] ?? ''));
             $result = Upload::storePdf($file, $preferred);
         } else {
@@ -1225,6 +1236,28 @@ final class AdminApi
             return;
         }
 
+        $origName = (string) ($file['name'] ?? '');
+        if (!preg_match('/\.pdf$/i', $origName)) {
+            Response::json([
+                'status' => 'error',
+                'message' => 'Solo se permiten archivos PDF.',
+                'error' => 'Solo se permiten archivos PDF.',
+            ], 400);
+            return;
+        }
+
+        // Sanitiza el nombre antes de guardar (minúsculas, sin especiales, espacios → guiones)
+        $sanitized = Upload::sanitizePdfFilename($origName);
+        if ($sanitized === '') {
+            Response::json([
+                'status' => 'error',
+                'message' => 'Nombre de archivo PDF inválido.',
+                'error' => 'Nombre de archivo PDF inválido.',
+            ], 400);
+            return;
+        }
+        $file['name'] = $sanitized;
+
         $preferred = trim((string) ($_POST['slug'] ?? $row['slug'] ?? ''));
         $uploaded = Upload::storePdf($file, $preferred);
         if (!$uploaded['ok']) {
@@ -1293,7 +1326,7 @@ final class AdminApi
         }
         try {
             $slug = 'paletizador-alto-nivel-columbia-hl7200';
-            $url = '/img/fichas/' . $slug . '.pdf';
+            $url = 'img/fichas/' . $slug . '.pdf';
             $stmt = $pdo->prepare(
                 'UPDATE products SET ficha_pdf_url = ?
                  WHERE slug = ? AND (ficha_pdf_url IS NULL OR ficha_pdf_url = \'\')'

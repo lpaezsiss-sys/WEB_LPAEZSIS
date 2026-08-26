@@ -18,7 +18,49 @@ final class Upload
     }
 
     /**
+     * Sanitiza un nombre de PDF: minúsculas, sin caracteres especiales, espacios → guiones.
+     * Ejemplo: "HL7200 Cutsheet Spanish Digital.pdf" → "hl7200-cutsheet-spanish-digital.pdf"
+     */
+    public static function sanitizePdfFilename(string $originalName): string
+    {
+        $stem = self::sanitizePdfStem($originalName);
+        if ($stem === '') {
+            return '';
+        }
+        return $stem . '.pdf';
+    }
+
+    /** Stem sanitizado sin extensión (.pdf). */
+    public static function sanitizePdfStem(string $value): string
+    {
+        $value = basename(str_replace('\\', '/', $value));
+        $value = (string) (preg_replace('/\.pdf$/i', '', $value) ?? '');
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        if (class_exists(\Normalizer::class)) {
+            $normalized = \Normalizer::normalize($value, \Normalizer::FORM_D);
+            if (is_string($normalized) && $normalized !== '') {
+                $value = $normalized;
+            }
+            $value = (string) (preg_replace('/\p{M}/u', '', $value) ?? $value);
+        } elseif (function_exists('iconv')) {
+            $translit = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+            if (is_string($translit) && $translit !== '') {
+                $value = $translit;
+            }
+        }
+
+        $value = strtolower($value);
+        $value = (string) (preg_replace('/[^a-z0-9]+/', '-', $value) ?? '');
+        return trim($value, '-');
+    }
+
+    /**
      * Guarda un PDF en img/fichas/ (hermana de img/uploads/).
+     * El nombre final se deriva del archivo original sanitizado; $preferredBase es fallback (slug).
      * @param array $file $_FILES entry
      * @param string $preferredBase Nombre preferido sin extensión (slug del producto)
      */
@@ -32,13 +74,17 @@ final class Upload
             return ['ok' => false, 'error' => 'Archivo inválido'];
         }
 
+        $origName = (string) ($file['name'] ?? '');
+        // Extensión estrictamente .pdf
+        if (!preg_match('/\.pdf$/i', $origName)) {
+            return ['ok' => false, 'error' => 'Solo se permiten archivos PDF'];
+        }
+
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($tmp) ?: '';
-        $origName = strtolower((string) ($file['name'] ?? ''));
-        $isPdfExt = (bool) preg_match('/\.pdf$/i', $origName);
         $isPdfMime = in_array($mime, ['application/pdf', 'application/x-pdf'], true)
-            || ($isPdfExt && in_array($mime, ['application/octet-stream', 'binary/octet-stream', ''], true));
-        if (!$isPdfExt && !$isPdfMime) {
+            || in_array($mime, ['application/octet-stream', 'binary/octet-stream', ''], true);
+        if (!$isPdfMime) {
             return ['ok' => false, 'error' => 'Solo se permiten archivos PDF'];
         }
         if (($file['size'] ?? 0) > 15 * 1024 * 1024) {
@@ -52,21 +98,25 @@ final class Upload
             return ['ok' => false, 'error' => 'No se pudo crear carpeta img/fichas'];
         }
 
-        $base = strtolower(trim($preferredBase));
-        $base = preg_replace('/[^a-z0-9\-]+/', '-', $base) ?: '';
-        $base = trim((string) $base, '-');
+        $base = self::sanitizePdfStem($origName);
+        if ($base === '') {
+            $base = self::sanitizePdfStem($preferredBase);
+        }
         if ($base === '') {
             $base = 'ficha-' . bin2hex(random_bytes(6));
         }
+
         $name = $base . '.pdf';
         $dest = $dir . DIRECTORY_SEPARATOR . $name;
+
         if (!move_uploaded_file($tmp, $dest)) {
             return ['ok' => false, 'error' => 'Error al guardar el PDF'];
         }
 
+        // URL relativa limpia registrada en BD
         return [
             'ok' => true,
-            'url' => '/img/fichas/' . $name,
+            'url' => 'img/fichas/' . $name,
             'type' => 'pdf',
         ];
     }

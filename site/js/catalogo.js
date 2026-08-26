@@ -591,9 +591,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const name = btn.getAttribute("data-datasheet-name") || "Producto";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
       const fromAttr = (btn.getAttribute("data-datasheet-url") || "").trim();
-      const pdfUrl =
+      let pdfUrl =
         fromAttr ||
         (slug ? `img/fichas/${encodeURIComponent(slug)}.pdf` : "img/fichas/");
+      if (pdfUrl && !/^https?:/i.test(pdfUrl) && pdfUrl.charAt(0) !== "/") {
+        pdfUrl = "/" + pdfUrl.replace(/^\.\//, "");
+      }
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
