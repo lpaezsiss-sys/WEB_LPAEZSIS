@@ -1,5 +1,5 @@
 /**
- * Home — carrusel destacados + sectores dinámicos
+ * Home — hero banners, carrusel destacados + sectores dinámicos
  */
 (function () {
   "use strict";
@@ -84,6 +84,148 @@
     return u;
   }
 
+  function applyHeroSlide(banner) {
+    var title = $("heroTitle");
+    var lead = $("heroLead");
+    var btn1 = $("heroBtn1");
+    var btn2 = $("heroBtn2");
+    var media = $("heroMedia");
+    if (!banner) return;
+
+    if (title) title.textContent = banner.titulo || "";
+    if (lead) lead.textContent = banner.subtitulo || "";
+
+    if (btn1) {
+      var t1 = String(banner.texto_btn_1 || "").trim();
+      var l1 = String(banner.link_btn_1 || "").trim();
+      if (t1 && l1) {
+        btn1.textContent = t1;
+        btn1.href = l1;
+        btn1.hidden = false;
+      } else {
+        btn1.hidden = true;
+      }
+    }
+    if (btn2) {
+      var t2 = String(banner.texto_btn_2 || "").trim();
+      var l2 = String(banner.link_btn_2 || "").trim();
+      if (t2 && l2) {
+        btn2.textContent = t2;
+        btn2.href = l2;
+        btn2.hidden = false;
+      } else {
+        btn2.hidden = true;
+      }
+    }
+
+    if (media) {
+      var imgUrl = normalizeAssetUrl(banner.imagen_url) || "img/hero/line.jpg";
+      media.innerHTML =
+        '<img class="hero-media__slide is-active" src="' +
+        escapeHtml(imgUrl) +
+        '" alt="" width="1920" height="800" loading="eager" decoding="async">';
+    }
+  }
+
+  function initHeroSlider(banners) {
+    var hero = $("homeHero");
+    var nav = $("heroSliderNav");
+    var dots = $("heroDots");
+    var prev = $("heroPrev");
+    var next = $("heroNext");
+    if (!hero || !banners || !banners.length) return;
+
+    hero.classList.add("hero--managed");
+    var index = 0;
+    var timer = null;
+
+    function goTo(i) {
+      index = ((i % banners.length) + banners.length) % banners.length;
+      applyHeroSlide(banners[index]);
+      if (dots) {
+        dots.querySelectorAll(".hero-dot").forEach(function (dot, di) {
+          dot.classList.toggle("is-active", di === index);
+          dot.setAttribute("aria-selected", di === index ? "true" : "false");
+        });
+      }
+    }
+
+    function startAuto() {
+      stopAuto();
+      if (banners.length < 2) return;
+      timer = window.setInterval(function () {
+        goTo(index + 1);
+      }, 7000);
+    }
+
+    function stopAuto() {
+      if (timer) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    if (banners.length === 1) {
+      applyHeroSlide(banners[0]);
+      if (nav) nav.hidden = true;
+      return;
+    }
+
+    if (nav) nav.hidden = false;
+    if (dots) {
+      dots.innerHTML = banners
+        .map(function (_b, i) {
+          return (
+            '<button type="button" class="hero-dot' +
+            (i === 0 ? " is-active" : "") +
+            '" role="tab" aria-selected="' +
+            (i === 0 ? "true" : "false") +
+            '" aria-label="Slide ' +
+            (i + 1) +
+            '" data-hero-dot="' +
+            i +
+            '"></button>'
+          );
+        })
+        .join("");
+      dots.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-hero-dot]");
+        if (!btn) return;
+        goTo(parseInt(btn.getAttribute("data-hero-dot"), 10) || 0);
+        startAuto();
+      });
+    }
+    if (prev) {
+      prev.addEventListener("click", function () {
+        goTo(index - 1);
+        startAuto();
+      });
+    }
+    if (next) {
+      next.addEventListener("click", function () {
+        goTo(index + 1);
+        startAuto();
+      });
+    }
+
+    hero.addEventListener("mouseenter", stopAuto);
+    hero.addEventListener("mouseleave", startAuto);
+    goTo(0);
+    startAuto();
+  }
+
+  async function loadBanners() {
+    try {
+      var res = await fetch("api/banners.php?_=" + Date.now());
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var banners = await res.json();
+      if (!Array.isArray(banners) || !banners.length) return;
+      initHeroSlider(banners);
+    } catch (err) {
+      console.error("Error cargando banners:", err);
+    }
+  }
+
   async function loadSectores() {
     var grid = $("sectoresGrid");
     if (!grid) return;
@@ -124,6 +266,7 @@
   }
 
   function boot() {
+    loadBanners();
     initFeaturedCarousel();
     loadSectores();
   }

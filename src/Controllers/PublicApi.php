@@ -74,6 +74,10 @@ final class PublicApi
             self::sectores();
             return;
         }
+        if ($method === 'GET' && $path === '/api/banners') {
+            self::banners();
+            return;
+        }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
             self::brandDetail(urldecode($m[1]));
             return;
@@ -501,6 +505,100 @@ final class PublicApi
         $ins = $pdo->prepare(
             'INSERT INTO sectores (nombre, slug, imagen_url, link_url, orden, activo)
              VALUES (?, ?, ?, ?, ?, 1)'
+        );
+        foreach ($seed as $row) {
+            $ins->execute($row);
+        }
+    }
+
+    /**
+     * Home Hero Slider: JSON array plano de banners activos ordenados.
+     */
+    private static function banners(): void
+    {
+        try {
+            self::ensureBannersSchema();
+            $stmt = self::pdo()->query(
+                'SELECT id, titulo, subtitulo, imagen_url,
+                        texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden
+                 FROM banners
+                 WHERE activo = 1
+                 ORDER BY orden ASC, id ASC
+                 LIMIT 12'
+            );
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $resultado = array_map(static function (array $item): array {
+                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                return [
+                    'id' => (int) ($item['id'] ?? 0),
+                    'titulo' => (string) ($item['titulo'] ?? ''),
+                    'subtitulo' => (string) ($item['subtitulo'] ?? ''),
+                    'imagen_url' => $imagen,
+                    'texto_btn_1' => (string) ($item['texto_btn_1'] ?? ''),
+                    'link_btn_1' => (string) ($item['link_btn_1'] ?? ''),
+                    'texto_btn_2' => (string) ($item['texto_btn_2'] ?? ''),
+                    'link_btn_2' => (string) ($item['link_btn_2'] ?? ''),
+                    'orden' => (int) ($item['orden'] ?? 0),
+                ];
+            }, $rows ?: []);
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener banners: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Crea tabla banners + seed del hero actual si aún no existe. */
+    public static function ensureBannersSchema(): void
+    {
+        $pdo = self::pdo();
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS banners (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                titulo VARCHAR(255) NOT NULL DEFAULT \'\',
+                subtitulo TEXT NULL,
+                imagen_url VARCHAR(500) NOT NULL DEFAULT \'\',
+                texto_btn_1 VARCHAR(120) NOT NULL DEFAULT \'\',
+                link_btn_1 VARCHAR(500) NOT NULL DEFAULT \'\',
+                texto_btn_2 VARCHAR(120) NOT NULL DEFAULT \'\',
+                link_btn_2 VARCHAR(500) NOT NULL DEFAULT \'\',
+                orden INT NOT NULL DEFAULT 0,
+                activo TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY idx_banners_orden (orden, activo)
+             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+        $count = (int) $pdo->query('SELECT COUNT(*) FROM banners')->fetchColumn();
+        if ($count > 0) {
+            return;
+        }
+        $seed = [
+            [
+                'Soluciones industriales para optimizar tu línea de producción',
+                'Secado · Soplado · Limpieza · Packaging · Fin de línea. Tecnología especializada, ingeniería y soporte técnico local en Chile.',
+                'img/hero/line.jpg',
+                'Pedir Cotización',
+                'contacto.html',
+                'Evaluar Mi Aplicación',
+                'catalogo.html?tipo=equipo',
+                10,
+            ],
+            [
+                'Tecnología especializada para plantas en Chile',
+                'Secado, soplado y fin de línea con soporte técnico local. Representantes Sonic Air Systems.',
+                'img/hero/3piece_cans.jpg',
+                'Pedir Cotización',
+                'contacto.html',
+                'Ver Catálogo',
+                'catalogo.html?tipo=equipo',
+                20,
+            ],
+        ];
+        $ins = $pdo->prepare(
+            'INSERT INTO banners
+             (titulo, subtitulo, imagen_url, texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden, activo)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
         );
         foreach ($seed as $row) {
             $ins->execute($row);

@@ -114,7 +114,7 @@
     document.querySelectorAll(".app-tab").forEach(function (btn) {
       btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tab);
     });
-    ["equipos", "repuestos", "brands", "clientes", "soluciones", "sectores", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
+    ["equipos", "repuestos", "brands", "clientes", "soluciones", "sectores", "banners", "orders", "quotes", "contacts", "settings"].forEach(function (name) {
       var view = document.getElementById(name + "View");
       if (view) view.hidden = name !== tab;
     });
@@ -130,6 +130,7 @@
     if (tab === "clientes") loadClientes();
     if (tab === "soluciones") loadSoluciones();
     if (tab === "sectores") loadSectores();
+    if (tab === "banners") loadBanners();
     if (tab === "orders") loadOrders();
     if (tab === "quotes") loadQuotes();
     if (tab === "contacts") loadContacts();
@@ -1633,6 +1634,238 @@
         showToast("Sector actualizado");
         loadSectores();
       });
+    });
+  }
+
+  /* —— Banners Hero —— */
+  var bannersCache = [];
+
+  function setBannerImagenPreview(url) {
+    var wrap = document.getElementById("bannerImagenPreviewWrap");
+    var img = document.getElementById("bannerImagenPreview");
+    var field = document.getElementById("bannerImagenUrl");
+    var src = sectorImgSrc(url);
+    if (field) field.value = url || "";
+    if (!wrap || !img) return;
+    if (!src) {
+      wrap.hidden = true;
+      img.removeAttribute("src");
+      return;
+    }
+    img.src = src;
+    wrap.hidden = false;
+  }
+
+  function resetBannerForm() {
+    var form = document.getElementById("formBanner");
+    if (!form) return;
+    form.hidden = true;
+    document.getElementById("bannerId").value = "";
+    document.getElementById("bannerTitulo").value = "";
+    document.getElementById("bannerSubtitulo").value = "";
+    document.getElementById("bannerTextoBtn1").value = "Pedir Cotización";
+    document.getElementById("bannerLinkBtn1").value = "contacto.html";
+    document.getElementById("bannerTextoBtn2").value = "Evaluar Mi Aplicación";
+    document.getElementById("bannerLinkBtn2").value = "catalogo.html?tipo=equipo";
+    document.getElementById("bannerOrden").value = "0";
+    document.getElementById("bannerActivo").checked = true;
+    document.getElementById("bannerImagen").value = "";
+    setBannerImagenPreview("");
+    document.getElementById("bannerSaveBtn").textContent = "Guardar Slide";
+    var err = document.getElementById("bannerFormError");
+    if (err) {
+      err.hidden = true;
+      err.textContent = "";
+    }
+  }
+
+  function showBannerForm(item) {
+    var form = document.getElementById("formBanner");
+    if (!form) return;
+    form.hidden = false;
+    if (!item) {
+      document.getElementById("bannerId").value = "";
+      document.getElementById("bannerTitulo").value = "";
+      document.getElementById("bannerSubtitulo").value = "";
+      document.getElementById("bannerTextoBtn1").value = "Pedir Cotización";
+      document.getElementById("bannerLinkBtn1").value = "contacto.html";
+      document.getElementById("bannerTextoBtn2").value = "Evaluar Mi Aplicación";
+      document.getElementById("bannerLinkBtn2").value = "catalogo.html?tipo=equipo";
+      document.getElementById("bannerOrden").value = String((bannersCache.length + 1) * 10);
+      document.getElementById("bannerActivo").checked = true;
+      document.getElementById("bannerImagen").value = "";
+      setBannerImagenPreview("");
+      document.getElementById("bannerSaveBtn").textContent = "Crear Slide";
+    } else {
+      document.getElementById("bannerId").value = item.id || "";
+      document.getElementById("bannerTitulo").value = item.titulo || "";
+      document.getElementById("bannerSubtitulo").value = item.subtitulo || "";
+      document.getElementById("bannerTextoBtn1").value = item.texto_btn_1 || "";
+      document.getElementById("bannerLinkBtn1").value = item.link_btn_1 || "";
+      document.getElementById("bannerTextoBtn2").value = item.texto_btn_2 || "";
+      document.getElementById("bannerLinkBtn2").value = item.link_btn_2 || "";
+      document.getElementById("bannerOrden").value = item.orden != null ? item.orden : 0;
+      document.getElementById("bannerActivo").checked = coerceBool(item.activo, true);
+      document.getElementById("bannerImagen").value = "";
+      setBannerImagenPreview(item.imagen_url || "");
+      document.getElementById("bannerSaveBtn").textContent = "Actualizar Slide";
+    }
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function loadBanners() {
+    var tbody = document.getElementById("adminBannersList");
+    api("/banners").then(function (res) {
+      if (!tbody) return;
+      if (!res.ok) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty-hint">' +
+          ((res.data && res.data.error) || "No se pudieron cargar los banners") +
+          "</td></tr>";
+        return;
+      }
+      var items = (res.data && res.data.banners) || [];
+      bannersCache = items;
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-hint">No hay slides. Crea el primero.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items
+        .map(function (b) {
+          var img = sectorImgSrc(b.imagen_url);
+          var active = coerceBool(b.activo, true);
+          return (
+            '<tr data-banner-id="' +
+            escapeAttr(String(b.id)) +
+            '">' +
+            "<td>" +
+            (img
+              ? '<img class="admin-thumb" src="' + escapeHtml(img) + '" alt="">'
+              : '<span class="empty-hint">—</span>') +
+            "</td>" +
+            "<td><strong>" +
+            escapeHtml(b.titulo || "") +
+            "</strong></td>" +
+            "<td>" +
+            escapeHtml(String(b.orden != null ? b.orden : 0)) +
+            "</td>" +
+            "<td>" +
+            (active ? '<span class="badge-on">Activo</span>' : '<span class="badge-off">Inactivo</span>') +
+            "</td>" +
+            "<td class="table-actions">" +
+            '<button type="button" data-edit-banner="' +
+            escapeAttr(String(b.id)) +
+            '">Editar</button> ' +
+            '<button type="button" class="ghost" data-toggle-banner="' +
+            escapeAttr(String(b.id)) +
+            '">' +
+            (active ? "Desactivar" : "Activar") +
+            "</button> " +
+            '<button type="button" class="danger" data-del-banner="' +
+            escapeAttr(String(b.id)) +
+            '">Eliminar</button>' +
+            "</td></tr>"
+          );
+        })
+        .join("");
+    });
+  }
+
+  var bannerNewBtn = document.getElementById("bannerNewBtn");
+  if (bannerNewBtn) {
+    bannerNewBtn.addEventListener("click", function () {
+      showBannerForm(null);
+    });
+  }
+  var bannerResetBtn = document.getElementById("bannerResetBtn");
+  if (bannerResetBtn) {
+    bannerResetBtn.addEventListener("click", resetBannerForm);
+  }
+  var bannerImagenInput = document.getElementById("bannerImagen");
+  if (bannerImagenInput) {
+    bannerImagenInput.addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      var url = URL.createObjectURL(file);
+      setBannerImagenPreview(url);
+    });
+  }
+  var formBanner = document.getElementById("formBanner");
+  if (formBanner) {
+    formBanner.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var err = document.getElementById("bannerFormError");
+      if (err) {
+        err.hidden = true;
+        err.textContent = "";
+      }
+      var id = document.getElementById("bannerId").value.trim();
+      var fd = new FormData(formBanner);
+      if (!document.getElementById("bannerActivo").checked) {
+        fd.set("activo", "0");
+      } else {
+        fd.set("activo", "1");
+      }
+      var btn = document.getElementById("bannerSaveBtn");
+      if (btn) btn.disabled = true;
+      var path = id ? "/banners/" + id : "/banners";
+      api(path, { method: "POST", formData: fd }).then(function (res) {
+        if (btn) btn.disabled = false;
+        if (!res.ok) {
+          var msg = (res.data && res.data.error) || "No se pudo guardar";
+          if (err) {
+            err.hidden = false;
+            err.textContent = msg;
+          }
+          showToast(msg);
+          return;
+        }
+        showToast(id ? "Slide actualizado" : "Slide creado");
+        resetBannerForm();
+        loadBanners();
+      });
+    });
+  }
+  var bannersList = document.getElementById("adminBannersList");
+  if (bannersList) {
+    bannersList.addEventListener("click", function (e) {
+      var editId = e.target.getAttribute("data-edit-banner");
+      var toggleId = e.target.getAttribute("data-toggle-banner");
+      var delId = e.target.getAttribute("data-del-banner");
+      if (editId) {
+        var item = bannersCache.find(function (b) {
+          return String(b.id) === String(editId);
+        });
+        if (item) showBannerForm(item);
+        return;
+      }
+      if (toggleId) {
+        var row = bannersCache.find(function (b) {
+          return String(b.id) === String(toggleId);
+        });
+        if (!row) return;
+        var next = !coerceBool(row.activo, true);
+        api("/banners/" + toggleId, { method: "PUT", body: { activo: next } }).then(function (res) {
+          if (!res.ok) {
+            showToast((res.data && res.data.error) || "No se pudo actualizar");
+            return;
+          }
+          showToast(next ? "Slide activo" : "Slide oculto");
+          loadBanners();
+        });
+        return;
+      }
+      if (delId && confirm("¿Eliminar este slide del Hero?")) {
+        api("/banners/" + delId, { method: "DELETE" }).then(function (res) {
+          if (!res.ok) {
+            showToast((res.data && res.data.error) || "No se pudo eliminar");
+            return;
+          }
+          showToast("Slide eliminado");
+          if (document.getElementById("bannerId").value === String(delId)) resetBannerForm();
+          loadBanners();
+        });
+      }
     });
   }
 

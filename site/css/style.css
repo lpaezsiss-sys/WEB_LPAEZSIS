@@ -614,6 +614,76 @@ body.nav-open {
   object-position: center 50%;
 }
 
+/* Hero managed by JS (api/banners) */
+.hero--managed .hero-media__slide,
+.hero--managed .hero-media img.hero-media__slide {
+  animation: none;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 0.6s ease;
+}
+
+.hero--managed .hero-media__slide.is-active,
+.hero--managed .hero-media img.hero-media__slide.is-active {
+  opacity: 1;
+}
+
+.hero-slider-nav {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.hero-slider-btn,
+.hero-slider-dots,
+.hero-dot {
+  pointer-events: auto;
+}
+
+.hero-slider-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hero-slider-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.hero-slider-dots {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.hero-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+}
+
+.hero-dot.is-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
 .hero-scrim {
   position: absolute;
   inset: 0;

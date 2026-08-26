@@ -7,7 +7,7 @@
   <title>Admin | LPAEZsis</title>
   <base href="/admin/">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
-  <link rel="stylesheet" href="css/admin.css?v=11">
+  <link rel="stylesheet" href="css/admin.css?v=12">
 </head>
 <body>
   <div id="loginView" class="login-view">
@@ -32,6 +32,7 @@
         <button type="button" class="app-tab" data-tab="clientes">Clientes</button>
         <button type="button" class="app-tab" data-tab="soluciones">Soluciones</button>
         <button type="button" class="app-tab" data-tab="sectores">Sectores</button>
+        <button type="button" class="app-tab" data-tab="banners">Banners Hero</button>
         <button type="button" class="app-tab" data-tab="orders">Pedidos</button>
         <button type="button" class="app-tab" data-tab="quotes">Cotizaciones</button>
         <button type="button" class="app-tab" data-tab="contacts">Mensajes</button>
@@ -250,6 +251,94 @@
         <p class="error" id="sectoresFormError" hidden></p>
       </section>
 
+      <section class="view admin-panel" id="bannersView" hidden>
+        <div class="toolbar">
+          <h2>Banners Hero</h2>
+          <p class="meta" style="margin:0">Slides del Hero principal (imagen, título, textos y botones).</p>
+          <button type="button" class="btn btn-primary" id="bannerNewBtn">Nuevo slide</button>
+        </div>
+
+        <form id="formBanner" class="card admin-form" hidden>
+          <input type="hidden" name="id" id="bannerId" value="">
+          <input type="hidden" name="imagen_url" id="bannerImagenUrl" value="">
+
+          <div class="form-group">
+            <label for="bannerTitulo">Título Principal</label>
+            <input type="text" id="bannerTitulo" name="titulo" required maxlength="255"
+              placeholder="Ej. Soluciones industriales para optimizar tu línea de producción">
+          </div>
+          <div class="form-group">
+            <label for="bannerSubtitulo">Subtítulo / Bajada</label>
+            <textarea id="bannerSubtitulo" name="subtitulo" rows="3" maxlength="1000"
+              placeholder="Texto de apoyo bajo el título"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="bannerImagen">Imagen de fondo</label>
+            <input type="file" id="bannerImagen" name="imagen" accept="image/*">
+            <p class="hint-text">Recomendado 1920×800px (JPG/WebP). Si editas sin archivo, se conserva la actual.</p>
+            <div class="sector-admin-preview" id="bannerImagenPreviewWrap" hidden>
+              <img id="bannerImagenPreview" alt="Vista previa del banner">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerTextoBtn1">Botón Primario — Texto</label>
+              <input type="text" id="bannerTextoBtn1" name="texto_btn_1" maxlength="120" placeholder="Pedir Cotización">
+            </div>
+            <div class="form-group">
+              <label for="bannerLinkBtn1">Botón Primario — URL</label>
+              <input type="text" id="bannerLinkBtn1" name="link_btn_1" maxlength="500" placeholder="contacto.html">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerTextoBtn2">Botón Secundario — Texto</label>
+              <input type="text" id="bannerTextoBtn2" name="texto_btn_2" maxlength="120" placeholder="Evaluar Mi Aplicación">
+            </div>
+            <div class="form-group">
+              <label for="bannerLinkBtn2">Botón Secundario — URL</label>
+              <input type="text" id="bannerLinkBtn2" name="link_btn_2" maxlength="500" placeholder="catalogo.html?tipo=equipo">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerOrden">Orden</label>
+              <input type="number" id="bannerOrden" name="orden" value="0">
+            </div>
+            <label class="check-row" for="bannerActivo" style="align-self:end;margin-bottom:0.85rem">
+              <input type="checkbox" id="bannerActivo" name="activo" value="1" checked>
+              <span>Activo (visible en el home)</span>
+            </label>
+          </div>
+
+          <div class="dialog-actions" style="justify-content:flex-start;margin-top:0.5rem">
+            <button type="submit" class="btn btn-primary" id="bannerSaveBtn">Guardar Slide</button>
+            <button type="button" class="ghost" id="bannerResetBtn">Cancelar</button>
+          </div>
+          <p class="error" id="bannerFormError" hidden></p>
+        </form>
+
+        <hr class="admin-hr">
+        <h3>Slides registrados</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Título</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminBannersList"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="view" id="ordersView" hidden>
         <div class="toolbar"><h2>Pedidos</h2></div>
         <div class="grid" id="ordersList"></div>
@@ -430,6 +519,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=27"></script>
+  <script src="js/admin.js?v=28"></script>
 </body>
 </html>

@@ -164,6 +164,41 @@ final class AdminApi
             return;
         }
 
+        // Banners Hero
+        if ($method === 'GET' && $sub === '/banners') {
+            PublicApi::ensureBannersSchema();
+            $rows = self::pdo()->query(
+                'SELECT * FROM banners ORDER BY orden ASC, id ASC'
+            )->fetchAll();
+            Response::json(['banners' => $rows]);
+            return;
+        }
+        if ($method === 'POST' && $sub === '/banners') {
+            // JSON create OR multipart create
+            if (!empty($_FILES) || (isset($_SERVER['CONTENT_TYPE']) && stripos((string) $_SERVER['CONTENT_TYPE'], 'multipart/') === 0)) {
+                self::saveBannerForm(null);
+            } else {
+                self::createBanner();
+            }
+            return;
+        }
+        if ($method === 'PUT' && preg_match('#^/banners/(\d+)$#', $sub, $m)) {
+            self::updateBanner((int) $m[1]);
+            return;
+        }
+        if ($method === 'POST' && preg_match('#^/banners/(\d+)$#', $sub, $m)) {
+            self::saveBannerForm((int) $m[1]);
+            return;
+        }
+        if ($method === 'POST' && preg_match('#^/banners/(\d+)/imagen$#', $sub, $m)) {
+            self::uploadBannerImagen((int) $m[1]);
+            return;
+        }
+        if ($method === 'DELETE' && preg_match('#^/banners/(\d+)$#', $sub, $m)) {
+            self::deleteBanner((int) $m[1]);
+            return;
+        }
+
         if ($method === 'GET' && $sub === '/products') {
             $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
             $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -841,6 +876,180 @@ final class AdminApi
     {
         PublicApi::ensureSectoresSchema();
         self::pdo()->prepare('DELETE FROM sectores WHERE id = ?')->execute([$id]);
+        Response::json(['ok' => true]);
+    }
+
+    private static function createBanner(): void
+    {
+        PublicApi::ensureBannersSchema();
+        $b = self::body();
+        $titulo = trim((string) ($b['titulo'] ?? ''));
+        if ($titulo === '') {
+            Response::error('titulo es requerido');
+            return;
+        }
+        self::pdo()->prepare(
+            'INSERT INTO banners
+             (titulo, subtitulo, imagen_url, texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden, activo)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        )->execute([
+            $titulo,
+            trim((string) ($b['subtitulo'] ?? '')),
+            trim((string) ($b['imagen_url'] ?? '')),
+            trim((string) ($b['texto_btn_1'] ?? '')),
+            trim((string) ($b['link_btn_1'] ?? '')),
+            trim((string) ($b['texto_btn_2'] ?? '')),
+            trim((string) ($b['link_btn_2'] ?? '')),
+            (int) ($b['orden'] ?? 0),
+            array_key_exists('activo', $b) ? (!empty($b['activo']) ? 1 : 0) : 1,
+        ]);
+        Response::json(['id' => (int) self::pdo()->lastInsertId()]);
+    }
+
+    private static function updateBanner(int $id): void
+    {
+        PublicApi::ensureBannersSchema();
+        $b = self::body();
+        if (array_key_exists('activo', $b)) {
+            $b['activo'] = !empty($b['activo']) ? 1 : 0;
+        }
+        $fields = [
+            'titulo', 'subtitulo', 'imagen_url',
+            'texto_btn_1', 'link_btn_1', 'texto_btn_2', 'link_btn_2',
+            'orden', 'activo',
+        ];
+        $sets = [];
+        $vals = [];
+        foreach ($fields as $f) {
+            if (!array_key_exists($f, $b)) {
+                continue;
+            }
+            $val = $b[$f];
+            if ($f === 'orden') {
+                $val = (int) $val;
+            } elseif ($f !== 'activo') {
+                $val = trim((string) $val);
+            }
+            $sets[] = "$f = ?";
+            $vals[] = $val;
+        }
+        if (!$sets) {
+            Response::error('Sin cambios');
+            return;
+        }
+        $vals[] = $id;
+        self::pdo()->prepare('UPDATE banners SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($vals);
+        $stmt = self::pdo()->prepare('SELECT * FROM banners WHERE id = ?');
+        $stmt->execute([$id]);
+        Response::json($stmt->fetch() ?: ['ok' => true]);
+    }
+
+    /**
+     * POST multipart /banners[/{id}]: crea o actualiza + sube imagen a img/uploads/banners/.
+     */
+    private static function saveBannerForm(?int $id): void
+    {
+        PublicApi::ensureBannersSchema();
+        $existing = null;
+        if ($id !== null) {
+            $stmt = self::pdo()->prepare('SELECT * FROM banners WHERE id = ? LIMIT 1');
+            $stmt->execute([$id]);
+            $existing = $stmt->fetch();
+            if (!$existing) {
+                Response::error('Banner no encontrado', 404);
+                return;
+            }
+        }
+
+        $titulo = trim((string) ($_POST['titulo'] ?? ($existing['titulo'] ?? '')));
+        $subtitulo = trim((string) ($_POST['subtitulo'] ?? ($existing['subtitulo'] ?? '')));
+        $texto1 = trim((string) ($_POST['texto_btn_1'] ?? ($existing['texto_btn_1'] ?? '')));
+        $link1 = trim((string) ($_POST['link_btn_1'] ?? ($existing['link_btn_1'] ?? '')));
+        $texto2 = trim((string) ($_POST['texto_btn_2'] ?? ($existing['texto_btn_2'] ?? '')));
+        $link2 = trim((string) ($_POST['link_btn_2'] ?? ($existing['link_btn_2'] ?? '')));
+        $orden = isset($_POST['orden'])
+            ? (int) $_POST['orden']
+            : (int) ($existing['orden'] ?? 0);
+        $activo = isset($_POST['activo'])
+            ? (!empty($_POST['activo']) && (string) $_POST['activo'] !== '0' ? 1 : 0)
+            : (int) ($existing['activo'] ?? 1);
+        $imagen = trim((string) ($existing['imagen_url'] ?? ''));
+        if (isset($_POST['imagen_url']) && trim((string) $_POST['imagen_url']) !== '') {
+            $imagen = trim((string) $_POST['imagen_url']);
+        }
+
+        $file = null;
+        if (!empty($_FILES['imagen']) && is_array($_FILES['imagen'])) {
+            $file = $_FILES['imagen'];
+        } elseif (!empty($_FILES['file']) && is_array($_FILES['file'])) {
+            $file = $_FILES['file'];
+        } elseif (!empty($_FILES['image']) && is_array($_FILES['image'])) {
+            $file = $_FILES['image'];
+        }
+        if ($file && (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            $uploaded = Upload::storeImage($file, 'banners');
+            if (!$uploaded['ok']) {
+                Response::error((string) $uploaded['error']);
+                return;
+            }
+            $imagen = (string) $uploaded['url'];
+        }
+
+        if ($titulo === '') {
+            Response::error('titulo es requerido');
+            return;
+        }
+
+        if ($id === null) {
+            self::pdo()->prepare(
+                'INSERT INTO banners
+                 (titulo, subtitulo, imagen_url, texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden, activo)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            )->execute([$titulo, $subtitulo, $imagen, $texto1, $link1, $texto2, $link2, $orden, $activo]);
+            $id = (int) self::pdo()->lastInsertId();
+        } else {
+            self::pdo()->prepare(
+                'UPDATE banners SET
+                    titulo = ?, subtitulo = ?, imagen_url = ?,
+                    texto_btn_1 = ?, link_btn_1 = ?, texto_btn_2 = ?, link_btn_2 = ?,
+                    orden = ?, activo = ?
+                 WHERE id = ?'
+            )->execute([$titulo, $subtitulo, $imagen, $texto1, $link1, $texto2, $link2, $orden, $activo, $id]);
+        }
+
+        $out = self::pdo()->prepare('SELECT * FROM banners WHERE id = ?');
+        $out->execute([$id]);
+        Response::json($out->fetch() ?: ['ok' => true, 'id' => $id]);
+    }
+
+    private static function uploadBannerImagen(int $id): void
+    {
+        PublicApi::ensureBannersSchema();
+        $stmt = self::pdo()->prepare('SELECT id FROM banners WHERE id = ? LIMIT 1');
+        $stmt->execute([$id]);
+        if (!$stmt->fetch()) {
+            Response::error('Banner no encontrado', 404);
+            return;
+        }
+        $file = $_FILES['imagen'] ?? $_FILES['file'] ?? $_FILES['image'] ?? null;
+        if (!$file || !is_array($file)) {
+            Response::error('Archivo de imagen requerido');
+            return;
+        }
+        $uploaded = Upload::storeImage($file, 'banners');
+        if (!$uploaded['ok']) {
+            Response::error((string) $uploaded['error']);
+            return;
+        }
+        $url = (string) $uploaded['url'];
+        self::pdo()->prepare('UPDATE banners SET imagen_url = ? WHERE id = ?')->execute([$url, $id]);
+        Response::json(['ok' => true, 'url' => $url, 'imagen_url' => $url]);
+    }
+
+    private static function deleteBanner(int $id): void
+    {
+        PublicApi::ensureBannersSchema();
+        self::pdo()->prepare('DELETE FROM banners WHERE id = ?')->execute([$id]);
         Response::json(['ok' => true]);
     }
 
