@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8">
+<head><meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>Admin | LPAEZsis</title>
-  <base href="/admin/">
+  <base href="./">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
-  <link rel="stylesheet" href="css/admin.css?v=7">
+  <link rel="stylesheet" href="css/admin.css?v=13">
 </head>
 <body>
   <div id="loginView" class="login-view">
@@ -26,8 +26,13 @@
     <header class="app-header">
       <strong>LPAEZsis</strong>
       <nav class="app-tabs" id="appTabs">
-        <button type="button" class="app-tab is-active" data-tab="products">Productos</button>
+        <button type="button" class="app-tab is-active" data-tab="equipos">Equipos</button>
+        <button type="button" class="app-tab" data-tab="repuestos">Repuestos</button>
         <button type="button" class="app-tab" data-tab="brands">Marcas</button>
+        <button type="button" class="app-tab" data-tab="clientes">Clientes</button>
+        <button type="button" class="app-tab" data-tab="soluciones">Soluciones</button>
+        <button type="button" class="app-tab" data-tab="sectores">Sectores</button>
+        <button type="button" class="app-tab" data-tab="banners">Banners Hero</button>
         <button type="button" class="app-tab" data-tab="orders">Pedidos</button>
         <button type="button" class="app-tab" data-tab="quotes">Cotizaciones</button>
         <button type="button" class="app-tab" data-tab="contacts">Mensajes</button>
@@ -36,7 +41,7 @@
       <button type="button" class="ghost" id="logoutBtn" style="color:#fff;border-color:rgba(255,255,255,.35)">Salir</button>
     </header>
     <main class="app-main">
-      <section class="view" id="productsView">
+      <section class="view" id="equiposView">
         <div class="catalog-layout">
           <aside class="cat-sidebar" aria-label="Categorías">
             <div class="cat-sidebar__head">
@@ -48,15 +53,38 @@
           <div class="catalog-main">
             <div class="catalog-main__head">
               <div>
-                <h2 id="catalogTitle">Productos</h2>
+                <h2 id="catalogTitle">Equipos</h2>
                 <p class="catalog-meta" id="catalogMeta"></p>
               </div>
               <div class="catalog-main__actions">
                 <button type="button" class="ghost" id="editCategoryBtn" hidden>Editar categoría</button>
-                <button type="button" id="addProductBtn">+ Producto</button>
+                <button type="button" id="addProductBtn">+ Equipo</button>
               </div>
             </div>
             <div class="product-rows" id="productsList"></div>
+          </div>
+        </div>
+      </section>
+      <section class="view" id="repuestosView" hidden>
+        <div class="catalog-layout">
+          <aside class="cat-sidebar" aria-label="Categorías de repuestos">
+            <div class="cat-sidebar__head">
+              <h2>Categorías</h2>
+              <p class="hint-text" style="margin:0.35rem 0 0">Misma taxonomía; listado filtrado por tipo Repuesto.</p>
+            </div>
+            <div class="cat-sidebar__list" id="catSidebarListRepuestos"></div>
+          </aside>
+          <div class="catalog-main">
+            <div class="catalog-main__head">
+              <div>
+                <h2 id="catalogTitleRepuestos">Repuestos</h2>
+                <p class="catalog-meta" id="catalogMetaRepuestos"></p>
+              </div>
+              <div class="catalog-main__actions">
+                <button type="button" id="addRepuestoBtn">+ Repuesto</button>
+              </div>
+            </div>
+            <div class="product-rows" id="repuestosList"></div>
           </div>
         </div>
       </section>
@@ -64,6 +92,253 @@
         <div class="toolbar"><h2>Marcas</h2><button type="button" id="addBrandBtn">Nueva marca</button></div>
         <div class="grid" id="brandsList"></div>
       </section>
+
+      <section class="view admin-panel" id="clientesView" hidden>
+        <div class="toolbar">
+          <h2>Gestión de Clientes y Casos de Éxito</h2>
+        </div>
+
+        <form id="formCliente" class="card admin-form">
+          <input type="hidden" name="id" id="clienteId" value="">
+          <input type="hidden" name="logo_url" id="clienteLogoUrl" value="">
+
+          <div class="form-group">
+            <label for="clienteNombre">Nombre de la Empresa</label>
+            <input type="text" id="clienteNombre" name="nombre" placeholder="Ej. Embonor, Carozzi" required>
+          </div>
+
+          <div class="form-group">
+            <label for="clienteLogo">Logo (PNG, WEBP, SVG o JPG · fondo transparente recomendado)</label>
+            <input type="file" id="clienteLogo" name="logo" accept="image/png,image/webp,image/svg+xml,image/jpeg,image/gif">
+            <div class="client-logo-preview" id="clienteLogoPreviewWrap" hidden>
+              <img id="clienteLogoPreview" alt="Vista previa del logo">
+            </div>
+            <p class="hint-text">Si editas sin elegir archivo, se conserva el logo actual.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="clienteOrden">Orden de Prioridad</label>
+            <input type="number" id="clienteOrden" name="orden" value="0">
+          </div>
+
+          <label class="check-row" for="clienteActivo">
+            <input type="checkbox" id="clienteActivo" name="activo" checked>
+            <span>Activo (visible en el home)</span>
+          </label>
+
+          <div class="dialog-actions" style="justify-content:flex-start;margin-top:0.5rem">
+            <button type="submit" class="btn btn-primary" id="clienteSaveBtn">Guardar Cliente</button>
+            <button type="button" class="ghost" id="clienteResetBtn">Limpiar</button>
+          </div>
+          <p class="error" id="clienteFormError" hidden></p>
+        </form>
+
+        <hr class="admin-hr">
+
+        <h3>Clientes Registrados</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Logo</th>
+                <th>Nombre</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminClientesList">
+              <!-- Se llena dinámicamente con JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="view admin-panel" id="solucionesView" hidden>
+        <div class="toolbar">
+          <h2>Soluciones para tu planta</h2>
+          <p class="meta" style="margin:0">Hasta 8 soluciones activas visibles en el home.</p>
+        </div>
+
+        <form id="formSolucion" class="card admin-form">
+          <input type="hidden" name="id" id="solucionId" value="">
+          <input type="hidden" name="imagen_url" id="solucionImagenUrl" value="">
+
+          <div class="form-group">
+            <label for="solucionTitulo">Título</label>
+            <input type="text" id="solucionTitulo" name="titulo" placeholder="Ej. Secadores" required maxlength="150">
+          </div>
+
+          <div class="form-group">
+            <label for="solucionSlug">Slug (opcional)</label>
+            <input type="text" id="solucionSlug" name="slug" placeholder="se genera desde el título" maxlength="50">
+          </div>
+
+          <div class="form-group">
+            <label for="solucionBullet1">Bullet 1</label>
+            <input type="text" id="solucionBullet1" name="bullet_1" maxlength="255">
+          </div>
+          <div class="form-group">
+            <label for="solucionBullet2">Bullet 2</label>
+            <input type="text" id="solucionBullet2" name="bullet_2" maxlength="255">
+          </div>
+          <div class="form-group">
+            <label for="solucionBullet3">Bullet 3</label>
+            <input type="text" id="solucionBullet3" name="bullet_3" maxlength="255">
+          </div>
+
+          <div class="form-group">
+            <label for="solucionCtaTexto">Texto del CTA</label>
+            <input type="text" id="solucionCtaTexto" name="cta_texto" placeholder="Ver catálogo…" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label for="solucionCtaUrl">URL del CTA</label>
+            <input type="text" id="solucionCtaUrl" name="cta_url" placeholder="catalogo.html?category=…" maxlength="255">
+          </div>
+
+          <div class="form-group">
+            <label for="solucionImagen">Imagen del panel</label>
+            <input type="file" id="solucionImagen" name="imagen" accept="image/png,image/webp,image/jpeg,image/gif">
+            <div class="client-logo-preview" id="solucionImagenPreviewWrap" hidden>
+              <img id="solucionImagenPreview" alt="Vista previa">
+            </div>
+            <p class="hint-text">Si editas sin elegir archivo, se conserva la imagen actual.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="solucionOrden">Orden</label>
+            <input type="number" id="solucionOrden" name="orden" value="0">
+          </div>
+
+          <label class="check-row" for="solucionActivo">
+            <input type="checkbox" id="solucionActivo" name="activo" checked>
+            <span>Activo (visible en el home)</span>
+          </label>
+
+          <div class="dialog-actions" style="justify-content:flex-start;margin-top:0.5rem">
+            <button type="submit" class="btn btn-primary" id="solucionSaveBtn">Guardar Solución</button>
+            <button type="button" class="ghost" id="solucionResetBtn">Limpiar</button>
+          </div>
+          <p class="error" id="solucionFormError" hidden></p>
+        </form>
+
+        <hr class="admin-hr">
+
+        <h3>Soluciones registradas</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Título</th>
+                <th>Slug</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminSolucionesList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="view admin-panel" id="sectoresView" hidden>
+        <div class="toolbar">
+          <h2>Sectores donde trabajamos</h2>
+          <p class="meta" style="margin:0">Edita nombre, enlace e imagen de los 4 sectores del home.</p>
+        </div>
+        <div id="sectoresCards" class="sectores-admin-grid"></div>
+        <p class="error" id="sectoresFormError" hidden></p>
+      </section>
+
+      <section class="view admin-panel" id="bannersView" hidden>
+        <div class="toolbar">
+          <h2>Banners Hero</h2>
+          <p class="meta" style="margin:0">Slides del Hero principal (imagen, título, textos y botones).</p>
+          <button type="button" class="btn btn-primary" id="bannerNewBtn">Nuevo slide</button>
+        </div>
+
+        <form id="formBanner" class="card admin-form" hidden>
+          <input type="hidden" name="id" id="bannerId" value="">
+          <input type="hidden" name="imagen_url" id="bannerImagenUrl" value="">
+
+          <div class="form-group">
+            <label for="bannerTitulo">Título Principal</label>
+            <input type="text" id="bannerTitulo" name="titulo" required maxlength="255"
+              placeholder="Ej. Soluciones industriales para optimizar tu línea de producción">
+          </div>
+          <div class="form-group">
+            <label for="bannerSubtitulo">Subtítulo / Bajada</label>
+            <textarea id="bannerSubtitulo" name="subtitulo" rows="3" maxlength="1000"
+              placeholder="Texto de apoyo bajo el título"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="bannerImagen">Imagen de fondo</label>
+            <input type="file" id="bannerImagen" name="imagen" accept="image/*">
+            <p class="hint-text">Recomendado 1920×800px (JPG/WebP). Si editas sin archivo, se conserva la actual.</p>
+            <div class="sector-admin-preview" id="bannerImagenPreviewWrap" hidden>
+              <img id="bannerImagenPreview" alt="Vista previa del banner">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerTextoBtn1">Botón Primario — Texto</label>
+              <input type="text" id="bannerTextoBtn1" name="texto_btn_1" maxlength="120" placeholder="Pedir Cotización">
+            </div>
+            <div class="form-group">
+              <label for="bannerLinkBtn1">Botón Primario — URL</label>
+              <input type="text" id="bannerLinkBtn1" name="link_btn_1" maxlength="500" placeholder="contacto.html">
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerTextoBtn2">Botón Secundario — Texto</label>
+              <input type="text" id="bannerTextoBtn2" name="texto_btn_2" maxlength="120" placeholder="Evaluar Mi Aplicación">
+            </div>
+            <div class="form-group">
+              <label for="bannerLinkBtn2">Botón Secundario — URL</label>
+              <input type="text" id="bannerLinkBtn2" name="link_btn_2" maxlength="500" placeholder="catalogo.html?tipo=equipo">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="bannerOrden">Orden</label>
+              <input type="number" id="bannerOrden" name="orden" value="0">
+            </div>
+            <label class="check-row" for="bannerActivo" style="align-self:end;margin-bottom:0.85rem">
+              <input type="checkbox" id="bannerActivo" name="activo" value="1" checked>
+              <span>Activo (visible en el home)</span>
+            </label>
+          </div>
+
+          <div class="dialog-actions" style="justify-content:flex-start;margin-top:0.5rem">
+            <button type="submit" class="btn btn-primary" id="bannerSaveBtn">Guardar Slide</button>
+            <button type="button" class="ghost" id="bannerResetBtn">Cancelar</button>
+          </div>
+          <p class="error" id="bannerFormError" hidden></p>
+        </form>
+
+        <hr class="admin-hr">
+        <h3>Slides registrados</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Título</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminBannersList"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="view" id="ordersView" hidden>
         <div class="toolbar"><h2>Pedidos</h2></div>
         <div class="grid" id="ordersList"></div>
@@ -116,12 +391,19 @@
       <label>Nombre</label><input name="name" required>
       <label>Slug (opcional)</label><input name="slug">
       <label>Categoría</label><select name="category_id" id="productCategory" required></select>
+      <div class="form-group">
+        <label for="productoIndustria">Industria / Sector</label>
+        <select id="productoIndustria" name="industria_id" class="form-control">
+          <option value="">-- Seleccionar Industria --</option>
+        </select>
+      </div>
       <label>Marca</label><select name="brand_id" id="productBrand"><option value="">—</option></select>
       <label>Modo de venta</label>
       <select name="sale_mode">
         <option value="buy">Comprar</option>
         <option value="quote">Cotizar</option>
       </select>
+      <input type="hidden" name="tipo" id="productTipo" value="equipo">
       <label>Stock</label>
       <select name="stock_status">
         <option value="in_stock">En stock</option>
@@ -137,10 +419,24 @@
         <span class="image-pick__hint" id="productImageHint">Pincha para elegir imagen</span>
       </button>
       <input type="hidden" name="image_url" id="productImageUrl">
+      <label for="productFichaPdf">Ficha técnica (PDF)</label>
+      <input type="file" id="productFichaPdf" name="ficha_pdf" accept=".pdf,application/pdf">
+      <input type="hidden" name="ficha_pdf_url" id="productFichaPdfUrl" value="">
+      <p class="hint-text" id="productFichaPdfHint">Opcional. Máx. 15 MB. Al guardar se sube a <code>img/fichas/</code>.</p>
+      <p id="productFichaPdfLinkWrap" hidden>
+        <a id="productFichaPdfLink" href="#" target="_blank" rel="noopener">Ver PDF actual</a>
+        <button type="button" class="ghost" id="productFichaPdfClear">Quitar</button>
+      </p>
       <label>SEO title</label><input name="seo_title">
       <label>SEO description</label><textarea name="seo_description" rows="2"></textarea>
-      <label><input type="checkbox" name="is_featured"> Destacado</label>
-      <label><input type="checkbox" name="is_active" checked> Activo</label>
+      <label class="check-row" for="productIsFeatured">
+        <input type="checkbox" name="is_featured" id="productIsFeatured">
+        <span>Destacado</span>
+      </label>
+      <label class="check-row" for="productIsActive">
+        <input type="checkbox" name="is_active" id="productIsActive" checked>
+        <span>Activo</span>
+      </label>
       <div class="dialog-actions">
         <button type="button" class="ghost" value="cancel" id="productCancel">Cancelar</button>
         <button type="submit">Guardar</button>
@@ -181,10 +477,29 @@
         <label>SEO description</label><textarea name="seo_description" rows="2"></textarea>
       </div>
       <label>Orden</label><input name="sort_order" type="number" value="0">
-      <label><input type="checkbox" name="is_active" checked> Activo</label>
+      <label class="check-row" for="simpleIsActive">
+        <input type="checkbox" name="is_active" id="simpleIsActive" checked>
+        <span>Activo</span>
+      </label>
       <div class="dialog-actions">
         <button type="button" class="ghost" id="simpleCancel">Cancelar</button>
         <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="videoDialog">
+    <form method="dialog" class="dialog-body" id="videoForm" novalidate>
+      <h3>Insertar video</h3>
+      <label for="videoFileInput">Archivo local (MP4, WEBM · máx. 50 MB)</label>
+      <input type="file" id="videoFileInput" accept="video/mp4,video/webm">
+      <label for="videoUrlField">O URL de YouTube / Vimeo / archivo</label>
+      <input type="text" id="videoUrlField" inputmode="url" autocomplete="off" placeholder="https://youtube.com/… · https://vimeo.com/… · /img/uploads/…">
+      <p class="hint-text">Tras subir un archivo se usará la URL del servidor. Enlaces de YouTube/Vimeo se insertan como iframe.</p>
+      <p class="error" id="videoError" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="videoCancel">Cancelar</button>
+        <button type="submit" id="videoApply">Insertar video</button>
       </div>
     </form>
   </dialog>
@@ -212,6 +527,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=14"></script>
+  <script src="js/admin.js?v=34"></script>
 </body>
 </html>
