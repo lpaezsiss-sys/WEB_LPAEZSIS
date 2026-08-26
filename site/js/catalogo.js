@@ -398,7 +398,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
       `<div class="product-card-actions catalog-card-actions">` +
       `<a class="btn btn-primary btn-sm" href="${escapeAttr(quote)}">Pedir cotización</a>` +
-      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">Descargar ficha técnica</button>` +
+      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}" data-datasheet-url="${escapeAttr(prod?.ficha_pdf_url || "")}">Descargar ficha técnica</button>` +
       `</div></div></article>`
     );
   }
@@ -590,11 +590,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       const slug = btn.getAttribute("data-datasheet") || "";
       const name = btn.getAttribute("data-datasheet-name") || "Producto";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      const fromAttr = (btn.getAttribute("data-datasheet-url") || "").trim();
+      let pdfUrl =
+        fromAttr ||
+        (slug ? `img/fichas/${encodeURIComponent(slug)}.pdf` : "img/fichas/");
+      if (pdfUrl && !/^https?:/i.test(pdfUrl) && pdfUrl.charAt(0) !== "/") {
+        pdfUrl = "/" + pdfUrl.replace(/^\.\//, "");
+      }
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
         `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
-        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
+        `<div class="empty-actions"><a class="btn btn-primary" href="${escapeAttr(pdfUrl)}" target="_blank" rel="noopener">Descargar PDF</a>` +
         `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
       if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
       else datasheetDialog.setAttribute("open", "");
