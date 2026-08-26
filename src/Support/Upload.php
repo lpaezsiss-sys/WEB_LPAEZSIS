@@ -18,6 +18,58 @@ final class Upload
     }
 
     /**
+     * Guarda un PDF en img/fichas/ (hermana de img/uploads/).
+     * @param array $file $_FILES entry
+     * @param string $preferredBase Nombre preferido sin extensión (slug del producto)
+     */
+    public static function storePdf(array $file, string $preferredBase = ''): array
+    {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            return ['ok' => false, 'error' => 'No se pudo subir el archivo'];
+        }
+        $tmp = (string) ($file['tmp_name'] ?? '');
+        if ($tmp === '' || !is_uploaded_file($tmp)) {
+            return ['ok' => false, 'error' => 'Archivo inválido'];
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($tmp) ?: '';
+        $origName = strtolower((string) ($file['name'] ?? ''));
+        $isPdf = ($mime === 'application/pdf') || (bool) preg_match('/\.pdf$/i', $origName);
+        if (!$isPdf) {
+            return ['ok' => false, 'error' => 'Solo se permiten archivos PDF'];
+        }
+        if (($file['size'] ?? 0) > 15 * 1024 * 1024) {
+            return ['ok' => false, 'error' => 'El PDF supera 15 MB'];
+        }
+
+        $uploadDir = (string) Config::get('UPLOAD_DIR');
+        $imgRoot = dirname(rtrim($uploadDir, '/\\'));
+        $dir = $imgRoot . DIRECTORY_SEPARATOR . 'fichas';
+        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+            return ['ok' => false, 'error' => 'No se pudo crear carpeta img/fichas'];
+        }
+
+        $base = strtolower(trim($preferredBase));
+        $base = preg_replace('/[^a-z0-9\-]+/', '-', $base) ?: '';
+        $base = trim((string) $base, '-');
+        if ($base === '') {
+            $base = 'ficha-' . bin2hex(random_bytes(6));
+        }
+        $name = $base . '.pdf';
+        $dest = $dir . DIRECTORY_SEPARATOR . $name;
+        if (!move_uploaded_file($tmp, $dest)) {
+            return ['ok' => false, 'error' => 'Error al guardar el PDF'];
+        }
+
+        return [
+            'ok' => true,
+            'url' => '/img/fichas/' . $name,
+            'type' => 'pdf',
+        ];
+    }
+
+    /**
      * @param array $file $_FILES entry
      * @param string $kind "image"|"video"|"auto"
      * @param string $subdir Optional subdirectory under UPLOAD_DIR (e.g. "sectores")

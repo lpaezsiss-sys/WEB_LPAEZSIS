@@ -200,6 +200,7 @@ final class AdminApi
         }
 
         if ($method === 'GET' && $sub === '/products') {
+            self::ensureProductFichaColumn();
             $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
             $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                         b.slug AS brand_slug, b.name AS brand_name,
@@ -220,6 +221,7 @@ final class AdminApi
             return;
         }
         if ($method === 'GET' && preg_match('#^/products/(\d+)$#', $sub, $m)) {
+            self::ensureProductFichaColumn();
             $stmt = self::pdo()->prepare('SELECT * FROM products WHERE id = ? LIMIT 1');
             $stmt->execute([(int) $m[1]]);
             $row = $stmt->fetch();
@@ -348,20 +350,25 @@ final class AdminApi
             return;
         }
         $kind = strtolower((string) ($_POST['kind'] ?? 'auto'));
-        if ($kind !== 'image' && $kind !== 'video') {
+        if ($kind !== 'image' && $kind !== 'video' && $kind !== 'pdf') {
             $kind = 'auto';
         }
         $subdir = trim((string) ($_POST['subdir'] ?? ''));
-        $result = $kind === 'video'
-            ? Upload::storeVideo($file, $subdir)
-            : ($kind === 'image' ? Upload::storeImage($file, $subdir) : Upload::store($file, 'auto', $subdir));
+        if ($kind === 'pdf') {
+            $preferred = trim((string) ($_POST['slug'] ?? $_POST['filename'] ?? ''));
+            $result = Upload::storePdf($file, $preferred);
+        } else {
+            $result = $kind === 'video'
+                ? Upload::storeVideo($file, $subdir)
+                : ($kind === 'image' ? Upload::storeImage($file, $subdir) : Upload::store($file, 'auto', $subdir));
+        }
         if (!$result['ok']) {
             Response::error((string) $result['error']);
             return;
         }
         Response::json([
             'url' => $result['url'],
-            'type' => $result['type'] ?? ($kind === 'video' ? 'video' : 'image'),
+            'type' => $result['type'] ?? ($kind === 'video' ? 'video' : ($kind === 'pdf' ? 'pdf' : 'image')),
         ]);
     }
 
@@ -1055,6 +1062,7 @@ final class AdminApi
 
     private static function createProduct(): void
     {
+        self::ensureProductFichaColumn();
         $b = self::body();
         $name = trim((string) ($b['name'] ?? ''));
         $categoryId = (int) ($b['category_id'] ?? 0);
@@ -1077,8 +1085,8 @@ final class AdminApi
         self::pdo()->prepare(
             'INSERT INTO products
              (industria_id, category_id, brand_id, slug, name, description, sale_mode, tipo, stock_status, price_clp, image_url,
-              is_featured, is_active, seo_title, seo_description, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+              ficha_pdf_url, is_featured, is_active, seo_title, seo_description, sort_order)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
             $industriaId,
             $categoryId,
@@ -1092,6 +1100,7 @@ final class AdminApi
             array_key_exists('price_clp', $b) && $b['price_clp'] !== null && $b['price_clp'] !== ''
                 ? (int) $b['price_clp'] : null,
             $b['image_url'] ?? null,
+            trim((string) ($b['ficha_pdf_url'] ?? '')) ?: null,
             !empty($b['is_featured']) ? 1 : 0,
             !empty($b['is_active']) || !array_key_exists('is_active', $b) ? 1 : 0,
             $b['seo_title'] ?? null,
@@ -1114,6 +1123,7 @@ final class AdminApi
 
     private static function updateProduct(int $id): void
     {
+        self::ensureProductFichaColumn();
         $b = self::body();
         // Normalize booleans / empty brand
         if (array_key_exists('is_featured', $b)) {
@@ -1136,12 +1146,15 @@ final class AdminApi
         if (array_key_exists('price_clp', $b) && $b['price_clp'] === '') {
             $b['price_clp'] = null;
         }
+        if (array_key_exists('ficha_pdf_url', $b)) {
+            $b['ficha_pdf_url'] = trim((string) $b['ficha_pdf_url']) ?: null;
+        }
         if (array_key_exists('tipo', $b) || array_key_exists('sale_mode', $b)) {
             $b['tipo'] = self::normalizeProductTipo($b);
         }
         $fields = [
             'industria_id', 'category_id', 'brand_id', 'slug', 'name', 'description', 'sale_mode', 'tipo', 'stock_status',
-            'price_clp', 'image_url', 'is_featured', 'is_active', 'seo_title', 'seo_description', 'sort_order',
+            'price_clp', 'image_url', 'ficha_pdf_url', 'is_featured', 'is_active', 'seo_title', 'seo_description', 'sort_order',
         ];
         $sets = ['updated_at = NOW()'];
         $vals = [];
@@ -1185,5 +1198,39 @@ final class AdminApi
         $stmt = self::pdo()->prepare("SELECT * FROM {$table} WHERE id = ?");
         $stmt->execute([$id]);
         Response::json($stmt->fetch() ?: ['ok' => true]);
+    }
+
+    /** Asegura columna products.ficha_pdf_url y seed del PDF Columbia HL7200 si existe en disco. */
+    public static function ensureProductFichaColumn(): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
+        $pdo = self::pdo();
+        try {
+            $cols = $pdo->query('SHOW COLUMNS FROM products LIKE \'ficha_pdf_url\'')->fetchAll();
+            if (!$cols) {
+                $pdo->exec(
+                    'ALTER TABLE products
+                     ADD COLUMN ficha_pdf_url VARCHAR(500) NULL DEFAULT NULL
+                     AFTER image_url'
+                );
+            }
+        } catch (\Throwable $e) {
+            // ignore if no permission / already exists
+        }
+        try {
+            $slug = 'paletizador-alto-nivel-columbia-hl7200';
+            $url = '/img/fichas/' . $slug . '.pdf';
+            $stmt = $pdo->prepare(
+                'UPDATE products SET ficha_pdf_url = ?
+                 WHERE slug = ? AND (ficha_pdf_url IS NULL OR ficha_pdf_url = \'\')'
+            );
+            $stmt->execute([$url, $slug]);
+        } catch (\Throwable $e) {
+            // ignore
+        }
     }
 }

@@ -295,6 +295,7 @@ final class PublicApi
     /** Lista plana de productos para api/productos.php (filtra por ?brand= / ?marca= / ?tipo=). */
     private static function productosList(): void
     {
+        AdminApi::ensureProductFichaColumn();
         $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
         $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
         $brand = isset($_GET['brand']) ? trim((string) $_GET['brand']) : '';
@@ -640,6 +641,7 @@ final class PublicApi
 
     private static function products(): void
     {
+        AdminApi::ensureProductFichaColumn();
         $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
         $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -669,6 +671,7 @@ final class PublicApi
 
     private static function productDetail(string $slug): void
     {
+        AdminApi::ensureProductFichaColumn();
         $stmt = self::pdo()->prepare(
             'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                     b.slug AS brand_slug, b.name AS brand_name

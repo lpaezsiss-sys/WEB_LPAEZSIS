@@ -835,6 +835,7 @@
         setFormImagePreview(resolveProductImage(product));
         document.getElementById("productImageUrl").value = "";
       }
+      setProductFichaPdf(product.ficha_pdf_url || "");
       form.seo_title.value = product.seo_title || "";
       form.seo_description.value = product.seo_description || "";
       form.is_featured.checked = coerceBool(product.is_featured, false);
@@ -845,6 +846,7 @@
       form.sale_mode.value = productListTipo === "repuesto" ? "buy" : "quote";
       if (form.industria_id) form.industria_id.value = "";
       setFormImagePreview("");
+      setProductFichaPdf("");
     }
     document.getElementById("productDialogTitle").textContent = product
       ? productListTipo === "repuesto"
@@ -865,6 +867,67 @@
       },
     });
   });
+
+  function setProductFichaPdf(url) {
+    var field = document.getElementById("productFichaPdfUrl");
+    var wrap = document.getElementById("productFichaPdfLinkWrap");
+    var link = document.getElementById("productFichaPdfLink");
+    var fileInput = document.getElementById("productFichaPdf");
+    var u = String(url || "").trim();
+    if (field) field.value = u;
+    if (fileInput && !u) fileInput.value = "";
+    if (!wrap || !link) return;
+    if (!u) {
+      wrap.hidden = true;
+      link.removeAttribute("href");
+      return;
+    }
+    var href = u.charAt(0) === "/" || /^https?:/i.test(u) ? u : "/" + u.replace(/^\.\//, "");
+    link.href = href;
+    link.textContent = "Ver PDF actual";
+    wrap.hidden = false;
+  }
+
+  var productFichaPdfInput = document.getElementById("productFichaPdf");
+  if (productFichaPdfInput) {
+    productFichaPdfInput.addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      var form = document.getElementById("productForm");
+      var slug = (form && form.slug && form.slug.value.trim()) || "";
+      if (!slug && form && form.name) {
+        slug = String(form.name.value || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+      var fd = new FormData();
+      fd.append("file", file);
+      fd.append("kind", "pdf");
+      if (slug) fd.append("slug", slug);
+      api("/upload", { method: "POST", formData: fd }).then(function (res) {
+        if (!res.ok) {
+          showToast((res.data && res.data.error) || "No se pudo subir el PDF");
+          return;
+        }
+        var url = res.data && res.data.url;
+        if (!url) {
+          showToast("Respuesta de upload inválida");
+          return;
+        }
+        setProductFichaPdf(url);
+        showToast("Ficha PDF subida");
+      });
+    });
+  }
+  var productFichaPdfClear = document.getElementById("productFichaPdfClear");
+  if (productFichaPdfClear) {
+    productFichaPdfClear.addEventListener("click", function () {
+      setProductFichaPdf("");
+    });
+  }
 
   document.getElementById("imageCancel").addEventListener("click", function () {
     document.getElementById("imageDialog").close();
@@ -1042,6 +1105,7 @@
       price_clp: form.price_clp.value === "" ? null : Number(form.price_clp.value),
       description: form.description.value,
       image_url: form.image_url.value.trim(),
+      ficha_pdf_url: (document.getElementById("productFichaPdfUrl").value || "").trim(),
       seo_title: form.seo_title.value.trim(),
       seo_description: form.seo_description.value.trim(),
       is_featured: form.is_featured.checked,

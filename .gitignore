@@ -13,6 +13,7 @@ Thumbs.db
 !data/lpaezsis.sqlite
 !data/2026-08-25_sectores.sql
 !data/2026-08-26_banners.sql
+!data/2026-08-26_fichas_pdf.sql
 
 # Local / secrets
 .env
