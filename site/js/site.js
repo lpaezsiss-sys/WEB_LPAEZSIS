@@ -254,21 +254,36 @@
         ? formatPrice(p.price_clp)
         : "Cotización";
     var img = resolveProductImage(p);
+    var webp = resolveProductWebp(p, img);
     var slugImage = (p && (p.slug_image || p.slug)) || "";
     var imgFallback = slugImage
       ? "/img/productos/" + String(slugImage).replace(/'/g, "") + ".jpg"
       : "img/products/A07-10015.jpg";
-    var visual = img
+    var onerror =
+      "this.onerror=null;this.src='" +
+      imgFallback.replace(/'/g, "\\'") +
+      "';";
+    var imgTag = img
       ? '<img src="' +
-        img +
+        escapeAttr(img) +
         '" alt="' +
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" loading="lazy" decoding="async" width="480" height="480" onerror="this.onerror=null;this.src=\'' +
-        imgFallback.replace(/'/g, "\\'") +
-        '\'">'
+        '" loading="lazy" decoding="async" width="480" height="480" onerror="' +
+        onerror +
+        '">'
       : "LPAEZ";
+    var visual = imgTag;
+    if (img && webp) {
+      visual =
+        "<picture>" +
+        '<source type="image/webp" srcset="' +
+        escapeAttr(webp) +
+        '">' +
+        imgTag +
+        "</picture>";
+    }
     var payload = productPayload(p);
     var primaryCta =
       p.sale_mode === "buy"
@@ -379,6 +394,20 @@
     if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
     var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
     return PRODUCT_FALLBACKS[idx];
+  }
+
+  /** Hermano .webp bajo img/{products,hero,uploads,brand}/ o image_webp de API. */
+  function resolveProductWebp(p, imageUrl) {
+    var explicit = p && p.image_webp ? String(p.image_webp).trim() : "";
+    if (explicit) return explicit;
+    var url = String(imageUrl || "");
+    if (
+      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /\.(jpe?g|png)$/i.test(url)
+    ) {
+      return url.replace(/\.(jpe?g|png)$/i, ".webp");
+    }
+    return "";
   }
 
   function resolveCategoryImage(slug) {

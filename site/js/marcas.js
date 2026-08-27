@@ -23,6 +23,19 @@ function escapeAttr(str) {
   return escapeHtml(str).replace(/`/g, "&#96;");
 }
 
+/** Prefiere hermano .webp bajo img/{brand,uploads,products,hero}/. */
+function preferWebpUrl(url) {
+  var src = String(url || "").trim();
+  if (!src) return "";
+  if (
+    /(\/|^)img\/(products|hero|uploads|brand)\//i.test(src) &&
+    /\.(jpe?g|png)$/i.test(src)
+  ) {
+    return src.replace(/\.(jpe?g|png)$/i, ".webp");
+  }
+  return src;
+}
+
 function productTipoOf(p) {
   if (!p) return "equipo";
   if (p.tipo === "repuesto" || p.tipo === "equipo") return p.tipo;
@@ -185,7 +198,7 @@ function renderBrandSelector(brands, activeSlug) {
     .map(function (b) {
       var slug = b.slug || "";
       var nombre = b.nombre || b.name || slug;
-      var logo = b.logo_url || b.imagen || "";
+      var logo = preferWebpUrl(b.logo_url || b.imagen || "");
       if (logo && logo.charAt(0) === "/" && logo.indexOf("//") !== 0) {
         /* keep absolute site path */
       }
@@ -335,7 +348,7 @@ function updateBrandHero(brand) {
       else unwrapLogoLink();
       if (logoBox) logoBox.hidden = false;
     }
-    if (src) showHeroLogo(src);
+    if (src) showHeroLogo(preferWebpUrl(src));
     else hideHeroLogo();
   }
 

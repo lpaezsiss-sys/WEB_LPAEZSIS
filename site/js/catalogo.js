@@ -170,7 +170,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
 ];
 
@@ -247,40 +247,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return v;
   }
 
-  /** Aliases B2B limpios (home) → slug canónico + set de categorías relacionadas */
-  const CATEGORY_ALIAS_GROUPS = {
-    secado: ["secadores", "cuchillos-aire"],
-    soplado: ["turbinas-soplado"],
-    limpieza: ["bandas-modulares-higiene", "salas-limpias"],
-    packaging: [
-      "fin-de-linea",
-      "paletizado-convencional",
-      "paletizado-alta-velocidad",
-      "paletizado-robotico",
-      "paletizado-integrado",
-    ],
-  };
-
-  function resolveCategorySlug(raw) {
-    const v = cleanFilterValue(raw);
-    if (!v) return "";
-    const key = v.toLowerCase();
-    const group = CATEGORY_ALIAS_GROUPS[key];
-    if (group && group.length) return group[0];
-    return v;
-  }
-
-  function categoryMatchSet(rawOrResolved) {
-    const v = cleanFilterValue(rawOrResolved);
-    if (!v) return null;
-    const key = v.toLowerCase();
-    if (CATEGORY_ALIAS_GROUPS[key]) return CATEGORY_ALIAS_GROUPS[key];
-    for (const slugs of Object.values(CATEGORY_ALIAS_GROUPS)) {
-      if (slugs[0] === key) return slugs;
-    }
-    return [v];
-  }
-
   function buildQueryString(overrides) {
     const src = Object.assign(
       {
@@ -315,7 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     category:
       queryParam("category") === "repuestos" && tipoFromQuery === "repuesto"
         ? ""
-        : resolveCategorySlug(queryParam("category")),
+        : cleanFilterValue(queryParam("category")),
     brand: cleanFilterValue(queryParam("brand")),
     industry: cleanFilterValue(queryParam("industry")),
     industria: cleanFilterValue(queryParam("industria")),
@@ -488,13 +454,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     return file ? file[1] : "";
   }
 
-  /** Solo usa webp si la API lo envía; no inventar .webp (rompe <picture> en uploads). */
+  /** Prefiere WebP hermano bajo img/{products,hero,uploads,brand}/; la API puede enviar image_webp. */
   function normalizeProductWebp(prod, imageUrl) {
     const explicit = String((prod && prod.image_webp) || "").trim();
     if (explicit) return explicit;
-    // Mocks locales con webp real junto a img/products|hero
-    if (/^img\/(products|hero)\//i.test(String(imageUrl || "")) && /\.(jpe?g|png)$/i.test(imageUrl)) {
-      return imageUrl.replace(/\.(jpe?g|png)$/i, ".webp");
+    const url = String(imageUrl || "");
+    if (
+      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /\.(jpe?g|png)$/i.test(url)
+    ) {
+      return url.replace(/\.(jpe?g|png)$/i, ".webp");
     }
     return "";
   }
@@ -558,7 +527,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         encodeURIComponent(slug) +
         "&asunto=" +
         encodeURIComponent("Cotización: " + name),
-      ficha_url: prod.ficha_url || prod.datasheet_url || "",
+      ficha_url:
+        prod.ficha_pdf_url || prod.ficha_url || prod.datasheet_url || "",
     };
   }
 
@@ -606,10 +576,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!p) return false;
       if (state.tipo && productTipoOf(p) !== state.tipo) return false;
       if (state.industria && p.industria_slug !== state.industria) return false;
-      if (state.category) {
-        const allowed = categoryMatchSet(state.category);
-        if (allowed && allowed.indexOf(p.category_slug) === -1) return false;
-      }
+      if (state.category && p.category_slug !== state.category) return false;
       if (set && !set[p.category_slug]) return false;
       if (state.brand && p.brand_slug !== state.brand) return false;
       return true;
@@ -617,10 +584,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function cardHtml(prod) {
-    const name = prod?.name || "Producto";
+    const name = prod?.name || "Equipo";
     const slug = prod?.slug || "";
     const sku = prod?.sku || "N/A";
-    const cat = prod?.category_name || prod?.category_slug || "Producto";
+    const cat = prod?.category_name || prod?.category_slug || "Equipo";
+    const brand = prod?.brand_name || prod?.brand_slug || "";
     const tipo = productTipoOf(prod);
     const isRepuesto = tipo === "repuesto";
     const picture = productImageHtml(prod);
@@ -633,10 +601,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       "&name=" +
       encodeURIComponent(name);
 
-    const fichaUrl = String(prod?.ficha_url || prod?.datasheet_url || "").trim();
+    let fichaUrl = String(
+      prod?.ficha_url || prod?.ficha_pdf_url || prod?.datasheet_url || ""
+    ).trim();
+    if (fichaUrl && !/^https?:/i.test(fichaUrl) && fichaUrl.charAt(0) !== "/") {
+      fichaUrl = "/" + fichaUrl.replace(/^\.\//, "");
+    }
     const fichaHtml = fichaUrl
-      ? `<a href="${escapeAttr(fichaUrl)}" target="_blank" rel="noopener" class="btn btn-outline-spec">DESCARGAR FICHA TÉCNICA</a>`
-      : `<button type="button" class="btn btn-outline-spec" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">DESCARGAR FICHA TÉCNICA</button>`;
+      ? `<a href="${escapeAttr(fichaUrl)}" target="_blank" rel="noopener" class="btn btn-outline-spec">Ver Ficha (PDF)</a>`
+      : `<button type="button" class="btn btn-outline-spec" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}" data-datasheet-url="">Ver Ficha (PDF)</button>`;
 
     let actionsHtml;
     if (isRepuesto) {
@@ -654,17 +627,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<div class="product-card-actions catalog-card-actions">` +
         `<div class="action-buttons-group">` +
         `<button type="button" class="btn btn-buy" data-card-cart="${escapeAttr(cartPayload)}">COMPRAR</button>` +
-        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-secondary">COTIZAR</a>` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-secondary">Cotizar</a>` +
         `</div>` +
         fichaHtml +
         `</div>`;
     } else {
       actionsHtml =
         `<div class="product-card-actions catalog-card-actions">` +
-        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-primary">PEDIR COTIZACIÓN</a>` +
+        `<a href="${escapeAttr(quoteHref)}" class="btn btn-quote-primary">Cotizar</a>` +
         fichaHtml +
         `</div>`;
     }
+
+    const brandHtml = brand
+      ? `<span class="badge-brand">${escapeHtml(brand)}</span>`
+      : "";
 
     return (
       `<article class="product-card catalog-card reveal" data-tipo="${escapeAttr(tipo)}">` +
@@ -672,7 +649,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `<span class="badge-type ${isRepuesto ? "badge-type--comprar" : "badge-type--cotizar"}">${isRepuesto ? "Comprar" : "Cotizar"}</span>` +
       `${picture}</a>` +
       `<div class="product-card-body">` +
-      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span></div>` +
+      `<div class="product-meta"><span class="badge-category">${escapeHtml(cat)}</span>${brandHtml}</div>` +
       `<h3><a href="producto.html?slug=${encodeURIComponent(slug)}">${escapeHtml(name)}</a></h3>` +
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
       `${actionsHtml}` +
@@ -850,14 +827,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = e.target.closest("[data-datasheet]");
       if (!btn || !datasheetDialog || !datasheetBody) return;
       const slug = btn.getAttribute("data-datasheet") || "";
-      const name = btn.getAttribute("data-datasheet-name") || "Producto";
+      const name = btn.getAttribute("data-datasheet-name") || "Equipo";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      let fromAttr = (btn.getAttribute("data-datasheet-url") || "").trim();
+      let pdfUrl =
+        fromAttr ||
+        (slug ? `img/fichas/${encodeURIComponent(slug)}.pdf` : "img/fichas/");
+      if (pdfUrl && !/^https?:/i.test(pdfUrl) && pdfUrl.charAt(0) !== "/") {
+        pdfUrl = "/" + pdfUrl.replace(/^\.\//, "");
+      }
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
         `<p class="product-sku">SKU / Parte: ${escapeHtml(sku)}</p>` +
         `<p>Descarga el PDF o solicítalo con tu cotización.</p>` +
-        `<div class="empty-actions"><a class="btn btn-primary" href="img/fichas/${encodeURIComponent(slug)}.pdf" target="_blank" rel="noopener">Descargar PDF</a>` +
-        `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Pedir cotización con ficha</a></div>`;
+        `<div class="empty-actions"><a class="btn btn-primary" href="${escapeAttr(pdfUrl)}" target="_blank" rel="noopener">Ver Ficha (PDF)</a>` +
+        `<a class="btn btn-outline" href="cotizacion.html?sku=${encodeURIComponent(slug)}">Cotizar con ficha</a></div>`;
       if (typeof datasheetDialog.showModal === "function") datasheetDialog.showModal();
       else datasheetDialog.setAttribute("open", "");
     });
