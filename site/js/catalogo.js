@@ -426,23 +426,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     return prod && prod.sale_mode === "buy" ? "repuesto" : "equipo";
   }
 
-  /** Homologado con marcas/site.js: respeta image_url de la API (/img/uploads/...). */
+  const PLACEHOLDER_IMG = "img/placeholder.jpg";
+
+  /** Normaliza rutas de media: sin barras duplicadas; /img/... → img/...; conserva http(s). */
+  function normalizeMediaUrl(url) {
+    let u = String(url == null ? "" : url).trim();
+    if (!u) return "";
+    if (/^https?:\/\//i.test(u)) return u;
+    // Protocol-relative externo (//cdn...) vs //img/... del sitio
+    if (u.startsWith("//")) {
+      if (/^\/\/img\//i.test(u)) {
+        u = u.replace(/^\/+/, "");
+      } else {
+        return u;
+      }
+    }
+    u = u.replace(/^\/+/, "");
+    u = u.replace(/^\.\//, "");
+    // Colapsa dobles barras internas accidentales (img//uploads/x)
+    u = u.replace(/\/{2,}/g, "/");
+    return u;
+  }
+
+  /** Homologado con marcas/site.js: respeta image_url / imagen_url de la API. */
   function normalizeProductImage(prod) {
     const raw = prod || {};
-    let image = String(raw.image_url || raw.image || "").trim();
+    let image = normalizeMediaUrl(
+      raw.image_url || raw.imagen_url || raw.imagen || raw.image || ""
+    );
     if (/wp-content\/uploads/i.test(image)) {
       const file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
       if (file) image = "img/products/" + file[1];
     }
-    // Rutas absolutas del sitio (/img/uploads/...) se mantienen; la API ya las entrega así.
     if (!image && window.Lpaez?.resolveProductImage) {
       try {
-        image = Lpaez.resolveProductImage(raw);
+        image = normalizeMediaUrl(Lpaez.resolveProductImage(raw));
       } catch (_) {
         image = "";
       }
     }
-    if (!image) image = "img/products/A07-10015.jpg";
+    if (!image) image = PLACEHOLDER_IMG;
     return image;
   }
 
@@ -450,15 +473,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const raw = prod || {};
     if (raw.slug_image) return String(raw.slug_image).trim();
     if (raw.slug) return String(raw.slug).trim();
-    const file = String(imageUrl || "").match(/\/([^\/?#]+)\.(jpe?g|png|webp|gif)$/i);
+    const file = String(imageUrl || "").match(/\/?([^\/?#]+)\.(jpe?g|png|webp|gif)$/i);
     return file ? file[1] : "";
   }
 
   /** Prefiere WebP hermano bajo img/{products,hero,uploads,brand}/; la API puede enviar image_webp. */
   function normalizeProductWebp(prod, imageUrl) {
-    const explicit = String((prod && prod.image_webp) || "").trim();
+    const explicit = normalizeMediaUrl((prod && prod.image_webp) || "");
     if (explicit) return explicit;
-    const url = String(imageUrl || "");
+    const url = normalizeMediaUrl(imageUrl);
     if (
       /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
       /\.(jpe?g|png)$/i.test(url)
@@ -469,18 +492,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function productImageHtml(prod) {
-    const name = (prod && prod.name) || "Producto";
-    const img = (prod && prod.image_url) || "img/products/A07-10015.jpg";
-    const webp = (prod && prod.image_webp) || "";
-    const slugImage = slugImageOf(prod, img);
-    const fallback = slugImage
-      ? "/img/productos/" + slugImage + ".jpg"
-      : "img/products/A07-10015.jpg";
+    const name = (prod && prod.name) || "Equipo";
+    const img = normalizeMediaUrl((prod && prod.image_url) || "") || PLACEHOLDER_IMG;
+    const webp = normalizeMediaUrl((prod && prod.image_webp) || "");
+    const fallback = PLACEHOLDER_IMG;
     const onerror =
       "this.onerror=null;this.src='" + String(fallback).replace(/'/g, "\\'") + "';";
     const imgTag =
       `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}"` +
-      ` loading="lazy" decoding="async" width="480" height="480" onerror="${onerror}">`;
+      ` class="card-img-top" loading="lazy" decoding="async" width="480" height="480" onerror="${onerror}">`;
     if (webp) {
       return (
         `<picture>` +
@@ -718,7 +738,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           sku: p?.sku || p?.slug || "",
           image: (p?.image_url || "").indexOf("http") === 0
             ? p.image_url
-            : origin + "/" + String(p?.image_url || "").replace(/^\//, ""),
+            : origin + "/" + String(p?.image_url || "").replace(/^\/+/, ""),
           url: origin + "/producto.html?slug=" + encodeURIComponent(p?.slug || ""),
           brand: { "@type": "Brand", name: p?.brand_name || "Sonic Air Systems" },
         },
