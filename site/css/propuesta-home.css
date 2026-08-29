@@ -26,6 +26,76 @@
   opacity: 1;
 }
 
+/* Hero managed by JS (api/banners) — solo Home */
+.prop-hero.hero--managed .hero-media__slide,
+.prop-hero.hero--managed .hero-media img.hero-media__slide {
+  animation: none;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 0.6s ease;
+}
+
+.prop-hero.hero--managed .hero-media__slide.is-active,
+.prop-hero.hero--managed .hero-media img.hero-media__slide.is-active {
+  opacity: 1;
+}
+
+.prop-hero .hero-slider-nav {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.prop-hero .hero-slider-btn,
+.prop-hero .hero-slider-dots,
+.prop-hero .hero-dot {
+  pointer-events: auto;
+}
+
+.prop-hero .hero-slider-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prop-hero .hero-slider-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.prop-hero .hero-slider-dots {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.prop-hero .hero-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+}
+
+.prop-hero .hero-dot.is-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
 .prop-hero .hero-inner {
   max-width: var(--prop-max);
   gap: 0.85rem;
