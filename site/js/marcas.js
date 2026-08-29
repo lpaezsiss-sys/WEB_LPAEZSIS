@@ -27,12 +27,68 @@ function escapeAttr(str) {
 function preferWebpUrl(url) {
   var src = String(url || "").trim();
   if (!src) return "";
+  if (/^https?:\/\//i.test(src)) return src;
   if (
-    /(\/|^)img\/(products|hero|uploads|brand)\//i.test(src) &&
+    /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(src) &&
     /\.(jpe?g|png)$/i.test(src)
   ) {
     return src.replace(/\.(jpe?g|png)$/i, ".webp");
   }
+  return src;
+}
+
+/**
+ * Extrae y normaliza el logo de marca (hero + carrusel).
+ * Fallbacks: logo_url → imagen_logo → imagen → logo → img/marcas/{slug}.jpg → img/brand/{slug}.png
+ */
+function resolveBrandLogoUrl(brand) {
+  brand = brand || {};
+  var slug = String(brand.slug || "").trim();
+  var logoUrl =
+    brand.logo_url ||
+    brand.imagen_logo ||
+    brand.imagen ||
+    brand.logo ||
+    (slug ? "img/marcas/" + slug + ".jpg" : "") ||
+    (slug ? "img/brand/" + slug + ".png" : "") ||
+    "";
+  logoUrl = String(logoUrl || "").trim();
+  if (!logoUrl) return "";
+
+  // Absolutos http(s) sin tocar
+  if (/^https?:\/\//i.test(logoUrl)) return logoUrl;
+  // Protocol-relative → https
+  if (logoUrl.indexOf("//") === 0) return "https:" + logoUrl;
+
+  // Quitar slash inicial (p.ej. /img/brand/sonic-air.png → img/brand/...)
+  var logoNormalizado = logoUrl.replace(/^(\/\/|\/)/, "");
+  return logoNormalizado;
+}
+
+var LOGO_BY_SLUG = {
+  "sonic-air-systems": "img/brand/sonic-air.png",
+  sonic: "img/brand/sonic-air.png",
+  lyc: "img/brand/lyc.png",
+  movex: "img/brand/movex.png",
+  isodur: "img/brand/isodur.png",
+  combi: "img/brand/combi.png",
+  haida: "img/brand/haida.png",
+  "columbia-machine": "img/uploads/p-57c09a0440925f86.png",
+  "columbia-okura": "img/uploads/p-57c09a0440925f86.png",
+  "cmc-klebetechnik": "img/uploads/p-4123e04f38ce02ea.png",
+};
+
+function resolveBrandLogoWithSlugFallback(brand) {
+  var src = resolveBrandLogoUrl(brand);
+  var slug = String((brand && brand.slug) || "").trim();
+  if (src && !/^img\/marcas\//i.test(src)) return src;
+  // Si solo quedó el guess img/marcas/... o vacío, usar mapa local conocido
+  if (slug && LOGO_BY_SLUG[slug]) return LOGO_BY_SLUG[slug];
+  if (slug) {
+    var guess = slug.toLowerCase().replace(/-systems$/i, "");
+    if (LOGO_BY_SLUG[guess]) return LOGO_BY_SLUG[guess];
+  }
+  // img/marcas/{slug}.jpg solo si no hay mejor opción
   return src;
 }
 
@@ -198,10 +254,7 @@ function renderBrandSelector(brands, activeSlug) {
     .map(function (b) {
       var slug = b.slug || "";
       var nombre = b.nombre || b.name || slug;
-      var logo = preferWebpUrl(b.logo_url || b.imagen || "");
-      if (logo && logo.charAt(0) === "/" && logo.indexOf("//") !== 0) {
-        /* keep absolute site path */
-      }
+      var logo = preferWebpUrl(resolveBrandLogoWithSlugFallback(b));
       var img = logo
         ? '<img src="' +
           escapeAttr(logo) +
@@ -229,6 +282,7 @@ function renderBrandSelector(brands, activeSlug) {
   // Duplicar secuencia para carrusel continuo seamless
   container.innerHTML = cards + cards;
   container.style.animation = "";
+  container.classList.add("is-ready");
 }
 
 function updateBrandHero(brand) {
@@ -257,27 +311,11 @@ function updateBrandHero(brand) {
       ? logoEl.closest(".brand-intro-logo") ||
         logoEl.closest(".brand-hero-logo-box")
       : logoEl.parentElement;
-    var LOGO_BY_SLUG = {
-      "sonic-air-systems": "img/brand/sonic-air.png",
-      sonic: "img/brand/sonic-air.png",
-      lyc: "img/brand/lyc.png",
-      movex: "img/brand/movex.png",
-      isodur: "img/brand/isodur.png",
-      combi: "img/brand/combi.png",
-      haida: "img/brand/haida.png",
-      "columbia-machine": "img/uploads/p-57c09a0440925f86.png",
-      "cmc-klebetechnik": "img/uploads/p-4123e04f38ce02ea.png",
-    };
     var WEBSITE_BY_SLUG = {
       "sonic-air-systems": "https://www.sonicairsystems.com",
       sonic: "https://www.sonicairsystems.com",
     };
-    var src = String(brand.logo_url || brand.imagen || brand.logo || "").trim();
-    if (!src && slug && LOGO_BY_SLUG[slug]) src = LOGO_BY_SLUG[slug];
-    if (!src && slug) {
-      var guess = String(slug).toLowerCase().replace(/-systems$/i, "");
-      if (LOGO_BY_SLUG[guess]) src = LOGO_BY_SLUG[guess];
-    }
+    var src = resolveBrandLogoWithSlugFallback(brand);
     var websiteUrl = String(
       brand.website_url || brand.website || brand.url || ""
     ).trim();
@@ -338,6 +376,20 @@ function updateBrandHero(brand) {
     }
     function showHeroLogo(url) {
       logoEl.onerror = function () {
+        // Reintento: mapa por slug → placeholder → ocultar
+        if (!logoEl.dataset.fb) {
+          logoEl.dataset.fb = "1";
+          var alt = slug && LOGO_BY_SLUG[slug] ? LOGO_BY_SLUG[slug] : "";
+          if (alt && alt !== url) {
+            logoEl.src = preferWebpUrl(alt);
+            return;
+          }
+        }
+        if (logoEl.dataset.fb === "1") {
+          logoEl.dataset.fb = "2";
+          logoEl.src = "img/placeholder-logo.png";
+          return;
+        }
         hideHeroLogo();
       };
       logoEl.src = url;
@@ -448,14 +500,45 @@ async function loadBrandDetailExtras(slug) {
   }
 }
 
+/** Normaliza imagen de equipo/producto: imagen_url | image_url | placeholder. */
+function resolveEquipImage(eq) {
+  var eqImg = String(
+    (eq && (eq.imagen_url || eq.image_url || eq.imagen || eq.image)) ||
+      "img/placeholder.jpg"
+  ).trim();
+  if (!eqImg) eqImg = "img/placeholder.jpg";
+  if (/^https?:\/\//i.test(eqImg)) return eqImg;
+  if (eqImg.indexOf("//") === 0) return "https:" + eqImg;
+  return eqImg.replace(/^(\/\/|\/)/, "") || "img/placeholder.jpg";
+}
+
 function renderProductCardHtml(p) {
+  var eqImg = resolveEquipImage(p);
+  // Propagar URL normalizada para Lpaez.productCardHtml / fallback local
+  var normalized = Object.assign({}, p, {
+    image_url: eqImg,
+    imagen_url: eqImg,
+    imagen: eqImg,
+  });
+
   if (window.Lpaez && typeof Lpaez.productCardHtml === "function") {
-    return Lpaez.productCardHtml(p);
+    return Lpaez.productCardHtml(normalized);
   }
-  var name = escapeHtml(p.name || p.nombre || "Producto");
-  var slug = p.slug || "";
+  var name = escapeHtml(normalized.name || normalized.nombre || "Producto");
+  var slug = normalized.slug || "";
+  var imgSrc = preferWebpUrl(eqImg) || eqImg;
   return (
     '<article class="product-card catalog-card">' +
+    '<a class="product-card-visual" href="producto.html?slug=' +
+    encodeURIComponent(slug) +
+    '">' +
+    '<img src="' +
+    escapeAttr(imgSrc) +
+    '" alt="' +
+    escapeAttr(name) +
+    '" loading="lazy" decoding="async" width="480" height="480" ' +
+    'onerror="this.onerror=null;this.src=\'img/placeholder.jpg\';">' +
+    "</a>" +
     '<div class="product-card-body"><h3><a href="producto.html?slug=' +
     encodeURIComponent(slug) +
     '">' +
