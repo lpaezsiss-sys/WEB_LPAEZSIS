@@ -1,75 +1,80 @@
-# Freeze — estado estable LPAEZsis (prueba1)
+# Freeze — estado estable LPAEZsis (prueba1 + producción)
 
-**Fecha:** 2026-08-25  
-**Tag:** `freeze-prueba1-2026-08-25`  
-**Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260825-5af8`  
-**Rama de trabajo al momento del freeze:** `cursor/destacados-carrusel-5af8`  
-**Commit:** `6984ec5`
-**PRs recientes incluidas en staging:** #28–#32 (cards CTAs, nosotros/contacto, home B2B, logos carrusel, destacados carrusel)
+**Fecha:** 2026-08-29  
+**Tag:** `freeze-prueba1-2026-08-29`  
+**Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260829-5af8`  
+**Rama de trabajo al momento del freeze:** `main`  
+**Commit:** `bcfd6d9`
 
-Estado verificado en hosting al freeze: `/api/health` → `db: ok`, PHP `7.4.33`, **19** productos (9 equipos / 10 repuestos), **8** marcas, **8** clientes, **5** soluciones activas.
+PRs / entregas recientes incluidas: #53 (hero autoplay), deploy producción www, fix logos/carrusel/tarjetas marcas (`072e98c`, `bcfd6d9`).
 
-Snapshot front: archivos de `https://prueba1.lpaezsis.cl/` sincronizados a `site/` (HTML/CSS/JS + `img/uploads` imágenes; videos grandes ya presentes se reutilizan).
+Estado verificado al freeze:
 
-## Sitio de prueba
+| Entorno | Health | PHP | Productos | Marcas |
+|---------|--------|-----|-----------|--------|
+| Producción `www.lpaezsis.cl` | `db: ok` | 7.4.33 | **19** (9 equipos / 10 repuestos) | **8** |
+| Staging `prueba1.lpaezsis.cl` | `db: ok` | 7.4.33 | **19** | **8** |
 
+## Sitios
+
+### Producción
+- URL: https://www.lpaezsis.cl/ (redirige desde www → apex según hosting)
+- Home: https://www.lpaezsis.cl/
+- Marcas: https://www.lpaezsis.cl/marcas.html
+- CMC: https://www.lpaezsis.cl/marcas.html?slug=cmc-klebetechnik
+- Catálogo: https://www.lpaezsis.cl/catalogo.html?tipo=equipo
+- API health: https://www.lpaezsis.cl/api/health → `db: ok`
+
+### Staging (prueba1)
 - URL: https://prueba1.lpaezsis.cl/
 - Admin: https://prueba1.lpaezsis.cl/admin/
-- API health: https://prueba1.lpaezsis.cl/api/health → `db: ok`, PHP `7.4.33`
-- Home: https://prueba1.lpaezsis.cl/
-- Catálogo equipos: https://prueba1.lpaezsis.cl/catalogo.html?tipo=equipo
-- Repuestos: https://prueba1.lpaezsis.cl/repuestos.html
-- Nosotros / Contacto (B2B): https://prueba1.lpaezsis.cl/nosotros.html · https://prueba1.lpaezsis.cl/contacto.html
-- Marcas: https://prueba1.lpaezsis.cl/marcas.html
-- Clientes (API): https://prueba1.lpaezsis.cl/api/clientes
-- Soluciones (API): https://prueba1.lpaezsis.cl/api/soluciones
+- API health: https://prueba1.lpaezsis.cl/api/health → `db: ok`
+- Marcas / Catálogo / Repuestos / Nosotros / Contacto según rutas habituales
 
 ## Hosting (BlueHosting)
 
 ```text
 public_html/src/                         → backend PHP (7.4)
 public_html/src/.env                     → MySQL real (no commitear)
-public_html/prueba1.lpaezsis.cl/         → front (contenido de site/)
+public_html/prueba1.lpaezsis.cl/         → front staging (site/)
+public_html/lpaezsis.cl/                 → front producción (site/ promovido)
+public_html/lpaezsis.cl-wp-backup-20260829/  → respaldo WordPress previo al cutover
 ```
 
 - BD: `sistem29_lpaezsis`
 - Usuario BD: `sistem29_lpaezsis`
 - Dump compatible: `data/lpaezsis_bluehosting.sql`
-- Uploads: `prueba1.lpaezsis.cl/img/uploads/` (imágenes `p-*` y videos `v-*.mp4`)
+- Uploads: `img/uploads/` (imágenes `p-*`, videos `v-*.mp4`, banners)
 
 ## Qué incluye este freeze
 
-### Front (`site/`) — snapshot staging 2026-08-25
-- Home B2B: hero kicker/H1/CTAs, soluciones con filtros limpios `category=secado|soplado|limpieza|packaging`
-- Carruseles logos: `section-brands` / `section-clients` (`propuesta-marcas.css`)
-- Productos destacados: carrusel deslizable 3/2/1 (`featured-carousel.css`, `js/index.js`)
-- Nosotros B2B (slogan, ficha sin headcount, CTA evaluación) + Contacto B2B (SLA, tel etiquetados, Ley 19.628, `contacto.js`)
-- Catálogo con aliases de categoría + botones de card alineados al fondo
-- Vista `repuestos.html` + `js/repuestos.js` + nav Productos | Repuestos | …
-- Search header / propuesta CSS-JS según staging
-- Cache típica al freeze: `style.css?v=128`, `layout.js?v=39`, `featured-carousel.css?v=3`, `propuesta-marcas.css?v=6`
+### Front (`site/`)
+- Home: hero gestionado (`api/banners`, autoplay 5s, `index.js`, `propuesta-home.css`)
+- Marcas: logos hero + carrusel con `<picture>`/PNG fallback (`marcas.js?v=131`), tarjetas producto con `resolveEquipImage`
+- Assets WebP/PNG de marcas alineados local↔prod (`combi`, `isodur`, Columbia, CMC producto)
+- Catálogo cache-bust `catalogo.js?v=131`
+- Vista repuestos, nosotros/contacto B2B, carruseles home (destacados / marcas / clientes)
 
-### Backend (`src/` en repo + `site/api/*.php` planos)
-- API pública + admin (Bearer), PHP **7.4**
-- Rutas staging: `/api/products`, `/api/productos`, `/api/repuestos`, `/api/marcas`, `/api/clientes`, `/api/soluciones`, `/api/search`, `/api/health`
+### Backend
+- API pública + admin, PHP **7.4**
+- Rutas: `/api/health`, `/api/products`, `/api/productos`, `/api/marcas`, `/api/banners`, `/api/clientes`, `/api/soluciones`, `/api/search`, …
 
-### Datos / tools
-- `data/lpaezsis_bluehosting.sql` (sin collation `uca1400`)
-- `data/lpaezsis.sqlite` + `tools/preview_server.py` (preview Cursor)
-- `tools/create_db_bluehosting.sh` (UAPI cPanel)
+### Tools / QA
+- `tools/preview_server.py` (preview local + SQLite)
+- `tools/verify_marcas_assets.py` + `tools/marcas-assets-diff-report.md`
 
 ## Cómo volver a este estado
 
 ```bash
 git fetch origin
-git checkout freeze-prueba1-2026-08-25
+git checkout freeze-prueba1-2026-08-29
 # o
-git checkout cursor/freeze-prueba1-20260825-5af8
+git checkout cursor/freeze-prueba1-20260829-5af8
 ```
 
 ZIP del freeze:
 
-https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-25.zip
+https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-29.zip
 
 ## Freezes anteriores
 
@@ -81,15 +86,16 @@ https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2
 | 2026-08-18 | `freeze-prueba1-2026-08-18` | `cursor/freeze-prueba1-20260818-5af8` |
 | 2026-08-21 | `freeze-prueba1-2026-08-21` | `cursor/freeze-prueba1-20260821-5af8` |
 | 2026-08-25 | `freeze-prueba1-2026-08-25` | `cursor/freeze-prueba1-20260825-5af8` |
+| 2026-08-29 | `freeze-prueba1-2026-08-29` | `cursor/freeze-prueba1-20260829-5af8` |
 
 ## Notas de seguridad / ops
 
 - No commitear `src/.env` ni claves FTP/cPanel
-- No re-subir a staging un `PublicApi.php` incompleto desde `main` desactualizado
+- Respaldo WP producción: `public_html/lpaezsis.cl-wp-backup-20260829/`
 - Rotar claves expuestas en chats cuando sea posible
 
 ## Mejoras siguientes (fuera del freeze)
 
-- Merge a `main` de PRs abiertos (#28–#32 y anteriores)
-- Alinear cache-bust de `style.css` / `layout.js` en todas las páginas
-- Producción definitiva (dominio final, `APP_DEBUG=0`, HTTPS/SEO)
+- Limpiar WIP local no mergeado (`site/js/index.js` hero local, `tools/preview_server.py` banners/marcas locales, `site/api/banners.php`)
+- Alinear staging prueba1 con el mismo `marcas.js?v=131` si aún no está
+- `APP_DEBUG=0` y SEO canónico en dominio final
