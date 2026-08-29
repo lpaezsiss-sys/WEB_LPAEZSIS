@@ -1,0 +1,100 @@
+{
+  "production": "https://www.lpaezsis.cl",
+  "brands": [
+    {
+      "slug": "sonic-air-systems",
+      "logo": "img/brand/sonic-air.png",
+      "png_prod": 200,
+      "webp": "img/brand/sonic-air.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "columbia-machine",
+      "logo": "img/uploads/p-57c09a0440925f86.png",
+      "png_prod": 200,
+      "webp": "img/uploads/p-57c09a0440925f86.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "lyc",
+      "logo": "img/brand/lyc.png",
+      "png_prod": 200,
+      "webp": "img/brand/lyc.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "cmc-klebetechnik",
+      "logo": "img/uploads/p-4123e04f38ce02ea.png",
+      "png_prod": 200,
+      "webp": "img/uploads/p-4123e04f38ce02ea.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "movex",
+      "logo": "img/brand/movex.png",
+      "png_prod": 200,
+      "webp": "img/brand/movex.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "isodur",
+      "logo": "img/brand/isodur.png",
+      "png_prod": 200,
+      "webp": "img/brand/isodur.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "combi",
+      "logo": "img/brand/combi.png",
+      "png_prod": 200,
+      "webp": "img/brand/combi.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    },
+    {
+      "slug": "haida",
+      "logo": "img/brand/haida.png",
+      "png_prod": 200,
+      "webp": "img/brand/haida.webp",
+      "webp_prod": 200,
+      "local_png": true,
+      "local_webp": true,
+      "action": "OK"
+    }
+  ],
+  "cmc_products": [
+    {
+      "name": "Cinta Doble Contacto CMC 10730",
+      "slug": "cinta-doble-contacto-cmc-10730",
+      "sku": "22",
+      "image": "img/uploads/p-2da9ba1ab72c04ed.webp",
+      "prod_status": 200,
+      "local": true
+    }
+  ],
+  "deploy_candidates": [],
+  "notes": [
+    "marcas.js v=131 usa <picture> con PNG/JPG como src principal; WebP es opcional.",
+    "Subir deploy_candidates evita 404 de source webp en navegadores que lo prefieren."
+  ]
+}

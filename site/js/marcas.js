@@ -23,18 +23,53 @@ function escapeAttr(str) {
   return escapeHtml(str).replace(/`/g, "&#96;");
 }
 
-/** Prefiere hermano .webp bajo img/{brand,uploads,products,hero}/. */
+/** Prefiere hermano .webp bajo img/{brand,uploads,products,hero,marcas}/.
+ *  Devuelve "" si no aplica conversión (ya es webp, externo o ruta no elegible).
+ */
 function preferWebpUrl(url) {
   var src = String(url || "").trim();
   if (!src) return "";
-  if (/^https?:\/\//i.test(src)) return src;
+  if (/^https?:\/\//i.test(src)) return "";
   if (
     /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(src) &&
     /\.(jpe?g|png)$/i.test(src)
   ) {
     return src.replace(/\.(jpe?g|png)$/i, ".webp");
   }
-  return src;
+  return "";
+}
+
+/** <picture> con source webp opcional + img raster (evita 404 de webp en prod). */
+function brandLogoPictureHtml(src, alt, placeholder) {
+  var raster = String(src || "").trim();
+  if (!raster) {
+    return (
+      '<span class="industrial-brand-card__name">' + escapeHtml(alt || "") + "</span>"
+    );
+  }
+  var webp = preferWebpUrl(raster);
+  var ph = placeholder || "img/placeholder-logo.png";
+  var onerr =
+    "if(!this.dataset.fb){this.dataset.fb=1;this.src='" +
+    ph.replace(/'/g, "\\'") +
+    "';}else{this.style.display='none';}";
+  var img =
+    '<img src="' +
+    escapeAttr(raster) +
+    '" alt="' +
+    escapeAttr(alt || "") +
+    '" loading="lazy" decoding="async" width="140" height="60" onerror="' +
+    onerr +
+    '">';
+  if (!webp || webp === raster) return img;
+  return (
+    "<picture>" +
+    '<source type="image/webp" srcset="' +
+    escapeAttr(webp) +
+    '">' +
+    img +
+    "</picture>"
+  );
 }
 
 /**
@@ -254,19 +289,8 @@ function renderBrandSelector(brands, activeSlug) {
     .map(function (b) {
       var slug = b.slug || "";
       var nombre = b.nombre || b.name || slug;
-      var logo = preferWebpUrl(resolveBrandLogoWithSlugFallback(b));
-      var img = logo
-        ? '<img src="' +
-          escapeAttr(logo) +
-          '" alt="' +
-          escapeAttr(nombre) +
-          '" loading="lazy" decoding="async" width="140" height="60" ' +
-          'onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src=\'' +
-          PLACEHOLDER +
-          '\';}else{this.style.display=\'none\';}">'
-        : '<span class="industrial-brand-card__name">' +
-          escapeHtml(nombre) +
-          "</span>";
+      var logo = resolveBrandLogoWithSlugFallback(b);
+      var img = brandLogoPictureHtml(logo, nombre, PLACEHOLDER);
       return (
         '<a href="marcas.html?slug=' +
         encodeURIComponent(slug) +
@@ -328,19 +352,26 @@ function updateBrandHero(brand) {
     }
 
     function unwrapLogoLink() {
-      var parent = logoEl.parentElement;
+      var node = logoEl;
+      var pic = logoEl.parentElement;
+      if (pic && pic.tagName === "PICTURE") node = pic;
+      var parent = node.parentElement;
       if (
         parent &&
         parent.tagName === "A" &&
         parent.classList.contains("brand-logo-link")
       ) {
-        parent.parentNode.insertBefore(logoEl, parent);
+        parent.parentNode.insertBefore(node, parent);
         parent.remove();
       }
     }
 
     function ensureLogoLink(href) {
-      var parent = logoEl.parentElement;
+      var node = logoEl;
+      if (logoEl.parentElement && logoEl.parentElement.tagName === "PICTURE") {
+        node = logoEl.parentElement;
+      }
+      var parent = node.parentElement;
       var title =
         "Visitar sitio oficial de " + (nombre || slug || "la marca");
       if (
@@ -360,8 +391,8 @@ function updateBrandHero(brand) {
       a.target = "_blank";
       a.rel = "noopener noreferrer";
       a.title = title;
-      logoEl.parentNode.insertBefore(a, logoEl);
-      a.appendChild(logoEl);
+      node.parentNode.insertBefore(a, node);
+      a.appendChild(node);
       return a;
     }
 
@@ -375,13 +406,14 @@ function updateBrandHero(brand) {
       if (logoBox) logoBox.hidden = true;
     }
     function showHeroLogo(url) {
+      var raster = String(url || "").trim();
+      var webp = preferWebpUrl(raster);
       logoEl.onerror = function () {
-        // Reintento: mapa por slug → placeholder → ocultar
         if (!logoEl.dataset.fb) {
           logoEl.dataset.fb = "1";
           var alt = slug && LOGO_BY_SLUG[slug] ? LOGO_BY_SLUG[slug] : "";
-          if (alt && alt !== url) {
-            logoEl.src = preferWebpUrl(alt);
+          if (alt && alt !== raster) {
+            logoEl.src = alt;
             return;
           }
         }
@@ -392,15 +424,28 @@ function updateBrandHero(brand) {
         }
         hideHeroLogo();
       };
-      logoEl.src = url;
+      logoEl.src = raster;
       logoEl.alt = "Logo " + (nombre || slug || "marca");
       logoEl.hidden = false;
       logoEl.style.display = "";
       if (websiteUrl) ensureLogoLink(websiteUrl);
       else unwrapLogoLink();
+      // picture alrededor del <img> (webp opcional; el raster evita huecos si 404)
+      if (webp && webp !== raster) {
+        var wrapParent = logoEl.parentElement;
+        if (wrapParent && wrapParent.tagName !== "PICTURE") {
+          var pic = document.createElement("picture");
+          var source = document.createElement("source");
+          source.type = "image/webp";
+          source.srcset = webp;
+          wrapParent.insertBefore(pic, logoEl);
+          pic.appendChild(source);
+          pic.appendChild(logoEl);
+        }
+      }
       if (logoBox) logoBox.hidden = false;
     }
-    if (src) showHeroLogo(preferWebpUrl(src));
+    if (src) showHeroLogo(src);
     else hideHeroLogo();
   }
 
@@ -526,18 +571,28 @@ function renderProductCardHtml(p) {
   }
   var name = escapeHtml(normalized.name || normalized.nombre || "Producto");
   var slug = normalized.slug || "";
-  var imgSrc = preferWebpUrl(eqImg) || eqImg;
-  return (
-    '<article class="product-card catalog-card">' +
-    '<a class="product-card-visual" href="producto.html?slug=' +
-    encodeURIComponent(slug) +
-    '">' +
+  var imgSrc = eqImg;
+  var webp = preferWebpUrl(eqImg);
+  var imgTag =
     '<img src="' +
     escapeAttr(imgSrc) +
     '" alt="' +
     escapeAttr(name) +
     '" loading="lazy" decoding="async" width="480" height="480" ' +
-    'onerror="this.onerror=null;this.src=\'img/placeholder.jpg\';">' +
+    'onerror="this.onerror=null;this.src=\'img/placeholder.jpg\';">';
+  var visual = webp
+    ? "<picture><source type=\"image/webp\" srcset=\"" +
+      escapeAttr(webp) +
+      '">' +
+      imgTag +
+      "</picture>"
+    : imgTag;
+  return (
+    '<article class="product-card catalog-card">' +
+    '<a class="product-card-visual" href="producto.html?slug=' +
+    encodeURIComponent(slug) +
+    '">' +
+    visual +
     "</a>" +
     '<div class="product-card-body"><h3><a href="producto.html?slug=' +
     encodeURIComponent(slug) +
