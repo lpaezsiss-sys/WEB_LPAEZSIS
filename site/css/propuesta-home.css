@@ -1,0 +1,355 @@
+/**
+ * propuesta-home.css — estilos de la Home (Propuesta A)
+ * Cargado desde index.html junto a style.css.
+ */
+
+:root {
+  --prop-ink: #0f172a;
+  --prop-ink-soft: #334155;
+  --prop-muted: #64748b;
+  --prop-line: #e2e8f0;
+  --prop-surface: #f8fafc;
+  --prop-white: #ffffff;
+  --prop-red: #d81f37;
+  --prop-red-dark: #b8172c;
+  --prop-charcoal: #0d0d0d;
+  --prop-max: 1100px;
+}
+
+/* ——— Hero propuesta ——— */
+.prop-hero .hero-media__slide {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.prop-hero .hero-media__slide.is-active {
+  opacity: 1;
+}
+
+/* Hero managed by JS (api/banners) — solo Home */
+.prop-hero.hero--managed .hero-media__slide,
+.prop-hero.hero--managed .hero-media img.hero-media__slide {
+  animation: none;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 0.6s ease;
+}
+
+.prop-hero.hero--managed .hero-media__slide.is-active,
+.prop-hero.hero--managed .hero-media img.hero-media__slide.is-active {
+  opacity: 1;
+}
+
+.prop-hero .hero-slider-nav {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.prop-hero .hero-slider-btn,
+.prop-hero .hero-slider-dots,
+.prop-hero .hero-dot {
+  pointer-events: auto;
+}
+
+.prop-hero .hero-slider-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prop-hero .hero-slider-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.prop-hero .hero-slider-dots {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.prop-hero .hero-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+}
+
+.prop-hero .hero-dot.is-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
+.prop-hero .hero-inner {
+  max-width: var(--prop-max);
+  gap: 0.85rem;
+}
+
+.prop-hero__brand {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.65rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+  line-height: 1.05;
+}
+
+.prop-hero__title {
+  margin: 0;
+  max-width: 22ch;
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.25;
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+.prop-hero__subtitle {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.prop-hero__lead {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.prop-hero__micro {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+/* --- ESTILOS DE PRUEBA LOCAL PARA HOME PROPUESTA --- */
+
+/* Doble CTA Hero */
+.hero-cta-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.btn-secondary-outline {
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary-outline:hover {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* Módulo por Aplicaciones */
+.home-solutions-section {
+  padding: 4rem 1.5rem;
+  background-color: #f8fafc;
+}
+
+.home-solutions-section .container {
+  max-width: var(--prop-max);
+  margin: 0 auto;
+}
+
+.home-solutions-section .section-header {
+  display: block;
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.home-solutions-section .section-header h2 {
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-weight: 800;
+  font-style: italic;
+  color: var(--prop-ink);
+}
+
+.home-solutions-section .section-header p {
+  margin: 0 auto;
+  max-width: 46ch;
+  color: var(--prop-muted);
+  font-size: 1rem;
+}
+
+.solutions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.solution-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.75rem 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.solution-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #dc2626;
+}
+
+.solution-card__icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.solution-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+.solution-card p {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+  flex-grow: 1;
+  margin: 0;
+}
+
+.solution-link {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+/* Banner aviso propuesta (solo local/preview) */
+.prop-preview-banner {
+  background: #0f172a;
+  color: #e2e8f0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  padding: 0.45rem 1rem;
+}
+
+.prop-preview-banner a {
+  color: #fda4af;
+  font-weight: 750;
+}
+
+/* Modal diagnóstico rápido (aislado a esta propuesta) */
+.prop-modal[hidden] {
+  display: none !important;
+}
+
+.prop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.prop-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.prop-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  background: var(--prop-white);
+  border-radius: 12px;
+  padding: 1.35rem 1.35rem 1.25rem;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.28);
+}
+
+.prop-modal__dialog h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--prop-ink);
+}
+
+.prop-modal__dialog p {
+  margin: 0 0 1rem;
+  color: var(--prop-muted);
+  font-size: 0.95rem;
+}
+
+.prop-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.prop-modal__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--prop-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .prop-hero__title {
+    max-width: none;
+  }
+
+  .solutions-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -254,15 +254,33 @@
         ? formatPrice(p.price_clp)
         : "Cotización";
     var img = resolveProductImage(p);
-    var visual = img
+    var webp = resolveProductWebp(p, img);
+    var imgFallback = PLACEHOLDER_IMG;
+    var onerror =
+      "this.onerror=null;this.src='" +
+      imgFallback.replace(/'/g, "\\'") +
+      "';";
+    var imgTag = img
       ? '<img src="' +
-        img +
+        escapeAttr(img) +
         '" alt="' +
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" loading="lazy" decoding="async" width="480" height="480">'
+        '" class="card-img-top" loading="lazy" decoding="async" width="480" height="480" onerror="' +
+        onerror +
+        '">'
       : "LPAEZ";
+    var visual = imgTag;
+    if (img && webp) {
+      visual =
+        "<picture>" +
+        '<source type="image/webp" srcset="' +
+        escapeAttr(webp) +
+        '">' +
+        imgTag +
+        "</picture>";
+    }
     var payload = productPayload(p);
     var primaryCta =
       p.sale_mode === "buy"
@@ -367,12 +385,44 @@
     "salas-limpias": "img/hero/plant.jpg",
   };
 
+  var PLACEHOLDER_IMG = "img/placeholder.jpg";
+
+  function normalizeMediaUrl(url) {
+    var u = String(url == null ? "" : url).trim();
+    if (!u) return "";
+    if (/^https?:\/\//i.test(u)) return u;
+    if (u.indexOf("//") === 0) {
+      if (/^\/\/img\//i.test(u)) u = u.replace(/^\/+/, "");
+      else return u;
+    }
+    u = u.replace(/^\/+/, "").replace(/^\.\//, "");
+    u = u.replace(/\/{2,}/g, "/");
+    return u;
+  }
+
   function resolveProductImage(p) {
-    if (!p) return PRODUCT_FALLBACKS[0];
-    if (p.image_url) return p.image_url;
+    if (!p) return PLACEHOLDER_IMG;
+    var raw = normalizeMediaUrl(
+      p.image_url || p.imagen_url || p.imagen || p.image || ""
+    );
+    if (raw) return raw;
     if (PRODUCT_IMAGES[p.slug]) return PRODUCT_IMAGES[p.slug];
     var idx = Math.abs(Number(p.id) || 0) % PRODUCT_FALLBACKS.length;
-    return PRODUCT_FALLBACKS[idx];
+    return PRODUCT_FALLBACKS[idx] || PLACEHOLDER_IMG;
+  }
+
+  /** Hermano .webp bajo img/{products,hero,uploads,brand}/ o image_webp de API. */
+  function resolveProductWebp(p, imageUrl) {
+    var explicit = normalizeMediaUrl(p && p.image_webp ? p.image_webp : "");
+    if (explicit) return explicit;
+    var url = normalizeMediaUrl(imageUrl);
+    if (
+      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /\.(jpe?g|png)$/i.test(url)
+    ) {
+      return url.replace(/\.(jpe?g|png)$/i, ".webp");
+    }
+    return "";
   }
 
   function resolveCategoryImage(slug) {
