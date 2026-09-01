@@ -61,7 +61,18 @@
       headers: headers,
       body: body,
     }).then(function (res) {
-      return res.json().then(function (data) {
+      return res.text().then(function (errorText) {
+        var data = {};
+        if (errorText) {
+          try {
+            data = JSON.parse(errorText);
+          } catch (parseErr) {
+            data = { error: errorText.slice(0, 500), raw: true };
+          }
+        }
+        if (!res.ok) {
+          console.error("Detalle del Error HTTP:", res.status, errorText);
+        }
         if (res.status === 401 && path !== "/login") {
           setToken(null);
           showLogin();

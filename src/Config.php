@@ -51,11 +51,11 @@ final class Config
         if (self::$values['UPLOAD_DIR'] === '') {
             // site/img/uploads relative to src/
             self::$values['UPLOAD_DIR'] = dirname($srcDir) . '/site/img/uploads';
-            // On BlueHosting subdomain: public_html/prueba1.../img/uploads may differ;
-            // prefer sibling site folder if present, else public_html/<host>/img/uploads via env.
+            // On BlueHosting: prefer domain front folders under public_html/.
             $candidates = [
-                dirname($srcDir) . '/site/img/uploads',
+                dirname($srcDir) . '/lpaezsis.cl/img/uploads',
                 dirname($srcDir) . '/prueba1.lpaezsis.cl/img/uploads',
+                dirname($srcDir) . '/site/img/uploads',
                 dirname($srcDir) . '/img/uploads',
             ];
             foreach ($candidates as $cand) {
