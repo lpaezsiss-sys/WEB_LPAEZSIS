@@ -27,9 +27,10 @@ function escapeAttr(str) {
  *  Devuelve "" si no aplica conversión (ya es webp, externo o ruta no elegible).
  */
 function preferWebpUrl(url) {
-  var src = String(url || "").trim();
+  var raw = String(url || "").trim();
+  if (!raw || /^https?:\/\//i.test(raw) || raw.indexOf("//") === 0) return "";
+  var src = raw.replace(/^(\/\/|\/)/, "");
   if (!src) return "";
-  if (/^https?:\/\//i.test(src)) return "";
   if (
     /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(src) &&
     /\.(jpe?g|png)$/i.test(src)
@@ -39,65 +40,60 @@ function preferWebpUrl(url) {
   return "";
 }
 
-/** <picture> con source webp opcional + img raster (evita 404 de webp en prod). */
+/** Img de logo de marca: finalSrc + img-fluid + onerror → placeholder. */
 function brandLogoPictureHtml(src, alt, placeholder) {
-  var raster = String(src || "").trim();
-  if (!raster) {
-    return (
-      '<span class="industrial-brand-card__name">' + escapeHtml(alt || "") + "</span>"
-    );
-  }
-  var webp = preferWebpUrl(raster);
-  var ph = placeholder || "img/placeholder-logo.png";
-  var onerr =
-    "if(!this.dataset.fb){this.dataset.fb=1;this.src='" +
-    ph.replace(/'/g, "\\'") +
-    "';}else{this.style.display='none';}";
-  var img =
-    '<img src="' +
-    escapeAttr(raster) +
-    '" alt="' +
-    escapeAttr(alt || "") +
-    '" loading="lazy" decoding="async" width="140" height="60" onerror="' +
-    onerr +
-    '">';
-  if (!webp || webp === raster) return img;
+  var rawImg = String(src || "").trim();
+  var ph = placeholder || "img/placeholder.jpg";
+  var finalSrc = rawImg
+    ? /^https?:\/\//i.test(rawImg)
+      ? rawImg
+      : rawImg.indexOf("//") === 0
+        ? "https:" + rawImg
+        : rawImg.replace(/^(\/\/|\/)/, "") || ph
+    : ph;
+  var nombre = alt || "Marca";
   return (
-    "<picture>" +
-    '<source type="image/webp" srcset="' +
-    escapeAttr(webp) +
-    '">' +
-    img +
-    "</picture>"
+    '<img src="' +
+    escapeAttr(finalSrc) +
+    '" alt="' +
+    escapeAttr(nombre) +
+    '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
+    ph.replace(/'/g, "\\'") +
+    "';\">"
   );
 }
 
 /**
  * Extrae y normaliza el logo de marca (hero + carrusel).
- * Fallbacks: logo_url → imagen_logo → imagen → logo → img/marcas/{slug}.jpg → img/brand/{slug}.png
+ * imagen_url | logo_url | imagen → sin slash inicial; vacío → placeholder.
  */
 function resolveBrandLogoUrl(brand) {
   brand = brand || {};
   var slug = String(brand.slug || "").trim();
-  var logoUrl =
+  var rawImg =
+    brand.imagen_url ||
     brand.logo_url ||
     brand.imagen_logo ||
     brand.imagen ||
     brand.logo ||
-    (slug ? "img/marcas/" + slug + ".jpg" : "") ||
-    (slug ? "img/brand/" + slug + ".png" : "") ||
     "";
-  logoUrl = String(logoUrl || "").trim();
-  if (!logoUrl) return "";
+  rawImg = String(rawImg || "").trim();
+  var finalSrc = rawImg
+    ? rawImg.replace(/^(\/\/|\/)/, "")
+    : "img/placeholder.jpg";
 
-  // Absolutos http(s) sin tocar
-  if (/^https?:\/\//i.test(logoUrl)) return logoUrl;
-  // Protocol-relative → https
-  if (logoUrl.indexOf("//") === 0) return "https:" + logoUrl;
+  if (rawImg) {
+    if (/^https?:\/\//i.test(rawImg)) return rawImg;
+    if (rawImg.indexOf("//") === 0) return "https:" + rawImg;
+    return finalSrc || "img/placeholder.jpg";
+  }
 
-  // Quitar slash inicial (p.ej. /img/brand/sonic-air.png → img/brand/...)
-  var logoNormalizado = logoUrl.replace(/^(\/\/|\/)/, "");
-  return logoNormalizado;
+  // Sin URL en API: guess por slug (mapa / rutas estáticas)
+  if (slug && typeof LOGO_BY_SLUG !== "undefined" && LOGO_BY_SLUG[slug]) {
+    return LOGO_BY_SLUG[slug];
+  }
+  if (slug) return "img/brand/" + slug + ".png";
+  return "img/placeholder.jpg";
 }
 
 var LOGO_BY_SLUG = {
@@ -116,15 +112,16 @@ var LOGO_BY_SLUG = {
 function resolveBrandLogoWithSlugFallback(brand) {
   var src = resolveBrandLogoUrl(brand);
   var slug = String((brand && brand.slug) || "").trim();
-  if (src && !/^img\/marcas\//i.test(src)) return src;
-  // Si solo quedó el guess img/marcas/... o vacío, usar mapa local conocido
+  if (src && src !== "img/placeholder.jpg" && !/^img\/marcas\//i.test(src)) {
+    return src;
+  }
+  // Si solo quedó placeholder / guess img/marcas/... , usar mapa local conocido
   if (slug && LOGO_BY_SLUG[slug]) return LOGO_BY_SLUG[slug];
   if (slug) {
     var guess = slug.toLowerCase().replace(/-systems$/i, "");
     if (LOGO_BY_SLUG[guess]) return LOGO_BY_SLUG[guess];
   }
-  // img/marcas/{slug}.jpg solo si no hay mejor opción
-  return src;
+  return src || "img/placeholder.jpg";
 }
 
 function productTipoOf(p) {
@@ -269,7 +266,7 @@ function renderBrandSelector(brands, activeSlug) {
     document.querySelector(".brand-selector");
   if (!container) return;
 
-  var PLACEHOLDER = "img/placeholder-logo.png";
+  var PLACEHOLDER = "img/placeholder.jpg";
   var list = (brands || []).filter(function (b) {
     var slug = b.slug || "";
     // "Otras marcas": excluir la marca activa de la vista de detalle
@@ -288,9 +285,20 @@ function renderBrandSelector(brands, activeSlug) {
   var cards = list
     .map(function (b) {
       var slug = b.slug || "";
-      var nombre = b.nombre || b.name || slug;
-      var logo = resolveBrandLogoWithSlugFallback(b);
-      var img = brandLogoPictureHtml(logo, nombre, PLACEHOLDER);
+      var nombre = b.nombre || b.name || "Marca";
+      var rawImg = b.imagen_url || b.logo_url || b.imagen || "";
+      var finalSrc = rawImg
+        ? String(rawImg).replace(/^(\/\/|\/)/, "")
+        : PLACEHOLDER;
+      var logo = resolveBrandLogoWithSlugFallback(b) || finalSrc;
+      var img =
+        '<img src="' +
+        escapeAttr(logo) +
+        '" alt="' +
+        escapeAttr(nombre) +
+        '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
+        PLACEHOLDER.replace(/'/g, "\\'") +
+        "';\">";
       return (
         '<a href="marcas.html?slug=' +
         encodeURIComponent(slug) +
@@ -406,7 +414,14 @@ function updateBrandHero(brand) {
       if (logoBox) logoBox.hidden = true;
     }
     function showHeroLogo(url) {
-      var raster = String(url || "").trim();
+      var rawImg = String(url || "").trim();
+      var raster = rawImg
+        ? /^https?:\/\//i.test(rawImg)
+          ? rawImg
+          : rawImg.indexOf("//") === 0
+            ? "https:" + rawImg
+            : rawImg.replace(/^(\/\/|\/)/, "") || "img/placeholder.jpg"
+        : "img/placeholder.jpg";
       var webp = preferWebpUrl(raster);
       logoEl.onerror = function () {
         if (!logoEl.dataset.fb) {
@@ -419,7 +434,7 @@ function updateBrandHero(brand) {
         }
         if (logoEl.dataset.fb === "1") {
           logoEl.dataset.fb = "2";
-          logoEl.src = "img/placeholder-logo.png";
+          logoEl.src = "img/placeholder.jpg";
           return;
         }
         hideHeroLogo();
