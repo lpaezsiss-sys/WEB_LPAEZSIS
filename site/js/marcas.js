@@ -7,6 +7,67 @@ document.addEventListener("DOMContentLoaded", function () {
   initMarcasPage();
 });
 
+var BRAND_IMG_PLACEHOLDER = "img/placeholder.jpg";
+
+/**
+ * Normaliza cualquier URL de imagen de marca (logo, banner, galería, fotos).
+ * Quita slashes iniciales redundantes y cae a placeholder si viene vacía.
+ */
+function formatBrandImg(url) {
+  if (!url || typeof url !== "string" || url.trim() === "") {
+    return BRAND_IMG_PLACEHOLDER;
+  }
+  var trimmed = url.trim();
+  // Absolutos http(s) sin alterar
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // Protocol-relative → https
+  if (trimmed.indexOf("//") === 0) return "https:" + trimmed;
+  // Elimina slashes iniciales redundantes
+  var cleaned = trimmed.replace(/^(\/\/|\/)/, "");
+  return cleaned !== "" ? cleaned : BRAND_IMG_PLACEHOLDER;
+}
+
+/**
+ * Extrae URL cruda desde string u objeto de galería/foto.
+ * Equivale a: imgObj.url || imgObj.imagen || imgObj.src || imgObj
+ */
+function brandImgSource(imgObj) {
+  if (imgObj == null) return "";
+  if (typeof imgObj === "string") return imgObj;
+  if (typeof imgObj === "object") {
+    return (
+      imgObj.url ||
+      imgObj.imagen ||
+      imgObj.src ||
+      imgObj.imagen_url ||
+      imgObj.image_url ||
+      ""
+    );
+  }
+  return String(imgObj);
+}
+
+/** Markup <img> homogéneo para logos / galería / banners de marca. */
+function brandImgTag(imgObj, alt) {
+  var imgSrc = formatBrandImg(
+    (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
+  );
+  // Si imgObj es objeto sin url/imagen/src, brandImgSource cubre imagen_url/etc.
+  if (imgSrc === BRAND_IMG_PLACEHOLDER && imgObj && typeof imgObj === "object") {
+    imgSrc = formatBrandImg(brandImgSource(imgObj));
+  }
+  var nombre = alt || "Marca";
+  return (
+    '<img src="' +
+    escapeAttr(imgSrc) +
+    '" alt="' +
+    escapeAttr(nombre) +
+    '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
+    BRAND_IMG_PLACEHOLDER.replace(/'/g, "\\'") +
+    "';\">"
+  );
+}
+
 function escapeHtml(str) {
   if (window.Lpaez && typeof Lpaez.escapeHtml === "function") {
     return Lpaez.escapeHtml(str);
@@ -27,45 +88,26 @@ function escapeAttr(str) {
  *  Devuelve "" si no aplica conversión (ya es webp, externo o ruta no elegible).
  */
 function preferWebpUrl(url) {
-  var raw = String(url || "").trim();
-  if (!raw || /^https?:\/\//i.test(raw) || raw.indexOf("//") === 0) return "";
-  var src = raw.replace(/^(\/\/|\/)/, "");
-  if (!src) return "";
+  var formatted = formatBrandImg(url);
+  if (!formatted || formatted === BRAND_IMG_PLACEHOLDER) return "";
+  if (/^https?:\/\//i.test(formatted)) return "";
   if (
-    /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(src) &&
-    /\.(jpe?g|png)$/i.test(src)
+    /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(formatted) &&
+    /\.(jpe?g|png)$/i.test(formatted)
   ) {
-    return src.replace(/\.(jpe?g|png)$/i, ".webp");
+    return formatted.replace(/\.(jpe?g|png)$/i, ".webp");
   }
   return "";
 }
 
-/** Img de logo de marca: finalSrc + img-fluid + onerror → placeholder. */
-function brandLogoPictureHtml(src, alt, placeholder) {
-  var rawImg = String(src || "").trim();
-  var ph = placeholder || "img/placeholder.jpg";
-  var finalSrc = rawImg
-    ? /^https?:\/\//i.test(rawImg)
-      ? rawImg
-      : rawImg.indexOf("//") === 0
-        ? "https:" + rawImg
-        : rawImg.replace(/^(\/\/|\/)/, "") || ph
-    : ph;
-  var nombre = alt || "Marca";
-  return (
-    '<img src="' +
-    escapeAttr(finalSrc) +
-    '" alt="' +
-    escapeAttr(nombre) +
-    '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
-    ph.replace(/'/g, "\\'") +
-    "';\">"
-  );
+/** Img de logo de marca: formatBrandImg + img-fluid + onerror → placeholder. */
+function brandLogoPictureHtml(src, alt) {
+  return brandImgTag(src, alt || "Marca");
 }
 
 /**
  * Extrae y normaliza el logo de marca (hero + carrusel).
- * imagen_url | logo_url | imagen → sin slash inicial; vacío → placeholder.
+ * imagen_url | logo_url | imagen → formatBrandImg; vacío → placeholder / mapa slug.
  */
 function resolveBrandLogoUrl(brand) {
   brand = brand || {};
@@ -76,24 +118,18 @@ function resolveBrandLogoUrl(brand) {
     brand.imagen_logo ||
     brand.imagen ||
     brand.logo ||
+    brand.banner_url ||
+    brand.banner ||
     "";
   rawImg = String(rawImg || "").trim();
-  var finalSrc = rawImg
-    ? rawImg.replace(/^(\/\/|\/)/, "")
-    : "img/placeholder.jpg";
-
-  if (rawImg) {
-    if (/^https?:\/\//i.test(rawImg)) return rawImg;
-    if (rawImg.indexOf("//") === 0) return "https:" + rawImg;
-    return finalSrc || "img/placeholder.jpg";
-  }
+  if (rawImg) return formatBrandImg(rawImg);
 
   // Sin URL en API: guess por slug (mapa / rutas estáticas)
   if (slug && typeof LOGO_BY_SLUG !== "undefined" && LOGO_BY_SLUG[slug]) {
-    return LOGO_BY_SLUG[slug];
+    return formatBrandImg(LOGO_BY_SLUG[slug]);
   }
-  if (slug) return "img/brand/" + slug + ".png";
-  return "img/placeholder.jpg";
+  if (slug) return formatBrandImg("img/brand/" + slug + ".png");
+  return BRAND_IMG_PLACEHOLDER;
 }
 
 var LOGO_BY_SLUG = {
@@ -112,16 +148,15 @@ var LOGO_BY_SLUG = {
 function resolveBrandLogoWithSlugFallback(brand) {
   var src = resolveBrandLogoUrl(brand);
   var slug = String((brand && brand.slug) || "").trim();
-  if (src && src !== "img/placeholder.jpg" && !/^img\/marcas\//i.test(src)) {
-    return src;
+  if (src && src !== BRAND_IMG_PLACEHOLDER && !/^img\/marcas\//i.test(src)) {
+    return formatBrandImg(src);
   }
-  // Si solo quedó placeholder / guess img/marcas/... , usar mapa local conocido
-  if (slug && LOGO_BY_SLUG[slug]) return LOGO_BY_SLUG[slug];
+  if (slug && LOGO_BY_SLUG[slug]) return formatBrandImg(LOGO_BY_SLUG[slug]);
   if (slug) {
     var guess = slug.toLowerCase().replace(/-systems$/i, "");
-    if (LOGO_BY_SLUG[guess]) return LOGO_BY_SLUG[guess];
+    if (LOGO_BY_SLUG[guess]) return formatBrandImg(LOGO_BY_SLUG[guess]);
   }
-  return src || "img/placeholder.jpg";
+  return formatBrandImg(src);
 }
 
 function productTipoOf(p) {
@@ -266,7 +301,6 @@ function renderBrandSelector(brands, activeSlug) {
     document.querySelector(".brand-selector");
   if (!container) return;
 
-  var PLACEHOLDER = "img/placeholder.jpg";
   var list = (brands || []).filter(function (b) {
     var slug = b.slug || "";
     // "Otras marcas": excluir la marca activa de la vista de detalle
@@ -287,18 +321,10 @@ function renderBrandSelector(brands, activeSlug) {
       var slug = b.slug || "";
       var nombre = b.nombre || b.name || "Marca";
       var rawImg = b.imagen_url || b.logo_url || b.imagen || "";
-      var finalSrc = rawImg
-        ? String(rawImg).replace(/^(\/\/|\/)/, "")
-        : PLACEHOLDER;
-      var logo = resolveBrandLogoWithSlugFallback(b) || finalSrc;
-      var img =
-        '<img src="' +
-        escapeAttr(logo) +
-        '" alt="' +
-        escapeAttr(nombre) +
-        '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
-        PLACEHOLDER.replace(/'/g, "\\'") +
-        "';\">";
+      var finalSrc = formatBrandImg(
+        resolveBrandLogoWithSlugFallback(b) || rawImg
+      );
+      var img = brandImgTag(finalSrc, nombre);
       return (
         '<a href="marcas.html?slug=' +
         encodeURIComponent(slug) +
@@ -414,31 +440,25 @@ function updateBrandHero(brand) {
       if (logoBox) logoBox.hidden = true;
     }
     function showHeroLogo(url) {
-      var rawImg = String(url || "").trim();
-      var raster = rawImg
-        ? /^https?:\/\//i.test(rawImg)
-          ? rawImg
-          : rawImg.indexOf("//") === 0
-            ? "https:" + rawImg
-            : rawImg.replace(/^(\/\/|\/)/, "") || "img/placeholder.jpg"
-        : "img/placeholder.jpg";
+      var raster = formatBrandImg(url);
       var webp = preferWebpUrl(raster);
       logoEl.onerror = function () {
         if (!logoEl.dataset.fb) {
           logoEl.dataset.fb = "1";
           var alt = slug && LOGO_BY_SLUG[slug] ? LOGO_BY_SLUG[slug] : "";
           if (alt && alt !== raster) {
-            logoEl.src = alt;
+            logoEl.src = formatBrandImg(alt);
             return;
           }
         }
         if (logoEl.dataset.fb === "1") {
           logoEl.dataset.fb = "2";
-          logoEl.src = "img/placeholder.jpg";
+          logoEl.src = BRAND_IMG_PLACEHOLDER;
           return;
         }
         hideHeroLogo();
       };
+      logoEl.classList.add("img-fluid");
       logoEl.src = raster;
       logoEl.alt = "Logo " + (nombre || slug || "marca");
       logoEl.hidden = false;
@@ -517,15 +537,22 @@ async function loadBrandDetailExtras(slug) {
           var real =
             img.getAttribute("data-src") ||
             img.getAttribute("data-lazy-src") ||
-            img.getAttribute("data-original");
-          if (real) {
-            img.setAttribute("src", real);
-            img.removeAttribute("data-src");
-            img.removeAttribute("data-lazy-src");
-          }
-          if ((img.getAttribute("src") || "").indexOf("data:image") === 0) {
+            img.getAttribute("data-original") ||
+            img.getAttribute("src");
+          if ((real || "").indexOf("data:image") === 0) {
             img.remove();
+            return;
           }
+          var formatted = formatBrandImg(real || "");
+          img.setAttribute("src", formatted);
+          img.classList.add("img-fluid");
+          img.onerror = function () {
+            this.onerror = null;
+            this.src = BRAND_IMG_PLACEHOLDER;
+          };
+          img.removeAttribute("data-src");
+          img.removeAttribute("data-lazy-src");
+          img.removeAttribute("data-original");
         });
         contentEl.hidden = false;
       } else {
@@ -535,18 +562,27 @@ async function loadBrandDetailExtras(slug) {
     }
 
     if (galleryEl) {
-      var urls = brand.gallery || [];
+      var urls = brand.gallery || brand.galeria || brand.fotos || brand.images || [];
       if (urls && urls.length) {
+        var marcaNombre = brand.nombre || brand.name || "Marca";
         galleryEl.hidden = false;
         galleryEl.innerHTML = urls
-          .map(function (u) {
+          .map(function (imgObj) {
+            var imgSrc = formatBrandImg(
+              (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
+            );
             return (
               '<a class="brand-gallery-item" href="' +
-              escapeAttr(u) +
+              escapeAttr(imgSrc) +
               '" target="_blank" rel="noopener">' +
               '<img src="' +
-              escapeAttr(u) +
-              '" alt="" loading="lazy"></a>'
+              escapeAttr(imgSrc) +
+              '" alt="' +
+              escapeAttr(marcaNombre) +
+              '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
+              BRAND_IMG_PLACEHOLDER.replace(/'/g, "\\'") +
+              "';\">" +
+              "</a>"
             );
           })
           .join("");
@@ -562,14 +598,9 @@ async function loadBrandDetailExtras(slug) {
 
 /** Normaliza imagen de equipo/producto: imagen_url | image_url | placeholder. */
 function resolveEquipImage(eq) {
-  var eqImg = String(
-    (eq && (eq.imagen_url || eq.image_url || eq.imagen || eq.image)) ||
-      "img/placeholder.jpg"
-  ).trim();
-  if (!eqImg) eqImg = "img/placeholder.jpg";
-  if (/^https?:\/\//i.test(eqImg)) return eqImg;
-  if (eqImg.indexOf("//") === 0) return "https:" + eqImg;
-  return eqImg.replace(/^(\/\/|\/)/, "") || "img/placeholder.jpg";
+  var raw =
+    (eq && (eq.imagen_url || eq.image_url || eq.imagen || eq.image)) || "";
+  return formatBrandImg(raw);
 }
 
 function renderProductCardHtml(p) {
@@ -586,17 +617,11 @@ function renderProductCardHtml(p) {
   }
   var name = escapeHtml(normalized.name || normalized.nombre || "Producto");
   var slug = normalized.slug || "";
-  var imgSrc = eqImg;
-  var webp = preferWebpUrl(eqImg);
-  var imgTag =
-    '<img src="' +
-    escapeAttr(imgSrc) +
-    '" alt="' +
-    escapeAttr(name) +
-    '" loading="lazy" decoding="async" width="480" height="480" ' +
-    'onerror="this.onerror=null;this.src=\'img/placeholder.jpg\';">';
+  var imgSrc = formatBrandImg(eqImg);
+  var webp = preferWebpUrl(imgSrc);
+  var imgTag = brandImgTag(imgSrc, name);
   var visual = webp
-    ? "<picture><source type=\"image/webp\" srcset=\"" +
+    ? '<picture><source type="image/webp" srcset="' +
       escapeAttr(webp) +
       '">' +
       imgTag +
