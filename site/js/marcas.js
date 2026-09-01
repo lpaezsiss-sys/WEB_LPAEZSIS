@@ -11,6 +11,7 @@ var BRAND_IMG_PLACEHOLDER = "img/placeholder.jpg";
 
 /**
  * Normaliza cualquier URL de imagen de marca (logo, banner, galería, fotos).
+ * Reescribe legacy wp-content/uploads → img/products/FILE (WP ya no sirve binarios).
  * Quita slashes iniciales redundantes y cae a placeholder si viene vacía.
  */
 function formatBrandImg(url) {
@@ -18,6 +19,11 @@ function formatBrandImg(url) {
     return BRAND_IMG_PLACEHOLDER;
   }
   var trimmed = url.trim();
+  // Legacy WordPress: responde text/html, no la imagen → mapa local
+  if (/wp-content\/uploads/i.test(trimmed)) {
+    var wpFile = trimmed.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+    if (wpFile) return "img/products/" + wpFile[1];
+  }
   // Absolutos http(s) sin alterar
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   // Protocol-relative → https
@@ -596,11 +602,24 @@ async function loadBrandDetailExtras(slug) {
   }
 }
 
-/** Normaliza imagen de equipo/producto: imagen_url | image_url | placeholder. */
+/**
+ * Normaliza imagen de equipo/producto: imagen_url | image_url.
+ * Si no hay URL, usa Lpaez.resolveProductImage (mapa slug / fallbacks diversos),
+ * no el placeholder genérico (antes era una foto de impeller).
+ */
 function resolveEquipImage(eq) {
   var raw =
     (eq && (eq.imagen_url || eq.image_url || eq.imagen || eq.image)) || "";
-  return formatBrandImg(raw);
+  raw = String(raw || "").trim();
+  if (raw) return formatBrandImg(raw);
+  if (window.Lpaez && typeof Lpaez.resolveProductImage === "function") {
+    try {
+      return formatBrandImg(Lpaez.resolveProductImage(eq));
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  return BRAND_IMG_PLACEHOLDER;
 }
 
 function renderProductCardHtml(p) {
