@@ -390,6 +390,11 @@
   function normalizeMediaUrl(url) {
     var u = String(url == null ? "" : url).trim();
     if (!u) return "";
+    // Legacy WP uploads → local (WP responde text/html, no binarios)
+    if (/wp-content\/uploads/i.test(u)) {
+      var wpFile = u.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+      if (wpFile) return "img/products/" + wpFile[1];
+    }
     if (/^https?:\/\//i.test(u)) return u;
     if (u.indexOf("//") === 0) {
       if (/^\/\/img\//i.test(u)) u = u.replace(/^\/+/, "");
