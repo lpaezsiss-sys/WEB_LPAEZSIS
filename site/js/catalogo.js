@@ -500,7 +500,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "this.onerror=null;this.src='" + String(fallback).replace(/'/g, "\\'") + "';";
     const imgTag =
       `<img src="${escapeAttr(img)}" alt="${escapeAttr(name)}" title="${escapeAttr(name)}"` +
-      ` class="card-img-top" loading="lazy" decoding="async" width="480" height="480" onerror="${onerror}">`;
+      ` class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="${onerror}">`;
     if (webp) {
       return (
         `<picture>` +

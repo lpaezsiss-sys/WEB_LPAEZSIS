@@ -15,12 +15,15 @@ import argparse
 import json
 import mimetypes
 import os
+import re
 import secrets
 import sqlite3
 import sys
 import time
 import urllib.error
 import urllib.request
+from email import policy
+from email.parser import BytesParser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -32,8 +35,26 @@ DEFAULT_DB = ROOT / "data" / "lpaezsis.sqlite"
 DEFAULT_API = "https://lpaezsis.soptec.cl"
 DEFAULT_PORT = 8765
 
+# Ensure local static serving recognizes WebP.
+mimetypes.add_type("image/webp", ".webp")
+
 # In-memory admin sessions for local preview only.
 _LOCAL_SESSIONS: dict[str, float] = {}
+
+_ALLOWED_UPLOAD_TYPES = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+}
+_ALLOWED_UPLOAD_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
+_EXT_TO_MIME = {
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png": "image/png",
+    "webp": "image/webp",
+    "gif": "image/gif",
+}
 
 
 def _row_to_dict(row: sqlite3.Row) -> dict[str, Any]:
@@ -316,6 +337,9 @@ class PreviewHandler(BaseHTTPRequestHandler):
                         ).fetchall()
                     self._json(200, {"products": [_row_to_dict(r) for r in rows]})
                     return
+                if path == "/api/admin/upload" and self.command == "POST":
+                    self._handle_admin_upload()
+                    return
                 self._json(
                     501,
                     {
@@ -394,6 +418,74 @@ class PreviewHandler(BaseHTTPRequestHandler):
             self._cors()
             self.end_headers()
             self.wfile.write(payload)
+
+    def _handle_admin_upload(self) -> None:
+        """Save admin image uploads to site/img/uploads/ (JPG/PNG/WEBP/GIF)."""
+        ctype = self.headers.get("Content-Type") or ""
+        if "multipart/form-data" not in ctype.lower():
+            self._json(400, {"error": "Se espera multipart/form-data"})
+            return
+        length = int(self.headers.get("Content-Length") or 0)
+        if length <= 0:
+            self._json(400, {"error": "Archivo requerido"})
+            return
+        if length > 5 * 1024 * 1024 + 64 * 1024:
+            self._json(400, {"error": "La imagen supera 5 MB"})
+            return
+        raw = self.rfile.read(length)
+        try:
+            msg = BytesParser(policy=policy.default).parsebytes(
+                b"Content-Type: " + ctype.encode("utf-8", "replace") + b"\r\n\r\n" + raw
+            )
+        except Exception as exc:  # noqa: BLE001
+            self._json(400, {"error": "No se pudo leer el archivo", "detail": str(exc)})
+            return
+
+        file_part = None
+        for part in msg.iter_parts():
+            cd = part.get("Content-Disposition", "")
+            name_m = re.search(r'name="([^"]+)"', cd or "")
+            field = (name_m.group(1) if name_m else "") or ""
+            filename = part.get_filename() or ""
+            if field in ("file", "image") or filename:
+                file_part = part
+                break
+        if file_part is None:
+            self._json(400, {"error": "Archivo requerido"})
+            return
+
+        filename = file_part.get_filename() or "upload.bin"
+        client_ext = Path(filename).suffix.lower().lstrip(".")
+        payload = file_part.get_payload(decode=True) or b""
+        if not payload:
+            self._json(400, {"error": "Archivo vacío"})
+            return
+        if len(payload) > 5 * 1024 * 1024:
+            self._json(400, {"error": "La imagen supera 5 MB"})
+            return
+
+        part_mime = (file_part.get_content_type() or "").lower()
+        if part_mime in ("", "application/octet-stream"):
+            part_mime = _EXT_TO_MIME.get(client_ext, part_mime)
+        if part_mime not in _ALLOWED_UPLOAD_TYPES:
+            if client_ext not in _ALLOWED_UPLOAD_EXTS:
+                self._json(400, {"error": "Solo se permiten JPG, PNG, WEBP o GIF"})
+                return
+            part_mime = _EXT_TO_MIME[client_ext]
+        if client_ext and client_ext not in _ALLOWED_UPLOAD_EXTS:
+            self._json(400, {"error": "Extensión no permitida. Use jpg, png, webp o gif."})
+            return
+
+        ext = _ALLOWED_UPLOAD_TYPES[part_mime]
+        if client_ext in _ALLOWED_UPLOAD_EXTS and _EXT_TO_MIME.get(client_ext) == part_mime:
+            ext = "jpg" if client_ext == "jpeg" else client_ext
+
+        upload_dir = self.site_root / "img" / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        name = "p-" + secrets.token_hex(8) + "." + ext
+        dest = upload_dir / name
+        dest.write_bytes(payload)
+        self._json(200, {"url": "/img/uploads/" + name})
 
     def _serve_static(self, body: bool = True) -> None:
         parsed = urlparse(self.path)

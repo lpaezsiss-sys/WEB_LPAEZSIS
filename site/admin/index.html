@@ -194,11 +194,11 @@
       <h3>Elegir imagen</h3>
       <input type="hidden" id="imageTargetProductId" value="">
       <div class="image-dialog-preview">
-        <img id="imageDialogPreview" alt="" hidden>
+        <img id="imageDialogPreview" data-admin-image-preview alt="" hidden>
         <span class="image-pick__hint" id="imageDialogHint">Sin imagen</span>
       </div>
       <label for="imageFileInput">Archivo local (JPG, PNG, WEBP, GIF · máx. 5 MB)</label>
-      <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp,image/gif">
+      <input type="file" id="imageFileInput" data-admin-file-input accept="image/jpeg,image/png,image/webp,image/gif,.webp">
       <label for="imageUrlField">O URL</label>
       <!-- type=text: permite rutas relativas /img/uploads/... (type=url las rechaza) -->
       <input type="text" id="imageUrlField" inputmode="url" autocomplete="off" placeholder="https://… o /img/uploads/…">
@@ -212,6 +212,6 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-  <script src="js/admin.js?v=14"></script>
+  <script src="js/admin.js?v=17"></script>
 </body>
 </html>

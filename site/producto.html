@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=82">
+  <link rel="stylesheet" href="css/style.css?v=83">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -39,7 +39,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=38"></script>
-  <script src="js/site.js?v=22"></script>
+  <script src="js/site.js?v=29"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -106,11 +106,17 @@
         }
         crumb.hidden = false;
 
-        if (product.image_url || Lpaez.resolveProductImage(product)) {
-          var src = Lpaez.resolveProductImage(product);
-          document.getElementById("productVisual").innerHTML =
-            '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
-        }
+        var rawImg = product.imagen_url || product.image_url || "";
+        var finalSrc = rawImg
+          ? String(rawImg).replace(/^(\/\/|\/)/, "")
+          : "img/placeholder.jpg";
+        var nombre = product.nombre || product.name || "Producto";
+        document.getElementById("productVisual").innerHTML =
+          '<img src="' +
+          finalSrc +
+          '" alt="' +
+          Lpaez.escapeHtml(nombre) +
+          '" class="img-fluid" onerror="this.onerror=null; this.src=\'img/placeholder.jpg\';">';
         var actions = document.getElementById("productActions");
         if (product.sale_mode === "buy") {
           actions.innerHTML =

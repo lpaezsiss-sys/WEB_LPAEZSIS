@@ -109,13 +109,12 @@
   }
 
   function normalizeImage(url) {
-    var image = String(url || "").trim();
-    if (/wp-content\/uploads/i.test(image)) {
-      var file = image.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
-      if (file) image = "img/products/" + file[1];
+    var rawImg = String(url || "").trim();
+    if (/wp-content\/uploads/i.test(rawImg)) {
+      var file = rawImg.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+      if (file) rawImg = "img/products/" + file[1];
     }
-    if (!image) image = FALLBACK_IMG;
-    return image;
+    return rawImg ? rawImg.replace(/^(\/\/|\/)/, "") : "img/placeholder.jpg";
   }
 
   function normalizeProduct(raw) {
@@ -130,7 +129,7 @@
       brand_slug: prod.brand_slug || "",
       brand_name: prod.brand_name || "",
       stock_status: prod.stock_status || "on_request",
-      image_url: normalizeImage(prod.image_url || prod.image),
+      image_url: normalizeImage(prod.imagen_url || prod.image_url || prod.image),
       compat: extractCompat(prod),
       tipo_insumo: classifyTipo(prod),
       equipos: classifyEquipo(prod),
@@ -157,11 +156,12 @@
   };
 
   function cardHtml(p) {
-    var img = p.image_url || FALLBACK_IMG;
+    var rawImg = p.imagen_url || p.image_url || "";
+    var finalSrc = rawImg
+      ? String(rawImg).replace(/^(\/\/|\/)/, "")
+      : "img/placeholder.jpg";
     var onerror =
-      "this.onerror=null;this.src='" +
-      PLACEHOLDER_IMG.replace(/'/g, "\\'") +
-      "';";
+      "this.onerror=null;this.src='img/placeholder.jpg';";
     return (
       '<article class="product-card catalog-card repuesto-card reveal" data-id="' +
       escapeAttr(p.id) +
@@ -173,10 +173,10 @@
       '">' +
       '<span class="badge-type badge-type--repuesto">REPUESTO</span>' +
       '<img src="' +
-      escapeAttr(img) +
+      escapeAttr(finalSrc) +
       '" alt="' +
-      escapeAttr(p.name) +
-      '" loading="lazy" decoding="async" width="480" height="480" onerror="' +
+      escapeAttr(p.nombre || p.name) +
+      '" class="img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="' +
       onerror +
       '">' +
       "</a>" +

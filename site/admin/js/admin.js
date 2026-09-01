@@ -343,6 +343,8 @@
     if (!url) return "";
     url = String(url).trim();
     if (!url) return "";
+    // Local blob:/data: previews must stay as-is.
+    if (/^data:/i.test(url) || /^blob:/i.test(url)) return url;
     // Prefer local copies of legacy WP uploads when filename matches.
     var wp = url.match(/\/wp-content\/uploads\/[^?\s]*\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
     if (wp) return "/img/products/" + wp[1];
@@ -468,9 +470,23 @@
     }
   }
 
+  var ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  var ALLOWED_IMAGE_EXTS = ["jpg", "jpeg", "png", "webp", "gif"];
+  var previewObjectUrl = "";
+
+  function revokePreviewObjectUrl() {
+    if (previewObjectUrl) {
+      try {
+        URL.revokeObjectURL(previewObjectUrl);
+      } catch (e) {}
+      previewObjectUrl = "";
+    }
+  }
+
   function setDialogImagePreview(url) {
     var img = document.getElementById("imageDialogPreview");
     var hint = document.getElementById("imageDialogHint");
+    if (url !== previewObjectUrl) revokePreviewObjectUrl();
     if (url) {
       img.hidden = false;
       img.src = toSitePath(url) || url;
@@ -480,6 +496,15 @@
       img.removeAttribute("src");
       hint.hidden = false;
     }
+  }
+
+  function isAllowedImageFile(file) {
+    if (!file) return false;
+    var type = String(file.type || "").toLowerCase();
+    var name = String(file.name || "");
+    var ext = name.indexOf(".") >= 0 ? name.split(".").pop().toLowerCase() : "";
+    if (type && ALLOWED_IMAGE_TYPES.indexOf(type) !== -1) return true;
+    return ALLOWED_IMAGE_EXTS.indexOf(ext) !== -1;
   }
 
   var imagePickerContext = null;
@@ -538,14 +563,45 @@
   });
 
   document.getElementById("imageCancel").addEventListener("click", function () {
+    revokePreviewObjectUrl();
     document.getElementById("imageDialog").close();
   });
 
-  document.getElementById("imageFileInput").addEventListener("change", function () {
-    var file = this.files && this.files[0];
+  // Modal "Elegir imagen": previsualización inmediata (WebP incluida) + subida.
+  var fileInputAdmin =
+    document.querySelector("[data-admin-file-input]") ||
+    document.getElementById("imageFileInput");
+  var adminImagePreview =
+    document.querySelector("[data-admin-image-preview]") ||
+    document.getElementById("imageDialogPreview");
+
+  fileInputAdmin.addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
     var err = document.getElementById("imageError");
     err.hidden = true;
     if (!file) return;
+    if (!isAllowedImageFile(file)) {
+      err.hidden = false;
+      err.textContent = "Formato no permitido. Use JPG, PNG, WEBP o GIF.";
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      err.hidden = false;
+      err.textContent = "La imagen supera 5 MB";
+      e.target.value = "";
+      return;
+    }
+    var tempUrl = URL.createObjectURL(file);
+    revokePreviewObjectUrl();
+    previewObjectUrl = tempUrl;
+    if (adminImagePreview) {
+      adminImagePreview.hidden = false;
+      adminImagePreview.src = tempUrl;
+    }
+    var hint = document.getElementById("imageDialogHint");
+    if (hint) hint.hidden = true;
+
     var fd = new FormData();
     fd.append("file", file);
     api("/upload", { method: "POST", formData: fd }).then(function (res) {
@@ -558,7 +614,6 @@
       document.getElementById("imageUrlField").value = url || "";
       setDialogImagePreview(url || "");
       showToast("Imagen subida — pulsa «Usar imagen»");
-      // If picker was opened to save logo directly, apply immediately.
       if (url && imagePickerContext && imagePickerContext.autoApply) {
         var apply = imagePickerContext.onApply;
         Promise.resolve(apply ? apply(url) : null).then(function () {

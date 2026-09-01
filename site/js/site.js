@@ -267,7 +267,7 @@
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" class="card-img-top" loading="lazy" decoding="async" width="480" height="480" onerror="' +
+        '" class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="' +
         onerror +
         '">'
       : "LPAEZ";
