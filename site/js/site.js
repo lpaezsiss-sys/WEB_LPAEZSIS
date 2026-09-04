@@ -377,6 +377,7 @@
 
   var PRODUCT_IMAGES = {
     "secador-botellas-sonic": "img/hero/cans.jpg",
+    "secador-Tarros-sonic": "img/hero/3piece_cans.jpg",
     "turbina-soplado-sonic-100": "img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "img/products/A07-10976.jpg",
@@ -433,13 +434,16 @@
     return PRODUCT_FALLBACKS[idx] || PLACEHOLDER_IMG;
   }
 
-  /** Hermano .webp bajo img/{products,hero,uploads,brand}/ o image_webp de API. */
+  /** Hermano .webp bajo img/{products,hero,brand}/ o image_webp de API.
+   *  No inventa .webp en img/uploads/: los uploads admin suelen no tener pareja
+   *  y un <source webp> 404 (HTML) rompe el <picture> sin disparar onerror del <img>.
+   */
   function resolveProductWebp(p, imageUrl) {
     var explicit = normalizeMediaUrl(p && p.image_webp ? p.image_webp : "");
     if (explicit) return explicit;
     var url = normalizeMediaUrl(imageUrl);
     if (
-      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /(\/|^)img\/(products|hero|brand)\//i.test(url) &&
       /\.(jpe?g|png)$/i.test(url)
     ) {
       return url.replace(/\.(jpe?g|png)$/i, ".webp");

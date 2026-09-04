@@ -113,7 +113,8 @@ function escapeAttr(str) {
   return escapeHtml(str).replace(/`/g, "&#96;");
 }
 
-/** Prefiere hermano .webp bajo img/{brand,uploads,products,hero,marcas}/.
+/** Prefiere hermano .webp bajo img/{brand,products,hero,marcas}/.
+ *  No inventa .webp en img/uploads/ (uploads admin sin pareja → picture roto).
  *  Devuelve "" si no aplica conversión (ya es webp, externo o ruta no elegible).
  */
 function preferWebpUrl(url) {
@@ -121,7 +122,7 @@ function preferWebpUrl(url) {
   if (!formatted || formatted === BRAND_IMG_PLACEHOLDER) return "";
   if (/^https?:\/\//i.test(formatted)) return "";
   if (
-    /(\/|^)img\/(products|hero|uploads|brand|marcas)\//i.test(formatted) &&
+    /(\/|^)img\/(products|hero|brand|marcas)\//i.test(formatted) &&
     /\.(jpe?g|png)$/i.test(formatted)
   ) {
     return formatted.replace(/\.(jpe?g|png)$/i, ".webp");
