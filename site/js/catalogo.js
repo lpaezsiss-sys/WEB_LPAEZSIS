@@ -477,13 +477,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return file ? file[1] : "";
   }
 
-  /** Prefiere WebP hermano bajo img/{products,hero,uploads,brand}/; la API puede enviar image_webp. */
+  /** Prefiere WebP hermano bajo img/{products,hero,brand}/; la API puede enviar image_webp.
+   *  No inventa .webp en img/uploads/ (sin pareja → <picture> roto).
+   */
   function normalizeProductWebp(prod, imageUrl) {
     const explicit = normalizeMediaUrl((prod && prod.image_webp) || "");
     if (explicit) return explicit;
     const url = normalizeMediaUrl(imageUrl);
     if (
-      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /(\/|^)img\/(products|hero|brand)\//i.test(url) &&
       /\.(jpe?g|png)$/i.test(url)
     ) {
       return url.replace(/\.(jpe?g|png)$/i, ".webp");
