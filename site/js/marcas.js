@@ -10,6 +10,28 @@ document.addEventListener("DOMContentLoaded", function () {
 var BRAND_IMG_PLACEHOLDER = "img/placeholder.jpg";
 
 /**
+ * DEBUG temporal: captura fallos de carga de <img> antes de tocar rutas/lógica.
+ * Expuesto en window para handlers onerror inline.
+ */
+function logImageError(imgElement, originalUrl) {
+  console.group("❌ Error al Cargar Imagen");
+  console.error("URL Intentada:", imgElement && imgElement.src);
+  console.error("URL Original recibida:", originalUrl);
+  console.error(
+    "Estado de Red:",
+    window.navigator.onLine ? "Online" : "Offline"
+  );
+  console.groupEnd();
+
+  // Evita bucle infinito y asigna placeholder neutro
+  if (imgElement) {
+    imgElement.onerror = null;
+    imgElement.src = "img/placeholder.jpg";
+  }
+}
+window.logImageError = logImageError;
+
+/**
  * Normaliza cualquier URL de imagen de marca (logo, banner, galería, fotos).
  * Reescribe legacy wp-content/uploads → img/products/FILE (WP ya no sirve binarios).
  * Quita slashes iniciales redundantes y cae a placeholder si viene vacía.
@@ -55,6 +77,7 @@ function brandImgSource(imgObj) {
 
 /** Markup <img> homogéneo para logos / galería / banners de marca. */
 function brandImgTag(imgObj, alt) {
+  var originalRaw = brandImgSource(imgObj);
   var imgSrc = formatBrandImg(
     (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
   );
@@ -66,11 +89,11 @@ function brandImgTag(imgObj, alt) {
   return (
     '<img src="' +
     escapeAttr(imgSrc) +
+    '" data-original-url="' +
+    escapeAttr(originalRaw) +
     '" alt="' +
     escapeAttr(nombre) +
-    '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
-    BRAND_IMG_PLACEHOLDER.replace(/'/g, "\\'") +
-    "';\">"
+    '" class="img-fluid" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">'
   );
 }
 
@@ -449,6 +472,15 @@ function updateBrandHero(brand) {
       var raster = formatBrandImg(url);
       var webp = preferWebpUrl(raster);
       logoEl.onerror = function () {
+        // DEBUG: solo log; se conserva la cadena de fallback existente
+        console.group("❌ Error al Cargar Imagen (hero logo)");
+        console.error("URL Intentada:", logoEl.src);
+        console.error("URL Original recibida:", url);
+        console.error(
+          "Estado de Red:",
+          window.navigator.onLine ? "Online" : "Offline"
+        );
+        console.groupEnd();
         if (!logoEl.dataset.fb) {
           logoEl.dataset.fb = "1";
           var alt = slug && LOGO_BY_SLUG[slug] ? LOGO_BY_SLUG[slug] : "";
@@ -551,10 +583,10 @@ async function loadBrandDetailExtras(slug) {
           }
           var formatted = formatBrandImg(real || "");
           img.setAttribute("src", formatted);
+          img.setAttribute("data-original-url", real || "");
           img.classList.add("img-fluid");
           img.onerror = function () {
-            this.onerror = null;
-            this.src = BRAND_IMG_PLACEHOLDER;
+            logImageError(this, real || "");
           };
           img.removeAttribute("data-src");
           img.removeAttribute("data-lazy-src");
@@ -577,17 +609,18 @@ async function loadBrandDetailExtras(slug) {
             var imgSrc = formatBrandImg(
               (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
             );
+            var originalRaw = brandImgSource(imgObj);
             return (
               '<a class="brand-gallery-item" href="' +
               escapeAttr(imgSrc) +
               '" target="_blank" rel="noopener">' +
               '<img src="' +
               escapeAttr(imgSrc) +
+              '" data-original-url="' +
+              escapeAttr(originalRaw) +
               '" alt="' +
               escapeAttr(marcaNombre) +
-              '" class="img-fluid" onerror="this.onerror=null; this.src=\'' +
-              BRAND_IMG_PLACEHOLDER.replace(/'/g, "\\'") +
-              "';\">" +
+              '" class="img-fluid" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">' +
               "</a>"
             );
           })

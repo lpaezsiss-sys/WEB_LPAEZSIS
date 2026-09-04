@@ -5,6 +5,26 @@
   var QUOTE_KEY = "lpaezsis_quote_v1";
   var siteSettings = null;
 
+  /**
+   * DEBUG temporal: captura fallos de carga de <img> antes de tocar rutas/lógica.
+   */
+  function logImageError(imgElement, originalUrl) {
+    console.group("❌ Error al Cargar Imagen");
+    console.error("URL Intentada:", imgElement && imgElement.src);
+    console.error("URL Original recibida:", originalUrl);
+    console.error(
+      "Estado de Red:",
+      window.navigator.onLine ? "Online" : "Offline"
+    );
+    console.groupEnd();
+
+    if (imgElement) {
+      imgElement.onerror = null;
+      imgElement.src = "img/placeholder.jpg";
+    }
+  }
+  window.logImageError = logImageError;
+
   function $(id) {
     return document.getElementById(id);
   }
@@ -255,21 +275,18 @@
         : "Cotización";
     var img = resolveProductImage(p);
     var webp = resolveProductWebp(p, img);
-    var imgFallback = PLACEHOLDER_IMG;
-    var onerror =
-      "this.onerror=null;this.src='" +
-      imgFallback.replace(/'/g, "\\'") +
-      "';";
+    var originalImg =
+      (p && (p.image_url || p.imagen_url || p.imagen || p.image)) || "";
     var imgTag = img
       ? '<img src="' +
         escapeAttr(img) +
+        '" data-original-url="' +
+        escapeAttr(String(originalImg)) +
         '" alt="' +
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="' +
-        onerror +
-        '">'
+        '" class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">'
       : "LPAEZ";
     var visual = imgTag;
     if (img && webp) {
