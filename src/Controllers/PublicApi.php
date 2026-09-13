@@ -13,7 +13,7 @@ final class PublicApi
     public static function handle(string $method, string $path): void
     {
         $method = strtoupper((string) ($method ?? 'GET'));
-        $path = (string) ($path ?? '');
+        $path = self::normalizePath($path);
         if ($method === 'GET' && ($path === '/api' || $path === '/api/health')) {
             // Controllers live in src/Controllers → parent is src/
             $envPath = dirname(__DIR__) . '/.env';
@@ -81,6 +81,10 @@ final class PublicApi
             self::sectores();
             return;
         }
+        if ($method === 'GET' && $path === '/api/industrias') {
+            self::industrias();
+            return;
+        }
         if ($method === 'GET' && $path === '/api/banners') {
             self::banners();
             return;
@@ -121,6 +125,25 @@ final class PublicApi
     private static function pdo(): PDO
     {
         return Database::pdo();
+    }
+
+    /**
+     * Normaliza paths de rewrite Apache (/api/foo.php → /api/foo).
+     * Evita 404 cuando el front-controller recibe el sufijo .php.
+     */
+    private static function normalizePath(string $path): string
+    {
+        $path = str_replace('\\', '/', (string) ($path ?? ''));
+        $path = '/' . trim($path, '/');
+        if ($path === '/' || $path === '') {
+            return '/api';
+        }
+        if (strlen($path) > 4 && substr($path, -4) === '.php') {
+            $path = substr($path, 0, -4);
+        }
+        // Colapsa slashes internos accidentales
+        $path = preg_replace('#/+#', '/', $path) ?? $path;
+        return $path;
     }
 
     private static function body(): array
@@ -242,12 +265,12 @@ final class PublicApi
             $slug = Cast::str($_GET['slug'] ?? '');
 
             $mapRow = static function (array $b): array {
-                $nombre = (string) ($b['name'] ?? '');
-                $desc = (string) ($b['description'] ?? '');
-                $logo = (string) ($b['logo_url'] ?? '');
+                $nombre = Cast::str($b['name'] ?? '');
+                $desc = Cast::str($b['description'] ?? '');
+                $logo = Cast::str($b['logo_url'] ?? '');
                 return [
-                    'id' => isset($b['id']) ? (int) $b['id'] : null,
-                    'slug' => (string) ($b['slug'] ?? ''),
+                    'id' => isset($b['id']) ? Cast::int($b['id']) : null,
+                    'slug' => Cast::str($b['slug'] ?? ''),
                     'nombre' => $nombre,
                     'name' => $nombre,
                     'descripcion' => $desc,
@@ -464,19 +487,77 @@ final class PublicApi
             $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
             $resultado = array_map(static function (array $item): array {
                 $imagen = Cast::str($item['imagen_url'] ?? '');
-                $link = trim((string) ($item['link_url'] ?? ''));
+                $link = Cast::str($item['link_url'] ?? '');
                 return [
-                    'id' => (int) ($item['id'] ?? 0),
-                    'nombre' => (string) ($item['nombre'] ?? ''),
-                    'slug' => (string) ($item['slug'] ?? ''),
+                    'id' => Cast::int($item['id'] ?? 0),
+                    'nombre' => Cast::str($item['nombre'] ?? ''),
+                    'slug' => Cast::str($item['slug'] ?? ''),
                     'imagen_url' => $imagen,
                     'link_url' => $link !== '' ? $link : 'catalogo.html',
-                    'orden' => (int) ($item['orden'] ?? 0),
+                    'orden' => Cast::int($item['orden'] ?? 0),
                 ];
             }, $rows ?: []);
             Response::json($resultado);
         } catch (\Throwable $e) {
             Response::error('Error al obtener sectores: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /api/industrias — catálogo de industrias (máx. 8 activas).
+     * Respuesta plana: [{ id, slug, nombre, orden, imagen_random }, ...]
+     */
+    private static function industrias(): void
+    {
+        try {
+            $stmt = self::pdo()->query(
+                'SELECT * FROM industrias
+                 WHERE COALESCE(activo, 1) = 1
+                 ORDER BY orden ASC, nombre ASC
+                 LIMIT 8'
+            );
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $imgStmt = self::pdo()->prepare(
+                'SELECT image_url FROM products
+                 WHERE industria_id = ?
+                   AND is_active = 1
+                   AND image_url IS NOT NULL
+                   AND image_url != \'\'
+                 ORDER BY RAND()
+                 LIMIT 1'
+            );
+            $resultado = [];
+            foreach ($rows ?: [] as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $id = Cast::int($item['id'] ?? 0);
+                $imagen = Cast::str(
+                    $item['imagen_url'] ?? ($item['imagen'] ?? ($item['image_url'] ?? ''))
+                );
+                if ($imagen === '' && $id > 0) {
+                    try {
+                        $imgStmt->execute([$id]);
+                        $picked = $imgStmt->fetchColumn();
+                        $imagen = Cast::str($picked !== false ? $picked : '');
+                    } catch (\Throwable $e) {
+                        $imagen = '';
+                    }
+                }
+                if ($imagen === '') {
+                    $imagen = 'img/hero/plant.jpg';
+                }
+                $resultado[] = [
+                    'id' => $id,
+                    'slug' => Cast::str($item['slug'] ?? ''),
+                    'nombre' => Cast::str($item['nombre'] ?? ($item['name'] ?? '')),
+                    'orden' => Cast::int($item['orden'] ?? ($item['sort_order'] ?? 0)),
+                    'imagen_random' => $imagen,
+                ];
+            }
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener industrias: ' . $e->getMessage(), 500);
         }
     }
 
@@ -538,15 +619,15 @@ final class PublicApi
             $resultado = array_map(static function (array $item): array {
                 $imagen = Cast::str($item['imagen_url'] ?? '');
                 return [
-                    'id' => (int) ($item['id'] ?? 0),
-                    'titulo' => (string) ($item['titulo'] ?? ''),
-                    'subtitulo' => (string) ($item['subtitulo'] ?? ''),
+                    'id' => Cast::int($item['id'] ?? 0),
+                    'titulo' => Cast::str($item['titulo'] ?? ''),
+                    'subtitulo' => Cast::str($item['subtitulo'] ?? ''),
                     'imagen_url' => $imagen,
-                    'texto_btn_1' => (string) ($item['texto_btn_1'] ?? ''),
-                    'link_btn_1' => (string) ($item['link_btn_1'] ?? ''),
-                    'texto_btn_2' => (string) ($item['texto_btn_2'] ?? ''),
-                    'link_btn_2' => (string) ($item['link_btn_2'] ?? ''),
-                    'orden' => (int) ($item['orden'] ?? 0),
+                    'texto_btn_1' => Cast::str($item['texto_btn_1'] ?? ''),
+                    'link_btn_1' => Cast::str($item['link_btn_1'] ?? ''),
+                    'texto_btn_2' => Cast::str($item['texto_btn_2'] ?? ''),
+                    'link_btn_2' => Cast::str($item['link_btn_2'] ?? ''),
+                    'orden' => Cast::int($item['orden'] ?? 0),
                 ];
             }, $rows ?: []);
             Response::json($resultado);

@@ -46,6 +46,11 @@ final class Database
                 $options[PDO::MYSQL_ATTR_MULTI_STATEMENTS] = false;
             }
             self::$pdo = new PDO($dsn, $user, $pass, $options);
+            try {
+                self::$pdo->exec('SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci');
+            } catch (PDOException $e) {
+                // Algunos hosts restringen SET NAMES; el DSN ya pide charset.
+            }
         } catch (PDOException $e) {
             if (Config::bool('APP_DEBUG')) {
                 throw $e;
