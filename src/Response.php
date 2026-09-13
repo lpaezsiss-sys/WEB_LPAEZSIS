@@ -10,7 +10,18 @@ final class Response
     {
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+        // PHP 7.2+: sustituye UTF-8 inválido en vez de devolver false
+        if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+            $flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+        }
+        $encoded = json_encode($payload, $flags);
+        if ($encoded === false) {
+            http_response_code(500);
+            echo '{"error":"No se pudo serializar la respuesta JSON"}';
+            return;
+        }
+        echo $encoded;
     }
 
     public static function error(string $message, int $status = 400, array $extra = []): void

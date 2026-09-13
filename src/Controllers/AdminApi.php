@@ -6,6 +6,7 @@ namespace Lpaezsis\Controllers;
 use Lpaezsis\Auth;
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\Cast;
 use Lpaezsis\Support\Slug;
 use Lpaezsis\Support\Upload;
 use PDO;
@@ -204,7 +205,7 @@ final class AdminApi
 
         if ($method === 'GET' && $sub === '/products') {
             self::ensureProductFichaColumn();
-            $tipo = strtolower(trim((string) ($_GET['tipo'] ?? '')));
+            $tipo = strtolower(Cast::str($_GET['tipo'] ?? ''));
             $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                         b.slug AS brand_slug, b.name AS brand_name,
                         i.slug AS industria_slug, i.nombre AS industria_nombre
@@ -357,13 +358,13 @@ final class AdminApi
             Response::error('Archivo requerido');
             return;
         }
-        $kind = strtolower((string) ($_POST['kind'] ?? 'auto'));
+        $kind = strtolower(Cast::str($_POST['kind'] ?? 'auto', 'auto'));
         if ($kind !== 'image' && $kind !== 'video' && $kind !== 'pdf') {
             $kind = 'auto';
         }
-        $subdir = trim((string) ($_POST['subdir'] ?? ''));
+        $subdir = Cast::str($_POST['subdir'] ?? '');
         if ($kind === 'pdf') {
-            $origName = (string) ($file['name'] ?? '');
+            $origName = Cast::str($file['name'] ?? '');
             if (!preg_match('/\.pdf$/i', $origName)) {
                 Response::error('Solo se permiten archivos PDF');
                 return;
@@ -374,7 +375,7 @@ final class AdminApi
                 return;
             }
             $file['name'] = $sanitized;
-            $preferred = trim((string) ($_POST['slug'] ?? $_POST['filename'] ?? ''));
+            $preferred = Cast::str($_POST['slug'] ?? ($_POST['filename'] ?? ''));
             $result = Upload::storePdf($file, $preferred);
         } else {
             $result = $kind === 'video'
@@ -630,10 +631,10 @@ final class AdminApi
 
     private static function nullableString($value): ?string
     {
-        if ($value === null) {
+        if ($value === null || is_array($value) || is_object($value)) {
             return null;
         }
-        $s = trim((string) $value);
+        $s = Cast::str($value);
         return $s === '' ? null : $s;
     }
 
@@ -837,13 +838,13 @@ final class AdminApi
             return;
         }
 
-        $nombre = trim((string) ($_POST['nombre'] ?? $existing['nombre'] ?? ''));
-        $slug = trim((string) ($_POST['slug'] ?? $existing['slug'] ?? ''));
-        $link = trim((string) ($_POST['link_url'] ?? $existing['link_url'] ?? ''));
-        $orden = isset($_POST['orden']) ? (int) $_POST['orden'] : (int) ($existing['orden'] ?? 0);
-        $imagen = trim((string) ($existing['imagen_url'] ?? ''));
-        if (isset($_POST['imagen_url']) && trim((string) $_POST['imagen_url']) !== '') {
-            $imagen = trim((string) $_POST['imagen_url']);
+        $nombre = Cast::str($_POST['nombre'] ?? ($existing['nombre'] ?? ''));
+        $slug = Cast::str($_POST['slug'] ?? ($existing['slug'] ?? ''));
+        $link = Cast::str($_POST['link_url'] ?? ($existing['link_url'] ?? ''));
+        $orden = isset($_POST['orden']) ? Cast::int($_POST['orden']) : Cast::int($existing['orden'] ?? 0);
+        $imagen = Cast::str($existing['imagen_url'] ?? '');
+        if (isset($_POST['imagen_url']) && Cast::str($_POST['imagen_url']) !== '') {
+            $imagen = Cast::str($_POST['imagen_url']);
         }
 
         $file = null;
@@ -993,21 +994,21 @@ final class AdminApi
             }
         }
 
-        $titulo = trim((string) ($_POST['titulo'] ?? ($existing['titulo'] ?? '')));
-        $subtitulo = trim((string) ($_POST['subtitulo'] ?? ($existing['subtitulo'] ?? '')));
-        $texto1 = trim((string) ($_POST['texto_btn_1'] ?? ($existing['texto_btn_1'] ?? '')));
-        $link1 = trim((string) ($_POST['link_btn_1'] ?? ($existing['link_btn_1'] ?? '')));
-        $texto2 = trim((string) ($_POST['texto_btn_2'] ?? ($existing['texto_btn_2'] ?? '')));
-        $link2 = trim((string) ($_POST['link_btn_2'] ?? ($existing['link_btn_2'] ?? '')));
+        $titulo = Cast::str($_POST['titulo'] ?? ($existing['titulo'] ?? ''));
+        $subtitulo = Cast::str($_POST['subtitulo'] ?? ($existing['subtitulo'] ?? ''));
+        $texto1 = Cast::str($_POST['texto_btn_1'] ?? ($existing['texto_btn_1'] ?? ''));
+        $link1 = Cast::str($_POST['link_btn_1'] ?? ($existing['link_btn_1'] ?? ''));
+        $texto2 = Cast::str($_POST['texto_btn_2'] ?? ($existing['texto_btn_2'] ?? ''));
+        $link2 = Cast::str($_POST['link_btn_2'] ?? ($existing['link_btn_2'] ?? ''));
         $orden = isset($_POST['orden'])
-            ? (int) $_POST['orden']
-            : (int) ($existing['orden'] ?? 0);
+            ? Cast::int($_POST['orden'])
+            : Cast::int($existing['orden'] ?? 0);
         $activo = isset($_POST['activo'])
-            ? (!empty($_POST['activo']) && (string) $_POST['activo'] !== '0' ? 1 : 0)
-            : (int) ($existing['activo'] ?? 1);
-        $imagen = trim((string) ($existing['imagen_url'] ?? ''));
-        if (isset($_POST['imagen_url']) && trim((string) $_POST['imagen_url']) !== '') {
-            $imagen = trim((string) $_POST['imagen_url']);
+            ? (Cast::bool($_POST['activo'], false) ? 1 : 0)
+            : Cast::int($existing['activo'] ?? 1, 1);
+        $imagen = Cast::str($existing['imagen_url'] ?? '');
+        if (isset($_POST['imagen_url']) && Cast::str($_POST['imagen_url']) !== '') {
+            $imagen = Cast::str($_POST['imagen_url']);
         }
 
         $file = null;
@@ -1267,7 +1268,7 @@ final class AdminApi
         }
         $file['name'] = $sanitized;
 
-        $preferred = trim((string) ($_POST['slug'] ?? $row['slug'] ?? ''));
+        $preferred = Cast::str($_POST['slug'] ?? ($row['slug'] ?? ''));
         $uploaded = Upload::storePdf($file, $preferred);
         if (!$uploaded['ok']) {
             Response::error((string) $uploaded['error']);

@@ -5,6 +5,7 @@ namespace Lpaezsis\Controllers;
 
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\Cast;
 use PDO;
 
 final class PublicApi
@@ -29,7 +30,8 @@ final class PublicApi
                 'ok' => true,
                 'service' => 'lpaezsis-api',
                 'php' => PHP_VERSION,
-                'compat' => '7.4+',
+                'compat' => '7.4+/8.1-ready',
+                'php81_ready' => true,
                 'env_file' => $hasEnv ? 'found' : 'missing',
                 'db' => $dbOk ? 'ok' : 'error',
                 'db_error' => $dbOk ? null : $dbError,
@@ -176,8 +178,8 @@ final class PublicApi
      */
     private static function search(): void
     {
-        $q = isset($_GET['q']) ? trim((string) ($_GET['q'] ?? '')) : '';
-        if (function_exists('mb_strlen') ? \mb_strlen($q) < 2 : strlen($q ?? '') < 2) {
+        $q = Cast::str($_GET['q'] ?? '');
+        if (function_exists('mb_strlen') ? \mb_strlen($q) < 2 : strlen($q) < 2) {
             Response::json([]);
             return;
         }
@@ -234,7 +236,7 @@ final class PublicApi
     private static function marcas(): void
     {
         try {
-            $slug = isset($_GET['slug']) ? trim((string) $_GET['slug']) : '';
+            $slug = Cast::str($_GET['slug'] ?? '');
 
             $mapRow = static function (array $b): array {
                 $nombre = (string) ($b['name'] ?? '');
@@ -298,11 +300,11 @@ final class PublicApi
     private static function productosList(): void
     {
         AdminApi::ensureProductFichaColumn();
-        $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
-        $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
-        $brand = isset($_GET['brand']) ? trim((string) $_GET['brand']) : '';
-        if ($brand === '' && isset($_GET['marca'])) {
-            $brand = trim((string) $_GET['marca']);
+        $featured = Cast::bool($_GET['featured'] ?? null, false);
+        $tipo = Cast::str($_GET['tipo'] ?? '');
+        $brand = Cast::str($_GET['brand'] ?? '');
+        if ($brand === '') {
+            $brand = Cast::str($_GET['marca'] ?? '');
         }
 
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -347,9 +349,9 @@ final class PublicApi
     private static function repuestosList(): void
     {
         $_GET['tipo'] = 'repuesto';
-        $q = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
-        if ($q === '' && isset($_GET['search'])) {
-            $q = trim((string) $_GET['search']);
+        $q = Cast::str($_GET['q'] ?? '');
+        if ($q === '') {
+            $q = Cast::str($_GET['search'] ?? '');
         }
 
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
@@ -359,9 +361,9 @@ final class PublicApi
                 LEFT JOIN brands b ON b.id = p.brand_id
                 WHERE p.is_active = 1 AND p.tipo = ?';
         $params = ['repuesto'];
-        $brand = isset($_GET['brand']) ? trim((string) $_GET['brand']) : '';
-        if ($brand === '' && isset($_GET['marca'])) {
-            $brand = trim((string) $_GET['marca']);
+        $brand = Cast::str($_GET['brand'] ?? '');
+        if ($brand === '') {
+            $brand = Cast::str($_GET['marca'] ?? '');
         }
         if ($brand !== '') {
             if (ctype_digit($brand)) {
@@ -411,7 +413,7 @@ final class PublicApi
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $resultado = array_map(static function (array $item): array {
-                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                $imagen = Cast::str($item['imagen_url'] ?? '');
                 if ($imagen === '') {
                     $imagen = 'img/hero/plant.jpg';
                 }
@@ -458,7 +460,7 @@ final class PublicApi
             );
             $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
             $resultado = array_map(static function (array $item): array {
-                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                $imagen = Cast::str($item['imagen_url'] ?? '');
                 $link = trim((string) ($item['link_url'] ?? ''));
                 return [
                     'id' => (int) ($item['id'] ?? 0),
@@ -531,7 +533,7 @@ final class PublicApi
             );
             $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
             $resultado = array_map(static function (array $item): array {
-                $imagen = trim((string) ($item['imagen_url'] ?? ''));
+                $imagen = Cast::str($item['imagen_url'] ?? '');
                 return [
                     'id' => (int) ($item['id'] ?? 0),
                     'titulo' => (string) ($item['titulo'] ?? ''),
@@ -644,8 +646,8 @@ final class PublicApi
     private static function products(): void
     {
         AdminApi::ensureProductFichaColumn();
-        $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
-        $tipo = isset($_GET['tipo']) ? trim((string) $_GET['tipo']) : '';
+        $featured = Cast::bool($_GET['featured'] ?? null, false);
+        $tipo = Cast::str($_GET['tipo'] ?? '');
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                        b.slug AS brand_slug, b.name AS brand_name
                 FROM products p
@@ -700,9 +702,9 @@ final class PublicApi
             Response::json(['message' => 'Mensaje enviado.']);
             return;
         }
-        $name = trim((string) ($b['name'] ?? ''));
-        $email = trim((string) ($b['email'] ?? ''));
-        $message = trim((string) ($b['message'] ?? ''));
+        $name = Cast::str($b['name'] ?? '');
+        $email = Cast::str($b['email'] ?? '');
+        $message = Cast::str($b['message'] ?? '');
         if ($name === '' || $email === '' || $message === '') {
             Response::error('Completa nombre, email y mensaje');
             return;
@@ -714,8 +716,8 @@ final class PublicApi
         $stmt->execute([
             $name,
             $email,
-            trim((string) ($b['phone'] ?? '')) ?: null,
-            trim((string) ($b['subject'] ?? '')) ?: null,
+            Cast::str($b['phone'] ?? '') ?: null,
+            Cast::str($b['subject'] ?? '') ?: null,
             $message,
         ]);
         Response::json(['message' => 'Mensaje enviado.']);
@@ -733,11 +735,11 @@ final class PublicApi
             Response::json(['public_code' => self::publicCode('Q')]);
             return;
         }
-        $name = trim((string) ($b['customer_name'] ?? ''));
-        $email = trim((string) ($b['customer_email'] ?? ''));
-        $phone = trim((string) ($b['customer_phone'] ?? ''));
-        $items = $b['items'] ?? [];
-        if ($name === '' || $email === '' || $phone === '' || !is_array($items) || !$items) {
+        $name = Cast::str($b['customer_name'] ?? '');
+        $email = Cast::str($b['customer_email'] ?? '');
+        $phone = Cast::str($b['customer_phone'] ?? '');
+        $items = Cast::arr($b['items'] ?? []);
+        if ($name === '' || $email === '' || $phone === '' || !$items) {
             Response::error('Datos de cotización incompletos');
             return;
         }
@@ -755,8 +757,8 @@ final class PublicApi
                 $name,
                 $email,
                 $phone,
-                trim((string) ($b['company_name'] ?? '')) ?: null,
-                trim((string) ($b['message'] ?? '')) ?: null,
+                Cast::str($b['company_name'] ?? '') ?: null,
+                Cast::str($b['message'] ?? '') ?: null,
             ]);
             $quoteId = (int) $pdo->lastInsertId();
             $itemStmt = $pdo->prepare(
@@ -765,8 +767,11 @@ final class PublicApi
             );
             $prod = $pdo->prepare('SELECT id, name, sale_mode FROM products WHERE id = ? LIMIT 1');
             foreach ($items as $item) {
-                $pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
-                $qty = max(1, (int) ($item['qty'] ?? 1));
+                if (!is_array($item)) {
+                    continue;
+                }
+                $pid = Cast::int($item['product_id'] ?? 0);
+                $qty = max(1, Cast::int($item['qty'] ?? 1, 1));
                 $prod->execute([$pid]);
                 $p = $prod->fetch();
                 if (!$p) {
@@ -795,11 +800,11 @@ final class PublicApi
             Response::json(['public_code' => self::publicCode('O')]);
             return;
         }
-        $name = trim((string) ($b['customer_name'] ?? ''));
-        $email = trim((string) ($b['customer_email'] ?? ''));
-        $phone = trim((string) ($b['customer_phone'] ?? ''));
-        $items = $b['items'] ?? [];
-        if ($name === '' || $email === '' || $phone === '' || !is_array($items) || !$items) {
+        $name = Cast::str($b['customer_name'] ?? '');
+        $email = Cast::str($b['customer_email'] ?? '');
+        $phone = Cast::str($b['customer_phone'] ?? '');
+        $items = Cast::arr($b['items'] ?? []);
+        if ($name === '' || $email === '' || $phone === '' || !$items) {
             Response::error('Datos del pedido incompletos');
             return;
         }
@@ -814,19 +819,22 @@ final class PublicApi
                 'SELECT id, name, price_clp, sale_mode FROM products WHERE id = ? AND is_active = 1 LIMIT 1'
             );
             foreach ($items as $item) {
-                $pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
-                $qty = max(1, (int) ($item['qty'] ?? 1));
+                if (!is_array($item)) {
+                    continue;
+                }
+                $pid = Cast::int($item['product_id'] ?? 0);
+                $qty = max(1, Cast::int($item['qty'] ?? 1, 1));
                 $prod->execute([$pid]);
                 $p = $prod->fetch();
                 if (!$p || ($p['sale_mode'] ?? '') !== 'buy') {
                     continue;
                 }
-                $unit = (int) ($p['price_clp'] ?? 0);
+                $unit = Cast::int($p['price_clp'] ?? 0);
                 $line = $unit * $qty;
                 $subtotal += $line;
                 $lines[] = [
-                    'product_id' => (int) $p['id'],
-                    'product_name' => $p['name'],
+                    'product_id' => Cast::int($p['id'] ?? 0),
+                    'product_name' => Cast::str($p['name'] ?? ''),
                     'unit_price_clp' => $unit,
                     'qty' => $qty,
                     'line_total_clp' => $line,
@@ -847,9 +855,9 @@ final class PublicApi
                 $name,
                 $email,
                 $phone,
-                trim((string) ($b['company_name'] ?? '')) ?: null,
-                trim((string) ($b['address'] ?? '')) ?: null,
-                trim((string) ($b['notes'] ?? '')) ?: null,
+                Cast::str($b['company_name'] ?? '') ?: null,
+                Cast::str($b['address'] ?? '') ?: null,
+                Cast::str($b['notes'] ?? '') ?: null,
                 $subtotal,
             ]);
             $orderId = (int) $pdo->lastInsertId();
