@@ -32,11 +32,20 @@ final class Database
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $host, $port, $name, $charset);
 
         try {
-            self::$pdo = new PDO($dsn, $user, $pass, [
+            $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
+            ];
+            // PHP 8.1+: evita casts implícitos string en fetches numéricos
+            if (defined('PDO::ATTR_STRINGIFY_FETCHES')) {
+                $options[PDO::ATTR_STRINGIFY_FETCHES] = false;
+            }
+            // Debe ir en el constructor (no setAttribute posterior).
+            if (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
+                $options[PDO::MYSQL_ATTR_MULTI_STATEMENTS] = false;
+            }
+            self::$pdo = new PDO($dsn, $user, $pass, $options);
         } catch (PDOException $e) {
             if (Config::bool('APP_DEBUG')) {
                 throw $e;

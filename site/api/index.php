@@ -59,10 +59,14 @@ if (strncmp($path, '/api', 4) !== 0) {
 try {
     Router::dispatch((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'), $path);
 } catch (Throwable $e) {
+    $extra = [];
+    if (\Lpaezsis\Config::bool('APP_DEBUG')) {
+        $extra['detail'] = $e->getMessage();
+    }
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode([
-        'error' => 'Error interno del API',
-        'detail' => $e->getMessage(),
-    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode(
+        array_merge(['error' => 'Error interno del API'], $extra),
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
 }

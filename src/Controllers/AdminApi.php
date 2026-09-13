@@ -179,7 +179,7 @@ final class AdminApi
         }
         if ($method === 'POST' && $sub === '/banners') {
             // JSON create OR multipart create
-            if (!empty($_FILES) || (isset($_SERVER['CONTENT_TYPE']) && stripos((string) $_SERVER['CONTENT_TYPE'], 'multipart/') === 0)) {
+            if (!empty($_FILES) || (isset($_SERVER['CONTENT_TYPE']) && stripos(Cast::str($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/') === 0)) {
                 self::saveBannerForm(null);
             } else {
                 self::createBanner();
@@ -262,7 +262,7 @@ final class AdminApi
         }
         if ($method === 'PUT' && preg_match('#^/orders/(\d+)$#', $sub, $m)) {
             $b = self::body();
-            $status = (string) ($b['status'] ?? '');
+            $status = Cast::str($b['status'] ?? '');
             self::pdo()->prepare('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?')
                 ->execute([$status, (int) $m[1]]);
             Response::json(['ok' => true]);
@@ -276,7 +276,7 @@ final class AdminApi
         }
         if ($method === 'PUT' && preg_match('#^/quotes/(\d+)$#', $sub, $m)) {
             $b = self::body();
-            $status = (string) ($b['status'] ?? '');
+            $status = Cast::str($b['status'] ?? '');
             self::pdo()->prepare('UPDATE quotes SET status = ?, updated_at = NOW() WHERE id = ?')
                 ->execute([$status, (int) $m[1]]);
             Response::json(['ok' => true]);
@@ -290,7 +290,7 @@ final class AdminApi
         }
         if ($method === 'PUT' && preg_match('#^/contacts/(\d+)$#', $sub, $m)) {
             $b = self::body();
-            $status = (string) ($b['status'] ?? '');
+            $status = Cast::str($b['status'] ?? '');
             self::pdo()->prepare('UPDATE contact_messages SET status = ? WHERE id = ?')
                 ->execute([$status, (int) $m[1]]);
             Response::json(['ok' => true]);
@@ -315,7 +315,7 @@ final class AdminApi
     private static function login(): void
     {
         $b = self::body();
-        $password = (string) ($b['password'] ?? '');
+        $password = Cast::str($b['password'] ?? '');
         if ($password === '') {
             Response::error('Contraseña requerida', 400);
             return;
@@ -332,8 +332,8 @@ final class AdminApi
     {
         $token = Auth::bearerToken() ?? '';
         $b = self::body();
-        $current = (string) ($b['current_password'] ?? $b['password'] ?? '');
-        $next = (string) ($b['new_password'] ?? '');
+        $current = Cast::str($b['current_password'] ?? ($b['password'] ?? ''));
+        $next = Cast::str($b['new_password'] ?? '');
         if ($current === '' || strlen($next ?? '') < 8) {
             Response::error('Contraseña actual y nueva (mín. 8) requeridas');
             return;
@@ -389,7 +389,7 @@ final class AdminApi
                     $extra[$k] = $result[$k];
                 }
             }
-            Response::error((string) $result['error'], 400, $extra);
+            Response::error(Cast::str($result['error'] ?? 'Error'), 400, $extra);
             return;
         }
         Response::json([
@@ -427,12 +427,12 @@ final class AdminApi
     private static function createCategory(): void
     {
         $b = self::body();
-        $name = trim((string) ($b['name'] ?? ''));
+        $name = Cast::str($b['name'] ?? '');
         if ($name === '') {
             Response::error('Nombre requerido');
             return;
         }
-        $slug = trim((string) ($b['slug'] ?? '')) ?: Slug::unique($name, function (string $s): bool {
+        $slug = Cast::str($b['slug'] ?? '') ?: Slug::unique($name, function (string $s): bool {
             $st = self::pdo()->prepare('SELECT 1 FROM categories WHERE slug = ?');
             $st->execute([$s]);
             return (bool) $st->fetchColumn();
@@ -468,12 +468,12 @@ final class AdminApi
     private static function createBrand(): void
     {
         $b = self::body();
-        $name = trim((string) ($b['name'] ?? ''));
+        $name = Cast::str($b['name'] ?? '');
         if ($name === '') {
             Response::error('Nombre requerido');
             return;
         }
-        $slug = trim((string) ($b['slug'] ?? '')) ?: Slug::unique($name, function (string $s): bool {
+        $slug = Cast::str($b['slug'] ?? '') ?: Slug::unique($name, function (string $s): bool {
             $st = self::pdo()->prepare('SELECT 1 FROM brands WHERE slug = ?');
             $st->execute([$s]);
             return (bool) $st->fetchColumn();
@@ -514,8 +514,8 @@ final class AdminApi
     private static function createCliente(): void
     {
         $b = self::body();
-        $nombre = trim((string) ($b['nombre'] ?? $b['name'] ?? ''));
-        $logo = trim((string) ($b['logo_url'] ?? ''));
+        $nombre = Cast::str($b['nombre'] ?? ($b['name'] ?? ''));
+        $logo = Cast::str($b['logo_url'] ?? '');
         if ($nombre === '' || $logo === '') {
             Response::error('nombre y logo_url son requeridos');
             return;
@@ -592,8 +592,8 @@ final class AdminApi
 
     private static function normalizeSolucionPayload(array $b, ?int $id = null): array
     {
-        $titulo = trim((string) ($b['titulo'] ?? $b['title'] ?? $b['name'] ?? ''));
-        $slugIn = trim((string) ($b['slug'] ?? ''));
+        $titulo = Cast::str($b['titulo'] ?? ($b['title'] ?? ($b['name'] ?? '')));
+        $slugIn = Cast::str($b['slug'] ?? '');
         $slug = $slugIn !== ''
             ? Slug::make($slugIn)
             : ($titulo !== ''
@@ -762,12 +762,12 @@ final class AdminApi
     {
         PublicApi::ensureSectoresSchema();
         $b = self::body();
-        $nombre = trim((string) ($b['nombre'] ?? ''));
+        $nombre = Cast::str($b['nombre'] ?? '');
         if ($nombre === '') {
             Response::error('nombre es requerido');
             return;
         }
-        $slug = trim((string) ($b['slug'] ?? ''));
+        $slug = Cast::str($b['slug'] ?? '');
         if ($slug === '') {
             $slug = Slug::unique($nombre, static function (string $s): bool {
                 $st = self::pdo()->prepare('SELECT 1 FROM sectores WHERE slug = ?');
@@ -781,8 +781,8 @@ final class AdminApi
         )->execute([
             $nombre,
             $slug,
-            trim((string) ($b['imagen_url'] ?? '')),
-            trim((string) ($b['link_url'] ?? '')),
+            Cast::str($b['imagen_url'] ?? ''),
+            Cast::str($b['link_url'] ?? ''),
             (int) ($b['orden'] ?? 0),
             array_key_exists('activo', $b) ? (!empty($b['activo']) ? 1 : 0) : 1,
         ]);
@@ -805,7 +805,7 @@ final class AdminApi
             }
             $val = $b[$f];
             if ($f === 'nombre' || $f === 'slug' || $f === 'imagen_url' || $f === 'link_url') {
-                $val = trim((string) ($val ?? ''));
+                $val = Cast::str($val);
             }
             if ($f === 'orden') {
                 $val = (int) $val;
@@ -858,10 +858,10 @@ final class AdminApi
         if ($file && (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             $uploaded = Upload::storeImage($file, 'sectores');
             if (!$uploaded['ok']) {
-                Response::error((string) $uploaded['error']);
+                Response::error(Cast::str($uploaded['error'] ?? 'Error'));
                 return;
             }
-            $imagen = (string) $uploaded['url'];
+            $imagen = Cast::str($uploaded['url'] ?? '');
         }
 
         if ($nombre === '') {
@@ -897,10 +897,10 @@ final class AdminApi
         }
         $uploaded = Upload::storeImage($file, 'sectores');
         if (!$uploaded['ok']) {
-            Response::error((string) $uploaded['error']);
+            Response::error(Cast::str($uploaded['error'] ?? 'Error'));
             return;
         }
-        $url = (string) $uploaded['url'];
+        $url = Cast::str($uploaded['url'] ?? '');
         self::pdo()->prepare('UPDATE sectores SET imagen_url = ? WHERE id = ?')->execute([$url, $id]);
         Response::json(['ok' => true, 'url' => $url, 'imagen_url' => $url]);
     }
@@ -916,7 +916,7 @@ final class AdminApi
     {
         PublicApi::ensureBannersSchema();
         $b = self::body();
-        $titulo = trim((string) ($b['titulo'] ?? ''));
+        $titulo = Cast::str($b['titulo'] ?? '');
         if ($titulo === '') {
             Response::error('titulo es requerido');
             return;
@@ -927,12 +927,12 @@ final class AdminApi
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
             $titulo,
-            trim((string) ($b['subtitulo'] ?? '')),
-            trim((string) ($b['imagen_url'] ?? '')),
-            trim((string) ($b['texto_btn_1'] ?? '')),
-            trim((string) ($b['link_btn_1'] ?? '')),
-            trim((string) ($b['texto_btn_2'] ?? '')),
-            trim((string) ($b['link_btn_2'] ?? '')),
+            Cast::str($b['subtitulo'] ?? ''),
+            Cast::str($b['imagen_url'] ?? ''),
+            Cast::str($b['texto_btn_1'] ?? ''),
+            Cast::str($b['link_btn_1'] ?? ''),
+            Cast::str($b['texto_btn_2'] ?? ''),
+            Cast::str($b['link_btn_2'] ?? ''),
             (int) ($b['orden'] ?? 0),
             array_key_exists('activo', $b) ? (!empty($b['activo']) ? 1 : 0) : 1,
         ]);
@@ -961,7 +961,7 @@ final class AdminApi
             if ($f === 'orden') {
                 $val = (int) $val;
             } elseif ($f !== 'activo') {
-                $val = trim((string) ($val ?? ''));
+                $val = Cast::str($val);
             }
             $sets[] = "$f = ?";
             $vals[] = $val;
@@ -1022,10 +1022,10 @@ final class AdminApi
         if ($file && (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             $uploaded = Upload::storeImage($file, 'banners');
             if (!$uploaded['ok']) {
-                Response::error((string) $uploaded['error']);
+                Response::error(Cast::str($uploaded['error'] ?? 'Error'));
                 return;
             }
-            $imagen = (string) $uploaded['url'];
+            $imagen = Cast::str($uploaded['url'] ?? '');
         }
 
         if ($titulo === '') {
@@ -1071,10 +1071,10 @@ final class AdminApi
         }
         $uploaded = Upload::storeImage($file, 'banners');
         if (!$uploaded['ok']) {
-            Response::error((string) $uploaded['error']);
+            Response::error(Cast::str($uploaded['error'] ?? 'Error'));
             return;
         }
-        $url = (string) $uploaded['url'];
+        $url = Cast::str($uploaded['url'] ?? '');
         self::pdo()->prepare('UPDATE banners SET imagen_url = ? WHERE id = ?')->execute([$url, $id]);
         Response::json(['ok' => true, 'url' => $url, 'imagen_url' => $url]);
     }
@@ -1090,13 +1090,13 @@ final class AdminApi
     {
         self::ensureProductFichaColumn();
         $b = self::body();
-        $name = trim((string) ($b['name'] ?? ''));
+        $name = Cast::str($b['name'] ?? '');
         $categoryId = (int) ($b['category_id'] ?? 0);
         if ($name === '' || $categoryId <= 0) {
             Response::error('Nombre y categoría requeridos');
             return;
         }
-        $slug = trim((string) ($b['slug'] ?? '')) ?: Slug::unique($name, function (string $s): bool {
+        $slug = Cast::str($b['slug'] ?? '') ?: Slug::unique($name, function (string $s): bool {
             $st = self::pdo()->prepare('SELECT 1 FROM products WHERE slug = ?');
             $st->execute([$s]);
             return (bool) $st->fetchColumn();
@@ -1126,7 +1126,7 @@ final class AdminApi
             array_key_exists('price_clp', $b) && $b['price_clp'] !== null && $b['price_clp'] !== ''
                 ? (int) $b['price_clp'] : null,
             $b['image_url'] ?? null,
-            trim((string) ($b['ficha_pdf_url'] ?? '')) ?: null,
+            Cast::str($b['ficha_pdf_url'] ?? '') ?: null,
             !empty($b['is_featured']) ? 1 : 0,
             !empty($b['is_active']) || !array_key_exists('is_active', $b) ? 1 : 0,
             $b['seo_title'] ?? null,
@@ -1138,12 +1138,12 @@ final class AdminApi
 
     private static function normalizeProductTipo(array $b): string
     {
-        $tipo = strtolower(trim((string) ($b['tipo'] ?? '')));
+        $tipo = strtolower(Cast::str($b['tipo'] ?? ''));
         if ($tipo === 'repuesto' || $tipo === 'equipo') {
             return $tipo;
         }
         // Inferencia desde sale_mode si no viene tipo.
-        $mode = (string) ($b['sale_mode'] ?? 'quote');
+        $mode = Cast::str($b['sale_mode'] ?? 'quote', 'quote');
         return $mode === 'buy' ? 'repuesto' : 'equipo';
     }
 
@@ -1173,7 +1173,7 @@ final class AdminApi
             $b['price_clp'] = null;
         }
         if (array_key_exists('ficha_pdf_url', $b)) {
-            $b['ficha_pdf_url'] = trim((string) ($b['ficha_pdf_url'] ?? '')) ?: null;
+            $b['ficha_pdf_url'] = Cast::str($b['ficha_pdf_url'] ?? '') ?: null;
         }
         if (array_key_exists('tipo', $b) || array_key_exists('sale_mode', $b)) {
             $b['tipo'] = self::normalizeProductTipo($b);
@@ -1271,10 +1271,10 @@ final class AdminApi
         $preferred = Cast::str($_POST['slug'] ?? ($row['slug'] ?? ''));
         $uploaded = Upload::storePdf($file, $preferred);
         if (!$uploaded['ok']) {
-            Response::error((string) $uploaded['error']);
+            Response::error(Cast::str($uploaded['error'] ?? 'Error'));
             return;
         }
-        $url = (string) $uploaded['url'];
+        $url = Cast::str($uploaded['url'] ?? '');
         self::pdo()->prepare('UPDATE products SET ficha_pdf_url = ?, updated_at = NOW() WHERE id = ?')
             ->execute([$url, $id]);
 

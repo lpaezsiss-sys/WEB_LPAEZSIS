@@ -35,6 +35,9 @@ final class PublicApi
                 'env_file' => $hasEnv ? 'found' : 'missing',
                 'db' => $dbOk ? 'ok' : 'error',
                 'db_error' => $dbOk ? null : $dbError,
+                'php_notices' => \Lpaezsis\Config::bool('APP_DEBUG')
+                    ? \Lpaezsis\Support\ErrorHandler::logged()
+                    : [],
             ]);
             return;
         }

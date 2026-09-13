@@ -26,5 +26,6 @@ spl_autoload_register(static function ($class) {
 });
 
 \Lpaezsis\Config::load(__DIR__);
+\Lpaezsis\Support\ErrorHandler::register();
 // MySQL se conecta bajo demanda (Database::pdo), no en el bootstrap,
 // para que /api/health responda aunque falte .env o la BD.
