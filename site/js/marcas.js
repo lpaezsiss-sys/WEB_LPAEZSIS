@@ -8,28 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 var BRAND_IMG_PLACEHOLDER = "img/placeholder.jpg";
-
-/**
- * DEBUG temporal: captura fallos de carga de <img> antes de tocar rutas/lógica.
- * Expuesto en window para handlers onerror inline.
- */
-function logImageError(imgElement, originalUrl) {
-  console.group("❌ Error al Cargar Imagen");
-  console.error("URL Intentada:", imgElement && imgElement.src);
-  console.error("URL Original recibida:", originalUrl);
-  console.error(
-    "Estado de Red:",
-    window.navigator.onLine ? "Online" : "Offline"
-  );
-  console.groupEnd();
-
-  // Evita bucle infinito y asigna placeholder neutro
-  if (imgElement) {
-    imgElement.onerror = null;
-    imgElement.src = "img/placeholder.jpg";
-  }
-}
-window.logImageError = logImageError;
+var BRAND_IMG_ONERROR =
+  "this.onerror=null;this.src='" + BRAND_IMG_PLACEHOLDER + "';";
 
 /**
  * Normaliza cualquier URL de imagen de marca (logo, banner, galería, fotos).
@@ -77,7 +57,6 @@ function brandImgSource(imgObj) {
 
 /** Markup <img> homogéneo para logos / galería / banners de marca. */
 function brandImgTag(imgObj, alt) {
-  var originalRaw = brandImgSource(imgObj);
   var imgSrc = formatBrandImg(
     (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
   );
@@ -89,11 +68,11 @@ function brandImgTag(imgObj, alt) {
   return (
     '<img src="' +
     escapeAttr(imgSrc) +
-    '" data-original-url="' +
-    escapeAttr(originalRaw) +
     '" alt="' +
     escapeAttr(nombre) +
-    '" class="img-fluid" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">'
+    '" class="img-fluid" onerror="' +
+    BRAND_IMG_ONERROR +
+    '">'
   );
 }
 
@@ -584,10 +563,11 @@ async function loadBrandDetailExtras(slug) {
           }
           var formatted = formatBrandImg(real || "");
           img.setAttribute("src", formatted);
-          img.setAttribute("data-original-url", real || "");
+          img.removeAttribute("data-original-url");
           img.classList.add("img-fluid");
           img.onerror = function () {
-            logImageError(this, real || "");
+            this.onerror = null;
+            this.src = BRAND_IMG_PLACEHOLDER;
           };
           img.removeAttribute("data-src");
           img.removeAttribute("data-lazy-src");
@@ -610,18 +590,17 @@ async function loadBrandDetailExtras(slug) {
             var imgSrc = formatBrandImg(
               (imgObj && (imgObj.url || imgObj.imagen || imgObj.src)) || imgObj
             );
-            var originalRaw = brandImgSource(imgObj);
             return (
               '<a class="brand-gallery-item" href="' +
               escapeAttr(imgSrc) +
               '" target="_blank" rel="noopener">' +
               '<img src="' +
               escapeAttr(imgSrc) +
-              '" data-original-url="' +
-              escapeAttr(originalRaw) +
               '" alt="' +
               escapeAttr(marcaNombre) +
-              '" class="img-fluid" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">' +
+              '" class="img-fluid" onerror="' +
+              BRAND_IMG_ONERROR +
+              '">' +
               "</a>"
             );
           })
