@@ -4,7 +4,7 @@
 **Tag:** `freeze-prueba1-2026-09-13-php81`  
 **Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260913-php81-5af8`  
 **Rama de trabajo al momento del freeze:** `cursor/ops-cleanup-freeze-5af8` (sobre `main` + #61 + cleanup)  
-**Commit:** `cc2584a`
+**Commit tip:** tag `freeze-prueba1-2026-09-13-php81`
 
 PRs / entregas incluidas: **#61** (migración PHP 8.1 Pasos 1–5), **#62** (retirar `logImageError` + bump cache), y entregas previas de marcas/imágenes (#56–#59) ya en producción.
 
