@@ -10,8 +10,8 @@ final class Router
 {
     public static function dispatch(string $method, string $path): void
     {
-        $method = strtoupper($method);
-        $path = '/' . trim($path, '/');
+        $method = strtoupper((string) ($method ?? 'GET'));
+        $path = '/' . trim((string) ($path ?? ''), '/');
         if ($path === '/') {
             $path = '/api';
         }

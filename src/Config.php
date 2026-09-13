@@ -30,12 +30,16 @@ final class Config
         self::$values = $defaults;
         if ($path) {
             foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
-                $line = trim($line);
+                $line = trim((string) ($line ?? ''));
                 if ($line === '' || $line[0] === '#' || strpos($line, '=') === false) {
                     continue;
                 }
-                [$k, $v] = array_map('trim', explode('=', $line, 2));
-                $v = trim($v, "\"'");
+                $parts = explode('=', $line, 2);
+                $k = trim((string) ($parts[0] ?? ''));
+                $v = trim((string) ($parts[1] ?? ''), "\"'");
+                if ($k === '') {
+                    continue;
+                }
                 self::$values[$k] = $v;
             }
         }
@@ -74,7 +78,7 @@ final class Config
 
     public static function bool(string $key, bool $default = false): bool
     {
-        $v = strtolower((string) self::get($key, $default ? '1' : '0'));
+        $v = strtolower((string) (self::get($key, $default ? '1' : '0') ?? ($default ? '1' : '0')));
         return in_array($v, ['1', 'true', 'yes', 'on'], true);
     }
 }

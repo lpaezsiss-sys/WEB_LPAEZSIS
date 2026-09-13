@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 /**
  * Compatibility helpers for PHP 7.4+ shared hosting.
+ * Also casts null → string so internals stay safe on PHP 8.1+ (no null to string natives).
  */
 if (!function_exists('str_starts_with')) {
     function str_starts_with($haystack, $needle)

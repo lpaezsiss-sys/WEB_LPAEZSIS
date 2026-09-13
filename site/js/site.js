@@ -5,6 +5,26 @@
   var QUOTE_KEY = "lpaezsis_quote_v1";
   var siteSettings = null;
 
+  /**
+   * DEBUG temporal: captura fallos de carga de <img> antes de tocar rutas/lógica.
+   */
+  function logImageError(imgElement, originalUrl) {
+    console.group("❌ Error al Cargar Imagen");
+    console.error("URL Intentada:", imgElement && imgElement.src);
+    console.error("URL Original recibida:", originalUrl);
+    console.error(
+      "Estado de Red:",
+      window.navigator.onLine ? "Online" : "Offline"
+    );
+    console.groupEnd();
+
+    if (imgElement) {
+      imgElement.onerror = null;
+      imgElement.src = "img/placeholder.jpg";
+    }
+  }
+  window.logImageError = logImageError;
+
   function $(id) {
     return document.getElementById(id);
   }
@@ -255,21 +275,18 @@
         : "Cotización";
     var img = resolveProductImage(p);
     var webp = resolveProductWebp(p, img);
-    var imgFallback = PLACEHOLDER_IMG;
-    var onerror =
-      "this.onerror=null;this.src='" +
-      imgFallback.replace(/'/g, "\\'") +
-      "';";
+    var originalImg =
+      (p && (p.image_url || p.imagen_url || p.imagen || p.image)) || "";
     var imgTag = img
       ? '<img src="' +
         escapeAttr(img) +
+        '" data-original-url="' +
+        escapeAttr(String(originalImg)) +
         '" alt="' +
         escapeAttr(p.name) +
         '" title="' +
         escapeAttr(p.name) +
-        '" class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="' +
-        onerror +
-        '">'
+        '" class="card-img-top img-fluid" loading="lazy" decoding="async" width="480" height="480" onerror="logImageError(this, this.getAttribute(\'data-original-url\') || \'\')">'
       : "LPAEZ";
     var visual = imgTag;
     if (img && webp) {
@@ -360,6 +377,7 @@
 
   var PRODUCT_IMAGES = {
     "secador-botellas-sonic": "img/hero/cans.jpg",
+    "secador-Tarros-sonic": "img/hero/3piece_cans.jpg",
     "turbina-soplado-sonic-100": "img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "img/products/A07-10976.jpg",
@@ -390,6 +408,11 @@
   function normalizeMediaUrl(url) {
     var u = String(url == null ? "" : url).trim();
     if (!u) return "";
+    // Legacy WP uploads → local (WP responde text/html, no binarios)
+    if (/wp-content\/uploads/i.test(u)) {
+      var wpFile = u.match(/\/([^\/?#]+\.(jpe?g|png|webp|gif))$/i);
+      if (wpFile) return "img/products/" + wpFile[1];
+    }
     if (/^https?:\/\//i.test(u)) return u;
     if (u.indexOf("//") === 0) {
       if (/^\/\/img\//i.test(u)) u = u.replace(/^\/+/, "");
@@ -411,13 +434,16 @@
     return PRODUCT_FALLBACKS[idx] || PLACEHOLDER_IMG;
   }
 
-  /** Hermano .webp bajo img/{products,hero,uploads,brand}/ o image_webp de API. */
+  /** Hermano .webp bajo img/{products,hero,brand}/ o image_webp de API.
+   *  No inventa .webp en img/uploads/: los uploads admin suelen no tener pareja
+   *  y un <source webp> 404 (HTML) rompe el <picture> sin disparar onerror del <img>.
+   */
   function resolveProductWebp(p, imageUrl) {
     var explicit = normalizeMediaUrl(p && p.image_webp ? p.image_webp : "");
     if (explicit) return explicit;
     var url = normalizeMediaUrl(imageUrl);
     if (
-      /(\/|^)img\/(products|hero|uploads|brand)\//i.test(url) &&
+      /(\/|^)img\/(products|hero|brand)\//i.test(url) &&
       /\.(jpe?g|png)$/i.test(url)
     ) {
       return url.replace(/\.(jpe?g|png)$/i, ".webp");

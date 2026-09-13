@@ -41,26 +41,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $path = $_GET['__path'] ?? ($_SERVER['PATH_INFO'] ?? '');
-if ($path === '' || $path === null) {
-    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (!is_string($path) || $path === '' || $path === null) {
+    $uri = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    $uri = is_string($uri) && $uri !== '' ? $uri : '/';
     if (preg_match('#/api(?:/index\.php)?(/.*)?$#', $uri, $m)) {
         $path = $m[1] ?? '/';
     } else {
         $path = $uri;
     }
 }
+$path = (string) ($path ?? '/');
 
-if (strncmp((string) $path, '/api', 4) !== 0) {
+if (strncmp($path, '/api', 4) !== 0) {
     $path = '/api' . ($path === '/' ? '' : $path);
 }
 
 try {
-    Router::dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
+    Router::dispatch((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'), $path);
 } catch (Throwable $e) {
+    $extra = [];
+    if (\Lpaezsis\Config::bool('APP_DEBUG')) {
+        $extra['detail'] = $e->getMessage();
+    }
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode([
-        'error' => 'Error interno del API',
-        'detail' => $e->getMessage(),
-    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode(
+        array_merge(['error' => 'Error interno del API'], $extra),
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
 }

@@ -52,6 +52,7 @@ final class Upload
     /** Stem sanitizado sin extensión (.pdf). */
     public static function sanitizePdfStem(string $value): string
     {
+        $value = (string) ($value ?? '');
         $value = basename(str_replace('\\', '/', $value));
         $value = (string) (preg_replace('/\.pdf$/i', '', $value) ?? '');
         $value = trim($value);
@@ -72,7 +73,7 @@ final class Upload
             }
         }
 
-        $value = strtolower($value);
+        $value = strtolower((string) ($value ?? ''));
         $value = (string) (preg_replace('/[^a-z0-9]+/', '-', $value) ?? '');
         return trim($value, '-');
     }
@@ -110,7 +111,7 @@ final class Upload
             }
 
             $uploadDir = self::resolveUploadDir();
-            $imgRoot = dirname(rtrim($uploadDir, '/\\'));
+            $imgRoot = dirname(rtrim((string) ($uploadDir ?? ''), '/\\'));
             $dir = $imgRoot . DIRECTORY_SEPARATOR . 'fichas';
             if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
                 return ['ok' => false, 'error' => 'No se pudo crear carpeta img/fichas', 'dir' => $dir];
@@ -235,12 +236,12 @@ final class Upload
             }
 
             $dir = self::resolveUploadDir();
-            $subdir = trim(str_replace(['..', '\\'], '', $subdir), '/');
+            $subdir = trim(str_replace(['..', '\\'], '', (string) ($subdir ?? '')), '/');
             if ($subdir !== '') {
                 if (!preg_match('/^[a-z0-9_-]+$/i', $subdir)) {
                     return ['ok' => false, 'error' => 'Subcarpeta de upload inválida'];
                 }
-                $dir = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR . $subdir;
+                $dir = rtrim((string) ($dir ?? ''), '/\\') . DIRECTORY_SEPARATOR . $subdir;
             }
             if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
                 return ['ok' => false, 'error' => 'No se pudo crear carpeta de uploads', 'dir' => $dir];
@@ -251,7 +252,7 @@ final class Upload
 
             $prefixName = $isVideo ? 'v-' : 'p-';
             $name = $prefixName . bin2hex(random_bytes(8)) . '.' . $ext;
-            $dest = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR . $name;
+            $dest = rtrim((string) ($dir ?? ''), '/\\') . DIRECTORY_SEPARATOR . $name;
             if (!move_uploaded_file($tmp, $dest)) {
                 return ['ok' => false, 'error' => 'Error al guardar el archivo', 'dir' => $dir];
             }

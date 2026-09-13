@@ -1,27 +1,27 @@
 # Freeze — estado estable LPAEZsis (prueba1 + producción)
 
-**Fecha:** 2026-08-29  
-**Tag:** `freeze-prueba1-2026-08-29`  
-**Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260829-5af8`  
-**Rama de trabajo al momento del freeze:** `main`  
-**Commit:** `bcfd6d9`
+**Fecha:** 2026-09-13  
+**Tag:** `freeze-prueba1-2026-09-13`  
+**Rama inmutable de respaldo:** `cursor/freeze-prueba1-20260913-5af8`  
+**Rama de trabajo al momento del freeze:** `cursor/img-error-debug-5af8` (sobre `main` + #57)  
+**Commit:** `b45756f`
 
-PRs / entregas recientes incluidas: #53 (hero autoplay), deploy producción www, fix logos/carrusel/tarjetas marcas (`072e98c`, `bcfd6d9`).
+PRs / entregas recientes incluidas: #56 (Upload.php completo / WebP), #57 (marcas: `wp-content` → `img/products`, placeholder neutro), #59 (debug `logImageError` + fix `.webp` fantasma en `img/uploads`), deploy producción www + staging prueba1.
 
 Estado verificado al freeze:
 
 | Entorno | Health | PHP | Productos | Marcas |
 |---------|--------|-----|-----------|--------|
-| Producción `www.lpaezsis.cl` | `db: ok` | 7.4.33 | **19** (9 equipos / 10 repuestos) | **8** |
-| Staging `prueba1.lpaezsis.cl` | `db: ok` | 7.4.33 | **19** | **8** |
+| Producción `www.lpaezsis.cl` | `db: ok` | 7.4.33 | **21** (11 equipos / 10 repuestos) | **8** |
+| Staging `prueba1.lpaezsis.cl` | `db: ok` | 7.4.33 | **21** | **8** |
 
 ## Sitios
 
 ### Producción
-- URL: https://www.lpaezsis.cl/ (redirige desde www → apex según hosting)
+- URL: https://www.lpaezsis.cl/
 - Home: https://www.lpaezsis.cl/
 - Marcas: https://www.lpaezsis.cl/marcas.html
-- CMC: https://www.lpaezsis.cl/marcas.html?slug=cmc-klebetechnik
+- Sonic: https://www.lpaezsis.cl/marcas.html?slug=sonic-air-systems
 - Catálogo: https://www.lpaezsis.cl/catalogo.html?tipo=equipo
 - API health: https://www.lpaezsis.cl/api/health → `db: ok`
 
@@ -44,20 +44,23 @@ public_html/lpaezsis.cl-wp-backup-20260829/  → respaldo WordPress previo al cu
 - BD: `sistem29_lpaezsis`
 - Usuario BD: `sistem29_lpaezsis`
 - Dump compatible: `data/lpaezsis_bluehosting.sql`
-- Uploads: `img/uploads/` (imágenes `p-*`, videos `v-*.mp4`, banners)
+- Uploads: `img/uploads/` (imágenes `p-*`, videos `v-*.mp4`, banners, PDFs)
 
 ## Qué incluye este freeze
 
 ### Front (`site/`)
-- Home: hero gestionado (`api/banners`, autoplay 5s, `index.js`, `propuesta-home.css`)
-- Marcas: logos hero + carrusel con `<picture>`/PNG fallback (`marcas.js?v=131`), tarjetas producto con `resolveEquipImage`
-- Assets WebP/PNG de marcas alineados local↔prod (`combi`, `isodur`, Columbia, CMC producto)
-- Catálogo cache-bust `catalogo.js?v=131`
-- Vista repuestos, nosotros/contacto B2B, carruseles home (destacados / marcas / clientes)
+- Marcas: `formatBrandImg` reescribe legacy `wp-content/uploads/...` → `img/products/FILE` (`marcas.js?v=138`)
+- `resolveProductWebp` / `preferWebpUrl`: **no inventan** `.webp` bajo `img/uploads/` (evita `<picture>` roto)
+- Debug temporal: `logImageError` en `onerror` de `<img>` (consola: URL intentada / original / red)
+- Placeholder neutro `img/placeholder.jpg`
+- Galería Sonic: Capturas PNG en `img/products/`
+- `site.js?v=32` en marcas / catálogo / repuestos / producto
+- Home / catálogo / repuestos / nosotros / contacto B2B según entregas previas
 
 ### Backend
 - API pública + admin, PHP **7.4**
-- Rutas: `/api/health`, `/api/products`, `/api/productos`, `/api/marcas`, `/api/banners`, `/api/clientes`, `/api/soluciones`, `/api/search`, …
+- `Upload.php` completo (`store` / `storePdf` / `storeVideo` / WebP) + ruta prod `img/uploads`
+- Rutas: `/api/health`, `/api/products`, `/api/productos`, `/api/marcas`, `/api/brands/{slug}`, `/api/banners`, `/api/clientes`, `/api/soluciones`, `/api/search`, …
 
 ### Tools / QA
 - `tools/preview_server.py` (preview local + SQLite)
@@ -67,14 +70,14 @@ public_html/lpaezsis.cl-wp-backup-20260829/  → respaldo WordPress previo al cu
 
 ```bash
 git fetch origin
-git checkout freeze-prueba1-2026-08-29
+git checkout freeze-prueba1-2026-09-13
 # o
-git checkout cursor/freeze-prueba1-20260829-5af8
+git checkout cursor/freeze-prueba1-20260913-5af8
 ```
 
 ZIP del freeze:
 
-https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-08-29.zip
+https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2026-09-13.zip
 
 ## Freezes anteriores
 
@@ -87,6 +90,8 @@ https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2
 | 2026-08-21 | `freeze-prueba1-2026-08-21` | `cursor/freeze-prueba1-20260821-5af8` |
 | 2026-08-25 | `freeze-prueba1-2026-08-25` | `cursor/freeze-prueba1-20260825-5af8` |
 | 2026-08-29 | `freeze-prueba1-2026-08-29` | `cursor/freeze-prueba1-20260829-5af8` |
+| 2026-09-01 | `freeze-prueba1-2026-09-01` | `cursor/freeze-prueba1-20260901-5af8` |
+| 2026-09-13 | `freeze-prueba1-2026-09-13` | `cursor/freeze-prueba1-20260913-5af8` |
 
 ## Notas de seguridad / ops
 
@@ -96,6 +101,7 @@ https://github.com/lpaezsiss-sys/WEB_LPAEZSIS/archive/refs/tags/freeze-prueba1-2
 
 ## Mejoras siguientes (fuera del freeze)
 
-- Limpiar WIP local no mergeado (`site/js/index.js` hero local, `tools/preview_server.py` banners/marcas locales, `site/api/banners.php`)
-- Alinear staging prueba1 con el mismo `marcas.js?v=131` si aún no está
+- Mergear #57 / #59 a `main` si aún están en draft
+- Retirar `logImageError` cuando el diagnóstico de imágenes ya no sea necesario
+- Consolidar `admin.js` git vs prod antes de sobrescribir admin
 - `APP_DEBUG=0` y SEO canónico en dominio final

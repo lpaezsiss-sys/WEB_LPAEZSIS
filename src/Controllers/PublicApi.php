@@ -5,12 +5,15 @@ namespace Lpaezsis\Controllers;
 
 use Lpaezsis\Database;
 use Lpaezsis\Response;
+use Lpaezsis\Support\Cast;
 use PDO;
 
 final class PublicApi
 {
     public static function handle(string $method, string $path): void
     {
+        $method = strtoupper((string) ($method ?? 'GET'));
+        $path = self::normalizePath($path);
         if ($method === 'GET' && ($path === '/api' || $path === '/api/health')) {
             // Controllers live in src/Controllers → parent is src/
             $envPath = dirname(__DIR__) . '/.env';
@@ -23,15 +26,16 @@ final class PublicApi
             } catch (\Throwable $e) {
                 $dbError = $e->getMessage();
             }
-            Response::json([
+            Response::json(array_merge([
                 'ok' => true,
                 'service' => 'lpaezsis-api',
-                'php' => PHP_VERSION,
-                'compat' => '7.4+',
                 'env_file' => $hasEnv ? 'found' : 'missing',
                 'db' => $dbOk ? 'ok' : 'error',
                 'db_error' => $dbOk ? null : $dbError,
-            ]);
+                'php_notices' => \Lpaezsis\Config::bool('APP_DEBUG')
+                    ? \Lpaezsis\Support\ErrorHandler::logged()
+                    : [],
+            ], \Lpaezsis\Support\PhpRuntime::healthMeta()));
             return;
         }
         if ($method === 'GET' && $path === '/api/settings') {
@@ -44,6 +48,42 @@ final class PublicApi
         }
         if ($method === 'GET' && $path === '/api/brands') {
             self::brands();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/clientes') {
+            self::clientes();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/search') {
+            self::search();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/marcas') {
+            self::marcas();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/productos') {
+            self::productosList();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/repuestos') {
+            self::repuestosList();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/soluciones') {
+            self::soluciones();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/sectores') {
+            self::sectores();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/industrias') {
+            self::industrias();
+            return;
+        }
+        if ($method === 'GET' && $path === '/api/banners') {
+            self::banners();
             return;
         }
         if ($method === 'GET' && preg_match('#^/api/brands/([^/]+)$#', $path, $m)) {
@@ -84,6 +124,25 @@ final class PublicApi
         return Database::pdo();
     }
 
+    /**
+     * Normaliza paths de rewrite Apache (/api/foo.php → /api/foo).
+     * Evita 404 cuando el front-controller recibe el sufijo .php.
+     */
+    private static function normalizePath(string $path): string
+    {
+        $path = str_replace('\\', '/', (string) ($path ?? ''));
+        $path = '/' . trim($path, '/');
+        if ($path === '/' || $path === '') {
+            return '/api';
+        }
+        if (strlen($path) > 4 && substr($path, -4) === '.php') {
+            $path = substr($path, 0, -4);
+        }
+        // Colapsa slashes internos accidentales
+        $path = preg_replace('#/+#', '/', $path) ?? $path;
+        return $path;
+    }
+
     private static function body(): array
     {
         $raw = file_get_contents('php://input') ?: '';
@@ -112,6 +171,524 @@ final class PublicApi
              FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
         )->fetchAll();
         Response::json(['brands' => $rows]);
+    }
+
+    /**
+     * GET /api/clientes
+     * Lista plana de clientes activos: [{ id, nombre, logo_url }, ...]
+     */
+    private static function clientes(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, nombre, logo_url
+                 FROM clientes
+                 WHERE activo = 1
+                 ORDER BY orden ASC, nombre ASC'
+            );
+            $stmt->execute();
+            Response::json($stmt->fetchAll());
+        } catch (\Throwable $e) {
+            // Tabla ausente o sin migrar: no romper home.
+            Response::json([]);
+        }
+    }
+
+    /**
+     * GET /api/search?q=
+     * Búsqueda predictiva: productos + marcas (máx. 8).
+     * Respuesta: [{ id, titulo, slug, tipo, imagen, categoria }, ...]
+     */
+    private static function search(): void
+    {
+        $q = Cast::str($_GET['q'] ?? '');
+        if (function_exists('mb_strlen') ? \mb_strlen($q) < 2 : strlen($q) < 2) {
+            Response::json([]);
+            return;
+        }
+
+        try {
+            $like = '%' . $q . '%';
+            // Cupos separados para no saturar el LIMIT con solo productos.
+            $prodStmt = self::pdo()->prepare(
+                "SELECT p.id, p.name AS titulo, p.slug,
+                        COALESCE(NULLIF(p.tipo, ''), 'producto') AS tipo,
+                        p.image_url AS imagen, 'producto' AS categoria
+                 FROM products p
+                 WHERE p.is_active = 1
+                   AND (
+                     p.name LIKE ?
+                     OR IFNULL(p.description, '') LIKE ?
+                     OR IFNULL(p.tipo, '') LIKE ?
+                     OR p.slug LIKE ?
+                   )
+                 ORDER BY p.name ASC
+                 LIMIT 6"
+            );
+            $prodStmt->execute([$like, $like, $like, $like]);
+            $products = $prodStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $brandStmt = self::pdo()->prepare(
+                "SELECT b.id, b.name AS titulo, b.slug, 'marca' AS tipo,
+                        b.logo_url AS imagen, 'marca' AS categoria
+                 FROM brands b
+                 WHERE b.is_active = 1
+                   AND (
+                     b.name LIKE ?
+                     OR IFNULL(b.description, '') LIKE ?
+                     OR b.slug LIKE ?
+                   )
+                 ORDER BY b.name ASC
+                 LIMIT 2"
+            );
+            $brandStmt->execute([$like, $like, $like]);
+            $brands = $brandStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            Response::json(array_merge($products, $brands));
+        } catch (\Throwable $e) {
+            Response::error('Error en la búsqueda: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /api/marcas[?slug=]
+     * - Sin slug: { marcas: [...], brands: [...] } (aliases ES para marcas.js)
+     * - Con slug: { marca: {...}, todas: [...] }
+     * Tabla real: brands (is_active).
+     */
+    private static function marcas(): void
+    {
+        try {
+            $slug = Cast::str($_GET['slug'] ?? '');
+
+            $mapRow = static function (array $b): array {
+                $nombre = Cast::str($b['name'] ?? '');
+                $desc = Cast::str($b['description'] ?? '');
+                $logo = Cast::str($b['logo_url'] ?? '');
+                return [
+                    'id' => isset($b['id']) ? Cast::int($b['id']) : null,
+                    'slug' => Cast::str($b['slug'] ?? ''),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'descripcion' => $desc,
+                    'description' => $desc,
+                    'logo_url' => $logo,
+                    'imagen' => $logo,
+                    'website_url' => $b['website_url'] ?? null,
+                    'sort_order' => isset($b['sort_order']) ? (int) $b['sort_order'] : 0,
+                    'activo' => 1,
+                    'is_active' => 1,
+                ];
+            };
+
+            if ($slug !== '') {
+                $stmt = self::pdo()->prepare(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE slug = ? AND is_active = 1 LIMIT 1'
+                );
+                $stmt->execute([$slug]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$row) {
+                    Response::error('Marca no encontrada o inactiva', 404);
+                    return;
+                }
+
+                $todas = self::pdo()->query(
+                    'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                     FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+                )->fetchAll(PDO::FETCH_ASSOC);
+
+                $todasMapped = array_map($mapRow, $todas);
+                Response::json([
+                    'marca' => $mapRow($row),
+                    'todas' => $todasMapped,
+                    'marcas' => $todasMapped,
+                    'brands' => $todasMapped,
+                ]);
+                return;
+            }
+
+            $rows = self::pdo()->query(
+                'SELECT id, slug, name, description, logo_url, website_url, sort_order, is_active, created_at
+                 FROM brands WHERE is_active = 1 ORDER BY sort_order, name'
+            )->fetchAll(PDO::FETCH_ASSOC);
+            $marcas = array_map($mapRow, $rows);
+            Response::json(['marcas' => $marcas, 'brands' => $marcas]);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar marcas: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Lista plana de productos para api/productos.php (filtra por ?brand= / ?marca= / ?tipo=). */
+    private static function productosList(): void
+    {
+        AdminApi::ensureProductFichaColumn();
+        $featured = Cast::bool($_GET['featured'] ?? null, false);
+        $tipo = Cast::str($_GET['tipo'] ?? '');
+        $brand = Cast::str($_GET['brand'] ?? '');
+        if ($brand === '') {
+            $brand = Cast::str($_GET['marca'] ?? '');
+        }
+
+        $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
+                       b.slug AS brand_slug, b.name AS brand_name
+                FROM products p
+                LEFT JOIN categories c ON c.id = p.category_id
+                LEFT JOIN brands b ON b.id = p.brand_id
+                WHERE p.is_active = 1';
+        $params = [];
+        if ($featured) {
+            $sql .= ' AND p.is_featured = 1';
+        }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
+        if ($brand !== '') {
+            if (ctype_digit($brand)) {
+                $sql .= ' AND p.brand_id = ?';
+                $params[] = (int) $brand;
+            } else {
+                $sql .= ' AND b.slug = ?';
+                $params[] = $brand;
+            }
+        }
+        $sql .= ' ORDER BY p.sort_order, p.name';
+        try {
+            if ($params) {
+                $st = self::pdo()->prepare($sql);
+                $st->execute($params);
+                $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $rows = self::pdo()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            }
+            Response::json($rows);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar productos: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Lista forzada de repuestos: api/repuestos.php (?q=&brand=&marca=). */
+    private static function repuestosList(): void
+    {
+        $_GET['tipo'] = 'repuesto';
+        $q = Cast::str($_GET['q'] ?? '');
+        if ($q === '') {
+            $q = Cast::str($_GET['search'] ?? '');
+        }
+
+        $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
+                       b.slug AS brand_slug, b.name AS brand_name
+                FROM products p
+                LEFT JOIN categories c ON c.id = p.category_id
+                LEFT JOIN brands b ON b.id = p.brand_id
+                WHERE p.is_active = 1 AND p.tipo = ?';
+        $params = ['repuesto'];
+        $brand = Cast::str($_GET['brand'] ?? '');
+        if ($brand === '') {
+            $brand = Cast::str($_GET['marca'] ?? '');
+        }
+        if ($brand !== '') {
+            if (ctype_digit($brand)) {
+                $sql .= ' AND p.brand_id = ?';
+                $params[] = (int) $brand;
+            } else {
+                $sql .= ' AND b.slug = ?';
+                $params[] = $brand;
+            }
+        }
+        if ($q !== '') {
+            $sql .= ' AND (p.name LIKE ? OR p.slug LIKE ? OR p.description LIKE ? OR COALESCE(p.seo_title, \'\') LIKE ?)';
+            $like = '%' . $q . '%';
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+        }
+        $sql .= ' ORDER BY p.sort_order, p.name';
+        try {
+            $st = self::pdo()->prepare($sql);
+            $st->execute($params);
+            $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+            Response::json($rows);
+        } catch (\Throwable $e) {
+            Response::error('Error al consultar repuestos: ' . $e->getMessage(), 500);
+        }
+    }
+
+
+    /**
+     * Home "Soluciones para tu planta": JSON array plano de activos ordenados.
+     * Campos compatibles con admin (bullet_*, cta_*, imagen_url) + alias imagen/descripcion.
+     */
+    private static function soluciones(): void
+    {
+        try {
+            $stmt = self::pdo()->prepare(
+                'SELECT id, slug, titulo, bullet_1, bullet_2, bullet_3,
+                        cta_texto, cta_url, imagen_url, orden, activo
+                 FROM soluciones
+                 WHERE activo = 1
+                 ORDER BY orden ASC, titulo ASC
+                 LIMIT 8'
+            );
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $resultado = array_map(static function (array $item): array {
+                $imagen = Cast::str($item['imagen_url'] ?? '');
+                if ($imagen === '') {
+                    $imagen = 'img/hero/plant.jpg';
+                }
+                $titulo = Cast::str($item['titulo'] ?? '');
+                $bullet1 = Cast::str($item['bullet_1'] ?? '');
+
+                return [
+                    'id' => Cast::int($item['id'] ?? 0),
+                    'titulo' => $titulo,
+                    'slug' => Cast::str($item['slug'] ?? ''),
+                    'descripcion' => $bullet1,
+                    'imagen' => $imagen,
+                    'imagen_url' => $imagen,
+                    'bullet_1' => ($item['bullet_1'] ?? null) !== null ? Cast::str($item['bullet_1']) : null,
+                    'bullet_2' => ($item['bullet_2'] ?? null) !== null ? Cast::str($item['bullet_2']) : null,
+                    'bullet_3' => ($item['bullet_3'] ?? null) !== null ? Cast::str($item['bullet_3']) : null,
+                    'cta_texto' => ($item['cta_texto'] ?? null) !== null ? Cast::str($item['cta_texto']) : null,
+                    'cta_url' => ($item['cta_url'] ?? null) !== null ? Cast::str($item['cta_url']) : null,
+                    'orden' => Cast::int($item['orden'] ?? 0),
+                    'activo' => !empty($item['activo']),
+                ];
+            }, $rows);
+
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener soluciones: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Home "Sectores donde trabajamos": JSON array plano de activos ordenados.
+     * Campos: id, nombre, slug, imagen_url, link_url, orden.
+     */
+    private static function sectores(): void
+    {
+        try {
+            self::ensureSectoresSchema();
+            $stmt = self::pdo()->query(
+                'SELECT id, nombre, slug, imagen_url, link_url, orden
+                 FROM sectores
+                 WHERE activo = 1
+                 ORDER BY orden ASC, nombre ASC
+                 LIMIT 12'
+            );
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $resultado = array_map(static function (array $item): array {
+                $imagen = Cast::str($item['imagen_url'] ?? '');
+                $link = Cast::str($item['link_url'] ?? '');
+                return [
+                    'id' => Cast::int($item['id'] ?? 0),
+                    'nombre' => Cast::str($item['nombre'] ?? ''),
+                    'slug' => Cast::str($item['slug'] ?? ''),
+                    'imagen_url' => $imagen,
+                    'link_url' => $link !== '' ? $link : 'catalogo.html',
+                    'orden' => Cast::int($item['orden'] ?? 0),
+                ];
+            }, $rows ?: []);
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener sectores: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /api/industrias — catálogo de industrias (máx. 8 activas).
+     * Respuesta plana: [{ id, slug, nombre, orden, imagen_random }, ...]
+     */
+    private static function industrias(): void
+    {
+        try {
+            $stmt = self::pdo()->query(
+                'SELECT * FROM industrias
+                 WHERE COALESCE(activo, 1) = 1
+                 ORDER BY orden ASC, nombre ASC
+                 LIMIT 8'
+            );
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $imgStmt = self::pdo()->prepare(
+                'SELECT image_url FROM products
+                 WHERE industria_id = ?
+                   AND is_active = 1
+                   AND image_url IS NOT NULL
+                   AND image_url != \'\'
+                 ORDER BY RAND()
+                 LIMIT 1'
+            );
+            $resultado = [];
+            foreach ($rows ?: [] as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $id = Cast::int($item['id'] ?? 0);
+                $imagen = Cast::str(
+                    $item['imagen_url'] ?? ($item['imagen'] ?? ($item['image_url'] ?? ''))
+                );
+                if ($imagen === '' && $id > 0) {
+                    try {
+                        $imgStmt->execute([$id]);
+                        $picked = $imgStmt->fetchColumn();
+                        $imagen = Cast::str($picked !== false ? $picked : '');
+                    } catch (\Throwable $e) {
+                        $imagen = '';
+                    }
+                }
+                if ($imagen === '') {
+                    $imagen = 'img/hero/plant.jpg';
+                }
+                $resultado[] = [
+                    'id' => $id,
+                    'slug' => Cast::str($item['slug'] ?? ''),
+                    'nombre' => Cast::str($item['nombre'] ?? ($item['name'] ?? '')),
+                    'orden' => Cast::int($item['orden'] ?? ($item['sort_order'] ?? 0)),
+                    'imagen_random' => $imagen,
+                ];
+            }
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener industrias: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Crea tabla sectores + seed de 4 ítems si aún no existe. */
+    public static function ensureSectoresSchema(): void
+    {
+        $pdo = self::pdo();
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS sectores (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                nombre VARCHAR(150) NOT NULL,
+                slug VARCHAR(80) NOT NULL,
+                imagen_url VARCHAR(500) NOT NULL DEFAULT \'\',
+                link_url VARCHAR(500) NOT NULL DEFAULT \'\',
+                orden INT NOT NULL DEFAULT 0,
+                activo TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                UNIQUE KEY uq_sectores_slug (slug),
+                KEY idx_sectores_orden (orden, activo)
+             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+        $count = (int) $pdo->query('SELECT COUNT(*) FROM sectores')->fetchColumn();
+        if ($count > 0) {
+            return;
+        }
+        $seed = [
+            ['Alimentos y bebidas', 'alimentos-bebidas', 'img/hero/cans.jpg', 'catalogo.html?category=secado', 10],
+            ['Packaging y fin de línea', 'packaging-fin-de-linea', 'img/hero/line.jpg', 'catalogo.html?category=packaging', 20],
+            ['Farmacéutica y salas limpias', 'farmaceutica-salas-limpias', 'img/hero/plant.jpg', 'catalogo.html?category=limpieza', 30],
+            ['Mantención y repuestos', 'mantencion-repuestos', 'img/products/A07-10015.jpg', 'repuestos.html', 40],
+        ];
+        $ins = $pdo->prepare(
+            'INSERT INTO sectores (nombre, slug, imagen_url, link_url, orden, activo)
+             VALUES (?, ?, ?, ?, ?, 1)'
+        );
+        foreach ($seed as $row) {
+            $ins->execute($row);
+        }
+    }
+
+    /**
+     * Home Hero Slider: JSON array plano de banners activos ordenados.
+     */
+    private static function banners(): void
+    {
+        try {
+            self::ensureBannersSchema();
+            $stmt = self::pdo()->query(
+                'SELECT id, titulo, subtitulo, imagen_url,
+                        texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden
+                 FROM banners
+                 WHERE activo = 1
+                 ORDER BY orden ASC, id ASC
+                 LIMIT 12'
+            );
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $resultado = array_map(static function (array $item): array {
+                $imagen = Cast::str($item['imagen_url'] ?? '');
+                return [
+                    'id' => Cast::int($item['id'] ?? 0),
+                    'titulo' => Cast::str($item['titulo'] ?? ''),
+                    'subtitulo' => Cast::str($item['subtitulo'] ?? ''),
+                    'imagen_url' => $imagen,
+                    'texto_btn_1' => Cast::str($item['texto_btn_1'] ?? ''),
+                    'link_btn_1' => Cast::str($item['link_btn_1'] ?? ''),
+                    'texto_btn_2' => Cast::str($item['texto_btn_2'] ?? ''),
+                    'link_btn_2' => Cast::str($item['link_btn_2'] ?? ''),
+                    'orden' => Cast::int($item['orden'] ?? 0),
+                ];
+            }, $rows ?: []);
+            Response::json($resultado);
+        } catch (\Throwable $e) {
+            Response::error('Error al obtener banners: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /** Crea tabla banners + seed del hero actual si aún no existe. */
+    public static function ensureBannersSchema(): void
+    {
+        $pdo = self::pdo();
+        $pdo->exec(
+            'CREATE TABLE IF NOT EXISTS banners (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                titulo VARCHAR(255) NOT NULL DEFAULT \'\',
+                subtitulo TEXT NULL,
+                imagen_url VARCHAR(500) NOT NULL DEFAULT \'\',
+                texto_btn_1 VARCHAR(120) NOT NULL DEFAULT \'\',
+                link_btn_1 VARCHAR(500) NOT NULL DEFAULT \'\',
+                texto_btn_2 VARCHAR(120) NOT NULL DEFAULT \'\',
+                link_btn_2 VARCHAR(500) NOT NULL DEFAULT \'\',
+                orden INT NOT NULL DEFAULT 0,
+                activo TINYINT(1) NOT NULL DEFAULT 1,
+                created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY idx_banners_orden (orden, activo)
+             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
+        $count = (int) $pdo->query('SELECT COUNT(*) FROM banners')->fetchColumn();
+        if ($count > 0) {
+            return;
+        }
+        $seed = [
+            [
+                'Soluciones industriales para optimizar tu línea de producción',
+                'Secado · Soplado · Limpieza · Packaging · Fin de línea. Tecnología especializada, ingeniería y soporte técnico local en Chile.',
+                'img/hero/line.jpg',
+                'Pedir Cotización',
+                'contacto.html',
+                'Evaluar Mi Aplicación',
+                'catalogo.html?tipo=equipo',
+                10,
+            ],
+            [
+                'Tecnología especializada para plantas en Chile',
+                'Secado, soplado y fin de línea con soporte técnico local. Representantes Sonic Air Systems.',
+                'img/hero/3piece_cans.jpg',
+                'Pedir Cotización',
+                'contacto.html',
+                'Ver Catálogo',
+                'catalogo.html?tipo=equipo',
+                20,
+            ],
+        ];
+        $ins = $pdo->prepare(
+            'INSERT INTO banners
+             (titulo, subtitulo, imagen_url, texto_btn_1, link_btn_1, texto_btn_2, link_btn_2, orden, activo)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+        );
+        foreach ($seed as $row) {
+            $ins->execute($row);
+        }
     }
 
     private static function brandDetail(string $slug): void
@@ -149,23 +726,37 @@ final class PublicApi
 
     private static function products(): void
     {
-        $featured = isset($_GET['featured']) && (string) $_GET['featured'] === '1';
+        AdminApi::ensureProductFichaColumn();
+        $featured = Cast::bool($_GET['featured'] ?? null, false);
+        $tipo = Cast::str($_GET['tipo'] ?? '');
         $sql = 'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                        b.slug AS brand_slug, b.name AS brand_name
                 FROM products p
                 LEFT JOIN categories c ON c.id = p.category_id
                 LEFT JOIN brands b ON b.id = p.brand_id
                 WHERE p.is_active = 1';
+        $params = [];
         if ($featured) {
             $sql .= ' AND p.is_featured = 1';
         }
+        if ($tipo === 'equipo' || $tipo === 'repuesto') {
+            $sql .= ' AND p.tipo = ?';
+            $params[] = $tipo;
+        }
         $sql .= ' ORDER BY p.sort_order, p.name';
-        $rows = self::pdo()->query($sql)->fetchAll();
+        if ($params) {
+            $st = self::pdo()->prepare($sql);
+            $st->execute($params);
+            $rows = $st->fetchAll();
+        } else {
+            $rows = self::pdo()->query($sql)->fetchAll();
+        }
         Response::json(['products' => $rows]);
     }
 
     private static function productDetail(string $slug): void
     {
+        AdminApi::ensureProductFichaColumn();
         $stmt = self::pdo()->prepare(
             'SELECT p.*, c.slug AS category_slug, c.name AS category_name,
                     b.slug AS brand_slug, b.name AS brand_name
@@ -192,9 +783,9 @@ final class PublicApi
             Response::json(['message' => 'Mensaje enviado.']);
             return;
         }
-        $name = trim((string) ($b['name'] ?? ''));
-        $email = trim((string) ($b['email'] ?? ''));
-        $message = trim((string) ($b['message'] ?? ''));
+        $name = Cast::str($b['name'] ?? '');
+        $email = Cast::str($b['email'] ?? '');
+        $message = Cast::str($b['message'] ?? '');
         if ($name === '' || $email === '' || $message === '') {
             Response::error('Completa nombre, email y mensaje');
             return;
@@ -206,8 +797,8 @@ final class PublicApi
         $stmt->execute([
             $name,
             $email,
-            trim((string) ($b['phone'] ?? '')) ?: null,
-            trim((string) ($b['subject'] ?? '')) ?: null,
+            Cast::str($b['phone'] ?? '') ?: null,
+            Cast::str($b['subject'] ?? '') ?: null,
             $message,
         ]);
         Response::json(['message' => 'Mensaje enviado.']);
@@ -225,11 +816,11 @@ final class PublicApi
             Response::json(['public_code' => self::publicCode('Q')]);
             return;
         }
-        $name = trim((string) ($b['customer_name'] ?? ''));
-        $email = trim((string) ($b['customer_email'] ?? ''));
-        $phone = trim((string) ($b['customer_phone'] ?? ''));
-        $items = $b['items'] ?? [];
-        if ($name === '' || $email === '' || $phone === '' || !is_array($items) || !$items) {
+        $name = Cast::str($b['customer_name'] ?? '');
+        $email = Cast::str($b['customer_email'] ?? '');
+        $phone = Cast::str($b['customer_phone'] ?? '');
+        $items = Cast::arr($b['items'] ?? []);
+        if ($name === '' || $email === '' || $phone === '' || !$items) {
             Response::error('Datos de cotización incompletos');
             return;
         }
@@ -247,8 +838,8 @@ final class PublicApi
                 $name,
                 $email,
                 $phone,
-                trim((string) ($b['company_name'] ?? '')) ?: null,
-                trim((string) ($b['message'] ?? '')) ?: null,
+                Cast::str($b['company_name'] ?? '') ?: null,
+                Cast::str($b['message'] ?? '') ?: null,
             ]);
             $quoteId = (int) $pdo->lastInsertId();
             $itemStmt = $pdo->prepare(
@@ -257,8 +848,11 @@ final class PublicApi
             );
             $prod = $pdo->prepare('SELECT id, name, sale_mode FROM products WHERE id = ? LIMIT 1');
             foreach ($items as $item) {
-                $pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
-                $qty = max(1, (int) ($item['qty'] ?? 1));
+                if (!is_array($item)) {
+                    continue;
+                }
+                $pid = Cast::int($item['product_id'] ?? 0);
+                $qty = max(1, Cast::int($item['qty'] ?? 1, 1));
                 $prod->execute([$pid]);
                 $p = $prod->fetch();
                 if (!$p) {
@@ -287,11 +881,11 @@ final class PublicApi
             Response::json(['public_code' => self::publicCode('O')]);
             return;
         }
-        $name = trim((string) ($b['customer_name'] ?? ''));
-        $email = trim((string) ($b['customer_email'] ?? ''));
-        $phone = trim((string) ($b['customer_phone'] ?? ''));
-        $items = $b['items'] ?? [];
-        if ($name === '' || $email === '' || $phone === '' || !is_array($items) || !$items) {
+        $name = Cast::str($b['customer_name'] ?? '');
+        $email = Cast::str($b['customer_email'] ?? '');
+        $phone = Cast::str($b['customer_phone'] ?? '');
+        $items = Cast::arr($b['items'] ?? []);
+        if ($name === '' || $email === '' || $phone === '' || !$items) {
             Response::error('Datos del pedido incompletos');
             return;
         }
@@ -306,19 +900,22 @@ final class PublicApi
                 'SELECT id, name, price_clp, sale_mode FROM products WHERE id = ? AND is_active = 1 LIMIT 1'
             );
             foreach ($items as $item) {
-                $pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
-                $qty = max(1, (int) ($item['qty'] ?? 1));
+                if (!is_array($item)) {
+                    continue;
+                }
+                $pid = Cast::int($item['product_id'] ?? 0);
+                $qty = max(1, Cast::int($item['qty'] ?? 1, 1));
                 $prod->execute([$pid]);
                 $p = $prod->fetch();
                 if (!$p || ($p['sale_mode'] ?? '') !== 'buy') {
                     continue;
                 }
-                $unit = (int) ($p['price_clp'] ?? 0);
+                $unit = Cast::int($p['price_clp'] ?? 0);
                 $line = $unit * $qty;
                 $subtotal += $line;
                 $lines[] = [
-                    'product_id' => (int) $p['id'],
-                    'product_name' => $p['name'],
+                    'product_id' => Cast::int($p['id'] ?? 0),
+                    'product_name' => Cast::str($p['name'] ?? ''),
                     'unit_price_clp' => $unit,
                     'qty' => $qty,
                     'line_total_clp' => $line,
@@ -339,9 +936,9 @@ final class PublicApi
                 $name,
                 $email,
                 $phone,
-                trim((string) ($b['company_name'] ?? '')) ?: null,
-                trim((string) ($b['address'] ?? '')) ?: null,
-                trim((string) ($b['notes'] ?? '')) ?: null,
+                Cast::str($b['company_name'] ?? '') ?: null,
+                Cast::str($b['address'] ?? '') ?: null,
+                Cast::str($b['notes'] ?? '') ?: null,
                 $subtotal,
             ]);
             $orderId = (int) $pdo->lastInsertId();
@@ -367,3 +964,4 @@ final class PublicApi
         }
     }
 }
+
