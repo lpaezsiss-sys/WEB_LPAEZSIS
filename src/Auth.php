@@ -9,8 +9,8 @@ final class Auth
 {
     public static function bearerToken(): ?string
     {
-        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/Bearer\s+(\S+)/i', $header, $m)) {
+        $header = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
+        if ($header !== '' && preg_match('/Bearer\s+(\S+)/i', $header, $m)) {
             return $m[1];
         }
         return null;
@@ -44,7 +44,7 @@ final class Auth
         $pdo = Database::pdo();
         $stmt = $pdo->query('SELECT password_hash FROM admin_credentials WHERE id = 1 LIMIT 1');
         $row = $stmt->fetch();
-        if (!$row || !password_verify($password, (string) $row['password_hash'])) {
+        if (!$row || !password_verify((string) ($password ?? ''), (string) ($row['password_hash'] ?? ''))) {
             return null;
         }
 
@@ -61,7 +61,7 @@ final class Auth
         $pdo = Database::pdo();
         $stmt = $pdo->query('SELECT password_hash FROM admin_credentials WHERE id = 1 LIMIT 1');
         $row = $stmt->fetch();
-        if (!$row || !password_verify($current, (string) $row['password_hash'])) {
+        if (!$row || !password_verify((string) ($current ?? ''), (string) ($row['password_hash'] ?? ''))) {
             return false;
         }
         $hash = password_hash($next, PASSWORD_BCRYPT);

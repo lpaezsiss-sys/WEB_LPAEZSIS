@@ -14,7 +14,10 @@ final class AdminApi
 {
     public static function handle(string $method, string $path): void
     {
+        $method = strtoupper((string) ($method ?? 'GET'));
+        $path = (string) ($path ?? '');
         $sub = substr($path, strlen('/api/admin')) ?: '/';
+        $sub = (string) ($sub ?? '/');
         if ($sub === '') {
             $sub = '/';
         }
@@ -330,7 +333,7 @@ final class AdminApi
         $b = self::body();
         $current = (string) ($b['current_password'] ?? $b['password'] ?? '');
         $next = (string) ($b['new_password'] ?? '');
-        if ($current === '' || strlen($next) < 8) {
+        if ($current === '' || strlen($next ?? '') < 8) {
             Response::error('Contraseña actual y nueva (mín. 8) requeridas');
             return;
         }
@@ -801,7 +804,7 @@ final class AdminApi
             }
             $val = $b[$f];
             if ($f === 'nombre' || $f === 'slug' || $f === 'imagen_url' || $f === 'link_url') {
-                $val = trim((string) $val);
+                $val = trim((string) ($val ?? ''));
             }
             if ($f === 'orden') {
                 $val = (int) $val;
@@ -957,7 +960,7 @@ final class AdminApi
             if ($f === 'orden') {
                 $val = (int) $val;
             } elseif ($f !== 'activo') {
-                $val = trim((string) $val);
+                $val = trim((string) ($val ?? ''));
             }
             $sets[] = "$f = ?";
             $vals[] = $val;
@@ -1169,7 +1172,7 @@ final class AdminApi
             $b['price_clp'] = null;
         }
         if (array_key_exists('ficha_pdf_url', $b)) {
-            $b['ficha_pdf_url'] = trim((string) $b['ficha_pdf_url']) ?: null;
+            $b['ficha_pdf_url'] = trim((string) ($b['ficha_pdf_url'] ?? '')) ?: null;
         }
         if (array_key_exists('tipo', $b) || array_key_exists('sale_mode', $b)) {
             $b['tipo'] = self::normalizeProductTipo($b);
@@ -1186,7 +1189,7 @@ final class AdminApi
                 $vals[] = $b[$f];
             }
         }
-        if (count($sets) === 1) {
+        if (!is_array($sets) || count($sets) === 1) {
             Response::error('Sin cambios');
             return;
         }

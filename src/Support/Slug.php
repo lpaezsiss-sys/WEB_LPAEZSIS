@@ -7,7 +7,12 @@ final class Slug
 {
     public static function make(string $text): string
     {
-        $text = trim(mb_strtolower($text, 'UTF-8'));
+        $text = (string) ($text ?? '');
+        if (function_exists('mb_strtolower')) {
+            $text = trim(\mb_strtolower($text, 'UTF-8'));
+        } else {
+            $text = trim(strtolower($text));
+        }
         $map = [
             'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a',
             'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
@@ -18,13 +23,13 @@ final class Slug
         ];
         $text = strtr($text, $map);
         $text = preg_replace('/[^a-z0-9]+/', '-', $text) ?? '';
-        $text = trim($text, '-');
+        $text = trim((string) ($text ?? ''), '-');
         return $text !== '' ? $text : 'item';
     }
 
     public static function unique(string $base, callable $exists): string
     {
-        $slug = self::make($base);
+        $slug = self::make((string) ($base ?? ''));
         $candidate = $slug;
         $i = 2;
         while ($exists($candidate)) {

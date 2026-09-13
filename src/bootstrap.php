@@ -12,9 +12,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/polyfills.php';
 
 spl_autoload_register(static function ($class) {
+    $class = (string) ($class ?? '');
     $prefix = 'Lpaezsis\\';
     $len = strlen($prefix);
-    if (strncmp($class, $prefix, $len) !== 0) {
+    if ($class === '' || strncmp($class, $prefix, $len) !== 0) {
         return;
     }
     $relative = str_replace('\\', '/', substr($class, $len));

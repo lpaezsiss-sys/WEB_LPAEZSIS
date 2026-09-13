@@ -22,12 +22,12 @@ final class Database
             return self::$pdo;
         }
 
-        $host = Config::get('DB_HOST', '127.0.0.1');
-        $port = Config::get('DB_PORT', '3306');
-        $name = Config::get('DB_NAME', 'lpaezsis');
-        $user = Config::get('DB_USER', 'root');
-        $pass = Config::get('DB_PASS', '');
-        $charset = Config::get('DB_CHARSET', 'utf8mb4');
+        $host = (string) (Config::get('DB_HOST', '127.0.0.1') ?? '127.0.0.1');
+        $port = (string) (Config::get('DB_PORT', '3306') ?? '3306');
+        $name = (string) (Config::get('DB_NAME', 'lpaezsis') ?? 'lpaezsis');
+        $user = (string) (Config::get('DB_USER', 'root') ?? 'root');
+        $pass = (string) (Config::get('DB_PASS', '') ?? '');
+        $charset = (string) (Config::get('DB_CHARSET', 'utf8mb4') ?? 'utf8mb4');
 
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $host, $port, $name, $charset);
 
