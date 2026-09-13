@@ -5,11 +5,29 @@ namespace Lpaezsis;
 
 final class Response
 {
+    /** @var bool */
+    private static $headersSent = false;
+
+    /** Cabeceras de seguridad comunes para respuestas API JSON. */
+    public static function sendSecurityHeaders(): void
+    {
+        if (self::$headersSent || headers_sent()) {
+            return;
+        }
+        self::$headersSent = true;
+        header('Content-Type: application/json; charset=utf-8');
+        header('X-Content-Type-Options: nosniff');
+        header('Referrer-Policy: no-referrer-when-downgrade');
+        header('X-Frame-Options: SAMEORIGIN');
+        // API JSON: no cachear por defecto (evita filtrar tokens en proxies)
+        header('Cache-Control: no-store');
+    }
+
     /** @param mixed $payload */
     public static function json($payload, int $status = 200): void
     {
         http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
+        self::sendSecurityHeaders();
         $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
         // PHP 7.2+: sustituye UTF-8 inválido en vez de devolver false
         if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {

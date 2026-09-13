@@ -26,19 +26,16 @@ final class PublicApi
             } catch (\Throwable $e) {
                 $dbError = $e->getMessage();
             }
-            Response::json([
+            Response::json(array_merge([
                 'ok' => true,
                 'service' => 'lpaezsis-api',
-                'php' => PHP_VERSION,
-                'compat' => '7.4+/8.1-ready',
-                'php81_ready' => true,
                 'env_file' => $hasEnv ? 'found' : 'missing',
                 'db' => $dbOk ? 'ok' : 'error',
                 'db_error' => $dbOk ? null : $dbError,
                 'php_notices' => \Lpaezsis\Config::bool('APP_DEBUG')
                     ? \Lpaezsis\Support\ErrorHandler::logged()
                     : [],
-            ]);
+            ], \Lpaezsis\Support\PhpRuntime::healthMeta()));
             return;
         }
         if ($method === 'GET' && $path === '/api/settings') {
@@ -443,22 +440,22 @@ final class PublicApi
                 if ($imagen === '') {
                     $imagen = 'img/hero/plant.jpg';
                 }
-                $titulo = (string) ($item['titulo'] ?? '');
-                $bullet1 = isset($item['bullet_1']) ? (string) $item['bullet_1'] : '';
+                $titulo = Cast::str($item['titulo'] ?? '');
+                $bullet1 = Cast::str($item['bullet_1'] ?? '');
 
                 return [
-                    'id' => (int) ($item['id'] ?? 0),
+                    'id' => Cast::int($item['id'] ?? 0),
                     'titulo' => $titulo,
-                    'slug' => (string) ($item['slug'] ?? ''),
+                    'slug' => Cast::str($item['slug'] ?? ''),
                     'descripcion' => $bullet1,
                     'imagen' => $imagen,
                     'imagen_url' => $imagen,
-                    'bullet_1' => $item['bullet_1'] ?? null,
-                    'bullet_2' => $item['bullet_2'] ?? null,
-                    'bullet_3' => $item['bullet_3'] ?? null,
-                    'cta_texto' => $item['cta_texto'] ?? null,
-                    'cta_url' => $item['cta_url'] ?? null,
-                    'orden' => (int) ($item['orden'] ?? 0),
+                    'bullet_1' => ($item['bullet_1'] ?? null) !== null ? Cast::str($item['bullet_1']) : null,
+                    'bullet_2' => ($item['bullet_2'] ?? null) !== null ? Cast::str($item['bullet_2']) : null,
+                    'bullet_3' => ($item['bullet_3'] ?? null) !== null ? Cast::str($item['bullet_3']) : null,
+                    'cta_texto' => ($item['cta_texto'] ?? null) !== null ? Cast::str($item['cta_texto']) : null,
+                    'cta_url' => ($item['cta_url'] ?? null) !== null ? Cast::str($item['cta_url']) : null,
+                    'orden' => Cast::int($item['orden'] ?? 0),
                     'activo' => !empty($item['activo']),
                 ];
             }, $rows);

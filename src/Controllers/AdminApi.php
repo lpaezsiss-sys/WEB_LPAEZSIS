@@ -15,10 +15,15 @@ final class AdminApi
 {
     public static function handle(string $method, string $path): void
     {
-        $method = strtoupper((string) ($method ?? 'GET'));
-        $path = (string) ($path ?? '');
+        $method = strtoupper(Cast::str($method, 'GET'));
+        $path = Cast::str($path);
+        // Alinea con PublicApi::normalizePath (strip .php de rewrites)
+        $path = '/' . trim(str_replace('\\', '/', $path), '/');
+        if (strlen($path) > 4 && substr($path, -4) === '.php') {
+            $path = substr($path, 0, -4);
+        }
         $sub = substr($path, strlen('/api/admin')) ?: '/';
-        $sub = (string) ($sub ?? '/');
+        $sub = Cast::str($sub, '/');
         if ($sub === '') {
             $sub = '/';
         }

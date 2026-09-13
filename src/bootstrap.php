@@ -27,5 +27,13 @@ spl_autoload_register(static function ($class) {
 
 \Lpaezsis\Config::load(__DIR__);
 \Lpaezsis\Support\ErrorHandler::register();
+if (
+    !\Lpaezsis\Support\PhpRuntime::meetsRecommended()
+    && \Lpaezsis\Config::bool('APP_DEBUG')
+) {
+    error_log(
+        '[lpaezsis] PHP ' . PHP_VERSION . ' < 8.1 recomendado; migracion en curso.'
+    );
+}
 // MySQL se conecta bajo demanda (Database::pdo), no en el bootstrap,
 // para que /api/health responda aunque falte .env o la BD.

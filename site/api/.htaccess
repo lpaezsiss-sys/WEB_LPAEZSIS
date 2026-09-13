@@ -1,3 +1,4 @@
+Options -MultiViews
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php?__path=/api/$1 [QSA,L]
