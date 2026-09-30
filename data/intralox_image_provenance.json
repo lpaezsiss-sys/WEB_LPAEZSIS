@@ -1,0 +1,72 @@
+{
+  "note": "Solo fotografías reales con licencia reutilizable. No hay imágenes generadas ni artwork oficial de Intralox descargado de intralox.com.",
+  "discarded": [
+    {
+      "what": "Wordmarks e imágenes de planta generadas (intralox-preview-*.jpg y similares)",
+      "reason": "No son fotografías. El usuario pidió no inventar fotos."
+    }
+  ],
+  "images": [
+    {
+      "local_path": "/img/brand/intralox-sede-harahan.jpg",
+      "role": "Foto de marca / sede",
+      "is_photograph": true,
+      "shows_intralox": true,
+      "source_title": "Intralox L.L.C. US, Corporate Headquarters",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Intralox_L.L.C._US,_Corporate_Headquarters.jpg",
+      "author": "Spatms",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "caption_es": "Fotografía real de la sede Intralox L.L.C. en Estados Unidos, con el letrero oficial en la fachada. No es un render ni una imagen generada."
+    },
+    {
+      "local_path": "/img/brand/intralox-letrero.jpg",
+      "role": "logo_url propuesto (recorte fotográfico)",
+      "is_photograph": true,
+      "shows_intralox": true,
+      "derived_from": "/img/brand/intralox-sede-harahan.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Intralox_L.L.C._US,_Corporate_Headquarters.jpg",
+      "author": "Spatms",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "caption_es": "Recorte de la misma fotografía: letrero real Intralox (wordmark + icono de cadena) en la fachada. No es un logotipo vectorial oficial de partner. Reemplazar si LPAEZSIS tiene el archivo autorizado."
+    },
+    {
+      "local_path": "/img/productos/banda-modular-proceso-mariscos.jpg",
+      "role": "Contenido 1 (higiene / ThermoDrive®) y foto de producto",
+      "is_photograph": true,
+      "shows_intralox": false,
+      "source_title": "11 shrimp on conveyor",
+      "source_url": "https://commons.wikimedia.org/wiki/File:-11_shrimp_on_conveyor_(51299194239).jpg",
+      "author": "Texas Sea Grant (Flickr)",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/",
+      "caption_es": "Fotografía real de banda plástica modular en proceso de mariscos (Texas Sea Grant, 2002). Ilustra el tipo de aplicación higiénica de Intralox; no es una ficha oficial ThermoDrive®."
+    },
+    {
+      "local_path": "/img/productos/clasificacion-almacen-rodillos.jpg",
+      "role": "Contenido 2 (ARB™)",
+      "is_photograph": true,
+      "shows_intralox": false,
+      "source_title": "A conveyor belt in a large warehouse",
+      "source_url": "https://unsplash.com/photos/a-conveyor-belt-in-a-large-warehouse-qVpGF1mlaM8",
+      "unsplash_photo_id": "photo-1684695747561-9372850cf165",
+      "author": "Alberto Rodríguez (@albertorodriguez)",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "caption_es": "Fotografía real de transportadores de rodillos en un almacén. Ilustra el entorno de clasificación/manejos de cajas propio de ARB™; no es un equipo Intralox ARB."
+    },
+    {
+      "local_path": "/img/productos/envasado-latas-banda.jpg",
+      "role": "Galería opcional (beverage)",
+      "is_photograph": true,
+      "shows_intralox": false,
+      "source_title": "Bierdosen auf Transporteur",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bierdosen_auf_Transporteur.JPG",
+      "author": "Helfmann",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "caption_es": "Fotografía real de latas en transportador de planta de envasado. Ilustra beverage; no es producto Intralox."
+    }
+  ]
+}

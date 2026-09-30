@@ -209,6 +209,23 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 24,
+    slug: "banda-higienica-intralox-thermodrive",
+    name: "Banda higiénica Intralox ThermoDrive®",
+    sku: "INTRALOX-THERMODRIVE",
+    description: "Banda higiénica de termoplástico macizo Intralox ThermoDrive®, arrastre positivo sin tensado para proceso de alimentos. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/banda-modular-proceso-mariscos.jpg",
+    image_webp: "",
+    category_slug: "bandas-modulares-higiene",
+    category_name: "Bandas Modulares / Higiene Alimentaria",
+    brand_slug: "intralox",
+    brand_name: "Intralox",
+    quote_url: "cotizacion.html?sku=banda-higienica-intralox-thermodrive",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,19 +239,21 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "bandas-modulares-higiene", name: "Bandas Modulares / Higiene Alimentaria" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "intralox", name: "Intralox" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
 const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
-  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
+  { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado", "bandas-modulares-higiene"] },
   { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
