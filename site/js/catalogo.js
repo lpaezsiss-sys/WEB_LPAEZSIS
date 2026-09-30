@@ -218,7 +218,7 @@ const MOCK_PRODUCTS = [
     sale_mode: "quote",
     stock_status: "on_request",
     price_clp: null,
-    image_url: "img/productos/banda-modular-proceso-mariscos.jpg",
+    image_url: "",
     image_webp: "",
     category_slug: "bandas-modulares-higiene",
     category_name: "Bandas Modulares / Higiene Alimentaria",
