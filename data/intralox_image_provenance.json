@@ -1,0 +1,57 @@
+{
+  "note": "Publicación live: solo documentación (sin logo, sin galería, sin fotos de producto). Las fotos de sede/letrero quedan en el repo y no se suben al admin. No hay imágenes generadas ni artwork oficial de Intralox descargado de intralox.com.",
+  "discarded": [
+    {
+      "what": "Wordmarks e imágenes de planta generadas (intralox-preview-*.jpg)",
+      "reason": "No son fotografías."
+    },
+    {
+      "what": "/img/productos/banda-modular-proceso-mariscos.jpg (camarones sobre malla modular)",
+      "reason": "ThermoDrive® son bandas lisas azules de termoplástico macizo, no malla modular abierta."
+    },
+    {
+      "what": "/img/productos/clasificacion-almacen-rodillos.jpg (rodillos de almacén)",
+      "reason": "ARB™ es una banda con rodillos cilíndricos pequeños embebidos que, al activarse, giran o desvían cajas. No es un transportador de rodillos de frame."
+    },
+    {
+      "what": "/img/productos/envasado-latas-banda.jpg",
+      "reason": "Tabletop de latas; no es ThermoDrive lisa ni ARB."
+    }
+  ],
+  "pending_real_photos": [
+    {
+      "role": "ThermoDrive® / producto",
+      "required": "Fotografía real de banda higiénica lisa azul (superficie continua de termoplástico, no grid modular)."
+    },
+    {
+      "role": "ARB™",
+      "required": "Fotografía real de banda modular con rodillos pequeños embebidos girando o desviando cajas al activar los rodillos."
+    }
+  ],
+  "images": [
+    {
+      "local_path": "/img/brand/intralox-sede-harahan.jpg",
+      "role": "Foto de marca / sede",
+      "is_photograph": true,
+      "shows_intralox": true,
+      "source_title": "Intralox L.L.C. US, Corporate Headquarters",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Intralox_L.L.C._US,_Corporate_Headquarters.jpg",
+      "author": "Spatms",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "caption_es": "Fotografía real de la sede Intralox L.L.C. en Estados Unidos, con el letrero oficial en la fachada."
+    },
+    {
+      "local_path": "/img/brand/intralox-letrero.jpg",
+      "role": "logo_url propuesto (recorte fotográfico)",
+      "is_photograph": true,
+      "shows_intralox": true,
+      "derived_from": "/img/brand/intralox-sede-harahan.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Intralox_L.L.C._US,_Corporate_Headquarters.jpg",
+      "author": "Spatms",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "caption_es": "Recorte de la misma fotografía: letrero real Intralox. No es un logotipo vectorial oficial de partner."
+    }
+  ]
+}
