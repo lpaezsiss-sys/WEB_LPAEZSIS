@@ -1,5 +1,5 @@
 {
-  "note": "Solo fotografías reales con licencia reutilizable. No hay imágenes generadas ni artwork oficial de Intralox descargado de intralox.com.",
+  "note": "Publicación live: solo documentación (sin logo, sin galería, sin fotos de producto). Las fotos de sede/letrero quedan en el repo y no se suben al admin. No hay imágenes generadas ni artwork oficial de Intralox descargado de intralox.com.",
   "discarded": [
     {
       "what": "Wordmarks e imágenes de planta generadas (intralox-preview-*.jpg)",

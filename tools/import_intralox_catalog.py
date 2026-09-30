@@ -2,7 +2,8 @@
 """Import Intralox catalog. Default is dry-run (prints payload, no POST).
 
 Live admin upload requires BOTH --live and CONFIRM_LIVE_INTRALOX=yes.
-Does not change website settings/menus/passwords.
+Publishes documentation only: empty logo_url, empty image_url, no gallery,
+no file uploads. Does not change website settings/menus/passwords.
 Reuses the existing category slug bandas-modulares-higiene.
 """
 from __future__ import annotations
@@ -36,13 +37,15 @@ def compose_description(product: dict) -> str:
 
 def print_draft(catalog: dict) -> None:
     brand = catalog["brand"]
-    print("=== BORRADOR INTRALOX (sin POST) ===")
+    print("=== BORRADOR INTRALOX (documentación, sin fotos) ===")
     print("marca:", brand["name"], brand["slug"])
-    print("logo_url:", brand["logo_url"], "(letrero fotografiado, no vector oficial)")
+    print("logo_url:", repr(brand.get("logo_url") or ""), "(vacío: no se sube logo)")
     print("website:", brand["website_url"])
     print("categoria existente:", catalog["categories"][0]["slug"])
+    html = brand.get("content_html") or ""
+    print("content_html imgs:", html.count("<img"), "figures:", html.count("<figure"))
     for prod in catalog["products"]:
-        print("producto:", prod["slug"], "->", prod["image_url"])
+        print("producto:", prod["slug"], "->", prod.get("image_url"))
     print("upload_policy:", json.dumps(catalog.get("upload_policy"), ensure_ascii=False))
     print("Para publicar: CONFIRM_LIVE_INTRALOX=yes python3 tools/import_intralox_catalog.py --live")
 
@@ -71,11 +74,12 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
     print("usando categoria existente", cat_slug, cat.get("id"))
 
     brand = catalog["brand"]
+    # Documentación sin fotos: nunca enviar logo ni galería, aunque el JSON local tenga rutas.
     brand_payload = {
         "name": brand["name"],
         "slug": brand["slug"],
         "description": brand["description"],
-        "logo_url": brand["logo_url"],
+        "logo_url": "",
         "website_url": brand["website_url"],
         "content_html": brand["content_html"],
         "sort_order": brand["sort_order"],
@@ -100,7 +104,7 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
             "stock_status": "on_request",
             "category_id": int(cat["id"]),
             "brand_id": brand_id,
-            "image_url": prod["image_url"],
+            "image_url": "",
             "is_active": 1,
             "sort_order": prod["sort_order"],
             "seo_title": prod["name"] + " | Cotizar LPAEZsis",
