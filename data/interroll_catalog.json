@@ -12,7 +12,7 @@
     "seo_description": "Interroll en Chile con LPAEZSIS: rodillos, MCP, RollerDrive, clasificadores Sortteq y Pallet Flow. Cotización industrial para integradores y OEM.",
     "seo_keywords": "Interroll, rodillos transportadores, RollerDrive, MCP, mototambores, Sortteq MC-S, Pallet Flow, MPP, Carton Flow, manutención de materiales, LPAEZSIS Chile",
     "canonical_url": "/marcas.html?slug=interroll",
-    "logo_url": "",
+    "logo_url": "img/brand/interroll.png",
     "datasheet_url": null,
     "website_url": "https://www.interroll.com/",
     "sort_order": 35,
@@ -97,7 +97,7 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/rodillos-rollerdrive-interroll.jpg",
       "sort_order": 24
     },
     {
@@ -132,7 +132,7 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/plataforma-modular-mcp-interroll.jpg",
       "sort_order": 25
     },
     {
@@ -167,16 +167,17 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/clasificador-sortteq-mcs-interroll.jpg",
       "sort_order": 26
     }
   ],
   "upload_policy": {
     "live_admin": true,
-    "docs_only": true,
+    "docs_only": false,
     "requires_user_approval": true,
     "do_not_change_site_settings": true,
-    "no_photos": true,
-    "source": "ITRL Corporate Brochure ES/02-26 + interroll.com"
+    "no_photos": false,
+    "photos_from_catalog": true,
+    "source": "ITRL Corporate Brochure ES/02-26 recortes de producto + logo de portada"
   }
 }
