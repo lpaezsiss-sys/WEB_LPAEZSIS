@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 33,
+    slug: "motorizacion-alphastep-az-oriental-motor",
+    name: "Motorización αSTEP AZ Oriental Motor",
+    sku: "OM-ALPHASTEP-AZ",
+    description: "Sistema αSTEP AZ Oriental Motor: control híbrido, encoder absoluto ABZO sin batería y redes EtherNet/IP, EtherCAT y PROFINET. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/motorizacion-alphastep-az-oriental-motor.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "oriental-motor",
+    brand_name: "Oriental Motor",
+    quote_url: "cotizacion.html?sku=motorizacion-alphastep-az-oriental-motor",
+  },
+  {
+    id: 34,
+    slug: "motores-ca-reductores-oriental-motor",
+    name: "Motores CA y reductores Oriental Motor",
+    sku: "OM-AC-GEAR",
+    description: "Motores CA Oriental Motor World K (1–90 W) y KIIS (30–200 W) con reductor paralelo o angular, freno e inversor. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/motores-ca-reductores-oriental-motor.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "oriental-motor",
+    brand_name: "Oriental Motor",
+    quote_url: "cotizacion.html?sku=motores-ca-reductores-oriental-motor",
+  },
+  {
+    id: 35,
+    slug: "ventiladores-axiales-refrigeracion-oriental-motor",
+    name: "Ventiladores de refrigeración Oriental Motor",
+    sku: "OM-AXIAL-FAN",
+    description: "Ventiladores Oriental Motor axiales, centrífugos y de flujo cruzado (CA/CC) para refrigeración, secado y ventilación de gabinetes. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/ventiladores-axiales-refrigeracion-oriental-motor.jpg",
+    image_webp: "",
+    category_slug: "turbinas-soplado",
+    category_name: "Turbinas de Soplado",
+    brand_slug: "oriental-motor",
+    brand_name: "Oriental Motor",
+    quote_url: "cotizacion.html?sku=ventiladores-axiales-refrigeracion-oriental-motor",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +273,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "oriental-motor", name: "Oriental Motor" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
