@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 30,
+    slug: "rodillos-rollerdrive-interroll",
+    name: "Rodillos y RollerDrive Interroll",
+    sku: "INTERROLL-ROLLERDRIVE",
+    description: "Rodillos Interroll (hasta 60.000 variantes) y RollerDrive 24/48 V con acumulación ZPA para transportadores de cajas y paquetes. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/rodillos-rollerdrive-interroll.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "interroll",
+    brand_name: "Interroll",
+    quote_url: "cotizacion.html?sku=rodillos-rollerdrive-interroll",
+  },
+  {
+    id: 31,
+    slug: "plataforma-modular-mcp-interroll",
+    name: "Plataforma modular MCP Interroll",
+    sku: "INTERROLL-MCP",
+    description: "Modular Conveyor Platform (MCP) Interroll: módulos plug & play de rodillos y banda para flujo de cargas unitarias. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/plataforma-modular-mcp-interroll.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "interroll",
+    brand_name: "Interroll",
+    quote_url: "cotizacion.html?sku=plataforma-modular-mcp-interroll",
+  },
+  {
+    id: 32,
+    slug: "clasificador-sortteq-mcs-interroll",
+    name: "Clasificador modular Sortteq MC-S Interroll",
+    sku: "INTERROLL-MC-S",
+    description: "Interroll Sortteq MC-S: clasificador de cadena modular hasta 8.000 artículos/hora y 35 kg para cajas, polybags y CEP. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/clasificador-sortteq-mcs-interroll.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "interroll",
+    brand_name: "Interroll",
+    quote_url: "cotizacion.html?sku=clasificador-sortteq-mcs-interroll",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +273,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "interroll", name: "Interroll" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -235,7 +288,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
