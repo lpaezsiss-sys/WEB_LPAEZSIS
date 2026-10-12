@@ -1,0 +1,203 @@
+{
+  "brand": {
+    "name": "Oriental Motor",
+    "slug": "oriental-motor",
+    "origin_country": "Japón",
+    "subtitle": "Motores de precisión · αSTEP AZ · CA · Ventilación",
+    "short_description": "Oriental Motor (Japón, 1885): motorización αSTEP AZ, motores CA con reductor y ventiladores de refrigeración. Cotización LPAEZSIS Chile.",
+    "long_description": "<style>\n.om-kicker{margin:0 0 .35rem;color:#0055a4;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}\n.om-grid{display:flex;flex-wrap:wrap;gap:1rem}\n.om-card{flex:1 1 240px;background:#f7f7f8;border:1px solid #e2e2e6;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(0,85,164,.06)}\n.om-card h4{margin:0 0 .45rem;color:#1a1a1a;font-size:1.02rem;font-weight:800}\n.om-card p{margin:0}\n.om-note{margin:.75rem 0 0;font-size:.82rem;color:#5f5f5f}\n</style>\n<section class=\"brand-section\">\n<p class=\"om-kicker\">Oriental Motor · Tokio, Japón · 1885</p>\n<h3>Oriental Motor</h3>\n<p>Fundada en Japón en 1885, Oriental Motor desarrolla sistemas de movimiento de precisión: motores paso a paso, servomotores, motores CA, actuadores lineales y gestión térmica. El fabricante ofrece un portafolio de unos 50.000 productos para posicionamiento, control de velocidad y ventilación de equipos.</p>\n<p>La serie αSTEP AZ combina control híbrido (lazo cerrado / lazo abierto) con encoder absoluto mecánico sin batería. Las gamas World K y KIIS cubren motores CA de inducción y reversibles con reductor. Los ventiladores axiales, centrífugos y de flujo cruzado resuelven refrigeración, secado y ventilación de gabinetes.</p>\n<p>Sitio del fabricante: <a href=\"https://www.orientalmotor.com/\" rel=\"noopener noreferrer\">www.orientalmotor.com</a> · España/Europa: <a href=\"https://www.orientalmotor.eu/es\" rel=\"noopener noreferrer\">orientalmotor.eu/es</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Motorización αSTEP AZ — control híbrido y encoder absoluto</h3>\n<p>El sistema αSTEP AZ usa un sensor absoluto mecánico de múltiples vueltas (encoder ABZO) para conocer la posición del motor incluso tras un corte de energía. No requiere batería ni sensores externos de home o límite. El control híbrido opera en lazo cerrado y pasa a lazo abierto ante sobrecarga; no hay hunting ni ajuste de ganancia.</p>\n<p>Los drivers AZ admiten entrada de pulsos o controlador integrado, y redes EtherNet/IP, EtherCAT, PROFINET, Modbus, SSCNET III/H y MECHATROLINK. La familia incluye motor estándar, planetario, armónico, ángulo recto y actuadores (lineales, rotativos, pinza).</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>Encoder absoluto ABZO</h4>\n<p>Sensor mecánico de múltiples vueltas, sin batería ni retorno a home obligatorio.</p>\n</article>\n<article class=\"om-card\">\n<h4>Sin hunting ni ganancia</h4>\n<p>Control híbrido de motor paso a paso: respuesta alta y operación continua ante cambios de carga.</p>\n</article>\n<article class=\"om-card\">\n<h4>Redes industriales</h4>\n<p>EtherNet/IP, EtherCAT, PROFINET, Modbus y buses de servos japoneses.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025 y <a href=\"https://www.orientalmotor.com/stepper-motors/closed-loop-absolute-stepper-motors-az-series.html\" rel=\"noopener noreferrer\">orientalmotor.com — αSTEP AZ</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Motores CA y reductores World K / KIIS</h3>\n<p>Los motores CA estándar de Oriental Motor se conectan directo a la red y cubren inducción, reversible, parada y velocidad variable con reductor, freno o inversor. La serie World K ofrece inducción/reversible de 1 a 90 W (marco 42–90 mm), caja de bornes o conduit, freno electromagnético y reductores paralelos o de ángulo recto.</p>\n<p>La serie KIIS cubre inducción de 30 a 200 W (marco 80–110 mm), ejes de acero inoxidable, alto par admisible y uso con inversor. Vida útil de referencia 10.000 h y protección térmica incorporada.</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>World K</h4>\n<p>Inducción y reversible, 1–90 W, monofásico o trifásico, reductor paralelo o angular.</p>\n</article>\n<article class=\"om-card\">\n<h4>KIIS</h4>\n<p>30–200 W, engranajes de alta resistencia, bajo ruido y compatible con inversor.</p>\n</article>\n<article class=\"om-card\">\n<h4>Conexión a red CA</h4>\n<p>Arranque simple a 50/60 Hz; opciones de freno, caja de bornes y eje hueco o macizo.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025, Standard AC Motors.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Ventiladores de refrigeración — axiales, centrífugos y de flujo cruzado</h3>\n<p>Oriental Motor concentra la gestión térmica en ventiladores de caudal axial (MU/MRS/MRE), sopladores centrífugos (MB) y ventiladores de flujo cruzado (MF), en CA o CC. Los axiales ventilan gabinetes y dispositivos; los centrífugos entregan presión estática alta para secado o soplado concentrado; el flujo cruzado cubre franjas largas y espacios estrechos con aire uniforme.</p>\n<p>Hay versiones de larga vida, alarmas y termostato para encendido/apagado automático.</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>Axiales AC/DC</h4>\n<p>Ventilación de equipos y gabinetes; tamaños compactos y de mayor caudal.</p>\n</article>\n<article class=\"om-card\">\n<h4>Centrífugos</h4>\n<p>Aire concentrado y alta presión estática para refrigeración o secado.</p>\n</article>\n<article class=\"om-card\">\n<h4>Flujo cruzado</h4>\n<p>Caudal uniforme en superficies largas o huecos estrechos.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025 y <a href=\"https://www.orientalmotor.com/cooling-fans/index.html\" rel=\"noopener noreferrer\">orientalmotor.com — Cooling Fans</a>.</p>\n</section>",
+    "description": "Oriental Motor (Japón, 1885): motorización αSTEP AZ, motores CA con reductor y ventiladores de refrigeración. Cotización LPAEZSIS Chile.",
+    "content_html": "<style>\n.om-kicker{margin:0 0 .35rem;color:#0055a4;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}\n.om-grid{display:flex;flex-wrap:wrap;gap:1rem}\n.om-card{flex:1 1 240px;background:#f7f7f8;border:1px solid #e2e2e6;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(0,85,164,.06)}\n.om-card h4{margin:0 0 .45rem;color:#1a1a1a;font-size:1.02rem;font-weight:800}\n.om-card p{margin:0}\n.om-note{margin:.75rem 0 0;font-size:.82rem;color:#5f5f5f}\n</style>\n<section class=\"brand-section\">\n<p class=\"om-kicker\">Oriental Motor · Tokio, Japón · 1885</p>\n<h3>Oriental Motor</h3>\n<p>Fundada en Japón en 1885, Oriental Motor desarrolla sistemas de movimiento de precisión: motores paso a paso, servomotores, motores CA, actuadores lineales y gestión térmica. El fabricante ofrece un portafolio de unos 50.000 productos para posicionamiento, control de velocidad y ventilación de equipos.</p>\n<p>La serie αSTEP AZ combina control híbrido (lazo cerrado / lazo abierto) con encoder absoluto mecánico sin batería. Las gamas World K y KIIS cubren motores CA de inducción y reversibles con reductor. Los ventiladores axiales, centrífugos y de flujo cruzado resuelven refrigeración, secado y ventilación de gabinetes.</p>\n<p>Sitio del fabricante: <a href=\"https://www.orientalmotor.com/\" rel=\"noopener noreferrer\">www.orientalmotor.com</a> · España/Europa: <a href=\"https://www.orientalmotor.eu/es\" rel=\"noopener noreferrer\">orientalmotor.eu/es</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Motorización αSTEP AZ — control híbrido y encoder absoluto</h3>\n<p>El sistema αSTEP AZ usa un sensor absoluto mecánico de múltiples vueltas (encoder ABZO) para conocer la posición del motor incluso tras un corte de energía. No requiere batería ni sensores externos de home o límite. El control híbrido opera en lazo cerrado y pasa a lazo abierto ante sobrecarga; no hay hunting ni ajuste de ganancia.</p>\n<p>Los drivers AZ admiten entrada de pulsos o controlador integrado, y redes EtherNet/IP, EtherCAT, PROFINET, Modbus, SSCNET III/H y MECHATROLINK. La familia incluye motor estándar, planetario, armónico, ángulo recto y actuadores (lineales, rotativos, pinza).</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>Encoder absoluto ABZO</h4>\n<p>Sensor mecánico de múltiples vueltas, sin batería ni retorno a home obligatorio.</p>\n</article>\n<article class=\"om-card\">\n<h4>Sin hunting ni ganancia</h4>\n<p>Control híbrido de motor paso a paso: respuesta alta y operación continua ante cambios de carga.</p>\n</article>\n<article class=\"om-card\">\n<h4>Redes industriales</h4>\n<p>EtherNet/IP, EtherCAT, PROFINET, Modbus y buses de servos japoneses.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025 y <a href=\"https://www.orientalmotor.com/stepper-motors/closed-loop-absolute-stepper-motors-az-series.html\" rel=\"noopener noreferrer\">orientalmotor.com — αSTEP AZ</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Motores CA y reductores World K / KIIS</h3>\n<p>Los motores CA estándar de Oriental Motor se conectan directo a la red y cubren inducción, reversible, parada y velocidad variable con reductor, freno o inversor. La serie World K ofrece inducción/reversible de 1 a 90 W (marco 42–90 mm), caja de bornes o conduit, freno electromagnético y reductores paralelos o de ángulo recto.</p>\n<p>La serie KIIS cubre inducción de 30 a 200 W (marco 80–110 mm), ejes de acero inoxidable, alto par admisible y uso con inversor. Vida útil de referencia 10.000 h y protección térmica incorporada.</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>World K</h4>\n<p>Inducción y reversible, 1–90 W, monofásico o trifásico, reductor paralelo o angular.</p>\n</article>\n<article class=\"om-card\">\n<h4>KIIS</h4>\n<p>30–200 W, engranajes de alta resistencia, bajo ruido y compatible con inversor.</p>\n</article>\n<article class=\"om-card\">\n<h4>Conexión a red CA</h4>\n<p>Arranque simple a 50/60 Hz; opciones de freno, caja de bornes y eje hueco o macizo.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025, Standard AC Motors.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Ventiladores de refrigeración — axiales, centrífugos y de flujo cruzado</h3>\n<p>Oriental Motor concentra la gestión térmica en ventiladores de caudal axial (MU/MRS/MRE), sopladores centrífugos (MB) y ventiladores de flujo cruzado (MF), en CA o CC. Los axiales ventilan gabinetes y dispositivos; los centrífugos entregan presión estática alta para secado o soplado concentrado; el flujo cruzado cubre franjas largas y espacios estrechos con aire uniforme.</p>\n<p>Hay versiones de larga vida, alarmas y termostato para encendido/apagado automático.</p>\n<div class=\"om-grid\">\n<article class=\"om-card\">\n<h4>Axiales AC/DC</h4>\n<p>Ventilación de equipos y gabinetes; tamaños compactos y de mayor caudal.</p>\n</article>\n<article class=\"om-card\">\n<h4>Centrífugos</h4>\n<p>Aire concentrado y alta presión estática para refrigeración o secado.</p>\n</article>\n<article class=\"om-card\">\n<h4>Flujo cruzado</h4>\n<p>Caudal uniforme en superficies largas o huecos estrechos.</p>\n</article>\n</div>\n<p class=\"om-note\">Fuente: Oriental Motor Product Guide 2025 y <a href=\"https://www.orientalmotor.com/cooling-fans/index.html\" rel=\"noopener noreferrer\">orientalmotor.com — Cooling Fans</a>.</p>\n</section>",
+    "seo_title": "Oriental Motor Chile | αSTEP AZ, motores CA y ventilación - LPAEZSIS",
+    "seo_description": "Oriental Motor en Chile con LPAEZSIS: motorización αSTEP AZ, motores CA World K/KIIS y ventiladores de refrigeración. Cotización industrial.",
+    "seo_keywords": "Oriental Motor, αSTEP AZ, encoder absoluto ABZO, motores CA, World K, KIIS, reductores, ventiladores axiales, sopladores centrífugos, flujo cruzado, LPAEZSIS Chile",
+    "canonical_url": "/marcas.html?slug=oriental-motor",
+    "logo_url": "img/brand/oriental-motor.png",
+    "datasheet_url": null,
+    "website_url": "https://www.orientalmotor.com/",
+    "sort_order": 37,
+    "is_active": true,
+    "gallery_json": [],
+    "schema_json_ld": {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Brand",
+          "@id": "https://www.lpaezsis.cl/marcas.html?slug=oriental-motor#brand",
+          "name": "Oriental Motor",
+          "alternateName": "ORIENTAL MOTOR CO., LTD.",
+          "slogan": "The World Leader in Motion Systems",
+          "url": "https://www.lpaezsis.cl/marcas.html?slug=oriental-motor",
+          "description": "Oriental Motor en Chile con LPAEZSIS: motorización αSTEP AZ, motores CA World K/KIIS y ventiladores de refrigeración. Cotización industrial.",
+          "sameAs": [
+            "https://www.orientalmotor.com/",
+            "https://www.orientalmotor.eu/es"
+          ],
+          "additionalProperty": {
+            "@type": "PropertyValue",
+            "name": "País de origen",
+            "value": "Japón"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://www.lpaezsis.cl/#organization",
+          "name": "LPAEZ SOLUCIONES INDUSTRIALES SPA",
+          "alternateName": "LPAEZSIS",
+          "url": "https://www.lpaezsis.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.lpaezsis.cl/img/brand/logo.png"
+          },
+          "brand": {
+            "@id": "https://www.lpaezsis.cl/marcas.html?slug=oriental-motor#brand"
+          }
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "name": "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+      "slug": "transportadores-manejo-materiales",
+      "description": "Motores, reductores y motorización para manejo de materiales (categoría existente en LPAEZSIS).",
+      "existing": true,
+      "live_id": 11
+    },
+    {
+      "name": "Turbinas de Soplado",
+      "slug": "turbinas-soplado",
+      "description": "Turbinas, sopladores y ventiladores industriales (categoría existente en LPAEZSIS).",
+      "existing": true,
+      "live_id": 2
+    }
+  ],
+  "products": [
+    {
+      "name": "Motorización αSTEP AZ Oriental Motor",
+      "slug": "motorizacion-alphastep-az-oriental-motor",
+      "brand_slug": "oriental-motor",
+      "category_slug": "transportadores-manejo-materiales",
+      "sku": "OM-ALPHASTEP-AZ",
+      "summary": "Sistema αSTEP AZ Oriental Motor: control híbrido, encoder absoluto ABZO sin batería y redes EtherNet/IP, EtherCAT y PROFINET. Cotización LPAEZSIS.",
+      "detail": "Familia αSTEP AZ de Oriental Motor: motor paso a paso de control híbrido (lazo cerrado / abierto) con encoder absoluto mecánico ABZO, sin batería ni sensores externos de home. Sin hunting ni ajuste de ganancia. Drivers de pulsos o controlador integrado; redes EtherNet/IP, EtherCAT, PROFINET, Modbus, SSCNET III/H y MECHATROLINK. Motores estándar, planetarios, armónicos, de ángulo recto y actuadores lineales o rotativos.",
+      "seo_title": "Motorización αSTEP AZ Oriental Motor | Cotizar LPAEZsis",
+      "specs": [
+        [
+          "Familia",
+          "αSTEP AZ — control híbrido con encoder absoluto mecánico"
+        ],
+        [
+          "Encoder",
+          "ABZO absoluto de múltiples vueltas, sin batería ni sensores externos"
+        ],
+        [
+          "Control",
+          "Lazo cerrado / abierto; sin hunting ni ajuste de ganancia"
+        ],
+        [
+          "Redes",
+          "EtherNet/IP, EtherCAT, PROFINET, Modbus, SSCNET III/H, MECHATROLINK"
+        ],
+        [
+          "Mecánica",
+          "Estándar, planetario, armónico, ángulo recto, conector; actuadores lineales y rotativos"
+        ],
+        [
+          "Origen",
+          "Japón (ORIENTAL MOTOR CO., LTD.)"
+        ]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/motorizacion-alphastep-az-oriental-motor.jpg",
+      "sort_order": 36
+    },
+    {
+      "name": "Motores CA y reductores Oriental Motor",
+      "slug": "motores-ca-reductores-oriental-motor",
+      "brand_slug": "oriental-motor",
+      "category_slug": "transportadores-manejo-materiales",
+      "sku": "OM-AC-GEAR",
+      "summary": "Motores CA Oriental Motor World K (1–90 W) y KIIS (30–200 W) con reductor paralelo o angular, freno e inversor. Cotización LPAEZSIS.",
+      "detail": "Motores CA estándar Oriental Motor de conexión directa a red. World K: inducción y reversible de 1 a 90 W, marco 42–90 mm, monofásico o trifásico, reductor paralelo o de ángulo recto. KIIS: inducción 30–200 W, marco 80–110 mm, ejes inoxidables, alto par y uso con inversor. Protección térmica incorporada y vida de referencia 10.000 h.",
+      "seo_title": "Motores CA y reductores Oriental Motor | Cotizar LPAEZsis",
+      "specs": [
+        [
+          "Familia",
+          "Standard AC Motors — World K e KIIS"
+        ],
+        [
+          "World K",
+          "Inducción / reversible, 1–90 W, marco 42–90 mm"
+        ],
+        [
+          "KIIS",
+          "Inducción 30–200 W, marco 80–110 mm, compatible con inversor"
+        ],
+        [
+          "Reductores",
+          "Paralelo o ángulo recto; eje hueco o macizo; freno electromagnético opcional"
+        ],
+        [
+          "Alimentación",
+          "CA 50/60 Hz, monofásico o trifásico según serie"
+        ],
+        [
+          "Origen",
+          "Japón (ORIENTAL MOTOR CO., LTD.)"
+        ]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/motores-ca-reductores-oriental-motor.jpg",
+      "sort_order": 37
+    },
+    {
+      "name": "Ventiladores de refrigeración Oriental Motor",
+      "slug": "ventiladores-axiales-refrigeracion-oriental-motor",
+      "brand_slug": "oriental-motor",
+      "category_slug": "turbinas-soplado",
+      "sku": "OM-AXIAL-FAN",
+      "summary": "Ventiladores Oriental Motor axiales, centrífugos y de flujo cruzado (CA/CC) para refrigeración, secado y ventilación de gabinetes. Cotización LPAEZSIS.",
+      "detail": "Gama de refrigeración Oriental Motor: ventiladores axiales MU/MRS/MRE, sopladores centrífugos MB y flujo cruzado MF, en CA o CC. Los axiales ventilan equipos y gabinetes; los centrífugos aportan presión estática alta para soplado o secado; el flujo cruzado entrega aire uniforme en franjas largas. Opciones de larga vida, alarma y termostato.",
+      "seo_title": "Ventiladores de refrigeración Oriental Motor | Cotizar LPAEZsis",
+      "specs": [
+        [
+          "Familia",
+          "Cooling Fans — axiales, centrífugos y flujo cruzado"
+        ],
+        [
+          "Axiales",
+          "MU / MRS / MRE, CA o CC, ventilación de dispositivos"
+        ],
+        [
+          "Centrífugos",
+          "MB, aire concentrado y alta presión estática"
+        ],
+        [
+          "Flujo cruzado",
+          "MF, caudal uniforme para espacios largos o estrechos"
+        ],
+        [
+          "Opciones",
+          "Larga vida, alarmas y termostato de encendido automático"
+        ],
+        [
+          "Origen",
+          "Japón (ORIENTAL MOTOR CO., LTD.)"
+        ]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/ventiladores-axiales-refrigeracion-oriental-motor.jpg",
+      "sort_order": 38
+    }
+  ],
+  "upload_policy": {
+    "live_admin": true,
+    "docs_only": false,
+    "requires_user_approval": true,
+    "do_not_change_site_settings": true,
+    "no_photos": false,
+    "photos_from_catalog": true,
+    "source": "Oriental Motor Product Guide 2025 (orientalmotor.com/products/pdfs/2025): αSTEP AZ motores p08, World K/KIIS p30, Cooling Fans p32, wordmark portada p01"
+  }
+}
