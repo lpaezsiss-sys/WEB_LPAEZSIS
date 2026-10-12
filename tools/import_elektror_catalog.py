@@ -2,8 +2,8 @@
 """Import Elektror airsystems catalog. Default is dry-run (prints payload, no POST).
 
 Live admin upload requires BOTH --live and CONFIRM_LIVE_ELEKTROR=yes.
-Publishes documentation only: empty logo_url, empty image_url, no file uploads.
-Does not change website settings/menus/passwords.
+Uploads official catalog photos (ND aluminium, S-LP stainless, side-channel)
+and the Elektror wordmark. Does not change website settings/menus/passwords.
 Reuses the existing category slug turbinas-soplado.
 """
 from __future__ import annotations
@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import sys
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,17 +36,60 @@ def compose_description(product: dict) -> str:
     return "\n".join(lines)
 
 
+def local_file(rel: str | None) -> Path | None:
+    if not rel:
+        return None
+    path = ROOT / "site" / str(rel).lstrip("/")
+    return path if path.is_file() else None
+
+
+def mime_for(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix in {".jpg", ".jpeg"}:
+        return "image/jpeg"
+    if suffix == ".png":
+        return "image/png"
+    if suffix == ".webp":
+        return "image/webp"
+    return "application/octet-stream"
+
+
+def upload_image(client, rel: str | None) -> str:
+    path = local_file(rel)
+    if not path:
+        return ""
+    uploaded = client.request(
+        "POST",
+        "/api/admin/upload",
+        files={"file": (path.name, path.read_bytes(), mime_for(path))},
+    )
+    url = (uploaded.get("url") or "").strip()
+    if url:
+        print("uploaded", path.name, "->", url)
+    canonical = "/" + str(rel).lstrip("/")
+    try:
+        req = urllib.request.Request(client.base + canonical, method="HEAD")
+        with urllib.request.urlopen(req, timeout=15) as res:
+            if 200 <= getattr(res, "status", 200) < 400:
+                print("using canonical image", canonical)
+                return canonical
+    except Exception:
+        pass
+    return url or canonical
+
+
 def print_draft(catalog: dict) -> None:
     brand = catalog["brand"]
-    print("=== BORRADOR ELEKTROR (documentación, sin fotos) ===")
+    print("=== BORRADOR ELEKTROR (fotos del catálogo oficial) ===")
     print("marca:", brand["name"], brand["slug"])
-    print("logo_url:", repr(brand.get("logo_url") or ""), "(vacío: no se sube logo)")
+    print("logo_url:", brand.get("logo_url"), "local", bool(local_file(brand.get("logo_url"))))
     print("website:", brand["website_url"])
     print("categoria existente:", catalog["categories"][0]["slug"])
     html = brand.get("content_html") or ""
     print("content_html imgs:", html.count("<img"), "figures:", html.count("<figure"))
     for prod in catalog["products"]:
-        print("producto:", prod["slug"], "->", prod.get("image_url"))
+        rel = prod.get("image_url")
+        print("producto:", prod["slug"], "->", rel, "local", bool(local_file(rel)))
     print("upload_policy:", json.dumps(catalog.get("upload_policy"), ensure_ascii=False))
     print("Para publicar: CONFIRM_LIVE_ELEKTROR=yes python3 tools/import_elektror_catalog.py --live")
 
@@ -73,11 +117,12 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
     print("usando categoria existente", cat_slug, cat.get("id"))
 
     brand = catalog["brand"]
+    logo_url = upload_image(client, brand.get("logo_url"))
     brand_payload = {
         "name": brand["name"],
         "slug": brand["slug"],
         "description": brand["description"],
-        "logo_url": "",
+        "logo_url": logo_url,
         "website_url": brand["website_url"],
         "content_html": brand["content_html"],
         "sort_order": brand["sort_order"],
@@ -87,13 +132,14 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
     if existing_brand:
         client.request("PUT", f"/api/admin/brands/{existing_brand['id']}", brand_payload)
         brand_id = int(existing_brand["id"])
-        print("brand update", brand["slug"], brand_id)
+        print("brand update", brand["slug"], brand_id, "logo", logo_url)
     else:
         res = client.request("POST", "/api/admin/brands", brand_payload)
         brand_id = int(res.get("id") or (res.get("data") or {}).get("id") or res.get("brand", {}).get("id"))
-        print("brand create", brand["slug"], res)
+        print("brand create", brand["slug"], res, "logo", logo_url)
 
     for prod in catalog["products"]:
+        image_url = upload_image(client, prod.get("image_url"))
         payload = {
             "name": prod["name"],
             "slug": prod["slug"],
@@ -102,7 +148,7 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
             "stock_status": "on_request",
             "category_id": int(cat["id"]),
             "brand_id": brand_id,
-            "image_url": "",
+            "image_url": image_url,
             "is_active": 1,
             "sort_order": prod["sort_order"],
             "seo_title": prod.get("seo_title") or (prod["name"] + " | Cotizar LPAEZsis"),
@@ -111,10 +157,10 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
         existing = products.get(prod["slug"])
         if existing:
             client.request("PUT", f"/api/admin/products/{existing['id']}", payload)
-            print("product update", prod["slug"], existing["id"])
+            print("product update", prod["slug"], existing["id"], "img", image_url)
         else:
             res = client.request("POST", "/api/admin/products", payload)
-            print("product create", prod["slug"], res)
+            print("product create", prod["slug"], res, "img", image_url)
 
 
 def main() -> None:

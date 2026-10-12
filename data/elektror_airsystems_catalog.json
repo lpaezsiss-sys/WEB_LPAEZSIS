@@ -12,7 +12,7 @@
     "seo_description": "Descubre los ventiladores industriales y compresores de alta eficiencia de Elektror. Soluciones a medida con ingeniería alemana para procesos exigentes.",
     "seo_keywords": "Elektror, ventiladores industriales, ventiladores radiales, carcasa de aluminio, acero inoxidable 1.4301, variantes ATEX, compresores de canal de derivación, sopladores industriales, eficiencia energética IE3, transporte neumático, LPAEZSIS Chile",
     "canonical_url": "/marcas.html?slug=elektror-airsystems",
-    "logo_url": "",
+    "logo_url": "img/brand/elektror-airsystems.png",
     "datasheet_url": null,
     "website_url": "https://www.elektror.com/",
     "sort_order": 32,
@@ -100,7 +100,7 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/ventiladores-radiales-aluminio-elektror.jpg",
       "sort_order": 21
     },
     {
@@ -135,7 +135,7 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/ventiladores-radiales-inoxidable-elektror.jpg",
       "sort_order": 22
     },
     {
@@ -170,15 +170,17 @@
         ]
       ],
       "datasheet": null,
-      "image_url": null,
+      "image_url": "img/productos/compresores-canal-derivacion-elektror.jpg",
       "sort_order": 23
     }
   ],
   "upload_policy": {
     "live_admin": true,
-    "docs_only": true,
+    "docs_only": false,
     "requires_user_approval": true,
     "do_not_change_site_settings": true,
-    "no_photos": true
+    "no_photos": false,
+    "photos_from_catalog": true,
+    "source": "Catálogo oficial Elektror (elektror.com): ND D09/D092, S-LP 200/92, side-channel blower"
   }
 }
