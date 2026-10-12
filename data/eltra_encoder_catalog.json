@@ -1,0 +1,141 @@
+{
+  "brand": {
+    "name": "Eltra Encoder",
+    "slug": "eltra-encoder",
+    "origin_country": "Italia",
+    "subtitle": "Shaping your movement · Encoder incrementales, absolutos y lineales",
+    "short_description": "Eltra (Italia, 1985): encoder incrementales y absolutos, transductores lineales y sensores de posición. Cotización LPAEZSIS Chile.",
+    "long_description": "<style>\n.eltra-kicker{margin:0 0 .35rem;color:#0099b8;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}\n.eltra-grid{display:flex;flex-wrap:wrap;gap:1rem}\n.eltra-card{flex:1 1 240px;background:#f7f7f8;border:1px solid #e2e2e6;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(0,153,184,.06)}\n.eltra-card h4{margin:0 0 .45rem;color:#1a1a1a;font-size:1.02rem;font-weight:800}\n.eltra-card p{margin:0}\n.eltra-note{margin:.75rem 0 0;font-size:.82rem;color:#5f5f5f}\n</style>\n<section class=\"brand-section\">\n<p class=\"eltra-kicker\">Eltra · Sarego (VI), Italia · 1985</p>\n<h3>Eltra Encoder</h3>\n<p>Eltra S.p.A. desarrolla y fabrica sensores de control de posición desde 1985. Con el lema “Shaping your movement”, la planta de Sarego (Vicenza) ofrece más de 4.000 códigos y unas 180.000 unidades al año, con diseño a medida según la aplicación.</p>\n<p>El catálogo cubre encoder rotativos incrementales y absolutos (ópticos y magnéticos, modelos antideflagrantes, a cable y magnéticos), transductores lineales e interfaces fieldbus, más accesorios. Filiales en Eslovaquia y China; desde 2008 forma parte del grupo Avago / Broadcom, manteniendo identidad y calidad Made in Italy.</p>\n<p>Sitio del fabricante: <a href=\"https://www.eltra.it/en/\" rel=\"noopener noreferrer\">www.eltra.it</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Encoder incrementales rotativos — ópticos y magnéticos</h3>\n<p>Los incrementales Eltra miden posición y velocidad angular de ejes: madera, textil, CNC y maquinaria general. Resolución hasta 24.000 impulsos/giro, bridas variadas y salidas NPN, push-pull, HTL y RS-422. Eje macizo, ciego o pasante hasta 60 mm. Series ópticas ER/EH/EL/EF/EX e incrementales magnéticos EMI/EMIP.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>Hasta 24.000 ppr</h4>\n<p>Resolución óptica de catálogo hasta 24.000 impulsos por giro (ER 58 / ER 63).</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Eje macizo o hueco</h4>\n<p>Saliente, ciego o pasante hasta Ø 60 mm; cubiertas plásticas o metálicas.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Salidas industriales</h4>\n<p>NPN, push-pull, line driver HTL y RS-422; alimentación 5…30 Vdc; IP hasta 67.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/rotary-incremental-encoders/\" rel=\"noopener noreferrer\">eltra.it — Rotary incremental encoders</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Encoder absolutos — monogiro y multigiro</h3>\n<p>El absoluto Eltra entrega un código único por ángulo y conserva la posición tras un corte de energía: no hay que reponer el cero. Monogiro hasta 25 bit (33.554.432 posiciones/giro) y multigiro hasta 40 bit. Interfaces: analógica, paralela, BiSS, SSI, CANopen, Profibus, Profinet y EtherCAT. Gamas ópticas EAR/EAL/EAX y magnéticas EMA/EML, más multiturn AAM/EAM con fieldbus.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>Sin reset de cero</h4>\n<p>La posición se conserva al apagar; listo para rearranque y fieldbus.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>25 bit / 40 bit</h4>\n<p>Monogiro hasta 25 bit; multigiro hasta 40 bit según serie.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>SSI, BiSS y fieldbus</h4>\n<p>Analógica, paralela, SSI, BiSS, CANopen, Profibus, Profinet y EtherCAT.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/rotary-absolute-encoders/\" rel=\"noopener noreferrer\">eltra.it — Rotary absolute encoders</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Transductores lineales — potenciómetros, cinta y magnetostrictivos</h3>\n<p>Los lineales Eltra cubren carreras de 10 mm a 1.500 mm: potenciómetros EPLA/EPLB/EPLC/EPLT (ranura de montaje para prensas de plástico y caucho), cinta magnética incremental ETMA y absoluta TMAA (hasta 1 µm, SSI, IP67), encoder a cable FE/FES y magnetostrictivos EMSP/EMSS (vástago para cilindro hidráulico o perfil). Posición absoluta, sin contacto en las versiones magnéticas, y montaje sencillo.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>10–1.500 mm</h4>\n<p>Carreras de catálogo para potenciómetros y magnetostrictivos.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>TMAA / ETMA</h4>\n<p>Cinta magnética absoluta (1 µm, SSI, IP67) e incremental.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Cable y magnetostricción</h4>\n<p>FE/FES a cable; EMSP/EMSS para cilindro o perfil.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/linear-transducers/\" rel=\"noopener noreferrer\">eltra.it — Linear transducers</a>.</p>\n</section>",
+    "description": "Eltra (Italia, 1985): encoder incrementales y absolutos, transductores lineales y sensores de posición. Cotización LPAEZSIS Chile.",
+    "content_html": "<style>\n.eltra-kicker{margin:0 0 .35rem;color:#0099b8;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}\n.eltra-grid{display:flex;flex-wrap:wrap;gap:1rem}\n.eltra-card{flex:1 1 240px;background:#f7f7f8;border:1px solid #e2e2e6;border-radius:.75rem;padding:1.05rem 1.15rem;box-shadow:0 4px 14px rgba(0,153,184,.06)}\n.eltra-card h4{margin:0 0 .45rem;color:#1a1a1a;font-size:1.02rem;font-weight:800}\n.eltra-card p{margin:0}\n.eltra-note{margin:.75rem 0 0;font-size:.82rem;color:#5f5f5f}\n</style>\n<section class=\"brand-section\">\n<p class=\"eltra-kicker\">Eltra · Sarego (VI), Italia · 1985</p>\n<h3>Eltra Encoder</h3>\n<p>Eltra S.p.A. desarrolla y fabrica sensores de control de posición desde 1985. Con el lema “Shaping your movement”, la planta de Sarego (Vicenza) ofrece más de 4.000 códigos y unas 180.000 unidades al año, con diseño a medida según la aplicación.</p>\n<p>El catálogo cubre encoder rotativos incrementales y absolutos (ópticos y magnéticos, modelos antideflagrantes, a cable y magnéticos), transductores lineales e interfaces fieldbus, más accesorios. Filiales en Eslovaquia y China; desde 2008 forma parte del grupo Avago / Broadcom, manteniendo identidad y calidad Made in Italy.</p>\n<p>Sitio del fabricante: <a href=\"https://www.eltra.it/en/\" rel=\"noopener noreferrer\">www.eltra.it</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Encoder incrementales rotativos — ópticos y magnéticos</h3>\n<p>Los incrementales Eltra miden posición y velocidad angular de ejes: madera, textil, CNC y maquinaria general. Resolución hasta 24.000 impulsos/giro, bridas variadas y salidas NPN, push-pull, HTL y RS-422. Eje macizo, ciego o pasante hasta 60 mm. Series ópticas ER/EH/EL/EF/EX e incrementales magnéticos EMI/EMIP.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>Hasta 24.000 ppr</h4>\n<p>Resolución óptica de catálogo hasta 24.000 impulsos por giro (ER 58 / ER 63).</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Eje macizo o hueco</h4>\n<p>Saliente, ciego o pasante hasta Ø 60 mm; cubiertas plásticas o metálicas.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Salidas industriales</h4>\n<p>NPN, push-pull, line driver HTL y RS-422; alimentación 5…30 Vdc; IP hasta 67.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/rotary-incremental-encoders/\" rel=\"noopener noreferrer\">eltra.it — Rotary incremental encoders</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Encoder absolutos — monogiro y multigiro</h3>\n<p>El absoluto Eltra entrega un código único por ángulo y conserva la posición tras un corte de energía: no hay que reponer el cero. Monogiro hasta 25 bit (33.554.432 posiciones/giro) y multigiro hasta 40 bit. Interfaces: analógica, paralela, BiSS, SSI, CANopen, Profibus, Profinet y EtherCAT. Gamas ópticas EAR/EAL/EAX y magnéticas EMA/EML, más multiturn AAM/EAM con fieldbus.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>Sin reset de cero</h4>\n<p>La posición se conserva al apagar; listo para rearranque y fieldbus.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>25 bit / 40 bit</h4>\n<p>Monogiro hasta 25 bit; multigiro hasta 40 bit según serie.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>SSI, BiSS y fieldbus</h4>\n<p>Analógica, paralela, SSI, BiSS, CANopen, Profibus, Profinet y EtherCAT.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/rotary-absolute-encoders/\" rel=\"noopener noreferrer\">eltra.it — Rotary absolute encoders</a>.</p>\n</section>\n<section class=\"brand-section\">\n<h3>Transductores lineales — potenciómetros, cinta y magnetostrictivos</h3>\n<p>Los lineales Eltra cubren carreras de 10 mm a 1.500 mm: potenciómetros EPLA/EPLB/EPLC/EPLT (ranura de montaje para prensas de plástico y caucho), cinta magnética incremental ETMA y absoluta TMAA (hasta 1 µm, SSI, IP67), encoder a cable FE/FES y magnetostrictivos EMSP/EMSS (vástago para cilindro hidráulico o perfil). Posición absoluta, sin contacto en las versiones magnéticas, y montaje sencillo.</p>\n<div class=\"eltra-grid\">\n<article class=\"eltra-card\">\n<h4>10–1.500 mm</h4>\n<p>Carreras de catálogo para potenciómetros y magnetostrictivos.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>TMAA / ETMA</h4>\n<p>Cinta magnética absoluta (1 µm, SSI, IP67) e incremental.</p>\n</article>\n<article class=\"eltra-card\">\n<h4>Cable y magnetostricción</h4>\n<p>FE/FES a cable; EMSP/EMSS para cilindro o perfil.</p>\n</article>\n</div>\n<p class=\"eltra-note\">Fuente: Eltra Product Leaflet 2025 y <a href=\"https://www.eltra.it/en/product-category/linear-transducers/\" rel=\"noopener noreferrer\">eltra.it — Linear transducers</a>.</p>\n</section>",
+    "seo_title": "Eltra Encoder Chile | Incrementales, absolutos y lineales - LPAEZSIS",
+    "seo_description": "Eltra Encoder en Chile con LPAEZSIS: incrementales hasta 24.000 ppr, absolutos SSI/EtherCAT y transductores lineales. Cotización industrial.",
+    "seo_keywords": "Eltra, encoder incremental, encoder absoluto, SSI, EtherCAT, Profinet, transductor lineal, TMAA, magnetostrictivo, LPAEZSIS Chile",
+    "canonical_url": "/marcas.html?slug=eltra-encoder",
+    "logo_url": "img/brand/eltra-encoder.png",
+    "datasheet_url": null,
+    "website_url": "https://www.eltra.it/en/",
+    "sort_order": 38,
+    "is_active": true,
+    "gallery_json": [],
+    "schema_json_ld": {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Brand",
+          "@id": "https://www.lpaezsis.cl/marcas.html?slug=eltra-encoder#brand",
+          "name": "Eltra Encoder",
+          "alternateName": "Eltra S.p.A.",
+          "slogan": "Shaping your movement",
+          "url": "https://www.lpaezsis.cl/marcas.html?slug=eltra-encoder",
+          "description": "Eltra Encoder en Chile con LPAEZSIS: incrementales hasta 24.000 ppr, absolutos SSI/EtherCAT y transductores lineales. Cotización industrial.",
+          "sameAs": [
+            "https://www.eltra.it/en/"
+          ],
+          "additionalProperty": {
+            "@type": "PropertyValue",
+            "name": "País de origen",
+            "value": "Italia"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://www.lpaezsis.cl/#organization",
+          "name": "LPAEZ SOLUCIONES INDUSTRIALES SPA",
+          "alternateName": "LPAEZSIS",
+          "url": "https://www.lpaezsis.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.lpaezsis.cl/img/brand/logo.png"
+          },
+          "brand": {
+            "@id": "https://www.lpaezsis.cl/marcas.html?slug=eltra-encoder#brand"
+          }
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "name": "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+      "slug": "transportadores-manejo-materiales",
+      "description": "Sensores de posición y encoder para maquinaria y manejo de materiales (categoría existente en LPAEZSIS).",
+      "existing": true,
+      "live_id": 11
+    }
+  ],
+  "products": [
+    {
+      "name": "Encoder incrementales rotativos Eltra",
+      "slug": "encoder-incrementales-eltra",
+      "brand_slug": "eltra-encoder",
+      "category_slug": "transportadores-manejo-materiales",
+      "sku": "ELTRA-INCR",
+      "summary": "Encoder incrementales Eltra ópticos y magnéticos, hasta 24.000 ppr, eje macizo o hueco hasta 60 mm, salidas NPN/HTL/RS-422. Cotización LPAEZSIS.",
+      "detail": "Gama incremental Eltra (óptica ER/EH/EL/EF/EX y magnética EMI/EMIP) para posición y velocidad angular. Hasta 24.000 impulsos/giro, eje saliente, ciego o pasante hasta Ø 60 mm, IP hasta 67. Salidas NPN, push-pull, HTL y RS-422; 5…30 Vdc. Aplicaciones: madera, textil, CNC y automatización.",
+      "seo_title": "Encoder incrementales rotativos Eltra | Cotizar LPAEZsis",
+      "specs": [
+        ["Familia", "Encoder incrementales rotativos ópticos y magnéticos"],
+        ["Resolución", "Hasta 24.000 ppr (catálogo óptico ER 58 / ER 63)"],
+        ["Mecánica", "Eje macizo, ciego o pasante hasta Ø 60 mm"],
+        ["Salidas", "NPN, push-pull, line driver HTL y RS-422"],
+        ["Alimentación / IP", "5…30 Vdc; IP hasta 67 según serie"],
+        ["Origen", "Italia (Eltra S.p.A., Sarego)"]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/encoder-incrementales-eltra.jpg",
+      "sort_order": 39
+    },
+    {
+      "name": "Encoder absolutos Eltra",
+      "slug": "encoder-absolutos-eltra",
+      "brand_slug": "eltra-encoder",
+      "category_slug": "transportadores-manejo-materiales",
+      "sku": "ELTRA-ABS",
+      "summary": "Encoder absolutos Eltra monogiro (hasta 25 bit) y multigiro (hasta 40 bit), SSI, BiSS, Profinet y EtherCAT. Cotización LPAEZSIS.",
+      "detail": "Encoder absolutos Eltra: la posición se conserva sin reset de cero tras un corte de energía. Monogiro hasta 25 bit (33.554.432 posiciones/giro) y multigiro hasta 40 bit. Interfaces analógica, paralela, BiSS, SSI, CANopen, Profibus, Profinet y EtherCAT. Series ópticas EAR/EAL/EAX, magnéticas EMA/EML y multiturn AAM/EAM.",
+      "seo_title": "Encoder absolutos Eltra | Cotizar LPAEZsis",
+      "specs": [
+        ["Familia", "Encoder absolutos monogiro y multigiro"],
+        ["Resolución", "Monogiro hasta 25 bit; multigiro hasta 40 bit"],
+        ["Memoria", "Posición retenida sin reponer el cero"],
+        ["Interfaces", "Analógica, paralela, BiSS, SSI, CANopen, Profibus, Profinet, EtherCAT"],
+        ["Series", "EAR / EAL / EAX, EMA / EML, AAM / EAM"],
+        ["Origen", "Italia (Eltra S.p.A., Sarego)"]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/encoder-absolutos-eltra.jpg",
+      "sort_order": 40
+    },
+    {
+      "name": "Transductores lineales Eltra",
+      "slug": "transductores-lineales-eltra",
+      "brand_slug": "eltra-encoder",
+      "category_slug": "transportadores-manejo-materiales",
+      "sku": "ELTRA-LINEAR",
+      "summary": "Transductores lineales Eltra: potenciómetros 10–1.500 mm, cinta magnética TMAA/ETMA, encoder a cable y magnetostrictivos. Cotización LPAEZSIS.",
+      "detail": "Transductores lineales Eltra para posición de carrera 10–1.500 mm. Potenciómetros EPLA/EPLB/EPLC/EPLT; cinta magnética incremental ETMA y absoluta TMAA (hasta 1 µm, SSI, IP67); encoder a cable FE/FES; magnetostrictivos EMSP/EMSS de vástago o perfil para cilindros hidráulicos. Alta vida útil y montaje con ranura o perfil.",
+      "seo_title": "Transductores lineales Eltra | Cotizar LPAEZsis",
+      "specs": [
+        ["Familia", "Transductores lineales: potenciómetro, cinta, cable y magnetostricción"],
+        ["Carrera", "10 mm a 1.500 mm según serie"],
+        ["TMAA", "Absoluto magnético, 1 µm, SSI, IP67, hasta 5 m/s"],
+        ["Cable", "FE / FES encoder a cable para medidas lineales"],
+        ["Magnetostrictivos", "EMSP / EMSS, vástago o perfil, analógico o SSI"],
+        ["Origen", "Italia (Eltra S.p.A., Sarego)"]
+      ],
+      "datasheet": null,
+      "image_url": "img/productos/transductores-lineales-eltra.jpg",
+      "sort_order": 41
+    }
+  ],
+  "upload_policy": {
+    "live_admin": true,
+    "docs_only": false,
+    "requires_user_approval": true,
+    "do_not_change_site_settings": true,
+    "no_photos": false,
+    "photos_from_catalog": true,
+    "source": "Eltra Product Leaflet 2025 (eltra.it): logo oficial eltra.it, incrementales p06, absolutos p12, lineales p17"
+  }
+}

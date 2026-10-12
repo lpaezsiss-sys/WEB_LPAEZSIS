@@ -780,6 +780,7 @@
     haida: "/img/brand/haida.png",
     "columbia-machine": "/img/brand/columbia-machine.png",
     "columbia-okura": "/img/brand/columbia-machine.png",
+    "eltra-encoder": "/img/brand/eltra-encoder.png",
   };
 
   function resolveBrandLogo(b) {

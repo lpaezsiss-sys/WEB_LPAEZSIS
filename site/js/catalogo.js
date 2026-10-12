@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 36,
+    slug: "encoder-incrementales-eltra",
+    name: "Encoder incrementales rotativos Eltra",
+    sku: "ELTRA-INCR",
+    description: "Encoder incrementales Eltra ópticos y magnéticos, hasta 24.000 ppr, eje macizo o hueco hasta 60 mm, salidas NPN/HTL/RS-422. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/encoder-incrementales-eltra.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "eltra-encoder",
+    brand_name: "Eltra Encoder",
+    quote_url: "cotizacion.html?sku=encoder-incrementales-eltra",
+  },
+  {
+    id: 37,
+    slug: "encoder-absolutos-eltra",
+    name: "Encoder absolutos Eltra",
+    sku: "ELTRA-ABS",
+    description: "Encoder absolutos Eltra monogiro (hasta 25 bit) y multigiro (hasta 40 bit), SSI, BiSS, Profinet y EtherCAT. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/encoder-absolutos-eltra.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "eltra-encoder",
+    brand_name: "Eltra Encoder",
+    quote_url: "cotizacion.html?sku=encoder-absolutos-eltra",
+  },
+  {
+    id: 38,
+    slug: "transductores-lineales-eltra",
+    name: "Transductores lineales Eltra",
+    sku: "ELTRA-LINEAR",
+    description: "Transductores lineales Eltra: potenciómetros 10–1.500 mm, cinta magnética TMAA/ETMA, encoder a cable y magnetostrictivos. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/transductores-lineales-eltra.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "eltra-encoder",
+    brand_name: "Eltra Encoder",
+    quote_url: "cotizacion.html?sku=transductores-lineales-eltra",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +273,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "eltra-encoder", name: "Eltra Encoder" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
