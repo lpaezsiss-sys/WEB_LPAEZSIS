@@ -780,6 +780,7 @@
     haida: "/img/brand/haida.png",
     "columbia-machine": "/img/brand/columbia-machine.png",
     "columbia-okura": "/img/brand/columbia-machine.png",
+    "mahesh-twisto-tech": "/img/brand/mahesh-twisto-tech.png",
   };
 
   function resolveBrandLogo(b) {
