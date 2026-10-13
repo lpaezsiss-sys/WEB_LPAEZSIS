@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 42,
+    slug: "transportador-tubular-cable-discos-cablevey",
+    name: "Transportador tubular de cable y discos Cablevey",
+    sku: "CABLEVEY-TUBULAR",
+    description: "Transportador tubular Cablevey de cable y discos, series 2–8″ (75 a 2.000 ft³/h). Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/transportador-tubular-cable-discos-cablevey.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "cablevey-conveyors",
+    brand_name: "Cablevey Conveyors",
+    quote_url: "cotizacion.html?sku=transportador-tubular-cable-discos-cablevey",
+  },
+  {
+    id: 43,
+    slug: "componentes-clave-cablevey",
+    name: "Componentes clave Cablevey",
+    sku: "CABLEVEY-COMPONENTS",
+    description: "Drive Unit, turnaround, sweeps 0–90°, inlets, descargas, Brush Box y acoplamientos Cablevey. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/componentes-clave-cablevey.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "cablevey-conveyors",
+    brand_name: "Cablevey Conveyors",
+    quote_url: "cotizacion.html?sku=componentes-clave-cablevey",
+  },
+  {
+    id: 44,
+    slug: "clearvey-cleanvey-cablevey",
+    name: "Clearvey y Cleanvey Cablevey",
+    sku: "CABLEVEY-CLEARVEY",
+    description: "Clearvey™ (tubo polímero food-contact) y Cleanvey CIP húmedo/seco para higiene Cablevey. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/clearvey-cleanvey-cablevey.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "cablevey-conveyors",
+    brand_name: "Cablevey Conveyors",
+    quote_url: "cotizacion.html?sku=clearvey-cleanvey-cablevey",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +273,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "cablevey-conveyors", name: "Cablevey Conveyors" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -235,7 +288,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
