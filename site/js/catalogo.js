@@ -209,6 +209,57 @@ const MOCK_PRODUCTS = [
     brand_name: "Columbia Machine",
     quote_url: "cotizacion.html?sku=paletizador-compacto-envolvedora-columbia-fl1000sw",
   },
+  {
+    id: 45,
+    slug: "vacuum-pumps-apply-italia",
+    name: "Vacuum Pumps Apply Italia",
+    sku: "APPLY-VP",
+    description: "Bombas de vacío Apply Italia en seco (serie SE 12–150 m³/h), lubricadas y baño de aceite. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/vacuum-pumps-apply-italia.jpg",
+    image_webp: "",
+    category_slug: "turbinas-soplado",
+    category_name: "Turbinas de Soplado",
+    brand_slug: "apply-italia",
+    brand_name: "Apply Italia",
+    quote_url: "cotizacion.html?sku=vacuum-pumps-apply-italia",
+  },
+  {
+    id: 46,
+    slug: "master-blower-apply-italia",
+    name: "Master Blower Apply Italia",
+    sku: "APPLY-MB",
+    description: "Turbina Master Blower APPLY hasta 20.000 rpm, series MB 2300–5000.1 (1.800–4.800 m³/h). Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/master-blower-apply-italia.jpg",
+    image_webp: "",
+    category_slug: "turbinas-soplado",
+    category_name: "Turbinas de Soplado",
+    brand_slug: "apply-italia",
+    brand_name: "Apply Italia",
+    quote_url: "cotizacion.html?sku=master-blower-apply-italia",
+  },
+  {
+    id: 47,
+    slug: "trasporto-pneumatico-apply-italia",
+    name: "Trasporto Pneumatico Apply Italia",
+    sku: "APPLY-TP",
+    description: "Sistemas Apply de transporte neumático: fase diluida y densa, filtros, tolvas inox y ATEX. Cotización LPAEZSIS.",
+    sale_mode: "quote",
+    stock_status: "on_request",
+    price_clp: null,
+    image_url: "img/productos/trasporto-pneumatico-apply-italia.jpg",
+    image_webp: "",
+    category_slug: "transportadores-manejo-materiales",
+    category_name: "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+    brand_slug: "apply-italia",
+    brand_name: "Apply Italia",
+    quote_url: "cotizacion.html?sku=trasporto-pneumatico-apply-italia",
+  },
 ];
 
 const MOCK_CATEGORIES = [
@@ -222,12 +273,14 @@ const MOCK_CATEGORIES = [
   { slug: "paletizado-alta-velocidad", name: "Paletizado de Alta Velocidad / Final de Línea" },
   { slug: "paletizado-robotico", name: "Paletizado Robótico / Células de Automatización" },
   { slug: "paletizado-integrado", name: "Paletizado Integrado / Soluciones Compactas" },
+  { slug: "transportadores-manejo-materiales", name: "Transportadores y Manejo de Materiales / Soluciones de Envasado" },
 ];
 
 const MOCK_BRANDS = [
   { slug: "sonic-air-systems", name: "Sonic Air Systems" },
   { slug: "columbia-machine", name: "Columbia Machine" },
   { slug: "columbia-okura", name: "COLUMBIA/OKURA" },
+  { slug: "apply-italia", name: "Apply Italia" },
 ];
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -235,7 +288,7 @@ const PAGE_SIZE = 12;
 
 const INDUSTRIES = [
   { id: "alimentos", label: "Alimentos", categories: ["secadores", "cuchillos-aire", "turbinas-soplado"] },
-  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado"] },
+  { id: "packaging", label: "Packaging", categories: ["fin-de-linea", "paletizado-convencional", "paletizado-alta-velocidad", "paletizado-robotico", "paletizado-integrado", "transportadores-manejo-materiales"] },
   { id: "farmaceutica", label: "Farmacéutica", categories: ["salas-limpias"] },
   { id: "repuestos", label: "Repuestos", categories: ["repuestos"] },
 ];
