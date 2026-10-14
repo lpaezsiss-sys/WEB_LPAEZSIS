@@ -326,6 +326,7 @@
     "turbina-soplado-sonic-100": "/img/products/vt-sonic.jpg",
     "correa-sonic-70-85": "/img/products/A07-10015.jpg",
     "filtro-poliester-s-75-85-100": "/img/products/A07-10976.jpg",
+    "flexible-neopreno-3-12pies-sonic": "/img/products/A07-10434.jpg",
     "paletizador-nivel-inferior-columbia-fl3000": "/img/productos/fl3000.jpg",
     "paletizador-alto-nivel-columbia-hl7200": "/img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "/img/productos/ai1800.jpg",
