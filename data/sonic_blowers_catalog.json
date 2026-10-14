@@ -1,0 +1,197 @@
+{
+  "brand": {
+    "name": "Sonic Air Systems",
+    "slug": "sonic-air-systems",
+    "existing": true,
+    "live_id": 1
+  },
+  "categories": [
+    {
+      "name": "Turbinas de Soplado",
+      "slug": "turbinas-soplado",
+      "existing": true,
+      "live_id": 2
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotos de estudio oficiales de las fichas Sonic L90029/L90032/L90016/L90018/L90020/L90023/L90026 (sonicairsystems.com/specification-sheets)",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Blower Sonic S70",
+      "slug": "blower-sonic-s70",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 30,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s70.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-70",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/662006f56fcf8a73d1015804_Blower%20Sonic%2070%20IEC%20RevD_L90030.pdf",
+      "summary": "Blower centrífugo Sonic S70: 50–700 SCFM, 3–10 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S70 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S70 para secado, soplado y vacío industrial. Carcasa de aluminio, tensor automático de correa y motores IEC/NEMA. Cotización según caudal y presión.",
+      "specs": [
+        ["Modelo", "Sonic 70 — soplante centrífuga"],
+        ["Caudal", "50 a 700 SCFM (85 a 1.189 m³/h)"],
+        ["Presión", "0,5 a 3,5 PSIG (3,4 a 24,1 kPa)"],
+        ["Vacío", "1,0 a 6,6 inHg (34 a 224 mbar)"],
+        ["Motores", "3 / 5 / 7,5 / 10 HP"],
+        ["Aire de entrada", "Hasta 52 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "45 a 84 kg"],
+        ["Ficha", "Sonic L90030 IEC / L90029 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S85",
+      "slug": "blower-sonic-s85",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 31,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s85.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-85",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/662010b547b3f9ae318a4581_Blower%20Sonic%2085%20IEC%20RevD_L90033.pdf",
+      "summary": "Blower centrífugo Sonic S85: 100–850 SCFM, 10–15 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S85 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S85 para líneas de secado y blow-off. Aluminio, tensor automático de correa y opciones washdown, ATEX y alta temperatura. Cotización según proceso.",
+      "specs": [
+        ["Modelo", "Sonic 85 — soplante centrífuga"],
+        ["Caudal", "100 a 850 SCFM (170 a 1.445 m³/h)"],
+        ["Presión", "0,5 a 3,75 PSIG (3,4 a 25,8 kPa)"],
+        ["Vacío", "1,0 a 7,0 inHg (34 a 237 mbar)"],
+        ["Motores", "10 / 15 HP"],
+        ["Aire de entrada", "Hasta 52 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "83 a 127 kg"],
+        ["Ficha", "Sonic L90033 IEC / L90032 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S100",
+      "slug": "blower-sonic-s100",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 32,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s100.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-100",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/662010c77b28c29c9ffdd0d6_Blower%20Sonic%20100%20IEC%20RevD_L90017.pdf",
+      "summary": "Blower centrífugo Sonic S100: 100–1.000 SCFM, 15–20 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S100 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S100, el modelo de referencia de la gama para secado industrial y cuchillos de aire. Tensor automático, huella compacta y motores IEC/NEMA.",
+      "specs": [
+        ["Modelo", "Sonic 100 — soplante centrífuga"],
+        ["Caudal", "100 a 1.000 SCFM (170 a 1.700 m³/h)"],
+        ["Presión", "0,5 a 3,5 PSIG (3,4 a 24,1 kPa)"],
+        ["Vacío", "1,0 a 6,6 inHg (34 a 224 mbar)"],
+        ["Motores", "15 / 20 HP"],
+        ["Aire de entrada", "Hasta 52 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "132 a 143 kg"],
+        ["Ficha", "Sonic L90017 IEC / L90016 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S150",
+      "slug": "blower-sonic-s150",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 33,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s150.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-150",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/66201128c95b65f2f2f22656_Blower%20Sonic%20150%20IEC%20RevC_L90019.pdf",
+      "summary": "Blower centrífugo Sonic S150: 100–1.200 SCFM, 20–25 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S150 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S150 de mayor presión y vacío para secado y blow-off exigente. Construcción en aluminio, tensor automático y opciones de bridas o motor hidráulico.",
+      "specs": [
+        ["Modelo", "Sonic 150 — soplante centrífuga"],
+        ["Caudal", "100 a 1.200 SCFM (170 a 2.039 m³/h)"],
+        ["Presión", "0,5 a 4,2 PSIG (3,4 a 28,9 kPa)"],
+        ["Vacío", "1,0 a 8,1 inHg (34 a 274 mbar)"],
+        ["Motores", "20 / 25 HP"],
+        ["Aire de entrada", "Hasta 52 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "142 a 179 kg"],
+        ["Ficha", "Sonic L90019 IEC / L90018 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S200",
+      "slug": "blower-sonic-s200",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 34,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s200.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-200",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/6620115e0ebae30bba99e725_Blower%20Sonic%20200%20IEC%20RevC_L90021.pdf",
+      "summary": "Blower centrífugo Sonic S200 dual paralelo: 200–2.000 SCFM, 25–40 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S200 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S200 de tipo dual paralelo para caudales medios-altos. Tensor automático, aluminio y motores IEC/NEMA de 25 a 40 HP.",
+      "specs": [
+        ["Modelo", "Sonic 200 — dual paralelo"],
+        ["Caudal", "200 a 2.000 SCFM (340 a 3.398 m³/h)"],
+        ["Presión", "0,5 a 3,5 PSIG (3,4 a 24,1 kPa)"],
+        ["Vacío", "1,0 a 6,6 inHg (34 a 224 mbar)"],
+        ["Motores", "25 / 30 / 40 HP"],
+        ["Aire de entrada", "Hasta 40 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "198 a 285 kg"],
+        ["Ficha", "Sonic L90021 IEC / L90020 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S300",
+      "slug": "blower-sonic-s300",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 35,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s300.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-300",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/662011864eaaacc1ab1f9418_Blower%20Sonic%20300%20IEC%20RevD_L90024.pdf",
+      "summary": "Blower centrífugo Sonic S300 dual paralelo: 200–2.400 SCFM, 25–50 HP. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S300 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S300 dual paralelo para el mayor caudal de la serie media. Hasta 50 HP, presión 4,2 PSIG y vacío 8,1 inHg. Cotización según línea.",
+      "specs": [
+        ["Modelo", "Sonic 300 — dual paralelo"],
+        ["Caudal", "200 a 2.400 SCFM (340 a 4.078 m³/h)"],
+        ["Presión", "0,5 a 4,2 PSIG (3,4 a 28,9 kPa)"],
+        ["Vacío", "1,0 a 8,1 inHg (34 a 274 mbar)"],
+        ["Motores", "25 / 30 / 40 / 50 HP"],
+        ["Aire de entrada", "Hasta 40 °C (aire); hasta 205 °C (enfriado por agua)"],
+        ["Peso aprox.", "198 a 311 kg"],
+        ["Ficha", "Sonic L90024 IEC / L90023 NEMA"]
+      ]
+    },
+    {
+      "name": "Blower Sonic S350",
+      "slug": "blower-sonic-s350",
+      "category_slug": "turbinas-soplado",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 36,
+      "is_featured": 1,
+      "image_url": "img/products/blower-sonic-s350.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/sonic-350",
+      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/662011c0052826ac6a5b1bea_Blower%20Sonic%20350%20IEC%20RevD_L90026.pdf",
+      "summary": "Blower centrífugo Sonic S350 de dos etapas: 350–3.500 SCFM, 30–37 kW. Cotización LPAEZSIS Chile.",
+      "seo_title": "Blower Sonic S350 | Cotizar LPAEZsis",
+      "detail": "Blower centrífugo Sonic S350 de dos etapas, el de mayor caudal de la familia. Hasta 3.500 SCFM con motores IEC 30/37 kW. Cotización para líneas de alto volumen.",
+      "specs": [
+        ["Modelo", "Sonic 350 — dos etapas"],
+        ["Caudal", "350 a 3.500 SCFM (595 a 5.946 m³/h)"],
+        ["Presión", "0,5 a 3,5 PSIG (3,4 a 24,1 kPa)"],
+        ["Vacío", "1,0 a 6,6 inHg (34 a 224 mbar)"],
+        ["Motores", "30 / 37 kW (IEC)"],
+        ["Aire de entrada", "Hasta 40 °C; inlet máx. 52 °C"],
+        ["Peso aprox.", "438 a 478 kg"],
+        ["Ficha", "Sonic L90026 IEC / L90025 NEMA Baldor"]
+      ]
+    }
+  ]
+}
