@@ -390,10 +390,34 @@
   };
 
   var DATASHEET_FILES = {
-    "paletizador-nivel-inferior-columbia-fl3000": "img/fichas/ficha_tecnica_fl3000_columbia.pdf",
-    "paletizador-alto-nivel-columbia-hl7200": "img/fichas/ficha_tecnica_hl7200_columbia.pdf",
-    "celda-paletizado-robotico-columbia-ai1800": "img/fichas/ficha_tecnica_ai1800_columbia.pdf",
-    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/ficha_tecnica_fl1000sw_columbia.pdf",
+    "paletizador-nivel-inferior-columbia-fl3000": "img/fichas/paletizador-nivel-inferior-columbia-fl3000.pdf",
+    "paletizador-alto-nivel-columbia-hl7200": "img/fichas/paletizador-alto-nivel-columbia-hl7200.pdf",
+    "celda-paletizado-robotico-columbia-ai1800": "img/fichas/celda-paletizado-robotico-columbia-ai1800.pdf",
+    "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/fichas/paletizador-compacto-envolvedora-columbia-fl1000sw.pdf",
+    "ventiladores-radiales-aluminio-elektror": "img/fichas/ventiladores-radiales-aluminio-elektror.pdf",
+    "ventiladores-radiales-inoxidable-elektror": "img/fichas/ventiladores-radiales-inoxidable-elektror.pdf",
+    "compresores-canal-derivacion-elektror": "img/fichas/compresores-canal-derivacion-elektror.pdf",
+    "rodillos-rollerdrive-interroll": "img/fichas/rodillos-rollerdrive-interroll.pdf",
+    "plataforma-modular-mcp-interroll": "img/fichas/plataforma-modular-mcp-interroll.pdf",
+    "clasificador-sortteq-mcs-interroll": "img/fichas/clasificador-sortteq-mcs-interroll.pdf",
+    "motorizacion-alphastep-az-oriental-motor": "img/fichas/motorizacion-alphastep-az-oriental-motor.pdf",
+    "motores-ca-reductores-oriental-motor": "img/fichas/motores-ca-reductores-oriental-motor.pdf",
+    "ventiladores-axiales-refrigeracion-oriental-motor": "img/fichas/ventiladores-axiales-refrigeracion-oriental-motor.pdf",
+    "encoder-incrementales-eltra": "img/fichas/encoder-incrementales-eltra.pdf",
+    "encoder-absolutos-eltra": "img/fichas/encoder-absolutos-eltra.pdf",
+    "transductores-lineales-eltra": "img/fichas/transductores-lineales-eltra.pdf",
+    "lineas-extrusion-mahesh-twisto": "img/fichas/lineas-extrusion-mahesh-twisto.pdf",
+    "maquinas-cuerda-mahesh-twisto": "img/fichas/maquinas-cuerda-mahesh-twisto.pdf",
+    "twisters-winders-mahesh-twisto": "img/fichas/twisters-winders-mahesh-twisto.pdf",
+    "transportador-tubular-cable-discos-cablevey": "img/fichas/transportador-tubular-cable-discos-cablevey.pdf",
+    "componentes-clave-cablevey": "img/fichas/componentes-clave-cablevey.pdf",
+    "clearvey-cleanvey-cablevey": "img/fichas/clearvey-cleanvey-cablevey.pdf",
+    "vacuum-pumps-apply-italia": "img/fichas/vacuum-pumps-apply-italia.pdf",
+    "master-blower-apply-italia": "img/fichas/master-blower-apply-italia.pdf",
+    "trasporto-pneumatico-apply-italia": "img/fichas/trasporto-pneumatico-apply-italia.pdf",
+    "cinta-doble-contacto-cmc-10730": "img/fichas/cinta-doble-contacto-cmc-10730.pdf",
+    "linea-blueline-movex-bandas-modulares": "img/fichas/linea-blueline-movex-bandas-modulares.pdf",
+    "fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc": "img/fichas/fabricacion-e-integracion-de-cintas-y-sistemas-transportadores-lyc.pdf",
     "blower-sonic-s70": "img/fichas/blower-sonic-s70.pdf",
     "blower-sonic-s85": "img/fichas/blower-sonic-s85.pdf",
     "blower-sonic-s100": "img/fichas/blower-sonic-s100.pdf",
@@ -447,6 +471,8 @@
 
   function resolveDatasheetUrl(product) {
     if (!product) return "";
+    var direct = product.ficha_pdf_url || product.ficha_url || product.datasheet_url || "";
+    if (direct) return String(direct).trim();
     var parsed = parseProductFicha(product.description);
     if (parsed.datasheet) return parsed.datasheet.replace(/^\//, "");
     if (DATASHEET_FILES[product.slug]) return DATASHEET_FILES[product.slug];

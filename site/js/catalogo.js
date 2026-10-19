@@ -533,6 +533,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const webp = knownWebp && !/columbia/i.test(image)
       ? image.replace(/\.(jpe?g|png)$/i, ".webp")
       : "";
+    let ficha =
+      prod.ficha_pdf_url || prod.ficha_url || prod.datasheet_url || "";
+    const fichaMatch = desc.match(/Ficha técnica:\s*(\S+)/i);
+    if (!ficha && fichaMatch) ficha = fichaMatch[1];
+    if (!ficha && window.Lpaez && window.Lpaez.resolveDatasheetUrl) {
+      try {
+        ficha = Lpaez.resolveDatasheetUrl(prod) || "";
+      } catch (_) {
+        ficha = "";
+      }
+    }
     return {
       id: prod.id,
       slug,
@@ -544,6 +555,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       price_clp: prod.price_clp ?? null,
       image_url: image,
       image_webp: webp,
+      ficha_url: ficha,
       category_slug: prod.category_slug || "",
       category_name: prod.category_name || "",
       brand_slug: prod.brand_slug || "",
@@ -614,7 +626,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       `<p class="product-sku"><span class="product-sku__label">SKU / Parte</span> ${escapeHtml(sku)}</p>` +
       `<div class="product-card-actions catalog-card-actions">` +
       `<a class="btn btn-primary btn-sm" href="${escapeAttr(quote)}">Pedir cotización</a>` +
-      `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}">Descargar ficha técnica</button>` +
+      (prod?.ficha_url
+        ? `<a class="btn btn-outline btn-sm" href="${escapeAttr(prod.ficha_url)}" target="_blank" rel="noopener">Ver ficha</a>`
+        : `<button type="button" class="btn btn-outline btn-sm" data-datasheet="${escapeAttr(slug)}" data-datasheet-name="${escapeAttr(name)}" data-datasheet-sku="${escapeAttr(sku)}" data-datasheet-url="">Ver ficha</button>`) +
       `</div></div></article>`
     );
   }
@@ -806,8 +820,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const slug = btn.getAttribute("data-datasheet") || "";
       const name = btn.getAttribute("data-datasheet-name") || "Producto";
       const sku = btn.getAttribute("data-datasheet-sku") || "";
+      const fromAttr = (btn.getAttribute("data-datasheet-url") || "").trim();
+      const found = (Array.isArray(allProducts) ? allProducts : []).find((p) => p && p.slug === slug);
       const datasheetHref =
-        (window.Lpaez && window.Lpaez.resolveDatasheetUrl && window.Lpaez.resolveDatasheetUrl({ slug: slug, description: prod && prod.description })) ||
+        fromAttr ||
+        (found && found.ficha_url) ||
+        (window.Lpaez && window.Lpaez.resolveDatasheetUrl && window.Lpaez.resolveDatasheetUrl(found || { slug: slug })) ||
         "img/fichas/" + encodeURIComponent(slug) + ".pdf";
       datasheetBody.innerHTML =
         `<h3>Ficha técnica</h3><p><strong>${escapeHtml(name)}</strong></p>` +
