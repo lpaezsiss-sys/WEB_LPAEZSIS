@@ -56,6 +56,11 @@ LOCAL_PHOTOS = {
     "paletizador-alto-nivel-columbia-hl7200": "site/img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "site/img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "site/img/productos/fl1000sw.jpg",
+    "bandas-intralox-serie-800": "site/img/products/bandas-intralox-serie-800.jpg",
+    "bandas-intralox-serie-1400": "site/img/products/bandas-intralox-serie-1400.jpg",
+    "bandas-intralox-serie-900": "site/img/products/bandas-intralox-serie-900.jpg",
+    "bandas-intralox-arb": "site/img/products/bandas-intralox-arb.jpg",
+    "bandas-intralox-thermodrive": "site/img/products/bandas-intralox-thermodrive.jpg",
 }
 
 
@@ -79,7 +84,7 @@ def parse_ficha(raw: str) -> tuple[str, list[tuple[str, str]]]:
                 continue
             key, val = cleaned.split(":", 1)
             key, val = key.strip(), val.strip()
-            if key.lower() == "ficha" or not key or not val:
+            if key.lower() in {"ficha", "fuente"} or not key or not val:
                 continue
             specs.append((key, val))
     else:

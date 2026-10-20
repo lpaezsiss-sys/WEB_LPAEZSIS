@@ -439,6 +439,11 @@
     "impeller-sonic-70-100": "img/fichas/impeller-sonic-70-100.pdf",
     "impeller-sonic-85-150": "img/fichas/impeller-sonic-85-150.pdf",
     "tensor-correa-sonic-todos-los-modelos": "img/fichas/tensor-correa-sonic-todos-los-modelos.pdf",
+    "bandas-intralox-serie-800": "img/fichas/bandas-intralox-serie-800.pdf",
+    "bandas-intralox-serie-1400": "img/fichas/bandas-intralox-serie-1400.pdf",
+    "bandas-intralox-serie-900": "img/fichas/bandas-intralox-serie-900.pdf",
+    "bandas-intralox-arb": "img/fichas/bandas-intralox-arb.pdf",
+    "bandas-intralox-thermodrive": "img/fichas/bandas-intralox-thermodrive.pdf",
   };
 
   function parseProductFicha(raw) {
