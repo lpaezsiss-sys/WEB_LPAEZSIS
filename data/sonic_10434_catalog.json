@@ -28,22 +28,53 @@
       "sort_order": 25,
       "is_featured": 1,
       "image_url": "img/products/A07-10434.jpg",
-      "datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/6620150a51b45e893d42b2be_Hose%20Flex%20Neoprene%20RevD_L90063.pdf",
+      "datasheet": "/img/fichas/flexible-neopreno-3-12pies-sonic.pdf",
       "summary": "Flexible de neopreno Sonic Air Systems Ø3\" x 12 pies (Cod 10434). Repuesto original en stock LPAEZSIS.",
       "seo_title": "Flexible de Neopreno Ø3\" x 12 pies Cod 10434 | LPAEZsis",
       "detail": "Flexible de neopreno Ø3\" x 12 pies Sonic Air Systems (Cod 10434)",
       "specs": [
-        ["P/N Sonic", "10434 — Hose-3\" ID Flex Neoprene"],
-        ["Material", "Fibra de vidrio recubierta de neopreno"],
-        ["Diámetro interior", "3.0 in / 76 mm"],
-        ["Largo", "12 pies (144.0 in / 3,65 m)"],
-        ["Temperatura", "−54 °C a 149 °C (−65 °F a 300 °F)"],
-        ["Presión máxima", "29 psi (200 kPa)"],
-        ["Radio de curvatura mínimo", "2.13 in / 54 mm"],
-        ["Peso aproximado", "0.361 lb / 0,16 kg"],
-        ["Extremos", "Puños moldeados y abrazaderas"],
-        ["Ficha", "Sonic L90063 Rev D (12/2022)"]
-      ]
+        [
+          "P/N Sonic",
+          "10434 — Hose-3\" ID Flex Neoprene"
+        ],
+        [
+          "Material",
+          "Fibra de vidrio recubierta de neopreno"
+        ],
+        [
+          "Diámetro interior",
+          "3.0 in / 76 mm"
+        ],
+        [
+          "Largo",
+          "12 pies (144.0 in / 3,65 m)"
+        ],
+        [
+          "Temperatura",
+          "−54 °C a 149 °C (−65 °F a 300 °F)"
+        ],
+        [
+          "Presión máxima",
+          "29 psi (200 kPa)"
+        ],
+        [
+          "Radio de curvatura mínimo",
+          "2.13 in / 54 mm"
+        ],
+        [
+          "Peso aproximado",
+          "0.361 lb / 0,16 kg"
+        ],
+        [
+          "Extremos",
+          "Puños moldeados y abrazaderas"
+        ],
+        [
+          "Ficha",
+          "Sonic L90063 Rev D (12/2022)"
+        ]
+      ],
+      "manufacturer_datasheet": "https://cdn.prod.website-files.com/653337fdcb7b49b9d946a042/6620150a51b45e893d42b2be_Hose%20Flex%20Neoprene%20RevD_L90063.pdf"
     }
   ]
 }
