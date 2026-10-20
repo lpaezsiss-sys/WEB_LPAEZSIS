@@ -1,0 +1,35 @@
+{
+  "note": "Fotos publicadas por Movex S.p.A. No son renders inventados ni fotos de stock genéricas.",
+  "images": [
+    {
+      "local_path": "site/img/products/pfx-movex.jpg",
+      "product": "pfx-movex",
+      "source_title": "Movex PFX — Not just a Color (ENG)",
+      "source_url": "https://wpbackend.movexii.com/wp-content/uploads/2024/11/Movex_PFX_Not-Just-a-Color_ENG.pdf",
+      "shows": "Fotografía de línea con banda/cadena naranja fluorescente PFX"
+    },
+    {
+      "local_path": "site/img/products/blulub-movex.jpg",
+      "product": "blulub-movex",
+      "source_title": "Movex BluLub Material",
+      "source_url": "https://wpbackend.movexii.com/wp-content/uploads/2026/07/Movex-BluLub-Material.pdf",
+      "shows": "Fotografía de curva/guía BluLub® con botellas (portada del folleto oficial)"
+    },
+    {
+      "local_path": "site/img/products/zero-contact-movex.jpg",
+      "product": "zero-contact-movex",
+      "source_title": "Zero Contact — ficha de producto Movex",
+      "source_url": "https://www.movexii.com/en/p/modular-solutions/zero-contact",
+      "asset": "https://movexps.publifarm.com/img/p/1/1/2/3/8/11238-large_default.jpg",
+      "shows": "Curva Zero Contact™ oficial (marco inox, banda RAL 5014)"
+    },
+    {
+      "local_path": "site/img/products/zero-atp-pro-movex.jpg",
+      "product": "zero-atp-pro-movex",
+      "source_title": "Zero ATP PRO — ficha de producto Movex",
+      "source_url": "https://www.movexii.com/en/p/modular-solutions/zero-atp-pro",
+      "asset": "https://movexps.publifarm.com/img/p/1/1/2/4/7/11247-large_default.jpg",
+      "shows": "Placa Zero ATP® Pro oficial con banda micropitch y laterales AISI 304"
+    }
+  ]
+}
