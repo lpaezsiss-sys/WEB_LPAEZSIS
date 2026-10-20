@@ -65,6 +65,9 @@ LOCAL_PHOTOS = {
     "blulub-movex": "site/img/products/blulub-movex.jpg",
     "zero-contact-movex": "site/img/products/zero-contact-movex.jpg",
     "zero-atp-pro-movex": "site/img/products/zero-atp-pro-movex.jpg",
+    "secado-frutas-sonic": "site/img/products/secado-frutas-sonic.jpg",
+    "smart-tunnel-sonic": "site/img/products/smart-tunnel-sonic.jpg",
+    "secado-estanques-sonic": "site/img/products/secado-estanques-sonic.jpg",
 }
 
 
@@ -143,7 +146,7 @@ def draw_leaflet(path: Path, product: dict, photo: bytes | None) -> None:
     mode = "COMPRAR" if product.get("sale_mode") == "buy" else "COTIZAR"
     sku = ""
     m = re.search(
-        r"Cod(?:igo)?\s*([A-Z0-9.\-]+)",
+        r"(?:C[oó]digo(?:\s*/\s*P/?N)?|Cod\.)\s+([A-Z0-9][A-Z0-9.\-]{2,})",
         detail + " " + (product.get("description") or ""),
         re.I,
     )
@@ -254,6 +257,13 @@ def load_products() -> list[dict]:
 
 
 def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--slugs", default="", help="Comma-separated slugs; empty = all branded products")
+    args = parser.parse_args()
+    only = {s.strip() for s in args.slugs.split(",") if s.strip()}
+
     register_fonts()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     tmp = ROOT / ".tmp" / "leaflet-photos"
@@ -262,6 +272,8 @@ def main() -> None:
     skipped = []
     for prod in load_products():
         slug = prod.get("slug") or ""
+        if only and slug not in only:
+            continue
         img = (prod.get("image_url") or "").strip()
         if not img:
             print("skip no photo", slug)

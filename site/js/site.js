@@ -448,6 +448,9 @@
     "blulub-movex": "img/fichas/blulub-movex.pdf",
     "zero-contact-movex": "img/fichas/zero-contact-movex.pdf",
     "zero-atp-pro-movex": "img/fichas/zero-atp-pro-movex.pdf",
+    "secado-frutas-sonic": "img/fichas/secado-frutas-sonic.pdf",
+    "smart-tunnel-sonic": "img/fichas/smart-tunnel-sonic.pdf",
+    "secado-estanques-sonic": "img/fichas/secado-estanques-sonic.pdf",
   };
 
   function parseProductFicha(raw) {

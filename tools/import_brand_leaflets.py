@@ -23,11 +23,14 @@ SKIP_NAMES = {
 
 
 def leaflet_files() -> dict[str, Path]:
+    only = {s.strip() for s in os.environ.get("LEAFLET_SLUGS", "").split(",") if s.strip()}
     files = {}
     for path in sorted(FICHAS.glob("*.pdf")):
         if path.name.startswith(SKIP_PREFIXES):
             continue
         if path.stat().st_size < 8000:
+            continue
+        if only and path.stem not in only:
             continue
         files[path.stem] = path
     return files
@@ -93,7 +96,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--api", default=DEFAULT_API)
+    parser.add_argument("--slugs", default="", help="Comma-separated slugs; empty = all leaflet PDFs")
     args = parser.parse_args()
+    if args.slugs:
+        os.environ["LEAFLET_SLUGS"] = args.slugs
     if not args.live:
         print_draft()
         return
