@@ -444,6 +444,10 @@
     "bandas-intralox-serie-900": "img/fichas/bandas-intralox-serie-900.pdf",
     "bandas-intralox-arb": "img/fichas/bandas-intralox-arb.pdf",
     "bandas-intralox-thermodrive": "img/fichas/bandas-intralox-thermodrive.pdf",
+    "pfx-movex": "img/fichas/pfx-movex.pdf",
+    "blulub-movex": "img/fichas/blulub-movex.pdf",
+    "zero-contact-movex": "img/fichas/zero-contact-movex.pdf",
+    "zero-atp-pro-movex": "img/fichas/zero-atp-pro-movex.pdf",
   };
 
   function parseProductFicha(raw) {

@@ -1,0 +1,122 @@
+{
+  "brand": {
+    "name": "MOVEX",
+    "slug": "movex",
+    "existing": true,
+    "live_id": 3
+  },
+  "categories": [
+    {
+      "name": "Bandas Modulares / Higiene Alimentaria",
+      "slug": "bandas-modulares-higiene",
+      "existing": true,
+      "live_id": 13
+    },
+    {
+      "name": "Transportadores y Manejo de Materiales / Soluciones de Envasado",
+      "slug": "transportadores-manejo-materiales",
+      "existing": true,
+      "live_id": 11
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotos oficiales Movex S.p.A.: folleto PFX, folleto BluLub Material y fichas de producto Zero Contact / Zero ATP Pro (movexii.com).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "PFX MOVEX",
+      "slug": "pfx-movex",
+      "sku": "MOVEX-PFX",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 70,
+      "is_featured": 1,
+      "image_url": "img/products/pfx-movex.jpg",
+      "product_url": "https://wpbackend.movexii.com/wp-content/uploads/2024/11/Movex_PFX_Not-Just-a-Color_ENG.pdf",
+      "summary": "Material MOVEX PFX (PBT) para cadenas y bandas en seco o con poca lubricación. Cotización LPAEZSIS Chile.",
+      "seo_title": "PFX MOVEX | Cotizar LPAEZsis",
+      "detail": "PFX es el material extra performance de Movex S.p.A. (PBT con aditivos, patente Movex) para cadenas y bandas que corren en seco o con lubricación limitada, a alta velocidad. Color naranja fluorescente. Certificado para contacto alimentario. Reduce la fricción cadena–producto y cadena–wearstrip y limita el dusting.",
+      "specs": [
+        ["Material", "PBT con aditivos — patente Movex S.p.A."],
+        ["Color", "Naranja fluorescente"],
+        ["Uso", "Alta velocidad, seco o lubricación limitada"],
+        ["Temperatura", "Seco −40 a 120 °C; húmedo −40 a 60 °C"],
+        ["Contacto alimentario", "Certificado (ficha PFX Movex)"],
+        ["Fricción seca", "vs PET 0,10; vs UHMW-PE / BluLub® 0,12"]
+      ]
+    },
+    {
+      "name": "BluLub® MOVEX",
+      "slug": "blulub-movex",
+      "sku": "MOVEX-BLULUB",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 71,
+      "is_featured": 1,
+      "image_url": "img/products/blulub-movex.jpg",
+      "product_url": "https://wpbackend.movexii.com/wp-content/uploads/2026/07/Movex-BluLub-Material.pdf",
+      "summary": "Material MOVEX BluLub® (UHMW-PE con lubricantes sólidos) para curvas, perfiles y nosebars. Cotización LPAEZSIS Chile.",
+      "seo_title": "BluLub MOVEX | Cotizar LPAEZsis",
+      "detail": "BluLub® (también citado como BlueLube) es el UHMW-PE de alto desempeño de Movex, con lubricantes sólidos, para piezas extruidas, mecanizadas y moldeadas: curvas, perfiles, nosebars y componentes. Baja fricción, menor ruido y menor consumo de energía en seco o con poca lubricación. Ensayos publicados con la Universidad Técnica de Chemnitz.",
+      "specs": [
+        ["Material", "UHMW-PE con lubricantes sólidos"],
+        ["Densidad molecular", "9.200.000 g/mol"],
+        ["Temperatura", "−40 a +80 °C (−40 a 176 °F)"],
+        ["Dilatación lineal", "2×10⁻⁴ °C⁻¹"],
+        ["Aplicaciones", "Curvas, perfiles extruidos, nosebars, piezas moldeadas"],
+        ["Uso", "Alta velocidad y/o alta carga, seco o lubricación limitada"]
+      ]
+    },
+    {
+      "name": "Zero Contact™ MOVEX",
+      "slug": "zero-contact-movex",
+      "sku": "MOVEX-ZERO-CONTACT",
+      "category_slug": "transportadores-manejo-materiales",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 72,
+      "is_featured": 1,
+      "image_url": "img/products/zero-contact-movex.jpg",
+      "product_url": "https://www.movexii.com/en/p/modular-solutions/zero-contact",
+      "summary": "Curva modular MOVEX Zero Contact™ de radio fijo, superficie cerrada. Cotización LPAEZSIS Chile.",
+      "seo_title": "Zero Contact MOVEX | Cotizar LPAEZsis",
+      "detail": "Zero Contact™ es la curva de radio fijo de Movex, con banda modular de paso pequeño y superficie cerrada (0 % abierta). Conecta con transportadores rectos, transferencias cortas y radio interior compacto. Aprobada FDA para alimentos y bebidas. Maneja envases de distinto tamaño, incluidos productos delicados a la salida de encogido.",
+      "specs": [
+        ["Tipo", "Curva de radio fijo, banda modular Flat Top"],
+        ["Radio interior", "600 a 2.000 mm (23,6 a 78,7 in)"],
+        ["Ancho de banda", "200 a 1.600 mm (7,9 a 63 in)"],
+        ["Módulos", "Acetal (POM), color RAL 5014; pasadores PBT blanco"],
+        ["Carga máx.", "13.500 N/m (924 lb/ft)"],
+        ["Ángulo / área abierta", "15° a 360° · 0 % abierta"],
+        ["Temperatura", "Seco −40 a 80 °C; húmedo −40 a 65 °C"]
+      ]
+    },
+    {
+      "name": "Zero ATP® Pro MOVEX",
+      "slug": "zero-atp-pro-movex",
+      "sku": "MOVEX-ZERO-ATP-PRO",
+      "category_slug": "transportadores-manejo-materiales",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 73,
+      "is_featured": 1,
+      "image_url": "img/products/zero-atp-pro-movex.jpg",
+      "product_url": "https://www.movexii.com/en/p/modular-solutions/zero-atp-pro",
+      "summary": "Placa de transferencia activa MOVEX Zero ATP® Pro, micropitch 510. Cotización LPAEZSIS Chile.",
+      "seo_title": "Zero ATP Pro MOVEX | Cotizar LPAEZsis",
+      "detail": "Zero ATP® Pro es la placa de transferencia activa compacta de Movex, con banda modular micropitch serie 510 FT. Une transportadores con transferencia corta, sin tensado y sin mantenimiento. Versión A con mini motor interno o versión B con eje chavetero. Marco lateral AISI 304.",
+      "specs": [
+        ["Tipo", "Placa de transferencia activa (patente Movex)"],
+        ["Banda", "Micropitch 510 FT"],
+        ["Ancho", "6 a 24 in (más anchos bajo consulta)"],
+        ["Largo de transferencia", "80 mm o 150 mm"],
+        ["Carga máx.", "3.000 N/m"],
+        ["Materiales de banda", "LFA, MX o LFB"],
+        ["Mini motor (A)", "6 a 15 V DC; hasta 14,7 m/min; −10 a +60 °C"]
+      ]
+    }
+  ]
+}

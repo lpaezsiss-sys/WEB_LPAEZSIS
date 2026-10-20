@@ -61,6 +61,10 @@ LOCAL_PHOTOS = {
     "bandas-intralox-serie-900": "site/img/products/bandas-intralox-serie-900.jpg",
     "bandas-intralox-arb": "site/img/products/bandas-intralox-arb.jpg",
     "bandas-intralox-thermodrive": "site/img/products/bandas-intralox-thermodrive.jpg",
+    "pfx-movex": "site/img/products/pfx-movex.jpg",
+    "blulub-movex": "site/img/products/blulub-movex.jpg",
+    "zero-contact-movex": "site/img/products/zero-contact-movex.jpg",
+    "zero-atp-pro-movex": "site/img/products/zero-atp-pro-movex.jpg",
 }
 
 
