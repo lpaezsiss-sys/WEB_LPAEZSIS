@@ -1,0 +1,36 @@
+{
+  "note": "Fotos publicadas por Columbia Machine y Columbia/Okura LLC. No son renders inventados ni fotos de stock genéricas (Shutterstock/iStock omitidos).",
+  "images": [
+    {
+      "local_path": "site/img/products/minipal-columbia.jpg",
+      "product": "minipal-columbia",
+      "source_title": "Cutsheet miniPAL® 10 — Columbia/Okura",
+      "source_url": "https://columbiaokura.com/wp-content/uploads/2024/10/Cutsheet-miniPAL10_10.02.24_white.pdf",
+      "shows": "Celda miniPAL® en stand con cajas Columbia/Okura y panel miniPAL®"
+    },
+    {
+      "local_path": "site/img/products/pintura-columbia.jpg",
+      "product": "pintura-columbia",
+      "source_title": "Featured Industries · Paint — Columbia Machine",
+      "source_url": "https://palletizing.com/",
+      "asset": "https://palletizing.com/wp-content/uploads/2026/03/paint.jpeg",
+      "shows": "Latas de pintura publicadas en la tarjeta oficial de industria Paint"
+    },
+    {
+      "local_path": "site/img/products/empacado-fresco-columbia.jpg",
+      "product": "empacado-fresco-columbia",
+      "source_title": "Featured Industries · Fresh-Packed Produce — Columbia Machine",
+      "source_url": "https://palletizing.com/",
+      "asset": "https://palletizing.com/wp-content/uploads/2026/03/produce.jpeg",
+      "shows": "Caja de manzanas publicada en la tarjeta oficial de industria Fresh-Packed Produce"
+    },
+    {
+      "local_path": "site/img/products/quimica-columbia.jpg",
+      "product": "quimica-columbia",
+      "source_title": "Chemicals & Petrochemicals — galería Columbia/Okura",
+      "source_url": "https://columbiaokura.com/industry/chemicals-petrochemicals/",
+      "asset": "https://columbiaokura.com/wp-content/uploads/2024/06/DSC05093.jpg",
+      "shows": "Robot Columbia paletizando sacos en celda con jaula y rodillos"
+    }
+  ]
+}

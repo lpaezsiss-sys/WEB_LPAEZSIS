@@ -1,0 +1,123 @@
+{
+  "brand": {
+    "name": "Columbia Machine",
+    "slug": "columbia-machine",
+    "existing": true,
+    "live_id": 9
+  },
+  "categories": [
+    {
+      "name": "Paletizado Robótico / Células de Automatización",
+      "slug": "paletizado-robotico",
+      "existing": true,
+      "live_id": 9
+    },
+    {
+      "name": "Paletizado Convencional / Final de Línea",
+      "slug": "paletizado-convencional",
+      "existing": true,
+      "live_id": 7
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotos publicadas por Columbia/Okura y Columbia Machine: hero del cutsheet miniPAL® 10, tarjetas Featured Industries Paint y Fresh-Packed Produce (palletizing.com) y foto de celda robótica DSC05093 (columbiaokura.com).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "MINIPAL Columbia",
+      "slug": "minipal-columbia",
+      "category_slug": "paletizado-robotico",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 90,
+      "is_featured": 1,
+      "image_url": "img/products/minipal-columbia.jpg",
+      "product_url": "https://columbiaokura.com/products/collaborative-robots/",
+      "summary": "Paletizador colaborativo Columbia/Okura miniPAL® para cajas, charolas, bultos y bolsas. Cotización LPAEZSIS Chile.",
+      "seo_title": "MINIPAL Columbia | Cotizar LPAEZsis",
+      "detail": "miniPAL® es la familia de paletizadores colaborativos de Columbia/Okura LLC, publicada desde 2019. Trabaja junto a operadores (force limiting, escáneres de área y radar), con software de patrones Pally® de Rocketfarm® y garantía de un año. Aplicaciones publicadas: cajas, spot packs, charolas, bultos y bolsas plásticas. Modelos 10, 20 y 30.",
+      "specs": [
+        ["Tipo", "Paletizador robótico colaborativo miniPAL® (Columbia/Okura)"],
+        ["Modelos", "miniPAL® 10, 20 y 30 (desde 2019)"],
+        ["Aplicaciones", "Cajas, spot packs, charolas, bultos y bolsas plásticas"],
+        ["Software / garantía", "Pally® de Rocketfarm® · 1 año"],
+        ["miniPAL 10", "Carga combinada 10 kg / 22 lb; hasta 8 cpm; huella 8′×10′; 2 pallets"],
+        ["miniPAL 10 (cutsheet)", "5–8 picks/min; alcance 1300 mm / 51 in; altura 2130 mm / 84 in"],
+        ["miniPAL 20", "Carga combinada 25 kg / 55 lb; 6–28 cajas/min; huella 10′×11′"],
+        ["miniPAL 20 (cutsheet)", "Altura 80″ (opc. 110″); pallet 48×48; 2×110 V 1PH 20 A; 80 psi 15 SCFM"],
+        ["miniPAL 30", "Capacidad 66 lb; alcance 51 in"],
+        ["Cabezal", "Vacío y clamp"]
+      ]
+    },
+    {
+      "name": "Pintura Columbia",
+      "slug": "pintura-columbia",
+      "category_slug": "paletizado-convencional",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 91,
+      "is_featured": 1,
+      "image_url": "img/products/pintura-columbia.jpg",
+      "product_url": "https://palletizing.com/",
+      "summary": "Paletizado convencional Columbia para cajas pesadas de pintura, aerosoles y bultos en shrink. Cotización LPAEZSIS Chile.",
+      "seo_title": "Pintura Columbia | Cotizar LPAEZsis",
+      "detail": "Columbia publica paletizadores para la industria de pintura (Featured Industries · Paint). Están pensados para cajas pesadas de pintura, aerosoles y empaque en shrink bundle, con sistemas convencionales que mantienen consistencia de estiba, integridad del producto y throughput en ambientes industriales. El fabricante no publica una cadencia específica para esta industria.",
+      "specs": [
+        ["Tipo", "Paletizado convencional Columbia para pintura"],
+        ["Empaques publicados", "Cajas pesadas de pintura, aerosoles y bultos en shrink"],
+        ["Sistemas", "Paletizadores convencionales Columbia"],
+        ["Estiba", "Consistencia de apilado publicada por el fabricante"],
+        ["Producto", "Protección de la integridad del envase"],
+        ["Producción", "Throughput dependiente de la línea (sin CPM publicado para pintura)"]
+      ]
+    },
+    {
+      "name": "Empacado Fresco Columbia",
+      "slug": "empacado-fresco-columbia",
+      "category_slug": "paletizado-convencional",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 92,
+      "is_featured": 1,
+      "image_url": "img/products/empacado-fresco-columbia.jpg",
+      "product_url": "https://palletizing.com/",
+      "summary": "Paletizado convencional Columbia para cajas de produce, RPC y totes en empacado fresco. Cotización LPAEZSIS Chile.",
+      "seo_title": "Empacado Fresco Columbia | Cotizar LPAEZsis",
+      "detail": "Columbia publica paletizadores para Fresh-Packed Produce. Manejan cajas de produce, RPC y totes con control suave y precisión de estiba estable. Los sistemas convencionales protegen la calidad del producto, mantienen el throughput y entregan desempeño consistente en operaciones de empacado fresco. El fabricante no publica una cadencia específica para esta industria.",
+      "specs": [
+        ["Tipo", "Paletizado convencional Columbia para produce fresco"],
+        ["Empaques publicados", "Cajas de produce, RPC y totes"],
+        ["Manejo", "Control suave y estiba estable"],
+        ["Sistemas", "Paletizadores convencionales Columbia"],
+        ["Calidad", "Protección de la calidad del producto"],
+        ["Uso", "Operaciones de empacado fresco"]
+      ]
+    },
+    {
+      "name": "Química Columbia",
+      "slug": "quimica-columbia",
+      "category_slug": "paletizado-robotico",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 93,
+      "is_featured": 1,
+      "image_url": "img/products/quimica-columbia.jpg",
+      "product_url": "https://columbiaokura.com/industry/chemicals-petrochemicals/",
+      "summary": "Paletizado Columbia/Okura para química y petroquímica: sacos, cajas, charolas y baldes. Cotización LPAEZSIS Chile.",
+      "seo_title": "Química Columbia | Cotizar LPAEZsis",
+      "detail": "Columbia publica paletizado para Chemical (estiba segura, colocación precisa y throughput) y Columbia/Okura para Chemicals & Petrochemicals. Soporta aceite de motor, pallets de resina y fertilizantes, en sacos, charolas, cajas y baldes. Ante materiales corrosivos o peligrosos el fabricante indica que un paletizador convencional no es adecuado y entrega robots a medida (pinturas, cableado y ventilación de tablero). Los tambores pueden requerir un brazo heavy-duty. No publica una cadencia numérica para esta industria.",
+      "specs": [
+        ["Tipo", "Paletizado Columbia/Okura para química y petroquímica"],
+        ["Productos publicados", "Aceite de motor, pallets de resina y fertilizantes"],
+        ["Empaques", "Sacos, charolas, cajas y baldes (pails)"],
+        ["Sacos", "Open-mouth, valve, FFS y bulk, entre otros"],
+        ["Cajas", "Wrap around, RSC, harness y HSC, entre otras"],
+        ["Convencional", "No apto ante corrosivos/peligrosos; robots a medida"],
+        ["Personalización", "Pinturas, cableado y ventilación de tablero según producto"],
+        ["Tambores", "Pueden requerir brazo heavy-duty"],
+        ["Beneficios publicados", "Estiba segura, colocación precisa, throughput y seguridad"]
+      ]
+    }
+  ]
+}

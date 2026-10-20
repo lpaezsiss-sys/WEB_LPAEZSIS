@@ -451,6 +451,10 @@
     "secado-frutas-sonic": "img/fichas/secado-frutas-sonic.pdf",
     "smart-tunnel-sonic": "img/fichas/smart-tunnel-sonic.pdf",
     "secado-estanques-sonic": "img/fichas/secado-estanques-sonic.pdf",
+    "minipal-columbia": "img/fichas/minipal-columbia.pdf",
+    "pintura-columbia": "img/fichas/pintura-columbia.pdf",
+    "empacado-fresco-columbia": "img/fichas/empacado-fresco-columbia.pdf",
+    "quimica-columbia": "img/fichas/quimica-columbia.pdf",
   };
 
   function parseProductFicha(raw) {
