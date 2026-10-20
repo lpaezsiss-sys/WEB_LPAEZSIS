@@ -68,6 +68,10 @@ LOCAL_PHOTOS = {
     "secado-frutas-sonic": "site/img/products/secado-frutas-sonic.jpg",
     "smart-tunnel-sonic": "site/img/products/smart-tunnel-sonic.jpg",
     "secado-estanques-sonic": "site/img/products/secado-estanques-sonic.jpg",
+    "minipal-columbia": "site/img/products/minipal-columbia.jpg",
+    "pintura-columbia": "site/img/products/pintura-columbia.jpg",
+    "empacado-fresco-columbia": "site/img/products/empacado-fresco-columbia.jpg",
+    "quimica-columbia": "site/img/products/quimica-columbia.jpg",
 }
 
 
