@@ -230,7 +230,7 @@ def draw_leaflet(path: Path, product: dict, photo: bytes | None) -> None:
     c.rect(0, 0, w, 18 * mm, fill=1, stroke=0)
     c.setFillColor(white)
     c.setFont("Sans", 7.4)
-    c.drawString(m_l, 10.2 * mm, "Fuente: datos y foto publicados del fabricante. Sin datos inventados.")
+    c.drawString(m_l, 10.2 * mm, "Fuente: datos y foto publicados del fabricante.")
     c.drawString(m_l, 6.2 * mm, "LPAEZSIS · Chile · www.lpaezsis.cl · Cotización o compra según producto.")
     c.setFont("Sans", 7)
     c.drawRightString(w - m_r, 8 * mm, slug[:42])

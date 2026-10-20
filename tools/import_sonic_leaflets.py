@@ -29,7 +29,7 @@ def leaflet_files() -> dict[str, Path]:
 
 
 def print_draft() -> None:
-    print("=== BORRADOR LEAFLETS SONIC (1 página, foto oficial, sin inventar) ===")
+    print("=== BORRADOR LEAFLETS SONIC (1 página, foto oficial) ===")
     for slug, path in leaflet_files().items():
         print(f"{slug} -> {path.relative_to(ROOT)} ({path.stat().st_size} bytes)")
     print("Para publicar: CONFIRM_LIVE_SONIC_LEAFLETS=yes python3 tools/import_sonic_leaflets.py --live")

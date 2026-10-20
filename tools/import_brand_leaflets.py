@@ -55,7 +55,7 @@ def set_datasheet_line(description: str, url: str) -> str:
 
 
 def print_draft() -> None:
-    print("=== BORRADOR LEAFLETS DE MARCA (1 página, foto real, sin inventar) ===")
+    print("=== BORRADOR LEAFLETS DE MARCA (1 página, foto real) ===")
     for slug, path in leaflet_files().items():
         print(f"{slug} -> {path.relative_to(ROOT)} ({path.stat().st_size} bytes)")
         print("   url", public_url(path))
