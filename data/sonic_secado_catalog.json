@@ -1,0 +1,90 @@
+{
+  "brand": {
+    "name": "Sonic Air Systems",
+    "slug": "sonic-air-systems",
+    "existing": true,
+    "live_id": 1
+  },
+  "categories": [
+    {
+      "name": "Secadores de Envases",
+      "slug": "secadores",
+      "existing": true,
+      "live_id": 1
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotos publicadas por Sonic Air Systems: cuchillo XE en línea de arándanos (página Food & Beverage), galería SMART Air Knife Tunnel y foto de estudio DRY-IN-PLACE® (páginas de producto sonicairsystems.com).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Secado de Frutas Sonic",
+      "slug": "secado-frutas-sonic",
+      "category_slug": "secadores",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 80,
+      "is_featured": 1,
+      "image_url": "img/products/secado-frutas-sonic.jpg",
+      "product_url": "https://www.sonicairsystems.com/case-study/setting-the-standard-for-avocado-drying-systems",
+      "summary": "Sistema Air Knife Sonic para soplado y secado de fruta tras el lavado. Cotización LPAEZSIS Chile.",
+      "seo_title": "Secado de Frutas Sonic | Cotizar LPAEZsis",
+      "detail": "Los sistemas Sonic Air Knife se publican como estándar de industria para el soplado de agua y el secado de cítricos, fruta de carozo y palta, para limpieza, apariencia, etiquetado y vida útil. Cada equipo se adapta al estilo, la velocidad y el ancho del transportador. Lo impulsan soplantes centrífugos Sonic de 3 a 50 HP (2 a 37 kW). En rodajas de manzana y pera el fabricante publica además el Sanitary Cold Air Knife con Cool-Air™ a 55 °F (12,8 °C) y filtro HEPA.",
+      "specs": [
+        ["Tipo", "Sistema Air Knife para soplado y secado de fruta"],
+        ["Aplicaciones publicadas", "Cítricos, fruta de carozo y palta"],
+        ["Soplantes", "3 a 50 HP (2 a 37 kW)"],
+        ["Configuración", "A medida según transportador, velocidad y ancho"],
+        ["Uso publicado", "Limpieza, apariencia, etiquetado y vida útil"],
+        ["Variante publicada", "Cold Air Knife + Cool-Air™ 55 °F (12,8 °C) y HEPA para rodajas de manzana y pera"]
+      ]
+    },
+    {
+      "name": "Smart Tunnel Sonic",
+      "slug": "smart-tunnel-sonic",
+      "category_slug": "secadores",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 81,
+      "is_featured": 1,
+      "image_url": "img/products/smart-tunnel-sonic.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/air-knife-tunnel-and-enclosure",
+      "summary": "Túnel modular SMART Air Knife de Sonic para secado de botellas y latas. Cotización LPAEZSIS Chile.",
+      "seo_title": "Smart Tunnel Sonic | Cotizar LPAEZsis",
+      "detail": "El SMART Air Knife Tunnel (SMART Tunnel Dryer) de Sonic es un túnel modular de acero inoxidable con módulos atornillables. Integra soplante y cuchillos de aire para secar botellas y latas antes de inspección, marcaje, etiquetado o empaque, de 100 a 1.500 productos por minuto. El enclosure del soplante va remoto. No requiere taladrar el transportador, salvo recortes de laterales.",
+      "specs": [
+        ["Tipo", "Túnel modular SMART Air Knife + enclosure remoto"],
+        ["Módulos estándar", "24 in (610 mm), 48 in (1.219 mm), 72 in (1.829 mm) y 96 in (2.438 mm)"],
+        ["En alimentos", "El fabricante indica expandible de 24 a 144 in (61 a 366 cm)"],
+        ["Cadencia", "100 a 1.500 productos/min"],
+        ["Ruido", "Reducción 7–10 dBA; opción <80 dBA"],
+        ["Contención", "Bandejas de goteo selladas; diseño aerodinámico para no remojar"],
+        ["Montaje", "Sin taladrar el transportador, salvo recortes de laterales"]
+      ]
+    },
+    {
+      "name": "Secado Estanques Sonic (DRY-IN-PLACE®)",
+      "slug": "secado-estanques-sonic",
+      "category_slug": "secadores",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 82,
+      "is_featured": 1,
+      "image_url": "img/products/secado-estanques-sonic.jpg",
+      "product_url": "https://www.sonicairsystems.com/products/dry-in-place-tank-dryer-patented",
+      "summary": "Secador de estanques Sonic DRY-IN-PLACE®, aire caliente sin calefactor. Cotización LPAEZSIS Chile.",
+      "seo_title": "Secado Estanques Sonic DRY-IN-PLACE | Cotizar LPAEZsis",
+      "detail": "El DRY-IN-PLACE® Tank Dryer de Sonic es un sistema patentado plug-and-play para secar estanques, totes, tambores, mezcladores, IBC, hoppers, barriles y tuberías con aire caliente de compresión, sin calefactor tradicional. Entrega caudales altos a 150–275 °F (66–135 °C). Potencias de 7,5 a 50 HP (5,5 a 37 kW). En New Century Snacks, un tote de 64 ft³ pasó de más de 8 horas a menos de 30 minutos con aire HEPA a unos 160 °F.",
+      "specs": [
+        ["Tipo", "DRY-IN-PLACE® Tank Dryer (patentado)"],
+        ["Temperatura de aire", "150 a 275 °F (66 a 135 °C), calor de compresión"],
+        ["Potencia", "7,5 a 50 HP (5,5 a 37 kW)"],
+        ["Presión", "1 a 2 psig sobre el producto"],
+        ["Aplicaciones", "Estanques, totes, tambores, mezcladores, IBC, hoppers, barriles y tuberías"],
+        ["Opciones", "HEPA en línea, carro portátil, monitoreo predictivo"],
+        ["Caso publicado", "Tote 64 ft³: de más de 8 h a menos de 30 min (~160 °F con HEPA)"]
+      ]
+    }
+  ]
+}

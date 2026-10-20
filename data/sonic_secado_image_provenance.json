@@ -1,0 +1,29 @@
+{
+  "note": "Fotos publicadas por Sonic Air Systems. No son renders inventados ni fotos de stock genéricas.",
+  "images": [
+    {
+      "local_path": "site/img/products/secado-frutas-sonic.jpg",
+      "product": "secado-frutas-sonic",
+      "source_title": "Drying System for Food & Beverage — galería oficial",
+      "source_url": "https://www.sonicairsystems.com/products/food-and-beverage",
+      "asset": "https://www.sonicairsystems.com/images/food-and-beverage-gallery-01.jpg",
+      "shows": "Cuchillo Sonic XE Airknife sobre transportador de malla con arándanos (cranberries)"
+    },
+    {
+      "local_path": "site/img/products/smart-tunnel-sonic.jpg",
+      "product": "smart-tunnel-sonic",
+      "source_title": "SMART Air Knife Tunnel and Blower Enclosure — galería oficial",
+      "source_url": "https://www.sonicairsystems.com/products/air-knife-tunnel-and-enclosure",
+      "asset": "https://www.sonicairsystems.com/images/air-knife-tunnel-gallery-03-web.jpg",
+      "shows": "Túnel modular Sonic SMART Tunnel en planta, con logos Sonic SMART TUNNEL"
+    },
+    {
+      "local_path": "site/img/products/secado-estanques-sonic.jpg",
+      "product": "secado-estanques-sonic",
+      "source_title": "DRY-IN-PLACE® Tank Dryer — galería oficial",
+      "source_url": "https://www.sonicairsystems.com/products/dry-in-place-tank-dryer-patented",
+      "asset": "https://www.sonicairsystems.com/images/image-45-14d17aab.jpg",
+      "shows": "Equipo portátil DRY-IN-PLACE® en carro, con logo Sonic Air Systems, cono y manguera"
+    }
+  ]
+}
