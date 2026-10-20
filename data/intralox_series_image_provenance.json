@@ -1,0 +1,45 @@
+{
+  "note": "Fotos de superficie publicadas por Intralox en Belt Finder / página ThermoDrive. No son renders ni fotos inventadas.",
+  "images": [
+    {
+      "local_path": "site/img/products/bandas-intralox-serie-800.jpg",
+      "product": "bandas-intralox-serie-800",
+      "source_title": "Series 800 Flat Top — Belt Finder",
+      "source_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-800/flat-top",
+      "asset": "5014239_DSCF2195_S800-Flat-Top_Surface_cropped.jpg",
+      "shows": "Superficie Flat Top blanca de módulos Serie 800"
+    },
+    {
+      "local_path": "site/img/products/bandas-intralox-serie-1400.jpg",
+      "product": "bandas-intralox-serie-1400",
+      "source_title": "Series 1400 Flat Top — Belt Finder",
+      "source_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-1400/flat-top",
+      "asset": "201052_color-LPedit_S1400-Flat-Top_Surface_cropped.jpg",
+      "shows": "Superficie Flat Top azul de módulos Serie 1400"
+    },
+    {
+      "local_path": "site/img/products/bandas-intralox-serie-900.jpg",
+      "product": "bandas-intralox-serie-900",
+      "source_title": "Series 900 Flush Grid — Belt Finder",
+      "source_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-900/flush-grid",
+      "asset": "5014239_DTA29283_S900-Flush-Grid_Surface_cropped.jpg",
+      "shows": "Malla Flush Grid azul Serie 900"
+    },
+    {
+      "local_path": "site/img/products/bandas-intralox-arb.jpg",
+      "product": "bandas-intralox-arb",
+      "source_title": "Series 400 0-Degree Angled Roller — Belt Finder",
+      "source_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-400/0-degree-angled-rollertm",
+      "asset": "5014239_DSCF1445_S400-0-Degree-Angled-Roller_Surface_cropped.jpg",
+      "shows": "Banda ARB Serie 400 con rodillos embebidos; marca PAT. INTRALOX"
+    },
+    {
+      "local_path": "site/img/products/bandas-intralox-thermodrive.jpg",
+      "product": "bandas-intralox-thermodrive",
+      "source_title": "S8026 Flat Top E (6.0 mm) Polyurethane — Belt Finder",
+      "source_url": "https://www.intralox.com/belt-finder/thermodrive/series-8026/s8026-flat-top-e-6-0-mm-polyurethane-v2",
+      "asset": "50011939_DTA21515_8026sinkfreev2_corner_3.38x2.png",
+      "shows": "Banda ThermoDrive S8026 azul de termoplástico macizo con barras de arrastre"
+    }
+  ]
+}

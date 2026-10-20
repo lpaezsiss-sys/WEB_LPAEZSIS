@@ -1,0 +1,142 @@
+{
+  "brand": {
+    "name": "Intralox",
+    "slug": "intralox",
+    "existing": true,
+    "live_id": 11
+  },
+  "categories": [
+    {
+      "name": "Bandas Modulares / Higiene Alimentaria",
+      "slug": "bandas-modulares-higiene",
+      "existing": true,
+      "live_id": 13
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotos de superficie oficiales del Belt Finder Intralox (intralox.com). Sin fotos inventadas.",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Bandas Intralox Serie 800",
+      "slug": "bandas-intralox-serie-800",
+      "sku": "INTRALOX-S800",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 60,
+      "is_featured": 1,
+      "image_url": "img/products/bandas-intralox-serie-800.jpg",
+      "product_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-800/flat-top",
+      "datasheet": "/img/fichas/bandas-intralox-serie-800.pdf",
+      "summary": "Bandas plásticas modulares Intralox Serie 800, paso 50,8 mm. Cotización LPAEZSIS Chile.",
+      "seo_title": "Bandas Intralox Serie 800 | Cotizar LPAEZsis",
+      "detail": "Banda plástica modular Intralox Serie 800. El estilo Flat Top (Belt Finder) tiene superficie cerrada, bordes flush y barra de arrastre inferior que aleja agua y residuos. Uso publicado: cargas pesadas o abrasivas y proceso de carne y aves. También hay Flush Grid (27 % abierta) y Perforated Flat Top (18 % abierta).",
+      "specs": [
+        ["Serie", "Intralox Serie 800 — banda plástica modular"],
+        ["Paso", "2,00 in (50,8 mm)"],
+        ["Flat Top", "Área abierta 0 %; ancho mín. 2 in (51 mm); incrementos 0,66 in (16,8 mm)"],
+        ["Bisagra / varilla", "Bisagra abierta; retención snap-lock, varilla headed Ø 0,24 in (6,1 mm)"],
+        ["Otros estilos", "Flush Grid 27 % abierta; Perforated Flat Top 18 % abierta"],
+        ["Resistencia Flat Top PP", "1.000 lbf/ft (14.600 N/m); 34 a 220 °F (1 a 104 °C)"]
+      ]
+    },
+    {
+      "name": "Bandas Intralox Serie 1400",
+      "slug": "bandas-intralox-serie-1400",
+      "sku": "INTRALOX-S1400",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 61,
+      "is_featured": 1,
+      "image_url": "img/products/bandas-intralox-serie-1400.jpg",
+      "product_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-1400/flat-top",
+      "datasheet": "/img/fichas/bandas-intralox-serie-1400.pdf",
+      "summary": "Bandas plásticas modulares Intralox Serie 1400, paso 25,4 mm. Cotización LPAEZSIS Chile.",
+      "seo_title": "Bandas Intralox Serie 1400 | Cotizar LPAEZsis",
+      "detail": "Banda plástica modular Intralox Serie 1400. El estilo Flat Top (Belt Finder) tiene superficie lisa cerrada, bordes flush y retención Slidelox. Paso de 1 in para transferencias cortas; el fabricante la indica para manejo de envases. Sprockets plásticos; la mayoría split. También hay Flush Grid (21 % abierta) y Flat Friction Top.",
+      "specs": [
+        ["Serie", "Intralox Serie 1400 — banda plástica modular"],
+        ["Paso", "1,00 in (25,4 mm)"],
+        ["Flat Top", "Área abierta 0 %; ancho mín. 5 in (127 mm); incrementos 1,00 in (25,4 mm)"],
+        ["Bisagra / varilla", "Bisagra cerrada; Slidelox, varilla unheaded Ø 0,24 in (6,1 mm)"],
+        ["Resistencia Flat Top", "Acetal 2.500 lbf/ft (36.500 N/m); PP 1.800 lbf/ft (26.300 N/m)"],
+        ["Temperatura Flat Top", "Acetal −50 a 200 °F (−46 a 93 °C); PP 34 a 220 °F (1 a 104 °C)"]
+      ]
+    },
+    {
+      "name": "Bandas Intralox Serie 900",
+      "slug": "bandas-intralox-serie-900",
+      "sku": "INTRALOX-S900",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 62,
+      "is_featured": 1,
+      "image_url": "img/products/bandas-intralox-serie-900.jpg",
+      "product_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-900/flush-grid",
+      "datasheet": "/img/fichas/bandas-intralox-serie-900.pdf",
+      "summary": "Bandas plásticas modulares Intralox Serie 900 Flush Grid, 38 % abierta. Cotización LPAEZSIS Chile.",
+      "seo_title": "Bandas Intralox Serie 900 | Cotizar LPAEZsis",
+      "detail": "Banda plástica modular Intralox Serie 900. El estilo Flush Grid (Belt Finder) tiene 38 % de área abierta para drenaje y enfriamiento, superficie superior lisa y bordes flush. Hay Raised Rib (nervios 4,7 mm) para placas de transferencia de dedos, y material Hi-Temp.",
+      "specs": [
+        ["Serie", "Intralox Serie 900 — Flush Grid / Raised Rib"],
+        ["Paso", "1,07 in (27,2 mm)"],
+        ["Flush Grid", "Área abierta 38 %; apertura aprox. 0,24 × 0,28 in (6,1 × 7,1 mm)"],
+        ["Ancho", "Mín. 2 in (51 mm); incrementos 0,33 in (8,4 mm)"],
+        ["Bisagra / varilla", "Bisagra abierta; snap-lock, varilla headed Ø 0,18 in (4,6 mm)"],
+        ["Resistencia Flush Grid PP", "700 lbf/ft (10.200 N/m); 34 a 220 °F (1 a 104 °C)"]
+      ]
+    },
+    {
+      "name": "Bandas Intralox ARB™",
+      "slug": "bandas-intralox-arb",
+      "sku": "INTRALOX-ARB",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 63,
+      "is_featured": 1,
+      "image_url": "img/products/bandas-intralox-arb.jpg",
+      "product_url": "https://www.intralox.com/belt-finder/modular-plastic-belting/series-400/0-degree-angled-rollertm",
+      "datasheet": "/img/fichas/bandas-intralox-arb.pdf",
+      "summary": "Bandas Intralox ARB™ Serie 400 con rodillos embebidos. Cotización LPAEZSIS Chile.",
+      "seo_title": "Bandas Intralox ARB | Cotizar LPAEZsis",
+      "detail": "Banda modular Intralox con tecnología Activated Roller Belt™ (ARB™). La Serie 400 0-Degree Angled Roller (Belt Finder) lleva rodillos de poliuretano embebidos, alineados con el avance. Con rodillos activos el producto avanza más rápido que la banda; en reposo viaja a la velocidad de la banda. Hay ángulos 0°, 30°, 45°, 60° y 90° según estilo.",
+      "specs": [
+        ["Tecnología", "Activated Roller Belt™ (ARB™) — Serie 400"],
+        ["Paso", "2,00 in (50,8 mm)"],
+        ["Rodillos", "Poliuretano (núcleo acetal); ejes inoxidable; paso entre rodillos 2,0 in (50,8 mm)"],
+        ["Área abierta", "11 % (0-Degree / 90-Degree Angled Roller)"],
+        ["Ancho", "Mín. 6 in (152 mm); incrementos 2,00 in (50,8 mm)"],
+        ["Resistencia", "PP/PU 1.600 lbf/ft (23.400 N/m); 34 a 200 °F (1 a 93 °C) negro"]
+      ]
+    },
+    {
+      "name": "Bandas Intralox ThermoDrive®",
+      "slug": "bandas-intralox-thermodrive",
+      "sku": "INTRALOX-THERMODRIVE",
+      "category_slug": "bandas-modulares-higiene",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 64,
+      "is_featured": 1,
+      "image_url": "img/products/bandas-intralox-thermodrive.jpg",
+      "product_url": "https://www.intralox.com/products/thermodrive",
+      "datasheet": "/img/fichas/bandas-intralox-thermodrive.pdf",
+      "summary": "Bandas higiénicas Intralox ThermoDrive® de termoplástico macizo, arrastre positivo sin tensado. Cotización LPAEZSIS Chile.",
+      "seo_title": "Bandas Intralox ThermoDrive | Cotizar LPAEZsis",
+      "detail": "Plataforma ThermoDrive® de Intralox: banda de termoplástico macizo, superficie continua (0 % abierta), arrastre positivo sin tensado. Accionamientos publicados: BarDrive (barra de ancho completo), LugDrive (lugs) y empalme ZeroSplice sin splicing en campo. Superficies Flat Top, Nub Top y Embedded Diamond Top. Foto: S8026 Flat Top E (Belt Finder).",
+      "specs": [
+        ["Tecnología", "ThermoDrive® — termoplástico macizo, arrastre positivo sin tensado"],
+        ["Paso BarDrive", "S8026 25,50 mm; S8050 49,68 mm"],
+        ["Paso LugDrive", "S8126 25,50 mm; S8140 39,50 mm"],
+        ["S8026 Flat Top E PU", "Espesor 6,0 mm; ancho 1 a 72 in (25 a 1.829 mm); azul o blanco"],
+        ["Temperatura PU", "20 a 140 °F (−7 a 60 °C) continuo (S8026 / S8050 PU)"],
+        ["Superficie", "Continua, 0 % abierta; Flat Top, Nub Top o Embedded Diamond Top"]
+      ]
+    }
+  ]
+}
