@@ -455,6 +455,7 @@
     "pintura-columbia": "img/fichas/pintura-columbia.pdf",
     "empacado-fresco-columbia": "img/fichas/empacado-fresco-columbia.pdf",
     "quimica-columbia": "img/fichas/quimica-columbia.pdf",
+    "ad-control-interroll": "img/fichas/ad-control-interroll.pdf",
   };
 
   function parseProductFicha(raw) {

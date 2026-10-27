@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "Interroll",
+    "slug": "interroll",
+    "existing": true,
+    "live_id": 13
+  },
+  "categories": [
+    {
+      "name": "Repuestos y Consumibles",
+      "slug": "repuestos",
+      "existing": true,
+      "live_id": 4
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Foto publicada en el catálogo de rodillos Interroll (accesorios AdControl, pág. 246) y datos del Operating Manual Interroll AdControl v2.2 (07/2022).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Ad Control Interroll",
+      "slug": "ad-control-interroll",
+      "sku": "S-1100372",
+      "tipo": "repuesto",
+      "category_slug": "repuestos",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 27,
+      "is_featured": 1,
+      "image_url": "img/products/ad-control-interroll.jpg",
+      "product_url": "https://www.interroll.com/fileadmin/Downloads/User_Manuals/Controls/AdControl/User_Manual_AdControl_EN.pdf",
+      "summary": "Repuesto Interroll AdControl S-1100372 para sustituir RollerDrive EC300 por EC310. A pedido, cotización LPAEZSIS Chile.",
+      "seo_title": "Ad Control Interroll S-1100372 | Cotizar LPAEZsis",
+      "detail": "El AdControl de Interroll (n.º S-1100372) es un adaptador de interfaz para sustituir un RollerDrive EC300 (predecesor del EC310) por un RollerDrive EC310 sin cambiar el cableado. Tiene un cable de conexión corto con conector compatible con el EC300, que se interconecta al DriveControl EC200/EC300 existente o al cable alargador; el EC310 se enchufa en el lado izquierdo. Los microinterruptores DIP, bajo tapa amarilla, configuran la etapa de engranaje. Según la relación de transmisión, también sirve al sustituir un EC200 por EC310. Manual oficial Interroll AdControl v2.2 (07/2022).",
+      "specs": [
+        ["N.º de artículo", "S-1100372"],
+        ["Tipo", "Adaptador de interfaz AdControl para RollerDrive"],
+        ["Uso publicado", "Sustituir EC300 (o EC200, según transmisión) por EC310"],
+        ["Conexión", "Cable corto con conector EC300 a DriveControl EC200/EC300"],
+        ["Ajuste", "Microinterruptores DIP bajo tapa protectora amarilla"],
+        ["Tensión", "24 V DC PELV; rango 19 a 26 V DC (protección inversión 30 V)"],
+        ["Consumo", "Hasta 5 A con RollerDrive; 0,5 A sin RollerDrive"],
+        ["Protección", "IP 20 · refrigeración por convección"],
+        ["Temperatura de trabajo", "0 a +40 °C (32 a 104 °F)"],
+        ["Origen", "Interroll (manual AdControl v2.2 y catálogo de rodillos)"]
+      ]
+    }
+  ]
+}

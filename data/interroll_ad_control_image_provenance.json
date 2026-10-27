@@ -1,0 +1,13 @@
+{
+  "note": "Foto publicada por Interroll en el catálogo de rodillos (accesorios). No es render inventado ni stock genérico.",
+  "images": [
+    {
+      "local_path": "site/img/products/ad-control-interroll.jpg",
+      "product": "ad-control-interroll",
+      "source_title": "Catálogo de rodillos Interroll — Accesorios, AdControl (pág. 246)",
+      "source_file": "Ad_control_Interroll_3ee9.pdf",
+      "source_url": "https://www.interroll.com/fileadmin/Downloads/User_Manuals/Controls/AdControl/User_Manual_AdControl_EN.pdf",
+      "shows": "AdControl Interroll con etiqueta, tapa DIP amarilla, LEDs y conector Controller"
+    }
+  ]
+}
