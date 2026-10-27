@@ -72,6 +72,7 @@ LOCAL_PHOTOS = {
     "pintura-columbia": "site/img/products/pintura-columbia.jpg",
     "empacado-fresco-columbia": "site/img/products/empacado-fresco-columbia.jpg",
     "quimica-columbia": "site/img/products/quimica-columbia.jpg",
+    "ad-control-interroll": "site/img/products/ad-control-interroll.jpg",
 }
 
 
