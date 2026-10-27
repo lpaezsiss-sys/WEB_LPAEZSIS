@@ -73,6 +73,7 @@ LOCAL_PHOTOS = {
     "empacado-fresco-columbia": "site/img/products/empacado-fresco-columbia.jpg",
     "quimica-columbia": "site/img/products/quimica-columbia.jpg",
     "ad-control-interroll": "site/img/products/ad-control-interroll.jpg",
+    "mototambor-dm-0113-interroll": "site/img/products/mototambor-dm-0113-interroll.jpg",
 }
 
 
