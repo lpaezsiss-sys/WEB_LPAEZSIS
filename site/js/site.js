@@ -456,6 +456,7 @@
     "empacado-fresco-columbia": "img/fichas/empacado-fresco-columbia.pdf",
     "quimica-columbia": "img/fichas/quimica-columbia.pdf",
     "ad-control-interroll": "img/fichas/ad-control-interroll.pdf",
+    "mototambor-dm-0113-interroll": "img/fichas/mototambor-dm-0113-interroll.pdf",
   };
 
   function parseProductFicha(raw) {

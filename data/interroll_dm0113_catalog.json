@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "Interroll",
+    "slug": "interroll",
+    "existing": true,
+    "live_id": 13
+  },
+  "categories": [
+    {
+      "name": "Repuestos y Consumibles",
+      "slug": "repuestos",
+      "existing": true,
+      "live_id": 4
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Foto publicada en el catálogo Interroll Mototambor serie DM, DM 0113 (05/2022, pág. 62).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Mototambor DM 0113 Interroll",
+      "slug": "mototambor-dm-0113-interroll",
+      "sku": "DM-0113",
+      "tipo": "repuesto",
+      "category_slug": "repuestos",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 28,
+      "is_featured": 1,
+      "image_url": "img/products/mototambor-dm-0113-interroll.jpg",
+      "product_url": "https://www.interroll.com/",
+      "summary": "Mototambor Interroll DM 0113, serie DM, IP69K. Repuesto a pedido, cotización LPAEZSIS Chile.",
+      "seo_title": "Mototambor DM 0113 Interroll | Cotizar LPAEZsis",
+      "detail": "El mototambor Interroll DM 0113 (serie DM, catálogo 05/2022) es modular y Plug-and-Play: combina eje, tapa, tubo y reductor de engranajes de acero con devanado asíncrono o síncrono. Pensado para la tensión máxima admisible de la banda en industria y fabricantes de bandas. Cubre logística interna alimentaria, industria, distribución y aeropuertos. Opciones publicadas: encoder, freno, antirretorno, revestimientos de goma y accesorios (no se combinan encoder y freno).",
+      "specs": [
+        ["Serie / modelo", "Mototambor Interroll serie DM · DM 0113"],
+        ["Diámetro de tubo", "112 mm cilíndrico; 113,5 mm abombado (catálogo)"],
+        ["Motores", "Asíncrono (rotor jaula) o síncrono AC de imanes permanentes"],
+        ["Tensión asíncrono", "230/400 V ±5 % (IEC 34/38), 50 Hz"],
+        ["Tensión síncrono", "230 o 400 V, 200 Hz"],
+        ["Protección / aislamiento", "IP69K · clase F, IEC 34 (VDE 0530)"],
+        ["Temperatura ambiente", "+2 a +40 °C (motor trifásico; +2 a +25 °C en algunas bandas)"],
+        ["Potencia asíncrono publicada", "160 a 550 W (tablas de catálogo)"],
+        ["Potencia síncrono publicada", "300 / 700 / 1.100 W (con aceite)"],
+        ["Opciones", "Encoder, freno, antirretorno, goma, conector Plug-and-Play"]
+      ]
+    }
+  ]
+}
