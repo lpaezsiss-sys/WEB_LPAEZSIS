@@ -457,18 +457,39 @@
     "quimica-columbia": "img/fichas/quimica-columbia.pdf",
     "ad-control-interroll": "img/fichas/ad-control-interroll.pdf",
     "mototambor-dm-0113-interroll": "img/fichas/mototambor-dm-0113-interroll.pdf",
+    "paletizado-sacos-columbia": "img/fichas/paletizado-sacos-columbia.pdf",
+  };
+
+  var VIDEO_FILES = {
+    "paletizado-sacos-columbia": "img/videos/paletizado-sacos-columbia.mp4",
   };
 
   function parseProductFicha(raw) {
     var text = String(raw || "").replace(/\r\n/g, "\n").trim();
     var specs = [];
     var datasheet = "";
-    var detail = text;
-    var fichaIdx = text.lastIndexOf("Ficha técnica:");
-    if (fichaIdx >= 0) {
-      datasheet = text.slice(fichaIdx + "Ficha técnica:".length).trim().split("\n")[0].trim();
-      text = text.slice(0, fichaIdx).trim();
+    var video = "";
+    var lines = text.split("\n");
+    while (lines.length) {
+      var last = lines[lines.length - 1].trim();
+      if (!last) {
+        lines.pop();
+        continue;
+      }
+      if (last.indexOf("Ficha técnica:") === 0 && !datasheet) {
+        datasheet = last.slice("Ficha técnica:".length).trim();
+        lines.pop();
+        continue;
+      }
+      if (last.indexOf("Video:") === 0 && !video) {
+        video = last.slice("Video:".length).trim();
+        lines.pop();
+        continue;
+      }
+      break;
     }
+    text = lines.join("\n").trim();
+    var detail = text;
     var specsIdx = text.indexOf("Especificaciones técnicas:");
     if (specsIdx >= 0) {
       detail = text.slice(0, specsIdx).trim();
@@ -484,7 +505,7 @@
     } else {
       detail = text;
     }
-    return { detail: detail, specs: specs, datasheet: datasheet };
+    return { detail: detail, specs: specs, datasheet: datasheet, video: video };
   }
 
   function resolveDatasheetUrl(product) {
@@ -495,6 +516,16 @@
     if (parsed.datasheet) return parsed.datasheet.replace(/^\//, "");
     if (DATASHEET_FILES[product.slug]) return DATASHEET_FILES[product.slug];
     if (product.slug) return "img/fichas/" + product.slug + ".pdf";
+    return "";
+  }
+
+  function resolveVideoUrl(product) {
+    if (!product) return "";
+    var direct = product.video_url || "";
+    if (direct) return String(direct).trim();
+    var parsed = parseProductFicha(product.description);
+    if (parsed.video) return parsed.video.replace(/^\//, "");
+    if (VIDEO_FILES[product.slug]) return VIDEO_FILES[product.slug];
     return "";
   }
 
@@ -724,6 +755,7 @@
     productCardHtml: productCardHtml,
     parseProductFicha: parseProductFicha,
     resolveDatasheetUrl: resolveDatasheetUrl,
+    resolveVideoUrl: resolveVideoUrl,
     resolveProductImage: resolveProductImage,
     productImageCandidates: productImageCandidates,
     imgTagHtml: imgTagHtml,

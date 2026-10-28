@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "Columbia Machine",
+    "slug": "columbia-machine",
+    "existing": true,
+    "live_id": 9
+  },
+  "categories": [
+    {
+      "name": "Paletizado Robótico / Células de Automatización",
+      "slug": "paletizado-robotico",
+      "existing": true,
+      "live_id": 9
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotograma del reel oficial Columbia/Okura LLC «30 Years of Innovation: Solving the Bag Stacking Challenge» (Facebook reel 1397984962416352): robot Columbia/Okura con end-effector de sacos sobre pallet. Video: el mismo reel, H.264 con subtítulos en español.",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Paletizado de Sacos Columbia",
+      "slug": "paletizado-sacos-columbia",
+      "tipo": "equipo",
+      "category_slug": "paletizado-robotico",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 94,
+      "is_featured": 1,
+      "image_url": "img/products/paletizado-sacos-columbia.jpg",
+      "video_file": "img/videos/paletizado-sacos-columbia.mp4",
+      "product_url": "https://columbiaokura.com/industry/agriculture/",
+      "source_reel": "https://www.facebook.com/reel/1397984962416352",
+      "summary": "Paletizado robótico Columbia/Okura de sacos: end-effector de empuje descendente para capas planas y estables. Cotización LPAEZSIS Chile.",
+      "seo_title": "Paletizado de Sacos Columbia | Cotizar LPAEZsis",
+      "detail": "Columbia/Okura LLC publica este reel de 30 años de innovación en estiba de sacos (Peter Waters). El problema publicado: materiales ensacados de densidad inconsistente, cargas coronadas, doble apilado poco viable y menos espacio de bodega. La solución publicada: refinar el bag push-down y el diseño del end-effector para capas planas y estables. En agricultura el fabricante indica conformado de sacos, estiba solapada para reducir el coronamiento, sacos de 50 kg o más, y accesorios (bag kickers, bag rollers y flatteners). Más de 200 instalaciones agrícolas. No publica una cadencia numérica para esta aplicación.",
+      "specs": [
+        ["Tipo", "Paletizado robótico Columbia/Okura de sacos"],
+        ["Problema publicado", "Densidad inconsistente, cargas coronadas, doble apilado poco viable"],
+        ["Solución publicada", "Bag push-down y end-effector para capas planas y estables"],
+        ["Portavoz", "Peter Waters, Columbia/Okura LLC"],
+        ["Conformado", "Bag shaping y estiba solapada para reducir coronamiento"],
+        ["Sacos", "50 kg o más (publicado en agricultura)"],
+        ["Accesorios publicados", "Bag kickers, bag rollers y flatteners"],
+        ["Experiencia", "Más de 200 instalaciones de paletizado en agricultura"],
+        ["Video", "Reel oficial Columbia/Okura, subtítulos en español"]
+      ]
+    }
+  ]
+}
