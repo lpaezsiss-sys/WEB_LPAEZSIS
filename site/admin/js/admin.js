@@ -514,17 +514,34 @@
 
   var SPECS_HEADER = "Especificaciones técnicas:";
   var FICHA_PREFIX = "Ficha técnica:";
+  var VIDEO_PREFIX = "Video:";
 
   function parseProductFicha(raw) {
     var text = String(raw || "").replace(/\r\n/g, "\n").trim();
     var specs = [];
     var datasheet = "";
-    var detail = text;
-    var fichaIdx = text.lastIndexOf(FICHA_PREFIX);
-    if (fichaIdx >= 0) {
-      datasheet = text.slice(fichaIdx + FICHA_PREFIX.length).trim().split("\n")[0].trim();
-      text = text.slice(0, fichaIdx).trim();
+    var video = "";
+    var lines = text.split("\n");
+    while (lines.length) {
+      var last = lines[lines.length - 1].trim();
+      if (!last) {
+        lines.pop();
+        continue;
+      }
+      if (last.indexOf(FICHA_PREFIX) === 0 && !datasheet) {
+        datasheet = last.slice(FICHA_PREFIX.length).trim();
+        lines.pop();
+        continue;
+      }
+      if (last.indexOf(VIDEO_PREFIX) === 0 && !video) {
+        video = last.slice(VIDEO_PREFIX.length).trim();
+        lines.pop();
+        continue;
+      }
+      break;
     }
+    text = lines.join("\n").trim();
+    var detail = text;
     var specsIdx = text.indexOf(SPECS_HEADER);
     if (specsIdx >= 0) {
       detail = text.slice(0, specsIdx).trim();
@@ -540,10 +557,10 @@
     } else {
       detail = text;
     }
-    return { detail: detail, specs: specs, datasheet: datasheet };
+    return { detail: detail, specs: specs, datasheet: datasheet, video: video };
   }
 
-  function composeProductDescription(detail, specsText, datasheet) {
+  function composeProductDescription(detail, specsText, datasheet, video) {
     var parts = [String(detail || "").trim()];
     var specs = String(specsText || "")
       .split("\n")
@@ -561,6 +578,10 @@
     if (datasheet) {
       parts.push("");
       parts.push(FICHA_PREFIX + " " + datasheet);
+    }
+    if (video) {
+      parts.push("");
+      parts.push(VIDEO_PREFIX + " " + video);
     }
     return parts.join("\n").trim();
   }
@@ -581,6 +602,7 @@
       form.description.value = ficha.detail || product.description || "";
       form.specs.value = ficha.specs.join("\n");
       form.datasheet_url.value = ficha.datasheet || "";
+      if (form.video_url) form.video_url.value = ficha.video || product.video_url || "";
       if (product.image_url) {
         setFormImagePreview(product.image_url);
       } else {
@@ -596,6 +618,7 @@
       form.stock_status.value = "on_request";
       form.specs.value = "";
       form.datasheet_url.value = "";
+      if (form.video_url) form.video_url.value = "";
       form.is_active.checked = true;
       setFormImagePreview("");
     }
@@ -710,7 +733,8 @@
       description: composeProductDescription(
         form.description.value,
         form.specs.value,
-        form.datasheet_url.value.trim()
+        form.datasheet_url.value.trim(),
+        form.video_url ? form.video_url.value.trim() : ""
       ),
       image_url: form.image_url.value.trim(),
       seo_title: form.seo_title.value.trim(),

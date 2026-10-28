@@ -6,7 +6,7 @@
   <title>Producto | LPAEZsis</title>
   <meta name="description" content="Detalle de producto industrial LPAEZsis.">
   <meta name="robots" content="index,follow">
-  <link rel="stylesheet" href="css/style.css?v=84">
+  <link rel="stylesheet" href="css/style.css?v=86">
 </head>
 <body>
   <div id="site-header-mount"></div>
@@ -41,7 +41,7 @@
   </main>
   <div id="site-footer-mount"></div>
   <script src="js/layout.js?v=35"></script>
-  <script src="js/site.js?v=25"></script>
+  <script src="js/site.js?v=26"></script>
   <script>
     var qty = 1;
     var product = null;
@@ -83,7 +83,7 @@
         document.getElementById("productLoading").hidden = true;
         document.getElementById("productDetail").hidden = false;
         document.getElementById("productName").textContent = product.name;
-        var ficha = Lpaez.parseProductFicha ? Lpaez.parseProductFicha(product.description) : { detail: product.description || "", specs: [], datasheet: "" };
+        var ficha = Lpaez.parseProductFicha ? Lpaez.parseProductFicha(product.description) : { detail: product.description || "", specs: [], datasheet: "", video: "" };
         var lead = document.getElementById("productLead");
         if (product.seo_description) {
           lead.hidden = false;
@@ -131,7 +131,19 @@
         }
         crumb.hidden = false;
 
-        if (product.image_url || Lpaez.resolveProductImage(product)) {
+        var visualEl = document.getElementById("productVisual");
+        var videoUrl = Lpaez.resolveVideoUrl ? Lpaez.resolveVideoUrl(product) : (product.video_url || ficha.video || "");
+        if (videoUrl) {
+          visualEl.classList.add("detail-visual--video");
+          var poster = product.image_url || (Lpaez.resolveProductImage ? Lpaez.resolveProductImage(product) : "");
+          visualEl.innerHTML =
+            '<video controls playsinline preload="metadata"' +
+            (poster ? ' poster="' + Lpaez.escapeHtml(poster) + '"' : "") +
+            ' src="' + Lpaez.escapeHtml(videoUrl) + '">' +
+            "Su navegador no reproduce el video. " +
+            '<a href="' + Lpaez.escapeHtml(videoUrl) + '" target="_blank" rel="noopener">Abrir video</a>.' +
+            "</video>";
+        } else if (product.image_url || Lpaez.resolveProductImage(product)) {
           var fallbacks = Lpaez.productImageCandidates
             ? Lpaez.productImageCandidates(product)
             : [product.image_url, "img/products/A07-10015.jpg"];
@@ -141,7 +153,7 @@
           var imgHtml = Lpaez.imgTagHtml
             ? Lpaez.imgTagHtml(src, product.name, "", fallbacks)
             : '<img src="' + src + '" alt="' + Lpaez.escapeHtml(product.name) + '">';
-          document.getElementById("productVisual").innerHTML = imgHtml;
+          visualEl.innerHTML = imgHtml;
         }
         var actions = document.getElementById("productActions");
         var datasheetUrl = Lpaez.resolveDatasheetUrl ? Lpaez.resolveDatasheetUrl(product) : "";

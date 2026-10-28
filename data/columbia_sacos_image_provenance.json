@@ -1,0 +1,22 @@
+{
+  "note": "Fotograma y video publicados por Columbia/Okura LLC. No son renders inventados ni fotos de stock (Shutterstock/iStock omitidos).",
+  "images": [
+    {
+      "local_path": "site/img/products/paletizado-sacos-columbia.jpg",
+      "product": "paletizado-sacos-columbia",
+      "source_title": "30 Years of Innovation: Solving the Bag Stacking Challenge — Columbia/Okura LLC",
+      "source_url": "https://www.facebook.com/reel/1397984962416352",
+      "shows": "Robot Columbia/Okura con end-effector de sacos colocando un saco sobre pallet (fotograma ~32 s del reel oficial)"
+    }
+  ],
+  "videos": [
+    {
+      "local_path": "site/img/videos/paletizado-sacos-columbia.mp4",
+      "product": "paletizado-sacos-columbia",
+      "source_title": "30 Years of Innovation: Solving the Bag Stacking Challenge — Columbia/Okura LLC",
+      "source_url": "https://www.facebook.com/reel/1397984962416352",
+      "duration_s": 45.97,
+      "notes": "Reel oficial recodificado a H.264 AAC, subtítulos en español quemados a partir de la locución de Peter Waters."
+    }
+  ]
+}

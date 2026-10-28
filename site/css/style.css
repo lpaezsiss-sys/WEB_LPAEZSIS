@@ -2578,6 +2578,21 @@ body.nav-open {
   display: block;
 }
 
+.detail-visual.detail-visual--video {
+  aspect-ratio: 9 / 16;
+  max-height: min(72vh, 680px);
+  padding: 0;
+  background: #111;
+}
+
+.detail-visual video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #111;
+  display: block;
+}
+
 .qty-row {
   display: inline-flex;
   align-items: center;

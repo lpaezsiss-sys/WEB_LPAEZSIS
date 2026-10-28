@@ -74,6 +74,7 @@ LOCAL_PHOTOS = {
     "quimica-columbia": "site/img/products/quimica-columbia.jpg",
     "ad-control-interroll": "site/img/products/ad-control-interroll.jpg",
     "mototambor-dm-0113-interroll": "site/img/products/mototambor-dm-0113-interroll.jpg",
+    "paletizado-sacos-columbia": "site/img/products/paletizado-sacos-columbia.jpg",
 }
 
 
@@ -87,6 +88,11 @@ def parse_ficha(raw: str) -> tuple[str, list[tuple[str, str]]]:
     idx = text.rfind("Ficha técnica:")
     if idx >= 0:
         text = text[:idx].strip()
+    vidx = text.rfind("\nVideo:")
+    if vidx >= 0:
+        text = text[:vidx].strip()
+    elif text.startswith("Video:"):
+        text = ""
     specs: list[tuple[str, str]] = []
     sidx = text.find("Especificaciones técnicas:")
     if sidx >= 0:
