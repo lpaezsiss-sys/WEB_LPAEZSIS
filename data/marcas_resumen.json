@@ -1,0 +1,410 @@
+{
+  "document": {
+    "title": "Representaciones industriales",
+    "subtitle": "Marcas que representa LPAEZ Soluciones Industriales en Chile",
+    "company": "LPAEZ Soluciones Industriales",
+    "legal": "LPAEZsis-Soluciones Industriales SpA",
+    "founded": "2019",
+    "seat": "Santiago, RM, Chile",
+    "tagline": "Equipos de soplado, secado y fin de línea para la industria",
+    "email": "ventas@lpaezsis.cl",
+    "phone": "+56 9 6823 2745",
+    "phone2": "+56 9 4185 7051",
+    "whatsapp": "+56 9 6823 2745",
+    "whatsapp_link": "https://wa.me/56968232745",
+    "web": "www.lpaezsis.cl",
+    "catalog": "https://www.lpaezsis.cl/marcas.html",
+    "footer": "Fuente: datos y fotos publicados de cada fabricante y del catálogo LPAEZSIS.",
+    "cover_lead": "Portafolio para gerentes de planta, mantenimiento y proyectos: soplado y secado, bandas e higiene, paletizado, transporte y control de movimiento. Cada marca se relaciona con la aplicación industrial donde LPAEZ la cotiza en Chile."
+  },
+  "brands": [
+    {
+      "slug": "sonic-air-systems",
+      "name": "Sonic Air Systems",
+      "display": "Sonic Air Systems",
+      "kicker": "Soplado y secado",
+      "hero": true,
+      "origin": "EE.UU. · desde 1990",
+      "logo": "site/img/brand/sonic-air.png",
+      "pitch": "Sopladores centrífugos y cuchillos de aire para quitar humedad superficial antes de etiquetar, codificar o embalar. Cada equipo se publica como diseñado a los parámetros del cliente y probado en planta en EE.UU.",
+      "applications": [
+        "Botellas, latas y tarros",
+        "Frutas tras el lavado",
+        "Carnes, quesos y envases",
+        "Estanques y mezcladores (DRY-IN-PLACE®)",
+        "Sustitución de aire comprimido"
+      ],
+      "line": "En catálogo: Smart Tunnel, secado de frutas, DRY-IN-PLACE®, blowers S70–S350 y secadores de botellas y latas.",
+      "photos": [
+        {
+          "file": "site/img/products/smart-tunnel-sonic.jpg",
+          "caption": "Smart Tunnel · secado de botellas y latas"
+        },
+        {
+          "file": "site/img/products/secado-frutas-sonic.jpg",
+          "caption": "Air Knife · soplado de fruta en línea"
+        }
+      ]
+    },
+    {
+      "slug": "movex",
+      "name": "MOVEX",
+      "display": "MOVEX",
+      "kicker": "Bandas e higiene alimentaria",
+      "hero": true,
+      "origin": "Italia · Blueline®",
+      "logo": "site/img/brand/movex.png",
+      "pitch": "Tras consolidarse en beverage, Movex desarrolla Blueline®: bandas modulares plásticas y sprockets para alto estándar higiénico, con bisagra autolimpiante e intercambiabilidad frente a los principales fabricantes food.",
+      "applications": [
+        "Beverage y envase",
+        "Carnes, aves y pescado",
+        "Panadería y frutas/verduras",
+        "Transferencia entre transportadores",
+        "Curvas, perfiles y nosebars"
+      ],
+      "line": "En catálogo: PFX, BluLub®, Zero Contact™, Zero ATP® Pro y línea Blueline®.",
+      "photos": [
+        {
+          "file": "site/img/products/pfx-movex.jpg",
+          "caption": "PFX · cadenas y bandas en seco / alta velocidad"
+        },
+        {
+          "file": "site/img/products/zero-atp-pro-movex.jpg",
+          "caption": "Zero ATP® Pro · placa de transferencia activa"
+        }
+      ]
+    },
+    {
+      "slug": "columbia-machine",
+      "name": "Columbia Machine",
+      "display": "Columbia / Columbia-Okura",
+      "kicker": "Paletizado convencional y robótico",
+      "hero": true,
+      "origin": "Columbia Machine · división robótica Columbia-Okura LLC",
+      "logo": "site/img/brand/columbia-machine.png",
+      "pitch": "LPAEZSIS representa en Chile paletizadores convencionales Columbia y la división robótica Columbia-Okura LLC: celdas de 4 ejes, cabezales adaptables y operación multilínea para sacos, cajas, charolas y baldes.",
+      "applications": [
+        "Embotellado y consumo masivo",
+        "Cajas, charolas y paquetes",
+        "Sacos y agroindustria",
+        "Pintura y químicos",
+        "Produce fresco (RPC y totes)"
+      ],
+      "line": "En catálogo: FL3000, HL7200, FL1000-SW, Ai1800, miniPAL®, paletizado de sacos, pintura, fresco y química.",
+      "photos": [
+        {
+          "file": "site/img/productos/ai1800.jpg",
+          "caption": "Columbia-Okura Ai1800 · celda robótica"
+        },
+        {
+          "file": "site/img/products/paletizado-sacos-columbia.jpg",
+          "caption": "Paletizado de sacos · end-effector Columbia/Okura"
+        }
+      ]
+    },
+    {
+      "slug": "intralox",
+      "name": "Intralox",
+      "display": "Intralox",
+      "kicker": "Bandas modulares y clasificación",
+      "origin": "EE.UU. · Laitram, LLC",
+      "logo": "site/img/brand/intralox.png",
+      "pitch": "Bandas plásticas modulares y equipos de manejo de producto: Serie 800 y 1400, Serie 900 Flush Grid, ThermoDrive® higiénica de termoplástico macizo y ARB™ con rodillos embebidos.",
+      "applications": [
+        "Higiene alimentaria",
+        "Clasificación y desvío ARB™",
+        "Lavado y drenaje",
+        "Empaque y manejo de envases"
+      ],
+      "line": "En catálogo: Series 800, 900, 1400, ARB™ y ThermoDrive®.",
+      "photos": [
+        {
+          "file": "site/img/products/bandas-intralox-thermodrive.jpg",
+          "caption": "ThermoDrive® · superficie continua higiénica"
+        },
+        {
+          "file": "site/img/products/bandas-intralox-arb.jpg",
+          "caption": "ARB™ · rodillos embebidos para clasificación"
+        }
+      ]
+    },
+    {
+      "slug": "interroll",
+      "name": "Interroll",
+      "display": "Interroll",
+      "kicker": "Manutención de materiales",
+      "origin": "Suiza · desde 1959",
+      "logo": "site/img/brand/interroll.png",
+      "pitch": "Equipos clave para cajas, paletas, paquetes y cargas unitarias: rodillos, RollerDrive, plataforma modular MCP, mototambores y clasificadores.",
+      "applications": [
+        "Cajas y paquetes",
+        "Pallets y flujo interno",
+        "Clasificación CEP",
+        "Alimentos (mototambor IP69K)"
+      ],
+      "line": "En catálogo: rodillos/RollerDrive, MCP, Sortteq MC-S, Ad Control y mototambor DM 0113.",
+      "photos": [
+        {
+          "file": "site/img/products/interroll-rodillos.jpg",
+          "caption": "Rodillos y RollerDrive · cajas y paquetes"
+        },
+        {
+          "file": "site/img/products/interroll-mcp.jpg",
+          "caption": "MCP · plataforma modular de transportadores"
+        }
+      ]
+    },
+    {
+      "slug": "elektror-airsystems",
+      "name": "Elektror airsystems",
+      "display": "Elektror airsystems",
+      "kicker": "Ventilación industrial",
+      "origin": "Alemania · Ostfildern",
+      "logo": "site/img/brand/elektror.png",
+      "pitch": "Ventiladores industriales y compresores de canal de derivación. Ingeniería alemana para refrigeración, secado, purga y transporte neumático, con variantes ATEX e inoxidable.",
+      "applications": [
+        "Refrigeración y secado",
+        "Purga de tableros",
+        "Química y farmacéutica",
+        "Alimentos (inox)",
+        "Transporte neumático"
+      ],
+      "line": "En catálogo: radiales de aluminio, radiales inoxidable y compresores de canal de derivación.",
+      "photos": [
+        {
+          "file": "site/img/products/elektror-alu.jpg",
+          "caption": "Radial de aluminio · refrigeración y secado"
+        },
+        {
+          "file": "site/img/products/elektror-inox.jpg",
+          "caption": "Radial inoxidable · entornos corrosivos"
+        }
+      ]
+    },
+    {
+      "slug": "apply-italia",
+      "name": "Apply Italia",
+      "display": "Apply Italia",
+      "kicker": "Vacío y aire de proceso",
+      "origin": "Italia · Bolonia · desde 2007",
+      "logo": "site/img/brand/apply.png",
+      "pitch": "Tres líneas publicadas: Vacuum Pumps (seco, lubricadas y baño de aceite), Master Blower y Trasporto Pneumatico en fase diluida o densa, con filtros, tolvas inox y opciones ATEX.",
+      "applications": [
+        "Vacío de proceso",
+        "Soplado de alta velocidad",
+        "Transporte neumático de polvos",
+        "Embalaje y pick & place"
+      ],
+      "line": "En catálogo: Vacuum Pumps, Master Blower y Trasporto Pneumatico.",
+      "photos": [
+        {
+          "file": "site/img/products/apply-vacuum.jpg",
+          "caption": "Vacuum Pumps · vacío en seco o lubricado"
+        },
+        {
+          "file": "site/img/products/apply-blower.jpg",
+          "caption": "Master Blower · turbina de proceso"
+        }
+      ]
+    },
+    {
+      "slug": "cablevey-conveyors",
+      "name": "Cablevey Conveyors",
+      "display": "Cablevey Conveyors",
+      "kicker": "Transporte tubular de granel",
+      "origin": "Oskaloosa, Iowa · Akona Process Solutions",
+      "logo": "site/img/brand/cablevey.png",
+      "pitch": "Transportadores tubulares de cable y discos para materiales a granel frágiles. El fabricante publica sistemas para café, cereales, frutos secos, pet food, polvos y snacks, con Clearvey™ y Cleanvey CIP.",
+      "applications": [
+        "Café y cereales",
+        "Frutos secos y snacks",
+        "Pet food y polvos",
+        "Higiene Clearvey / Cleanvey"
+      ],
+      "line": "En catálogo: transportador tubular, componentes clave, Clearvey y Cleanvey.",
+      "photos": [
+        {
+          "file": "site/img/products/cablevey-tubular.jpg",
+          "caption": "Cable y discos · granel frágil en tubo cerrado"
+        },
+        {
+          "file": "site/img/products/cablevey-clearvey.jpg",
+          "caption": "Clearvey / Cleanvey · higiene en proceso"
+        }
+      ]
+    },
+    {
+      "slug": "lyc",
+      "name": "LYC",
+      "display": "LYC",
+      "kicker": "Cintas a medida para envasado",
+      "origin": "Logistics & Conveyors · acero AISI 304/316",
+      "logo": "site/img/brand/lyc.png",
+      "pitch": "Ingeniería, fabricación, montaje y mantenimiento de transportadores para líneas de envasado: unifilares, acumulación, elevadores, banda modular, cadenas y pallets, en áreas estándar o asépticas. Integra componentes Movex, System Plast, Interroll e Intralox.",
+      "applications": [
+        "Botellas y formatos",
+        "Cajas, packs y pallets",
+        "Áreas asépticas",
+        "Montaje y mantenimiento"
+      ],
+      "line": "En catálogo: fabricación e integración de cintas y sistemas transportadores.",
+      "photos": [
+        {
+          "file": "site/img/products/lyc-cintas.jpg",
+          "caption": "Línea de envases · transportadores de botellas"
+        }
+      ]
+    },
+    {
+      "slug": "oriental-motor",
+      "name": "Oriental Motor",
+      "display": "Oriental Motor",
+      "kicker": "Motorización y refrigeración",
+      "origin": "Japón · desde 1885",
+      "logo": "site/img/brand/oriental-motor.png",
+      "pitch": "Sistemas de movimiento de precisión: αSTEP AZ (control híbrido, encoder absoluto ABZO, EtherNet/IP, EtherCAT y PROFINET), motores CA con reductor y ventiladores de refrigeración.",
+      "applications": [
+        "Posicionamiento de ejes",
+        "Reductores en maquinaria",
+        "Ventilación de gabinetes",
+        "Secado y refrigeración de equipos"
+      ],
+      "line": "En catálogo: αSTEP AZ, motores CA/reductores y ventiladores axiales.",
+      "photos": [
+        {
+          "file": "site/img/products/oriental-az.jpg",
+          "caption": "αSTEP AZ · motorización con encoder absoluto"
+        },
+        {
+          "file": "site/img/products/oriental-ca.jpg",
+          "caption": "Motores CA y reductores"
+        }
+      ]
+    },
+    {
+      "slug": "eltra-encoder",
+      "name": "Eltra Encoder",
+      "display": "Eltra Encoder",
+      "kicker": "Posición y realimentación",
+      "origin": "Italia · Sarego (VI) · desde 1985",
+      "logo": "site/img/brand/eltra.png",
+      "pitch": "Encoders rotativos incrementales y absolutos (ópticos y magnéticos) y transductores lineales para control de posición en maquinaria y transportadores.",
+      "applications": [
+        "Ejes de máquinas",
+        "Transportadores",
+        "Carreras lineales",
+        "Redes SSI, BiSS, Profinet, EtherCAT"
+      ],
+      "line": "En catálogo: incrementales, absolutos y transductores lineales.",
+      "photos": [
+        {
+          "file": "site/img/products/eltra-inc.jpg",
+          "caption": "Incrementales · eje macizo o hueco"
+        },
+        {
+          "file": "site/img/products/eltra-abs.jpg",
+          "caption": "Absolutos · monogiro y multigiro"
+        }
+      ]
+    },
+    {
+      "slug": "cmc-klebetechnik",
+      "name": "CMC Klebetechnik GmbH",
+      "display": "CMC Klebetechnik",
+      "kicker": "Cintas técnicas y empalme",
+      "origin": "Frankenthal, Alemania",
+      "logo": "site/img/brand/cmc.png",
+      "pitch": "Cintas adhesivas técnicas, piezas troqueladas y aislantes eléctricos (ISO 9001/14001, UL, IEC, RoHS, IMDS). En Chile se cotiza la línea para eléctrica, electrónica, automotriz y empalmes siliconados de etiquetas.",
+      "applications": [
+        "Empalme de etiquetas",
+        "Aislación eléctrica",
+        "Electrónica y automotriz",
+        "Conversión de films"
+      ],
+      "line": "En catálogo: cinta doble contacto CMC 10730 (PET + silicona, ambas caras).",
+      "photos": [
+        {
+          "file": "site/img/products/cmc-10730.jpg",
+          "caption": "CMC 10730 · cinta doble contacto siliconada"
+        }
+      ]
+    },
+    {
+      "slug": "mahesh-twisto-tech",
+      "name": "Mahesh Twisto Tech",
+      "display": "Mahesh Twisto Tech",
+      "kicker": "Extrusión y cuerda",
+      "origin": "Bhavnagar, India · desde 1985",
+      "logo": "site/img/brand/mahesh.png",
+      "pitch": "Líneas de extrusión PP/HDPE, máquinas de fabricación de cuerda y twisters/winders. Plantas publicadas para Danline y monofilamento, con HMI y recetas.",
+      "applications": [
+        "Extrusión PP Danline",
+        "Monofilamento HDPE",
+        "Cuerda 3 o 4 cabos",
+        "Twisters y enrollado"
+      ],
+      "line": "En catálogo: líneas de extrusión, máquinas de cuerda y twisters/winders.",
+      "photos": [
+        {
+          "file": "site/img/products/mahesh-extru.jpg",
+          "caption": "Línea de extrusión PP/HDPE"
+        },
+        {
+          "file": "site/img/products/mahesh-cuerda.jpg",
+          "caption": "Máquina de cuerda"
+        }
+      ]
+    },
+    {
+      "slug": "combi",
+      "name": "COMBI packaging systems",
+      "display": "COMBI packaging systems",
+      "kicker": "Formado y sellado de cajas",
+      "origin": "North Canton, Ohio · desde 1979",
+      "logo": "site/img/brand/combi.png",
+      "pitch": "Equipos automáticos de fin de línea: formadoras y selladoras de cajas, formadoras de charolas, empacadoras, sistemas robóticos de empaque y paletizado, y estaciones ergonómicas de empaque manual. Empresa conjunta con 3M Packaging Systems y Grupo Maillis.",
+      "applications": [
+        "Formado de cajas y charolas",
+        "Sellado de cajas",
+        "Empaque robótico",
+        "Paletizado de cajas"
+      ],
+      "line": "Se cotiza por proyecto según la línea de empaque.",
+      "photos": []
+    },
+    {
+      "slug": "isodur",
+      "name": "ISODUR",
+      "display": "ISODUR",
+      "kicker": "Salas limpias",
+      "origin": "Brasil · desde 1988",
+      "logo": "site/img/brand/isodur.png",
+      "pitch": "Salas limpias y tratamiento de aire para cumplir GMP o FDA: paneles modulares, esquinas redondeadas, luminarias ISOLED, puertas, pass through, visores, intertrabamiento, UTA y filtros planos/HEPA.",
+      "applications": [
+        "Salas de envasado",
+        "Laboratorios",
+        "Cosmética y farmacéutica",
+        "Hospitales y áreas de proceso"
+      ],
+      "line": "Se cotiza por proyecto según normativa GMP/FDA del recinto.",
+      "photos": []
+    },
+    {
+      "slug": "haida",
+      "name": "HAIDA",
+      "display": "HAIDA",
+      "kicker": "Ensayo de envases y materiales",
+      "origin": "HAIDA International · equipos de prueba",
+      "logo": "site/img/brand/haida.png",
+      "pitch": "Equipos de ensayo para papel, envases, impresión, cintas, bolsas, plásticos, caucho y control de calidad. En envases vidrio y PET la marca publica testers de espesor, sellado, torque de tapas y estrés.",
+      "applications": [
+        "Control de envases vidrio/PET",
+        "Papel e impresión",
+        "Cintas y bolsas",
+        "Laboratorio de calidad"
+      ],
+      "line": "Se cotiza por proyecto según el ensayo de envase o material.",
+      "photos": []
+    }
+  ]
+}
