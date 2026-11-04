@@ -1,0 +1,49 @@
+{
+  "brand": {
+    "name": "HAIDA",
+    "slug": "haida",
+    "existing": true,
+    "live_id": 6
+  },
+  "categories": [
+    {
+      "name": "Máquinas Fin de Línea",
+      "slug": "fin-de-linea",
+      "existing": true,
+      "live_id": 5
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Foto del instrumento HD-MFY-06S publicada en el documento Haida International Equipment «Testers for Plastic & Glass Bottle» (pág. 1).",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Test para Botellas",
+      "slug": "test-para-botellas-haida",
+      "tipo": "equipo",
+      "category_slug": "fin-de-linea",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 95,
+      "is_featured": 1,
+      "image_url": "img/products/test-para-botellas-haida.jpg",
+      "source_document": "img/fichas/testers-plastic-glass-bottle-haida.pdf",
+      "summary": "Línea Haida de ensayos para botellas de plástico y vidrio: sellado, torque, espesor, caída e impacto. Cotización LPAEZSIS Chile.",
+      "seo_title": "Test para Botellas Haida | Cotizar LPAEZsis",
+      "detail": "HAIDA International Equipment publica la línea Testers for Plastic & Glass Bottle para control de envases de plástico y vidrio. El documento lista ensayos de sellado de tapa antirrobo, torque de apertura y cierre, tensión interna en vidrio y preforma PET, espesor de pared y fondo, caída, desviación de verticalidad, carga vertical, transmitancia y haze, resistencia al impacto y choque térmico. Cotización LPAEZSIS Chile según el ensayo.",
+      "specs": [
+        ["Tipo", "Línea Haida Testers for Plastic & Glass Bottle"],
+        ["HD-MFY-06S", "Sellado de tapa antirrobo; 0–1,2 MPa (0–174,24 psi)"],
+        ["HD-NLY-20U", "Torque de apertura y cierre; 5 Nm (10 Nm opcional); Φ15–Φ170 mm"],
+        ["HD-YLY-03", "Tensión interna en vidrio, preforma PET y envases de vidrio"],
+        ["HD-CHY-B1", "Espesor de pared y fondo 0–12,5 mm; resolución 0,001 mm"],
+        ["HD-DL-1000", "Caída 1000–2000 mm; volumen de muestra 0–2,5 L"],
+        ["HD-ZPY-60U", "Desviación de verticalidad; Ø muestra 3–160 mm"],
+        ["HD-ZY-500", "Carga vertical 500 / 1000 / 1500 N (opcional)"],
+        ["Haze / impacto / choque térmico", "HD-WD-120 0–30 %; HD-CJY-03 0–2,5 N·m; HD-RCY-03 0–60 °C"],
+        ["Alimentación publicada", "220 V / 50 Hz (HD-CHY-B1 a batería)"]
+      ]
+    }
+  ]
+}

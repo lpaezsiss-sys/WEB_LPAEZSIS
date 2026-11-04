@@ -75,6 +75,7 @@ LOCAL_PHOTOS = {
     "ad-control-interroll": "site/img/products/ad-control-interroll.jpg",
     "mototambor-dm-0113-interroll": "site/img/products/mototambor-dm-0113-interroll.jpg",
     "paletizado-sacos-columbia": "site/img/products/paletizado-sacos-columbia.jpg",
+    "test-para-botellas-haida": "site/img/products/test-para-botellas-haida.jpg",
 }
 
 
