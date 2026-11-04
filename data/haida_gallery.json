@@ -1,0 +1,25 @@
+{
+  "brand_slug": "haida",
+  "brand_live_id": 6,
+  "upload_policy": {
+    "photo_source": "Fotos de equipos publicadas en Haida International Equipment «Testers for Plastic & Glass Bottle». Reemplazan capturas de WordPress (wp-content) que responden HTTP 404.",
+    "invented": false
+  },
+  "photos": [
+    {
+      "file": "img/products/test-para-botellas-haida.jpg",
+      "model": "HD-MFY-06S",
+      "shows": "Instrumento de sellado inteligente HD-MFY-06S"
+    },
+    {
+      "file": "img/products/haida-hd-nly-20u.jpg",
+      "model": "HD-NLY-20U",
+      "shows": "Medidor digital de torque de tapa HD-NLY-20U"
+    },
+    {
+      "file": "img/products/haida-hd-chy-b1.jpg",
+      "model": "HD-CHY-B1",
+      "shows": "Medidor de espesor de pared y fondo HD-CHY-B1"
+    }
+  ]
+}
