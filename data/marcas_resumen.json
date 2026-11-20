@@ -45,15 +45,25 @@
       "photos": [
         {
           "file": "site/img/products/secado-botellas-sonic.jpg",
-          "caption": "Secado de botellas · cuchillos de aire Sonic"
-        },
-        {
-          "file": "site/img/products/smart-tunnel-sonic.jpg",
-          "caption": "Smart Tunnel · túnel de secado en línea"
+          "caption": "Air Knife · secado de botellas"
         },
         {
           "file": "site/img/products/secado-frutas-sonic.jpg",
           "caption": "Air Knife · soplado de fruta en línea"
+        }
+      ],
+      "photos_below": [
+        {
+          "file": "site/img/products/blower-sonic-s85.jpg",
+          "caption": "Blower S85 · equipo Sonic"
+        },
+        {
+          "file": "site/img/products/A07-10434.jpg",
+          "caption": "Flexible de neopreno Ø3\" · accesorio"
+        },
+        {
+          "file": "site/img/products/A07-10976.jpg",
+          "caption": "Filtro poliéster con indicador · accesorio"
         }
       ]
     },
@@ -76,12 +86,12 @@
       "line": "En catálogo: PFX, BluLub®, Zero Contact™, Zero ATP® Pro y línea Blueline®.",
       "photos": [
         {
-          "file": "site/img/products/pfx-movex.jpg",
-          "caption": "PFX · cadenas y bandas en seco / alta velocidad"
+          "file": "site/img/products/zero-contact-movex.jpg",
+          "caption": "Zero Contact™ · banda modular en curva"
         },
         {
-          "file": "site/img/products/zero-atp-pro-movex.jpg",
-          "caption": "Zero ATP® Pro · placa de transferencia activa"
+          "file": "site/img/products/movex-banda-modular.jpg",
+          "caption": "Blueline® · banda modular higiénica"
         }
       ]
     },
@@ -385,7 +395,16 @@
         "Paletizado de cajas"
       ],
       "line": "Se cotiza por proyecto según la línea de empaque.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/combi-2ez-hs.jpg",
+          "caption": "2-EZ HS · formadora de cajas COMBI"
+        },
+        {
+          "file": "site/img/products/combi-ergopack.jpg",
+          "caption": "Ergopack® · formado, empaque y sellado"
+        }
+      ]
     },
     {
       "slug": "isodur",
@@ -402,7 +421,16 @@
         "Hospitales y áreas de proceso"
       ],
       "line": "Se cotiza por proyecto según normativa GMP/FDA del recinto.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/isodur-sala-limpia.jpg",
+          "caption": "Sala limpia · paneles y puertas ISODUR"
+        },
+        {
+          "file": "site/img/products/isodur-pass-through.jpg",
+          "caption": "Pass through y visor · sala limpia ISODUR"
+        }
+      ]
     },
     {
       "slug": "haida",
@@ -419,7 +447,16 @@
         "Laboratorio de calidad"
       ],
       "line": "Se cotiza por proyecto según el ensayo de envase o material.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/test-para-botellas-haida.jpg",
+          "caption": "HD-MFY-06S · tester de sellado HAIDA"
+        },
+        {
+          "file": "site/img/products/haida-hd-nly-20u.jpg",
+          "caption": "HD-NLY-20U · torque de tapas HAIDA"
+        }
+      ]
     }
   ]
 }

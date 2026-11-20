@@ -349,15 +349,29 @@ def draw_hero(c: canvas.Canvas, brand: dict, doc: dict, page: int, total: int, i
     y = draw_chips(c, brand["applications"], 14 * mm, y, w - 28 * mm)
 
     photos = [p for p in brand.get("photos") or [] if (ROOT / p["file"]).is_file()]
+    extra = [p for p in brand.get("photos_below") or [] if (ROOT / p["file"]).is_file()]
     if photos:
         y -= 4 * mm
         n = min(3, len(photos))
         gap = 3.5 * mm
         box_w = (w - 28 * mm - gap * (n - 1)) / n
-        box_h = 78 * mm if n >= 3 else 108 * mm
+        if extra:
+            box_h = 52 * mm
+        elif n >= 3:
+            box_h = 78 * mm
+        else:
+            box_h = 108 * mm
         for i, ph in enumerate(photos[:n]):
             draw_photo_card(c, ph, 14 * mm + i * (box_w + gap), y - box_h, box_w, box_h)
-        y -= box_h + 8 * mm
+        y -= box_h + (4 * mm if extra else 8 * mm)
+    if extra:
+        n = min(3, len(extra))
+        gap = 3.5 * mm
+        box_w = (w - 28 * mm - gap * (n - 1)) / n
+        box_h = 48 * mm
+        for i, ph in enumerate(extra[:n]):
+            draw_photo_card(c, ph, 14 * mm + i * (box_w + gap), y - box_h, box_w, box_h)
+        y -= box_h + 6 * mm
 
     c.setFillColor(MUTED)
     c.setFont("Sans-Italic", 8)
