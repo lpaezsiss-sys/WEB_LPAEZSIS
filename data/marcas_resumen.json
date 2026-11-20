@@ -1,7 +1,14 @@
 {
   "document": {
     "title": "Representaciones industriales",
-    "subtitle": "Marcas que representa LPAEZ Soluciones Industriales en Chile",
+    "subtitle": "Qué marcas cotiza LPAEZ en su planta",
+    "cover_kicker": "Documento comercial para gerentes de planta, mantenimiento y proyectos",
+    "cover_cta": "Cuéntenos su línea. Armamos la cotización según la aplicación.",
+    "cover_points": [
+      "Identificar la marca LPAEZ para soplado, secado, bandas, paletizado o movimiento",
+      "Ver equipos reales publicados por cada fabricante en su aplicación",
+      "Pedir cotización por WhatsApp o correo con el contexto de su aplicación"
+    ],
     "company": "LPAEZ Soluciones Industriales",
     "legal": "LPAEZsis-Soluciones Industriales SpA",
     "founded": "2019",
@@ -15,7 +22,7 @@
     "web": "www.lpaezsis.cl",
     "catalog": "https://www.lpaezsis.cl/marcas.html",
     "footer": "Fuente: datos y fotos publicados de cada fabricante y del catálogo LPAEZSIS.",
-    "cover_lead": "Portafolio para gerentes de planta, mantenimiento y proyectos: soplado y secado, bandas e higiene, paletizado, transporte y control de movimiento. Cada marca se relaciona con la aplicación industrial donde LPAEZ la cotiza en Chile."
+    "cover_lead": "El objetivo de este paper es comercial y concreto: que su equipo vea en minutos qué marcas representa LPAEZ Soluciones Industriales en Chile, en qué aplicación de planta se usan y cómo abrir una cotización. Fotos y datos publicados de cada fabricante."
   },
   "brands": [
     {
@@ -37,8 +44,12 @@
       "line": "En catálogo: Smart Tunnel, secado de frutas, DRY-IN-PLACE®, blowers S70–S350 y secadores de botellas y latas.",
       "photos": [
         {
+          "file": "site/img/products/secado-botellas-sonic.jpg",
+          "caption": "Secado de botellas · cuchillos de aire Sonic"
+        },
+        {
           "file": "site/img/products/smart-tunnel-sonic.jpg",
-          "caption": "Smart Tunnel · secado de botellas y latas"
+          "caption": "Smart Tunnel · túnel de secado en línea"
         },
         {
           "file": "site/img/products/secado-frutas-sonic.jpg",
@@ -252,6 +263,10 @@
         {
           "file": "site/img/products/lyc-cintas.jpg",
           "caption": "Línea de envases · transportadores de botellas"
+        },
+        {
+          "file": "site/img/products/lyc-cinta-modular.jpg",
+          "caption": "Cinta modular · transporte de cajas LYC"
         }
       ]
     },

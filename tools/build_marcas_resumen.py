@@ -176,55 +176,83 @@ def draw_cover(c: canvas.Canvas, data: dict, total: int) -> None:
     doc = data["document"]
     brands = data["brands"]
     w, h = A4
-    c.setFillColor(NAVY_DEEP)
+    c.setFillColor(white)
     c.rect(0, 0, w, h, fill=1, stroke=0)
     c.setFillColor(RED)
-    c.rect(0, h - 6 * mm, w, 6 * mm, fill=1, stroke=0)
+    c.rect(0, h - 4.5 * mm, w, 4.5 * mm, fill=1, stroke=0)
 
-    logo = ROOT / "site/img/brand/logo-mark-white.png"
+    logo = ROOT / "site/img/brand/logo.png"
     if not logo.is_file():
-        logo = ROOT / "site/img/brand/logo-white.png"
-    draw_logo(c, logo, 16 * mm, h - 38 * mm, 18 * mm, 18 * mm)
+        logo = ROOT / "site/img/brand/logo-mark.png"
+    draw_logo(c, logo, 16 * mm, h - 32 * mm, 72 * mm, 16 * mm)
 
-    c.setFillColor(white)
-    c.setFont("Sans", 9)
-    c.drawString(38 * mm, h - 24 * mm, "LPAEZ")
-    c.setFont("Sans-Italic", 9)
-    c.drawString(38 * mm, h - 28.5 * mm, "Soluciones Industriales")
+    c.setFillColor(MUTED)
+    c.setFont("Sans", 8)
+    c.drawRightString(w - 16 * mm, h - 22 * mm, doc.get("cover_kicker") or "")
 
-    c.setFont("Sans-Bold", 22)
-    y = h - 58 * mm
-    for line in wrap(c, doc["title"], "Sans-Bold", 22, w - 32 * mm):
+    c.setFillColor(NAVY)
+    c.setFont("Sans-Bold", 24)
+    y = h - 48 * mm
+    for line in wrap(c, doc["title"], "Sans-Bold", 24, w - 32 * mm):
         c.drawString(16 * mm, y, line)
-        y -= 9 * mm
+        y -= 10 * mm
     c.setFillColor(RED)
-    c.rect(16 * mm, y + 2 * mm, 28 * mm, 1.4 * mm, fill=1, stroke=0)
+    c.rect(16 * mm, y + 3 * mm, 32 * mm, 1.6 * mm, fill=1, stroke=0)
     y -= 8 * mm
-    c.setFillColor(HexColor("#d7dce8"))
-    c.setFont("Sans", 11)
-    for line in wrap(c, doc["subtitle"], "Sans", 11, w - 32 * mm):
+    c.setFillColor(INK)
+    c.setFont("Sans", 12)
+    for line in wrap(c, doc["subtitle"], "Sans", 12, w - 32 * mm):
         c.drawString(16 * mm, y, line)
-        y -= 5.4 * mm
+        y -= 5.8 * mm
 
-    y -= 4 * mm
-    c.setFillColor(HexColor("#c5cddd"))
-    c.setFont("Sans", 9)
-    for line in wrap(c, doc["cover_lead"], "Sans", 9, w - 32 * mm)[:6]:
-        c.drawString(16 * mm, y, line)
-        y -= 4.4 * mm
-
-    y -= 6 * mm
-    c.setFillColor(white)
+    y -= 5 * mm
+    lead_lines = wrap(c, doc["cover_lead"], "Sans", 9.2, w - 40 * mm)[:5]
+    box_h = 16 * mm + 4.5 * mm * len(lead_lines)
+    c.setFillColor(BG)
+    c.roundRect(14 * mm, y - box_h, w - 28 * mm, box_h, 4, fill=1, stroke=0)
+    c.setFillColor(RED)
     c.setFont("Sans-Bold", 8)
-    c.drawString(16 * mm, y, "ORDEN DE LECTURA")
-    y -= 6 * mm
-    c.setFont("Sans", 8.4)
-    order = "  →  ".join(b["display"] for b in brands[:6]) + "  →  …"
-    for line in wrap(c, order, "Sans", 8.4, w - 32 * mm):
-        c.drawString(16 * mm, y, line)
-        y -= 4.2 * mm
+    c.drawString(18 * mm, y - 7 * mm, "OBJETIVO DE ESTE PAPER")
+    c.setFillColor(INK)
+    c.setFont("Sans", 9.2)
+    ty = y - 13.5 * mm
+    for line in lead_lines:
+        c.drawString(18 * mm, ty, line)
+        ty -= 4.5 * mm
+    y -= box_h + 7 * mm
 
-    y -= 8 * mm
+    points = doc.get("cover_points") or []
+    if points:
+        col_w = (w - 40 * mm) / min(3, len(points))
+        for i, point in enumerate(points[:3]):
+            gx = 16 * mm + i * (col_w + 4 * mm)
+            c.setFillColor(HexColor("#f7f8fb"))
+            c.setStrokeColor(LINE)
+            c.setLineWidth(0.4)
+            c.roundRect(gx, y - 32 * mm, col_w, 32 * mm, 3, fill=1, stroke=1)
+            c.setFillColor(RED)
+            c.setFont("Sans-Bold", 11)
+            c.drawString(gx + 3.2 * mm, y - 9 * mm, f"0{i + 1}")
+            c.setFillColor(INK)
+            c.setFont("Sans", 7.6)
+            py = y - 16 * mm
+            for line in wrap(c, point, "Sans", 7.6, col_w - 6.5 * mm):
+                c.drawString(gx + 3.2 * mm, py, line)
+                py -= 3.6 * mm
+        y -= 40 * mm
+
+    c.setFillColor(NAVY)
+    c.setFont("Sans-Bold", 8)
+    c.drawString(16 * mm, y, "CÓMO LEERLO")
+    y -= 5.5 * mm
+    c.setFillColor(MUTED)
+    c.setFont("Sans", 8.2)
+    order = "  →  ".join(b["display"] for b in brands[:6]) + "  →  …"
+    for line in wrap(c, order, "Sans", 8.2, w - 32 * mm):
+        c.drawString(16 * mm, y, line)
+        y -= 4.1 * mm
+
+    y -= 6 * mm
     groups = [
         ("Soplado y secado", "Humedad de envase, fruta, estanques y aire de proceso.", "Sonic · Elektror · Apply"),
         ("Transporte e higiene", "Bandas, clasificación, cajas, granel y líneas de envase.", "Movex · Intralox · Interroll · Cablevey · LYC"),
@@ -233,28 +261,30 @@ def draw_cover(c: canvas.Canvas, data: dict, total: int) -> None:
     col_w = (w - 40 * mm) / 3
     for i, (title, body, names) in enumerate(groups):
         gx = 16 * mm + i * (col_w + 4 * mm)
-        c.setFillColor(HexColor("#1c2744"))
-        c.roundRect(gx, y - 40 * mm, col_w, 42 * mm, 3, fill=1, stroke=0)
+        c.setFillColor(BG)
+        c.roundRect(gx, y - 38 * mm, col_w, 40 * mm, 3, fill=1, stroke=0)
         c.setFillColor(RED)
-        c.rect(gx, y - 1.2 * mm, 14 * mm, 1.2 * mm, fill=1, stroke=0)
-        c.setFillColor(white)
-        c.setFont("Sans-Bold", 8.4)
+        c.rect(gx, y - 1 * mm, 14 * mm, 1.2 * mm, fill=1, stroke=0)
+        c.setFillColor(NAVY)
+        c.setFont("Sans-Bold", 8.2)
         c.drawString(gx + 3 * mm, y - 8 * mm, title)
-        c.setFillColor(HexColor("#c5cddd"))
-        c.setFont("Sans", 7.3)
+        c.setFillColor(INK)
+        c.setFont("Sans", 7.2)
         ty = y - 14 * mm
-        for line in wrap(c, body, "Sans", 7.3, col_w - 6 * mm):
+        for line in wrap(c, body, "Sans", 7.2, col_w - 6 * mm):
             c.drawString(gx + 3 * mm, ty, line)
-            ty -= 3.5 * mm
-        c.setFillColor(HexColor("#9aa3b5"))
-        c.setFont("Sans", 6.5)
-        ty -= 1.2 * mm
-        for line in wrap(c, names, "Sans", 6.5, col_w - 6 * mm):
+            ty -= 3.4 * mm
+        c.setFillColor(MUTED)
+        c.setFont("Sans", 6.4)
+        ty -= 1 * mm
+        for line in wrap(c, names, "Sans", 6.4, col_w - 6 * mm):
             c.drawString(gx + 3 * mm, ty, line)
-            ty -= 3.1 * mm
+            ty -= 3.0 * mm
 
-    c.setFillColor(white)
-    c.roundRect(14 * mm, 42 * mm, w - 28 * mm, 32 * mm, 4, fill=1, stroke=0)
+    c.setFillColor(HexColor("#f7f8fb"))
+    c.setStrokeColor(LINE)
+    c.setLineWidth(0.4)
+    c.roundRect(14 * mm, 40 * mm, w - 28 * mm, 30 * mm, 4, fill=1, stroke=1)
     logos = []
     for b in brands:
         p = ROOT / b["logo"]
@@ -263,20 +293,21 @@ def draw_cover(c: canvas.Canvas, data: dict, total: int) -> None:
     if logos:
         box_w = (w - 40 * mm) / min(8, len(logos))
         for i, p in enumerate(logos[:8]):
-            draw_logo(c, p, 20 * mm + i * box_w, 48 * mm, box_w - 3 * mm, 20 * mm)
+            draw_logo(c, p, 20 * mm + i * box_w, 45 * mm, box_w - 3 * mm, 20 * mm)
 
-    c.setFillColor(white)
+    c.setFillColor(NAVY)
     c.setFont("Sans-Bold", 9)
-    c.drawString(16 * mm, 34 * mm, doc["company"])
+    c.drawString(16 * mm, 32 * mm, doc.get("cover_cta") or doc["company"])
+    c.setFillColor(MUTED)
     c.setFont("Sans", 8)
-    c.drawString(16 * mm, 29 * mm, f"{doc['legal']}  ·  {doc['founded']}  ·  {doc['seat']}")
-    c.drawString(16 * mm, 24 * mm, f"{doc['email']}  ·  WhatsApp {doc['whatsapp']}  ·  {doc['web']}")
+    c.drawString(16 * mm, 26.5 * mm, f"{doc['legal']}  ·  {doc['founded']}  ·  {doc['seat']}")
+    c.drawString(16 * mm, 22 * mm, f"{doc['email']}  ·  WhatsApp {doc['whatsapp']}  ·  {doc['web']}")
     c.setFillColor(RED)
-    c.rect(0, 0, w, 16 * mm, fill=1, stroke=0)
+    c.rect(0, 0, w, 14 * mm, fill=1, stroke=0)
     c.setFillColor(white)
     c.setFont("Sans", 8)
-    c.drawString(16 * mm, 7 * mm, "PDF liviano para correo y WhatsApp  ·  Cotización según aplicación")
-    c.drawRightString(w - 16 * mm, 7 * mm, f"1 / {total}")
+    c.drawString(16 * mm, 6 * mm, "PDF liviano para correo y WhatsApp  ·  Cotización según aplicación")
+    c.drawRightString(w - 16 * mm, 6 * mm, f"1 / {total}")
 
 
 def draw_hero(c: canvas.Canvas, brand: dict, doc: dict, page: int, total: int, index_label: str) -> None:
@@ -323,7 +354,7 @@ def draw_hero(c: canvas.Canvas, brand: dict, doc: dict, page: int, total: int, i
         n = min(3, len(photos))
         gap = 3.5 * mm
         box_w = (w - 28 * mm - gap * (n - 1)) / n
-        box_h = 56 * mm if n >= 3 else 108 * mm
+        box_h = 78 * mm if n >= 3 else 108 * mm
         for i, ph in enumerate(photos[:n]):
             draw_photo_card(c, ph, 14 * mm + i * (box_w + gap), y - box_h, box_w, box_h)
         y -= box_h + 8 * mm
