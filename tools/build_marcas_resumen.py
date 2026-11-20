@@ -295,13 +295,13 @@ def draw_hero(c: canvas.Canvas, brand: dict, doc: dict, page: int, total: int, i
     c.drawRightString(w - 14 * mm, h - 13.4 * mm, brand["kicker"].upper())
 
     y = h - 36 * mm
-    draw_logo(c, ROOT / brand["logo"], 14 * mm, y - 4 * mm, 28 * mm, 14 * mm)
+    draw_logo(c, ROOT / brand["logo"], 14 * mm, y - 4 * mm, 38 * mm, 16 * mm)
     c.setFillColor(INK)
     c.setFont("Sans-Bold", 18)
-    c.drawString(46 * mm, y + 4 * mm, brand["display"])
+    c.drawString(56 * mm, y + 4 * mm, brand["display"])
     c.setFillColor(MUTED)
     c.setFont("Sans", 8.5)
-    c.drawString(46 * mm, y - 1.5 * mm, brand.get("origin") or "")
+    c.drawString(56 * mm, y - 1.5 * mm, brand.get("origin") or "")
 
     y -= 16 * mm
     c.setFillColor(INK)
@@ -320,10 +320,11 @@ def draw_hero(c: canvas.Canvas, brand: dict, doc: dict, page: int, total: int, i
     photos = [p for p in brand.get("photos") or [] if (ROOT / p["file"]).is_file()]
     if photos:
         y -= 4 * mm
-        gap = 4 * mm
-        box_w = (w - 28 * mm - gap) / min(2, len(photos))
-        box_h = 108 * mm
-        for i, ph in enumerate(photos[:2]):
+        n = min(3, len(photos))
+        gap = 3.5 * mm
+        box_w = (w - 28 * mm - gap * (n - 1)) / n
+        box_h = 56 * mm if n >= 3 else 108 * mm
+        for i, ph in enumerate(photos[:n]):
             draw_photo_card(c, ph, 14 * mm + i * (box_w + gap), y - box_h, box_w, box_h)
         y -= box_h + 8 * mm
 

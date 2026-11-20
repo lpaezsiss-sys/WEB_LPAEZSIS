@@ -81,7 +81,7 @@
       "kicker": "Paletizado convencional y robótico",
       "hero": true,
       "origin": "Columbia Machine · división robótica Columbia-Okura LLC",
-      "logo": "site/img/brand/columbia-machine.png",
+      "logo": "site/img/brand/columbia-okura.png",
       "pitch": "LPAEZSIS representa en Chile paletizadores convencionales Columbia y la división robótica Columbia-Okura LLC: celdas de 4 ejes, cabezales adaptables y operación multilínea para sacos, cajas, charolas y baldes.",
       "applications": [
         "Embotellado y consumo masivo",
@@ -93,8 +93,8 @@
       "line": "En catálogo: FL3000, HL7200, FL1000-SW, Ai1800, miniPAL®, paletizado de sacos, pintura, fresco y química.",
       "photos": [
         {
-          "file": "site/img/productos/ai1800.jpg",
-          "caption": "Columbia-Okura Ai1800 · celda robótica"
+          "file": "site/img/products/minipal-columbia.jpg",
+          "caption": "miniPAL® · robot colaborativo Columbia/Okura"
         },
         {
           "file": "site/img/products/paletizado-sacos-columbia.jpg",
