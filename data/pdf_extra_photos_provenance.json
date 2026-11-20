@@ -1,0 +1,54 @@
+{
+  "sonic_s85": {
+    "asset": "site/img/products/blower-sonic-s85.jpg",
+    "source": "Ficha y catálogo LPAEZSIS · Blower Sonic S85 (foto publicada del fabricante Sonic Air Systems)."
+  },
+  "sonic_accesorio_flexible": {
+    "asset": "site/img/products/A07-10434.jpg",
+    "source": "Catálogo LPAEZSIS · Flexible de neopreno Ø3\" x 12 pies código 10434."
+  },
+  "sonic_accesorio_filtro": {
+    "asset": "site/img/products/A07-10976.jpg",
+    "source": "Catálogo LPAEZSIS · Filtro poliéster completo con indicador Sonic."
+  },
+  "movex_banda_modular": {
+    "asset": "site/img/products/movex-banda-modular.jpg",
+    "source": "Recorte de una toma de la ficha Blueline® Movex (bandas modulares higiénicas) ya publicada en el catálogo. Foto de fabricante, no stock."
+  },
+  "movex_zero_contact": {
+    "asset": "site/img/products/zero-contact-movex.jpg",
+    "source": "Catálogo LPAEZSIS · Zero Contact™ Movex."
+  },
+  "combi_2ez_hs": {
+    "asset": "site/img/products/combi-2ez-hs.jpg",
+    "source_url": "https://44782104.fs1.hubspotusercontent-na1.net/hub/44782104/hubfs/2-EX%20HS%2020.jpg",
+    "source_page": "https://combi.com/automatic-case-erecting-systems",
+    "publisher": "Combi Packaging Systems LLC"
+  },
+  "combi_ergopack": {
+    "asset": "site/img/products/combi-ergopack.jpg",
+    "source_url": "https://44782104.fs1.hubspotusercontent-na1.net/hub/44782104/hubfs/ERGOPACK-20---ISO-FR_transparent_cropped.jpeg",
+    "source_page": "https://combi.com/semi-automatic-case-packing-systems/ergopack",
+    "publisher": "Combi Packaging Systems LLC"
+  },
+  "isodur_sala": {
+    "asset": "site/img/products/isodur-sala-limpia.jpg",
+    "source_url": "https://isodur.com.br/wp-content/uploads/2023/10/painel-sala-limpa-4.jpg",
+    "source_page": "https://isodur.com.br/produtos-para-sala-limpa/painel-para-sala-limpa/",
+    "publisher": "ISODUR"
+  },
+  "isodur_pass": {
+    "asset": "site/img/products/isodur-pass-through.jpg",
+    "source_url": "https://isodur.com.br/wp-content/uploads/2023/10/painel-sala-limpa-1.jpg",
+    "source_page": "https://isodur.com.br/produtos-para-sala-limpa/painel-para-sala-limpa/",
+    "publisher": "ISODUR"
+  },
+  "haida_mfy": {
+    "asset": "site/img/products/test-para-botellas-haida.jpg",
+    "source": "Catálogo LPAEZSIS · Test para Botellas HAIDA HD-MFY-06S (foto publicada del fabricante)."
+  },
+  "haida_nly": {
+    "asset": "site/img/products/haida-hd-nly-20u.jpg",
+    "source": "Catálogo LPAEZSIS · HAIDA HD-NLY-20U (foto publicada del fabricante)."
+  }
+}

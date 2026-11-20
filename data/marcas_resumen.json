@@ -1,7 +1,14 @@
 {
   "document": {
     "title": "Representaciones industriales",
-    "subtitle": "Marcas que representa LPAEZ Soluciones Industriales en Chile",
+    "subtitle": "Qué marcas cotiza LPAEZ en su planta",
+    "cover_kicker": "Documento comercial para gerentes de planta, mantenimiento y proyectos",
+    "cover_cta": "Cuéntenos su línea. Armamos la cotización según la aplicación.",
+    "cover_points": [
+      "Identificar la marca LPAEZ para soplado, secado, bandas, paletizado o movimiento",
+      "Ver equipos reales publicados por cada fabricante en su aplicación",
+      "Pedir cotización por WhatsApp o correo con el contexto de su aplicación"
+    ],
     "company": "LPAEZ Soluciones Industriales",
     "legal": "LPAEZsis-Soluciones Industriales SpA",
     "founded": "2019",
@@ -15,7 +22,7 @@
     "web": "www.lpaezsis.cl",
     "catalog": "https://www.lpaezsis.cl/marcas.html",
     "footer": "Fuente: datos y fotos publicados de cada fabricante y del catálogo LPAEZSIS.",
-    "cover_lead": "Portafolio para gerentes de planta, mantenimiento y proyectos: soplado y secado, bandas e higiene, paletizado, transporte y control de movimiento. Cada marca se relaciona con la aplicación industrial donde LPAEZ la cotiza en Chile."
+    "cover_lead": "El objetivo de este paper es comercial y concreto: que su equipo vea en minutos qué marcas representa LPAEZ Soluciones Industriales en Chile, en qué aplicación de planta se usan y cómo abrir una cotización. Fotos y datos publicados de cada fabricante."
   },
   "brands": [
     {
@@ -37,12 +44,26 @@
       "line": "En catálogo: Smart Tunnel, secado de frutas, DRY-IN-PLACE®, blowers S70–S350 y secadores de botellas y latas.",
       "photos": [
         {
-          "file": "site/img/products/smart-tunnel-sonic.jpg",
-          "caption": "Smart Tunnel · secado de botellas y latas"
+          "file": "site/img/products/secado-botellas-sonic.jpg",
+          "caption": "Air Knife · secado de botellas"
         },
         {
           "file": "site/img/products/secado-frutas-sonic.jpg",
           "caption": "Air Knife · soplado de fruta en línea"
+        }
+      ],
+      "photos_below": [
+        {
+          "file": "site/img/products/blower-sonic-s85.jpg",
+          "caption": "Blower S85 · equipo Sonic"
+        },
+        {
+          "file": "site/img/products/A07-10434.jpg",
+          "caption": "Flexible de neopreno Ø3\" · accesorio"
+        },
+        {
+          "file": "site/img/products/A07-10976.jpg",
+          "caption": "Filtro poliéster con indicador · accesorio"
         }
       ]
     },
@@ -65,12 +86,12 @@
       "line": "En catálogo: PFX, BluLub®, Zero Contact™, Zero ATP® Pro y línea Blueline®.",
       "photos": [
         {
-          "file": "site/img/products/pfx-movex.jpg",
-          "caption": "PFX · cadenas y bandas en seco / alta velocidad"
+          "file": "site/img/products/zero-contact-movex.jpg",
+          "caption": "Zero Contact™ · banda modular en curva"
         },
         {
-          "file": "site/img/products/zero-atp-pro-movex.jpg",
-          "caption": "Zero ATP® Pro · placa de transferencia activa"
+          "file": "site/img/products/movex-banda-modular.jpg",
+          "caption": "Blueline® · banda modular higiénica"
         }
       ]
     },
@@ -81,7 +102,7 @@
       "kicker": "Paletizado convencional y robótico",
       "hero": true,
       "origin": "Columbia Machine · división robótica Columbia-Okura LLC",
-      "logo": "site/img/brand/columbia-machine.png",
+      "logo": "site/img/brand/columbia-okura.png",
       "pitch": "LPAEZSIS representa en Chile paletizadores convencionales Columbia y la división robótica Columbia-Okura LLC: celdas de 4 ejes, cabezales adaptables y operación multilínea para sacos, cajas, charolas y baldes.",
       "applications": [
         "Embotellado y consumo masivo",
@@ -93,8 +114,8 @@
       "line": "En catálogo: FL3000, HL7200, FL1000-SW, Ai1800, miniPAL®, paletizado de sacos, pintura, fresco y química.",
       "photos": [
         {
-          "file": "site/img/productos/ai1800.jpg",
-          "caption": "Columbia-Okura Ai1800 · celda robótica"
+          "file": "site/img/products/minipal-columbia.jpg",
+          "caption": "miniPAL® · robot colaborativo Columbia/Okura"
         },
         {
           "file": "site/img/products/paletizado-sacos-columbia.jpg",
@@ -252,6 +273,10 @@
         {
           "file": "site/img/products/lyc-cintas.jpg",
           "caption": "Línea de envases · transportadores de botellas"
+        },
+        {
+          "file": "site/img/products/lyc-cinta-modular.jpg",
+          "caption": "Cinta modular · transporte de cajas LYC"
         }
       ]
     },
@@ -370,7 +395,16 @@
         "Paletizado de cajas"
       ],
       "line": "Se cotiza por proyecto según la línea de empaque.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/combi-2ez-hs.jpg",
+          "caption": "2-EZ HS · formadora de cajas COMBI"
+        },
+        {
+          "file": "site/img/products/combi-ergopack.jpg",
+          "caption": "Ergopack® · formado, empaque y sellado"
+        }
+      ]
     },
     {
       "slug": "isodur",
@@ -387,7 +421,16 @@
         "Hospitales y áreas de proceso"
       ],
       "line": "Se cotiza por proyecto según normativa GMP/FDA del recinto.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/isodur-sala-limpia.jpg",
+          "caption": "Sala limpia · paneles y puertas ISODUR"
+        },
+        {
+          "file": "site/img/products/isodur-pass-through.jpg",
+          "caption": "Pass through y visor · sala limpia ISODUR"
+        }
+      ]
     },
     {
       "slug": "haida",
@@ -404,7 +447,16 @@
         "Laboratorio de calidad"
       ],
       "line": "Se cotiza por proyecto según el ensayo de envase o material.",
-      "photos": []
+      "photos": [
+        {
+          "file": "site/img/products/test-para-botellas-haida.jpg",
+          "caption": "HD-MFY-06S · tester de sellado HAIDA"
+        },
+        {
+          "file": "site/img/products/haida-hd-nly-20u.jpg",
+          "caption": "HD-NLY-20U · torque de tapas HAIDA"
+        }
+      ]
     }
   ]
 }
