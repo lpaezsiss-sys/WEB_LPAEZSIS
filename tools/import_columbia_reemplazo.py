@@ -197,6 +197,36 @@ def import_live(catalog: dict, api: str, password: str | None, token: str | None
             res = client.request("POST", "/api/admin/products", payload)
             print("product create", prod["slug"], res, "img", image_url, "video", video_url)
 
+    append_brand_video(client, existing_brand, video_url=video_url, poster_url=image_url)
+
+
+def append_brand_video(client, brand: dict, video_url: str, poster_url: str) -> None:
+    marker = "reemplazo-brazo-robotico-columbia"
+    html = brand.get("content_html") or ""
+    if marker in html:
+        print("brand video section already present")
+        return
+    if not video_url:
+        return
+    poster = poster_url or ""
+    section = (
+        '\n<section class="brand-section">\n'
+        "<h3>Reemplazo de brazo robótico</h3>\n"
+        "<p>Programa de reemplazo de robot publicado por Columbia/Okura LLC. "
+        "Video oficial con subtítulos en español (Mitch Stalcup, Product Specialist Retrofits).</p>\n"
+        f'<video class="brand-video" controls playsinline preload="metadata" '
+        f'style="width:min(100%,360px);aspect-ratio:9/16;background:#111;border-radius:10px;display:block" '
+        f'poster="{poster}" src="{video_url}"></video>\n'
+        f'<p><a href="producto.html?slug={marker}">Ver ficha y cotizar</a></p>\n'
+        "</section>\n"
+    )
+    client.request(
+        "PUT",
+        f"/api/admin/brands/{brand['id']}",
+        {"content_html": html.rstrip() + section},
+    )
+    print("brand video section appended", brand.get("slug"))
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
