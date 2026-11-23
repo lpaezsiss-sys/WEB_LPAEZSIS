@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "COLUMBIA/OKURA",
+    "slug": "columbia-okura",
+    "slug_fallbacks": ["columbia-Okura", "columbia-machine"],
+    "existing": true
+  },
+  "categories": [
+    {
+      "name": "Paletizado Robótico / Células de Automatización",
+      "slug": "paletizado-robotico",
+      "existing": true,
+      "live_id": 9
+    }
+  ],
+  "upload_policy": {
+    "photo_source": "Fotograma del reel oficial Columbia/Okura LLC (Facebook reel 1723220582713204): brazo robótico Columbia/Okura LLC Vancouver WA. Video: el mismo reel, H.264 con subtítulos en español de la locución de Mitch Stalcup.",
+    "invented": false
+  },
+  "products": [
+    {
+      "name": "Reemplazo de brazo robótico Columbia",
+      "slug": "reemplazo-brazo-robotico-columbia",
+      "tipo": "equipo",
+      "category_slug": "paletizado-robotico",
+      "sale_mode": "quote",
+      "stock_status": "on_request",
+      "sort_order": 96,
+      "is_featured": 1,
+      "image_url": "img/products/reemplazo-brazo-robotico-columbia.jpg",
+      "video_file": "img/videos/reemplazo-brazo-robotico-columbia.mp4",
+      "product_url": "https://columbiaokura.com/",
+      "source_reel": "https://www.facebook.com/reel/1723220582713204",
+      "summary": "Programa Columbia/Okura de reemplazo de brazo robótico: auditoría en planta, cotización e instalación con baja interrupción. Cotización LPAEZSIS Chile.",
+      "seo_title": "Reemplazo de brazo robótico Columbia | Cotizar LPAEZsis",
+      "detail": "Columbia/Okura LLC publica su programa de reemplazo de robot cuando los repuestos se vuelven difíciles de encontrar y las visitas de servicio se vuelven rutinarias: la automatización heredada pasa de ser un activo a un pasivo. El camino publicado es de baja interrupción, desde la evaluación hasta la instalación, ya sea un upgrade a cobot de una línea o un sistema robótico de alta capacidad. Mitch Stalcup, Product Specialist Retrofits, describe visita en planta (fotos y medidas), cotización del brazo, ingeniería junto al cliente y, en muchos casos, reemplazo directo: se retira el brazo de la base y el gabinete de control y se instala la nueva generación, a menudo en un fin de semana o feriado para que el cambio sea lo más fluido posible. El fabricante no publica cadencia, potencia ni horas de montaje para este programa.",
+      "specs": [
+        ["Tipo", "Programa de reemplazo de brazo robótico Columbia/Okura"],
+        ["Motivo publicado", "Robot detenido sin repuestos, o cuello de botella del sistema"],
+        ["Alcance publicado", "Upgrade a cobot de una línea o sistema robótico de alta capacidad"],
+        ["Evaluación", "Auditoría en terreno: fotos, medidas y cotización"],
+        ["Ingeniería", "El equipo del fabricante trabaja con el cliente en todo el proceso"],
+        ["Reemplazo directo", "Se retira el brazo de la base y el gabinete de control; se instala la nueva generación"],
+        ["Calendario publicado", "Instalación en el tiempo del cliente, fines de semana o feriados"],
+        ["Portavoz", "Mitch Stalcup, Product Specialist Retrofits, Columbia/Okura"],
+        ["Video", "Reel oficial Columbia/Okura LLC, subtítulos en español"]
+      ]
+    }
+  ]
+}

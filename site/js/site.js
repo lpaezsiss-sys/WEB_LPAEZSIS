@@ -363,6 +363,7 @@
     "paletizador-alto-nivel-columbia-hl7200": "img/productos/hl7200.jpg",
     "celda-paletizado-robotico-columbia-ai1800": "img/productos/ai1800.jpg",
     "paletizador-compacto-envolvedora-columbia-fl1000sw": "img/productos/fl1000sw.jpg",
+    "reemplazo-brazo-robotico-columbia": "img/products/reemplazo-brazo-robotico-columbia.jpg",
   };
 
   var PRODUCT_FALLBACKS = [
@@ -458,10 +459,12 @@
     "ad-control-interroll": "img/fichas/ad-control-interroll.pdf",
     "mototambor-dm-0113-interroll": "img/fichas/mototambor-dm-0113-interroll.pdf",
     "paletizado-sacos-columbia": "img/fichas/paletizado-sacos-columbia.pdf",
+    "reemplazo-brazo-robotico-columbia": "img/fichas/reemplazo-brazo-robotico-columbia.pdf",
   };
 
   var VIDEO_FILES = {
     "paletizado-sacos-columbia": "img/videos/paletizado-sacos-columbia.mp4",
+    "reemplazo-brazo-robotico-columbia": "img/videos/reemplazo-brazo-robotico-columbia.mp4",
   };
 
   function parseProductFicha(raw) {

@@ -76,6 +76,7 @@ LOCAL_PHOTOS = {
     "mototambor-dm-0113-interroll": "site/img/products/mototambor-dm-0113-interroll.jpg",
     "paletizado-sacos-columbia": "site/img/products/paletizado-sacos-columbia.jpg",
     "test-para-botellas-haida": "site/img/products/test-para-botellas-haida.jpg",
+    "reemplazo-brazo-robotico-columbia": "site/img/products/reemplazo-brazo-robotico-columbia.jpg",
 }
 
 
