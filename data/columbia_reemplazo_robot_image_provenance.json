@@ -1,0 +1,23 @@
+{
+  "note": "Fotograma y video publicados por Columbia/Okura LLC. No son renders inventados ni fotos de stock (Shutterstock/iStock omitidos).",
+  "images": [
+    {
+      "local_path": "site/img/products/reemplazo-brazo-robotico-columbia.jpg",
+      "product": "reemplazo-brazo-robotico-columbia",
+      "source_title": "Robot replacement program — Columbia/Okura LLC",
+      "source_url": "https://www.facebook.com/reel/1723220582713204",
+      "shows": "Brazo robótico Columbia/Okura LLC Vancouver WA (fotograma ~40 s del reel oficial)"
+    }
+  ],
+  "videos": [
+    {
+      "local_path": "site/img/videos/reemplazo-brazo-robotico-columbia.mp4",
+      "product": "reemplazo-brazo-robotico-columbia",
+      "source_title": "Robot replacement program — Columbia/Okura LLC",
+      "source_url": "https://www.facebook.com/reel/1723220582713204",
+      "share_url": "https://www.facebook.com/share/r/1AFBfuuR7X/",
+      "duration_s": 69.87,
+      "notes": "Reel oficial recodificado a H.264 AAC, subtítulos en español quemados a partir de la locución de Mitch Stalcup, Product Specialist Retrofits."
+    }
+  ]
+}
